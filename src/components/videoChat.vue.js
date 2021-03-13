@@ -58,14 +58,6 @@ export default {
         }
       }
     },
-    // groupVideoSize(){
-    //   let _that = this
-    //   let store = _that.$store
-    //   return function (peerId) {
-    //     let videoDom =  _that.$refs[`memberVideo${peerId}`]
-    //    return videoDom.clientWidth
-    //   }
-    // },
     Avatar() {
       let _that = this
       let store = _that.$store
