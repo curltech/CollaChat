@@ -1,0 +1,18 @@
+<template lang="pug">
+  q-layout(:style="heightStyle")
+    q-page-container
+      q-page
+        q-toolbar
+          q-btn(flat round dense icon="keyboard_arrow_left" @click="$store.changeSettingSubKind('default')")
+          q-toolbar-title(align="center" style="padding-right:54px") {{$t('FAQ')}}
+        div
+          div(id="toc" style="padding-top:10px")
+          vue-markdown(class="result-html full-height full-width" :watches="['show','html','breaks','linkify','emoji','typographer','toc']"
+            :source="source" :show="show" :html="html" :breaks="breaks" :linkify="linkify"
+            :emoji="emoji" :typographer="typographer" :toc="toc" v-on:rendered="allRight"
+            v-on:toc-rendered="tocAllRight" toc-id="toc")
+        q-page-scroller(expand position="top" :scroll-offset="150" :offset="[0, 0]")
+          div(class="col cursor-pointer q-pa-sm bg-primary text-c-white text-center") {{$t('Scroll back up...')}}
+</template>
+<style lang="text/css" src="./../css/vue-markdown.css" />
+<script src="./faq.vue.js" />
