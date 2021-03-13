@@ -1,5 +1,5 @@
 {
-  "name": "CollaChat",
+  "name": "collachat",
   "version": "0.2.3",
   "description": "CollaChat",
   "productName": "CollaChat",
@@ -8,7 +8,6 @@
     "visualfengs <visualfengs@gmail.com>",
     "Jinhe Zhao <goldjinhe@126.com>"
   ],
-  "private": true,
   "scripts": {
     "lint": "eslint --ext .js,.vue src",
     "test": "echo \"No test specified\" && exit 0"
