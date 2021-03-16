@@ -647,10 +647,10 @@ export let chatComponent = new ChatComponent()
 export class ChatBlockComponent {
   constructor() {
   }
-  async save(current) {
+  async save(current, _peers) {
     let _that = this
     let expireDate = new Date().getTime() + 3600*24
-    let blockResult = await collectionUtil.saveBlock(current, true, BlockType.ChatAttach, null, expireDate)
+    let blockResult = await collectionUtil.saveBlock(current, true, BlockType.ChatAttach, _peers, expireDate)
     let result = true;
     if (blockResult) {
       current.state = EntityState.New
@@ -693,7 +693,7 @@ export class ChatBlockComponent {
       await pounchDb.execute('chatAttach', attachs, [], null)
     }
   }
-  async loadLocalAttach(messageId, from, notDecrypt) {
+  async loadLocalAttach(messageId, from) {
     let condition = {}
     let qs = []
     if (from) {

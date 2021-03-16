@@ -1,6 +1,6 @@
 import { date, Platform } from 'quasar'
 import VEmojiPicker from 'v-emoji-picker'
-
+import Vue from 'vue'
 import { EntityState } from 'libcolla'
 import { CollaUtil, TypeUtil, BlobUtil, UUID } from 'libcolla'
 import { myself, dataBlockService, peerClientService } from 'libcolla'
@@ -627,13 +627,13 @@ export default {
           if(block && block.length > 0){
             let attach = block[0].attachs[0]
             attach.ownerPeerId = myself.myselfPeerClient.peerId
-            await chatBlockComponent.saveLocalAttach([attach])
+            await chatBlockComponent.saveLocalAttach({attachs : [attach]})
             fileData = attach.content
             if (message.contentType === ChatContentType.VIDEO) {
               fileData = mediaComponent.fixVideoUrl(fileData)
             }
-            if(attach.orginalMessageId){
-              message.fileOrginalMessageId = attach.orginalMessageId
+            if(attach.originalMessageId){
+              message.fileoriginalMessageId = attach.originalMessageId
             }
           }else{
             _that.$q.notify({
@@ -852,7 +852,7 @@ export default {
           }
           if ((message.contentType === ChatContentType.VIDEO || message.contentType === ChatContentType.FILE || message.contentType === ChatContentType.IMAGE)) {
             let fileData = await store.getMessageFile(singleMessage)
-            await store.saveFileInMessage(chat,message,fileData, message.contentType,null,singleMessage.fileOrginalMessageId)
+            await store.saveFileInMessage(chat,message,fileData, message.contentType,null,singleMessage.fileoriginalMessageId)
           }
         }
         await store.sendChatMessage(chat, message)
@@ -897,7 +897,7 @@ export default {
         if(mergeMessage.contentType === message.contentType === ChatContentType.CHAT){
          await _that.recursiveMergeMessages(message)
         }else if(message.contentType === ChatContentType.VIDEO || message.contentType === ChatContentType.FILE || message.contentType === ChatContentType.IMAGE){
-            await store.saveFileInMessage(chat, message, fileData, message.contentType,null,mergeMessage.fileOrginalMessageId)
+            await store.saveFileInMessage(chat, message, fileData, message.contentType,null,mergeMessage.fileoriginalMessageId)
         }
       }
     },
@@ -1566,7 +1566,7 @@ export default {
       } else if (this.selectGroupChatMemberFlag === 'ownershipHandover') {
         await this.ownershipHandover()
       } else if (this.selectGroupChatMemberFlag === 'selectedGroupCallMember') {
-        store.selectedGroupCallMember(_that.selectedGroupChatMembers)
+        _that.selectedGroupCallMember(_that.selectedGroupChatMembers)
         _that.subKind = 'default'
       } else if (this.selectGroupChatMemberFlag === 'searchMessage') {
         let searchSenderLinkman = store.state.linkmanMap[_that.selectedGroupChatMemberPeerId]
@@ -2517,7 +2517,7 @@ export default {
     store.changeMessageSubKind = function (subKind) {
       _that.subKind = subKind
     }
-    store.initSearch = function (searchPrefix, searchText, messageResultList) {
+    Vue.prototype.initSearch = function (searchPrefix, searchText, messageResultList) {
       _that.searchPrefix = searchPrefix
       _that.searchText = searchText
       _that.searchDate = null

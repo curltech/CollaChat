@@ -1,5 +1,5 @@
 import { Platform } from 'quasar'
-
+import Vue from 'vue'
 import { myself } from 'libcolla'
 import { webrtcPeerPool } from 'libcolla'
 import { CollaUtil } from 'libcolla'
@@ -740,19 +740,15 @@ export default {
   },
   mounted() {
     let _that = this
-    let store = this.$store
-    store.receiveCallClose = _that.receiveCallClose
-    store.receiveRemoteStream = _that.receiveRemoteStream
-    store.receiveCallRequest = _that.receiveCallRequest
-    store.receiveGroupCallRequest = _that.receiveGroupCallRequest
-    store.selectedGroupCallMember = _that.selectedGroupCallMember
-    store.initiateCallRequest = _that.initiateCallRequest
-    store.acceptGroupCall = _that.acceptGroupCall
-    store.sendCallCloseMessage  = _that.sendCallCloseMessage
-    store.closeCall = _that.closeCall
+    Vue.prototype.receiveCallClose = _that.receiveCallClose
+    Vue.prototype.receiveRemoteStream = _that.receiveRemoteStream
+    Vue.prototype.receiveCallRequest = _that.receiveCallRequest
+    Vue.prototype.selectedGroupCallMember = _that.selectedGroupCallMember
+    Vue.prototype.initiateCallRequest = _that.initiateCallRequest
+    Vue.prototype.acceptGroupCall = _that.acceptGroupCall
+    Vue.prototype.sendCallCloseMessage  = _that.sendCallCloseMessage
+    Vue.prototype.closeCall = _that.closeCall
   },
   created() {
-    let _that = this
-    let store = _that.$store
   }
 }
