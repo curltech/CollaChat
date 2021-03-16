@@ -859,10 +859,22 @@ export default {
       }
       store.changeKind('message')
     },
-    async saveFileInMessage(chat, message, fileData, type, name, orginalMessageId) {
+    async saveFileInMessage(chat, message, fileData, type, name, originalMessageId) {
       let _that = this
       let store = _that.$store
       let peerId = chat.subjectId
+      let _peers = []
+      if(chat.subjectType === SubjectType.CHAT){
+        _peers.push(store.state.linkmanMap[peerId])
+      }else if(chat.subjectType === SubjectType.GROUP_CHAT){
+        let groupMembers = store.state.groupChatMap[subjectId].groupMembers
+        for (let groupMember of groupMembers) {
+          let linkman = store.state.linkmanMap[groupMember.memberPeerId]
+          if(linkman && groupMember.memberPeerId !== myself.myselfPeerClient.peerId){
+            _peers.push(linkman)
+          }
+        }
+      }
       chatComponent.localFileDataMap[message.messageId] = fileData
       let current = {
         _id: message.messageId,
@@ -871,12 +883,12 @@ export default {
           content: fileData,
           messageId: message.messageId,
           ownerPeerId: myself.myselfPeerClient.peerId,
-          orginalMessageId: orginalMessageId
+          originalMessageId: originalMessageId
         }],
         tag: "",
         updateDate: new Date().getTime()
       }
-      let saveResult = await chatBlockComponent.save(current)
+      let saveResult = await chatBlockComponent.save(current,_peers)
       if (!saveResult) {
         _that.$q.notify({
           message: _that.$i18n.t("Saved failed"),
@@ -887,7 +899,7 @@ export default {
         return;
       }
       message.blockId = current.blockId
-      message.connectPeerId = myself.myselfPeerClient.peerId
+      message.connectPeerId = myself.myselfPeerClient.connectPeerId
       if (type === ChatContentType.IMAGE) {
         message.thumbnail = await mediaComponent.compressImage(fileData)
       } else if (type === ChatContentType.VIDEO) {
@@ -1971,10 +1983,10 @@ export default {
         await store.handleReadCallback(message);
       }
       else if (messageType === P2pChatMessageType.CALL_REQUEST) {
-        await store.receiveCallRequest(message)
+        await _that.receiveCallRequest(message)
       }
       else if (messageType === P2pChatMessageType.CALL_CLOSE) {
-        await store.receiveCallClose(message)
+        await _that.receiveCallClose(message)
       }
       else if(messageType === P2pChatMessageType.CHAT_LINKMAN){
         await store.insertReceivedMessage(message)
@@ -2153,14 +2165,14 @@ export default {
           await contactComponent.update(ContactDataType.LINKMAN, linkmen, null)
         }
         console.log('activeStatus => Down, peerId:' + peerId)
-        if (store.closeCall && store.state.currentCallChat && store.state.currentCallChat.subjectId === linkman.peerId) {
+        if (_that.closeCall && store.state.currentCallChat && store.state.currentCallChat.subjectId === linkman.peerId) {
         _that.$q.notify({
           message: _that.$i18n.t('Chat already ended'),
           timeout: 3000,
           type: "warning",
           color: "warning",
         })
-          store.closeCall()
+          _that.closeCall()
         }
       }
     },
@@ -2500,7 +2512,7 @@ export default {
     webrtcPeerPool.registEvent('connect',_that.webrtcConnect)
     webrtcPeerPool.registEvent('close',_that.webrtcClose)
     webrtcPeerPool.registEvent('stream',async function(evt){
-      store.receiveRemoteStream(evt.stream,evt.source.targetPeerId)
+      _that.receiveRemoteStream(evt.stream,evt.source.targetPeerId)
     })
   },
   watch: {

@@ -639,8 +639,8 @@ export default {
       let store = _that.$store
       await store.gotoChat(chat.subjectId)
       store.messageEntry = 'search'
-      if (store.initSearch) {
-        store.initSearch(_that.ChatName(chat), _that.searchText, CollaUtil.clone(chat.messageResultList))
+      if (_that.initSearch) {
+        _that.initSearch(_that.ChatName(chat), _that.searchText, CollaUtil.clone(chat.messageResultList))
       } else {
         store.messageSearchPrefix = _that.ChatName(chat)
         store.messageSearchText = _that.searchText
