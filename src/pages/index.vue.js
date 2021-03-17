@@ -425,7 +425,18 @@ export default {
 
           //connect webrtc
           store.webrtcPeerPool = webrtcPeerPool
-          config.appParams.iceServer = [myselfPeerClient.connectAddress]
+          let _connectAddress = myselfPeerClient.connectPeerId.match(/\/dns4\/(\S*)\/tcp/)[1]
+          let iceServer = [
+              {
+                urls: `stun:${ _connectAddress }:3478`
+              },
+              {
+                urls: `turn:${ _connectAddress }:3478`,
+                username: `wf`,
+                credential: `wf123`
+              }
+          ]
+          config.appParams.iceServer = [iceServer]
           for (let linkman of store.state.linkmans) {
             if(linkman.peerId !== myselfPeerClient.peerId){
               webrtcPeerPool.create(linkman.peerId)
@@ -440,6 +451,7 @@ export default {
       //return null
     },
     async sendUnsentMessage(linkmanPeerId) {
+      
       let _that = this
       let store = _that.$store
       //linkman

@@ -161,6 +161,7 @@ export default {
      async removeStream(peerId){
       let _that = this
       let callChat = store.state.currentCallChat
+      if(!callChat)return
       let streams = store.state.currentCallChat.stream
       if(!streams)return
       for (let i = streams.length-1;i>=0;i--) {
@@ -724,12 +725,16 @@ export default {
       let currentVideoDom = _that.$refs.currentVideo
       let zoomVideoDom = _that.$refs.zoomVideo
       
-      if(zoomVideoDom.srcObject === callChat.streamMap[callChat.ownerPeerId]){
-          zoomVideoDom.srcObject = callChat.streamMap[callChat.subjectId]
-          currentVideoDom.srcObject = callChat.streamMap[callChat.ownerPeerId]
-      }else{
-        zoomVideoDom.srcObject = callChat.streamMap[callChat.ownerPeerId]
+      if(currentVideoDom.srcObject === callChat.streamMap[callChat.ownerPeerId]){
+        if(zoomVideoDom){
+          zoomVideoDom.srcObject = callChat.streamMap[callChat.ownerPeerId]
+        }
         currentVideoDom.srcObject = callChat.streamMap[callChat.subjectId]
+      }else{
+        if(zoomVideoDom){
+          zoomVideoDom.srcObject = callChat.streamMap[callChat.subjectId]
+        }
+        currentVideoDom.srcObject = callChat.streamMap[callChat.ownerPeerId]
       }
     },
     canCall() {
