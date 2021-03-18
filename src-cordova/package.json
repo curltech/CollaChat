@@ -107,7 +107,9 @@
         "PHOTO_LIBRARY_USAGE_DESCRIPTION": " "
       },
       "cordova-plugin-iosrtc": {},
-      "cordova-plugin-mediapicker-dmcsdk": {},
+      "cordova-plugin-mediapicker-dmcsdk": {
+        "IOS_PHOTO_LIBRARY_USAGE_DESCRIPTION": " "
+      },
       "sqli-cordova-disk-space-plugin": {},
       "cordova-plugin-photokandy-video-thumbnail": {},
       "cordova-plugin-badge": {},
