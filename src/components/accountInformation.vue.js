@@ -1,5 +1,5 @@
 import { date } from 'quasar'
-import AlloyCrop from 'alloycrop'
+import AlloyCrop from 'alloycrop4curltech'
 
 import { myself, myselfPeerService, peerClientService } from 'libcolla'
 import { BlobUtil, MobileNumberUtil } from 'libcolla'

@@ -1,1 +1,1 @@
-window.openpgp = require('openpgp')
+window.openpgp = require('openpgp4curltech')
