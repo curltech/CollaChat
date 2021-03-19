@@ -25,12 +25,18 @@ div(
         q-item-label(
           caption,
           lines="4",
-          v-for="(mediaDevice, index) in mediaDevices"
+          v-for="(mediaDevice, index) in mediaDevices",
+          :key="index"
         ) {{ mediaDevice.kind + ':' + mediaDevice.label }}
         q-item-label.text-h6 {{ $t('Constraints') }}
         q-item-label(caption, lines="4") {{ $t('constraints: ') + constraints }}
         q-item-label.text-h6 {{ $t('MimeType') }}
-        q-item-label(caption, lines="4" v-for="(mimeType, index) in mimeTypes") {{ mimeType }}
+        q-item-label(
+          caption,
+          lines="4",
+          v-for="(mimeType, index) in mimeTypes",
+          :key="index"
+        ) {{ mimeType }}
         q-item-label.text-h6 {{ $t('Webrtc') }}
         q-item-label(caption, lines="1") {{ $t('isSupportInsertableStream: ') + isSupportInsertableStream }}
         q-item-label(caption, lines="1") {{ $t('getUserMedia: ') + getUserMedia }}

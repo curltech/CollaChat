@@ -1,4 +1,4 @@
-import { myself, peerProfileService, peerClientService, queryPeerTransService } from 'libcolla'
+import { myself, peerProfileService, peerClientService, queryPeerTransAction } from 'libcolla'
 import { CollaUtil } from 'libcolla'
 import { TransactionType, transactionComponent } from '@/libs/biz/colla-transaction'
 import { date } from 'quasar'
@@ -67,7 +67,7 @@ export default {
         conditionBean.set('receiverPeerId', clientPeerId)
         conditionBean.set('transactionTimeStart', lastSyncTime)
         console.log(conditionBean)
-        let peerTrans = await queryPeerTransService.queryPeerTrans(null, conditionBean)
+        let peerTrans = await queryPeerTransAction.queryPeerTrans(null, conditionBean)
         console.log(peerTrans)
         if (peerTrans && peerTrans.length > 0) {
           let i = 0
