@@ -42,7 +42,7 @@ export default {
     },
     isSupportInsertableStream() {
 
-      return webrtcEncrypt.isSupportInsertableStream()
+      return webrtcEncrypt.supportInsertableStream()
     },
     getUserMedia() {
       if (navigator.getUserMedia) {
