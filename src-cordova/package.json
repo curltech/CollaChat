@@ -94,8 +94,8 @@
       },
       "cordova-plugin-sim": {},
       "cordova-sms-plugin": {},
-      "cordova-plugin-audio-recorder-api": {},
-      "cordova-plugin-audioinput": {},
+      "cordova-plugin-audio-recorder-api4curltech": {},
+      "cordova-plugin-audioinput4curltech": {},
       "cordova-plugin-local-notification": {},
       "cordova-plugin-calendar": {
         "CALENDAR_USAGE_DESCRIPTION": " ",
@@ -103,11 +103,11 @@
       },
       "cordova-sqlite-storage": {},
       "cordova-plugin-file": {},
-      "cordova-plugin-photo-library-wkwebview": {
+      "cordova-plugin-photo-library-wkwebview4curltech": {
         "PHOTO_LIBRARY_USAGE_DESCRIPTION": " "
       },
       "cordova-plugin-iosrtc": {},
-      "cordova-plugin-mediapicker-dmcsdk": {
+      "cordova-plugin-mediapicker-dmcsdk4curltech": {
         "IOS_PHOTO_LIBRARY_USAGE_DESCRIPTION": " "
       },
       "sqli-cordova-disk-space-plugin": {},
