@@ -17,8 +17,8 @@
   "license": "AGPL-3.0-or-later",
   "dependencies": {
     "cordova-plugin-add-swift-support": "^2.0.2",
-    "cordova-plugin-audio-recorder-api4curltech": "^0.0.6-curltech",
-    "cordova-plugin-audioinput4curltech": "^1.0.2-curltech",
+    "cordova-plugin-audio-recorder-api-curltech": "^0.0.6",
+    "cordova-plugin-audioinput-curltech": "^1.0.2",
     "cordova-plugin-background-mode": "^0.7.3",
     "cordova-plugin-badge": "^0.8.8",
     "cordova-plugin-calendar": "^5.1.5",
@@ -30,8 +30,8 @@
     "cordova-plugin-local-notification": "^0.9.0-beta.2",
     "cordova-plugin-media": "^5.0.3",
     "cordova-plugin-media-capture": "^3.0.3",
-    "cordova-plugin-mediapicker-dmcsdk4curltech": "^2.4.7-curltech",
-    "cordova-plugin-photo-library-wkwebview4curltech": "^3.0.3-curltech",
+    "cordova-plugin-mediapicker-dmcsdk-curltech": "^2.4.7",
+    "cordova-plugin-photo-library-wkwebview-curltech": "^3.0.3",
     "cordova-plugin-photokandy-video-thumbnail": "^2.1.0",
     "cordova-plugin-qrscanner": "^3.0.1",
     "cordova-plugin-sim": "^1.3.3",
@@ -94,8 +94,8 @@
       },
       "cordova-plugin-sim": {},
       "cordova-sms-plugin": {},
-      "cordova-plugin-audio-recorder-api4curltech": {},
-      "cordova-plugin-audioinput4curltech": {},
+      "cordova-plugin-audio-recorder-api-curltech": {},
+      "cordova-plugin-audioinput-curltech": {},
       "cordova-plugin-local-notification": {},
       "cordova-plugin-calendar": {
         "CALENDAR_USAGE_DESCRIPTION": " ",
@@ -103,11 +103,11 @@
       },
       "cordova-sqlite-storage": {},
       "cordova-plugin-file": {},
-      "cordova-plugin-photo-library-wkwebview4curltech": {
+      "cordova-plugin-photo-library-wkwebview-curltech": {
         "PHOTO_LIBRARY_USAGE_DESCRIPTION": " "
       },
       "cordova-plugin-iosrtc": {},
-      "cordova-plugin-mediapicker-dmcsdk4curltech": {
+      "cordova-plugin-mediapicker-dmcsdk-curltech": {
         "IOS_PHOTO_LIBRARY_USAGE_DESCRIPTION": " "
       },
       "sqli-cordova-disk-space-plugin": {},
