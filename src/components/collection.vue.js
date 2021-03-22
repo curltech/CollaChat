@@ -21,6 +21,7 @@ import CaptureMedia from '@/components/captureMedia'
 import NotePreview from '@/components/notePreview'
 import CollectionUploadWorker from '@/worker/collectionUpload.worker.js'
 import CollectionDownloadWorker from '@/worker/collectionDownload.worker.js'
+import heic2any from 'heic2any'
 
 let editor
 
@@ -770,8 +771,10 @@ export default {
               }
             }
             if (store.ios === true && localURL) {
-              if (localURL.indexOf('.JPG') > -1) {
+              if (localURL.indexOf('.JPG') > -1 || localURL.indexOf('.HEIC') > -1) {
                 type = 'image/jpeg'
+              } if (localURL.indexOf('.PNG') > -1) {
+                type = 'image/png'
               } else if (localURL.indexOf('.mp4') > -1) {
                 type = 'video/mp4'
               } else if (localURL.indexOf('.MOV') > -1) {
@@ -794,6 +797,12 @@ export default {
             }
             let fileEntry = await fileComponent.getFileEntry(localURL)
             blob = await fileComponent.readFile(fileEntry, { format: 'blob', type: type })
+            if (localURL.indexOf('.HEIC') > -1) {
+              let start = new Date().getTime()
+              blob = await heic2any({ blob: blob, toType: 'image/png' })
+              let end = new Date().getTime()
+              console.log('heic2any time:' + (end - start))
+            }
           } else {
             blob = u
           }
