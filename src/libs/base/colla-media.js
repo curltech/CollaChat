@@ -1569,6 +1569,18 @@ class MediaPickerComponent {
       )
     })
   }
+  compressImage(media) {
+    return new Promise(function (resolve, reject) {
+      MediaPicker.compressImage(media,
+        function success(compressMedia) {
+          resolve(compressMedia)
+        }, function error(error) {
+          console.log('compressImage failure: ' + error)
+          reject(error)
+        }
+      )
+    })
+  }
 }
 export let mediaPickerComponent = new MediaPickerComponent()
 

@@ -21,7 +21,6 @@ import CaptureMedia from '@/components/captureMedia'
 import NotePreview from '@/components/notePreview'
 import CollectionUploadWorker from '@/worker/collectionUpload.worker.js'
 import CollectionDownloadWorker from '@/worker/collectionDownload.worker.js'
-import heic2any from 'heic2any'
 
 let editor
 
@@ -771,7 +770,13 @@ export default {
               }
             }
             if (store.ios === true && localURL) {
-              if (localURL.indexOf('.JPG') > -1 || localURL.indexOf('.HEIC') > -1) {
+              if (localURL.indexOf('.HEIC') > -1) {
+                u.quality = 99
+                u = await mediaPickerComponent.compressImage(u)
+                localURL = u.uri
+                console.log('localURL2:' + localURL)
+                type = 'image/jpeg'
+              } else if (localURL.indexOf('.JPG') > -1) {
                 type = 'image/jpeg'
               } if (localURL.indexOf('.PNG') > -1) {
                 type = 'image/png'
@@ -790,19 +795,13 @@ export default {
                   blob = BlobUtil.base64ToBlob(base64)
                   await fileComponent.writeFile(fileEntry, blob, false)
                   localURL = dirEntry.toInternalURL() + fileName
-                  type = 'video/mp4'
                   console.log('localURL2:' + localURL)
+                  type = 'video/mp4'
                 }
               }
             }
             let fileEntry = await fileComponent.getFileEntry(localURL)
             blob = await fileComponent.readFile(fileEntry, { format: 'blob', type: type })
-            if (localURL.indexOf('.HEIC') > -1) {
-              let start = new Date().getTime()
-              blob = await heic2any({ blob: blob, toType: 'image/png' })
-              let end = new Date().getTime()
-              console.log('heic2any time:' + (end - start))
-            }
           } else {
             blob = u
           }
