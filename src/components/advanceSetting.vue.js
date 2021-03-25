@@ -1,10 +1,12 @@
 import { PeerEndpoint, peerEndpointService, myself, peerProfileService } from 'libcolla'
 import MyPeerEndPoints from '@/components/myPeerEndPoints'
+import DeveloperOptions from '@/components/developerOptions'
 
 export default {
   name: "AdvanceSetting",
   components: {
-    myPeerEndPoints: MyPeerEndPoints
+    myPeerEndPoints: MyPeerEndPoints,
+    developerOptions: DeveloperOptions
   },
   data() {
     return {
@@ -56,8 +58,7 @@ export default {
         this.developerOption = (this.developerOption === true ? false : true)
         return
       }
-      if (this.developerOption === false ||
-        (this.developerOption === true && (this.password === 'iamdeveloper' || this.password === 'iamprogrammer'))) {
+      if (this.developerOption === false || (this.developerOption === true && this.password === 'iamdeveloper')) {
         let currentDate = new Date()
         let myselfPeerClient = myself.myselfPeerClient
         myselfPeerClient.developerOption = this.developerOption

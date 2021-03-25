@@ -80,14 +80,6 @@ q-layout
               no-caps,
               :ripple="false"
             )
-            q-tab(v-if="developerOption===true"
-              name="developer",
-              icon="build",
-              :label="$t('Developer')",
-              @click="$store.changeTab('developer')",
-              no-caps,
-              :ripple="false"
-            )
         .col-10
           q-tab-panels(
             v-model="tab",
@@ -105,8 +97,6 @@ q-layout
               collection.drawcontent
             q-tab-panel(name="me", style="padding:0px 0px")
               me.drawcontent
-            q-tab-panel(v-if="developerOption===true" name="developer", style="padding:0px 0px")
-              developer.drawcontent
     q-page(v-if="ifMobileSize || $store.state.ifMobileStyle")
       //.top
       q-tab-panels(v-model="tab")
@@ -120,8 +110,6 @@ q-layout
           collection.drawcontent
         q-tab-panel(name="me", style="padding:0px 0px")
           me.drawcontent
-        q-tab-panel(v-if="developerOption===true" name="developer" style="padding:0px 0px")
-          developer.drawcontent
       q-tabs.navigatorTabMobileStyle.bg-c-grey-mobile.text-c-grey-mobile(
         v-if="chatLoadingDone",
         v-model="tab",
@@ -165,7 +153,6 @@ q-layout
           no-caps,
           :ripple="false"
         )
-        q-tab(v-if="developerOption===true" name="developer" icon="build" :label="$t('Developer')" @click="$store.changeTab('developer')"  no-caps :ripple="false")
   q-drawer.mainDrawer(
     v-if="!$store.state.ifScan",
     :no-swipe-close="noSwipeClose",
@@ -208,8 +195,6 @@ q-layout
         selectContacts.drawcontent
       q-tab-panel(name="selectConference", style="padding:0px 0px")
         selectConference.drawcontent
-      q-tab-panel(v-if="developerOption===true" name="developer", style="padding:0px 0px")
-        developer.drawcontent
   videoChat
   q-page-sticky.expend-video-sticky(
     position="bottom-right",

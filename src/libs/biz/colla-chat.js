@@ -159,11 +159,11 @@ export class Receive {
 export class ChatComponent {
   constructor() {
     this.localFileDataMap = {}
-    pounchDb.create('chat', ['ownerPeerId', 'subjectId', 'createDate'])
-    pounchDb.create('message', ['ownerPeerId', 'subjectId', 'createDate','receiveTime','actualReceiveTime'])
-    pounchDb.create('receive', ['ownerPeerId', 'subjectId', 'createDate', 'subjectType', 'receiverPeerId'])
-    pounchDb.create('chatAttach', ['ownerPeerId', 'subjectId', 'createDate', 'messageId'])
-    pounchDb.create('mergeMessage', ['ownerPeerId', 'mergeMessageId', 'createDate'])
+    pounchDb.create('chat', ['ownerPeerId', 'subjectId', 'createDate'], indexFields[ChatDataType.CHAT])
+    pounchDb.create('message', ['ownerPeerId', 'subjectId', 'createDate','receiveTime','actualReceiveTime'], indexFields[ChatDataType.MESSAGE])
+    pounchDb.create('receive', ['ownerPeerId', 'subjectId', 'createDate', 'subjectType', 'receiverPeerId'], indexFields[ChatDataType.RECEIVE])
+    pounchDb.create('chatAttach', ['ownerPeerId', 'subjectId', 'createDate', 'messageId'], indexFields[ChatDataType.ATTACH])
+    pounchDb.create('mergeMessage', ['ownerPeerId', 'mergeMessageId', 'createDate'], indexFields[ChatDataType.MERGEMESSAGE])
   }
   getDB(dataType) {
     return pounchDb.create(tables[dataType])

@@ -1,19 +1,21 @@
 import { webrtcEncrypt } from 'libcolla'
-
-import { mediaStreamComponent, mediaCaptureComponent, audioInputComponent } from '@/libs/base/colla-media'
+import { mediaStreamComponent } from '@/libs/base/colla-media'
 
 export default {
-  name: 'Developer',
+  name: 'SystemInfo',
   components: {
-
   },
   data() {
     return {
-      mediaDevices: null,
-      blob: null
+      mediaDevices: null
     }
   },
   computed: {
+    heightStyle() {
+      return {
+        height: `${this.$q.screen.height}px`
+      }
+    },
     device() {
       let device = {}
       let is = this.$q.platform.is
@@ -27,13 +29,6 @@ export default {
       device.userAgent = this.$q.platform.userAgent
 
       return device
-    },
-    videoCodecs() {
-      let peerConnection = new RTCPeerConnection()
-      const senders = peerConnection.getSenders()
-      //let videoCodecs = webrtcComponent.getVideoCodecs(peerConnection)
-
-      return videoCodecs
     },
     constraints() {
       let constraints = mediaStreamComponent.getSupportedConstraints()
@@ -67,26 +62,9 @@ export default {
         return true
       }
       return false
-    },
-    ifMobileSize() {
-      return (!window.device && this.$q.screen.width < 481)
     }
   },
   methods: {
-    start() {
-      audioInputComponent.startRecord()
-    },
-    async stop() {
-      await audioInputComponent.stopRecord()
-    },
-    play() {
-      this.blob = audioInputComponent.getBlob()
-      alert(this.blob.type)
-      audioInputComponent.play()
-    },
-    capture(){
-      mediaCaptureComponent.captureVideo()
-    }
   },
   created() {
     let _this = this
@@ -97,7 +75,6 @@ export default {
     this.mimeTypes = mediaStreamComponent.isTypeSupported()
   },
   mounted() {
-
   },
   watch: {
   }

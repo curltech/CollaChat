@@ -192,13 +192,13 @@ export class GroupMember {
 
 class ContactComponent {
   constructor() {
-    pounchDb.create('linkman', ['ownerPeerId', 'peerId', 'mobile', 'collectionType'])
-    pounchDb.create('linkmanRequest', ['ownerPeerId', 'createDate', 'receiverPeerId', 'senderPeerId', 'status'])
-    pounchDb.create('group', ['ownerPeerId', 'createDate', 'groupId', 'groupCategory', 'groupType'])
-    pounchDb.create('groupMember', ['ownerPeerId', 'createDate', 'groupId', 'memberPeerId', 'memberType'])
-    pounchDb.create('linkmanTag', ['ownerPeerId', 'createDate', 'name'])
-    pounchDb.create('linkmanTagLinkman', ['ownerPeerId', 'createDate', 'tagId', 'linkmanPeerId'])
-    pounchDb.create('peerContact', ['peerId', 'mobile', 'formattedName', 'name'])
+    pounchDb.create('linkman', ['ownerPeerId', 'peerId', 'mobile', 'collectionType'], indexFields[ContactDataType.LINKMAN])
+    pounchDb.create('linkmanRequest', ['ownerPeerId', 'createDate', 'receiverPeerId', 'senderPeerId', 'status'], indexFields[ContactDataType.LINKMAN_REQUEST])
+    pounchDb.create('group', ['ownerPeerId', 'createDate', 'groupId', 'groupCategory', 'groupType'], indexFields[ContactDataType.GROUP])
+    pounchDb.create('groupMember', ['ownerPeerId', 'createDate', 'groupId', 'memberPeerId', 'memberType'], indexFields[ContactDataType.GROUP_MEMBER])
+    pounchDb.create('linkmanTag', ['ownerPeerId', 'createDate', 'name'], indexFields[ContactDataType.LINKMAN_TAG])
+    pounchDb.create('linkmanTagLinkman', ['ownerPeerId', 'createDate', 'tagId', 'linkmanPeerId'], indexFields[ContactDataType.LINKMAN_TAGLINKMAN])
+    pounchDb.create('peerContact', ['peerId', 'mobile', 'formattedName', 'name'], indexFields[ContactDataType.PEER_CONTACT])
   }
   async loadLinkman(originCondition, sort, from, limit) {
     let condition = {}

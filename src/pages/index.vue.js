@@ -32,7 +32,6 @@ import FindContacts from '@/components/findContacts'
 import Channel from '@/components/channel'
 import Collection from '@/components/collection'
 import VideoChat from '@/components/videoChat'
-import Developer from '@/components/developer'
 
 let QRScanner = window.QRScanner
 
@@ -56,7 +55,6 @@ export default {
     collection: Collection,
     wallet: Wallet,
     setting: Setting,
-    developer: Developer,
     videoChat: VideoChat
   },
   data() {
@@ -71,7 +69,6 @@ export default {
       webSocket: null,
       light: false,
       chatLoadingDone: false,
-      developerKind: null,
       noSwipeClose: false,
       connectArray: [],
       pendingSetupSocket: false,
@@ -128,9 +125,6 @@ export default {
         }
       }
       return ReceivedArray
-    },
-    developerOption() {
-      return myself.myselfPeerClient.developerOption
     }
   },
   methods: {
@@ -2445,11 +2439,6 @@ export default {
           _that.meKind = 'accountInformation'
         }
         _that.kind = _that.meKind
-      } else if (tab === 'developer') {
-        if (!_that.developerKind) {
-          _that.developerKind = 'developer'
-        }
-        _that.kind = _that.developerKind
       }
     }
     store.getKind = function () {
@@ -2473,8 +2462,6 @@ export default {
         _that.channelKind = kind
       } else if (tab === 'me') {
         _that.meKind = kind
-      } else if (tab === 'developer') {
-        _that.developerKind = kind
       }
       _that.drawer = true
     }
@@ -2512,7 +2499,6 @@ export default {
     _that.contactsKind = 'receivedList'
     _that.channelKind = 'channel'
     _that.meKind = 'accountInformation'
-    _that.developerKind = 'developer'
     if (!(_that.ifMobileSize || store.state.ifMobileStyle)) {
       _that.drawer = true
     }
