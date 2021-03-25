@@ -5,7 +5,7 @@ import { CollaUtil, UUID } from 'libcolla'
 import { webrtcPeerPool } from 'libcolla'
 import { signalProtocol } from 'libcolla'
 import { PeerEndpoint, peerEndpointService } from 'libcolla'
-import { libp2pClientPool, config, peerClientService, p2pPeer, myself, myselfPeerService, ChatMessageType, chatAction, p2pChatAction } from 'libcolla'
+import { libp2pClientPool, config, peerClientService, p2pPeer, myself, myselfPeerService, ChatMessageType, chatAction, p2pChatAction, logService } from 'libcolla'
 
 import pinyinUtil from '@/libs/base/colla-pinyin'
 import * as CollaConstant from '@/libs/base/colla-constant'
@@ -146,96 +146,100 @@ export default {
     setupSocket: async function () {
       let _that = this
       let store = this.$store
-      store.state.networkStatus = 'CONNECTING'
-      let myselfPeerClient = myself.myselfPeerClient
-      let clientPeerId = myselfPeerClient.peerId
-      // 设置定位器
-      store.resetConnectAddress = false // 重置MPEP标识
-      if (store.connectAddress) {
-        let condition = {}
-        condition['ownerPeerId'] = clientPeerId
-        condition['address'] = store.connectAddress
-        let result = await peerEndpointService.find(condition, null, null, null, null)
-        if (!result || result.length === 0) {
-          store.resetConnectAddress = true
-          let pep = new PeerEndpoint()
-          pep.address = store.connectAddress
-          result = [pep]
-        } else {
-          let priority = result[0].priority
-          if (priority !== 1) {
-            condition = {}
-            condition['ownerPeerId'] = clientPeerId
-            condition['priority'] = { $in: [1, priority] }
-            let ret = await peerEndpointService.find(condition, null, null, null, null)
-            if (ret && ret.length > 0) {
-              for (let myPeerEndPoint of ret) {
-                if (myPeerEndPoint.priority === 1) {
-                  myPeerEndPoint.priority = priority
-                } else if (myPeerEndPoint.priority === priority) {
-                  myPeerEndPoint.priority = 1
+      try {
+        store.state.networkStatus = 'CONNECTING'
+        let myselfPeerClient = myself.myselfPeerClient
+        let clientPeerId = myselfPeerClient.peerId
+        // 设置定位器
+        store.resetConnectAddress = false // 重置MPEP标识
+        if (store.connectAddress) {
+          let condition = {}
+          condition['ownerPeerId'] = clientPeerId
+          condition['address'] = store.connectAddress
+          let result = await peerEndpointService.find(condition, null, null, null, null)
+          if (!result || result.length === 0) {
+            store.resetConnectAddress = true
+            let pep = new PeerEndpoint()
+            pep.address = store.connectAddress
+            result = [pep]
+          } else {
+            let priority = result[0].priority
+            if (priority !== 1) {
+              condition = {}
+              condition['ownerPeerId'] = clientPeerId
+              condition['priority'] = { $in: [1, priority] }
+              let ret = await peerEndpointService.find(condition, null, null, null, null)
+              if (ret && ret.length > 0) {
+                for (let myPeerEndPoint of ret) {
+                  if (myPeerEndPoint.priority === 1) {
+                    myPeerEndPoint.priority = priority
+                  } else if (myPeerEndPoint.priority === priority) {
+                    myPeerEndPoint.priority = 1
+                  }
                 }
+                await peerEndpointService.update(ret)
               }
-              await peerEndpointService.update(ret)
+              result[0].priority = 1
             }
-            result[0].priority = 1
           }
-        }
-        _that.connectArray.splice(0, _that.connectArray.length, ...[result[0]])
-      } else {
-        let condition = {}
-        condition['ownerPeerId'] = clientPeerId
-        condition['priority'] = { $gt: null }
-        let result = await peerEndpointService.find(condition, [{ priority: 'asc' }], null, null, null)
-        if (result && result.length > 0) {
-          if (result[0].priority !== 1) {
-            throw new Error('myPEPs[0].priority does not equal to 1!')
-          }
-          _that.connectArray.splice(0, _that.connectArray.length, ...result)
+          _that.connectArray.splice(0, _that.connectArray.length, ...[result[0]])
         } else {
-          _that.connectArray.splice(0, _that.connectArray.length)
-          for (let i = 1; i < CollaConstant.connectAddressOptionsISO[myself.myselfPeerClient.language].length; i++) {
-            let item = {}
-            item.address = CollaConstant.connectAddressOptionsISO[myself.myselfPeerClient.language][i].value
-            _that.connectArray.push(item)
+          let condition = {}
+          condition['ownerPeerId'] = clientPeerId
+          condition['priority'] = { $gt: null }
+          let result = await peerEndpointService.find(condition, [{ priority: 'asc' }], null, null, null)
+          if (result && result.length > 0) {
+            if (result[0].priority !== 1) {
+              throw new Error('myPEPs[0].priority does not equal to 1!')
+            }
+            _that.connectArray.splice(0, _that.connectArray.length, ...result)
+          } else {
+            _that.connectArray.splice(0, _that.connectArray.length)
+            for (let i = 1; i < CollaConstant.connectAddressOptionsISO[myself.myselfPeerClient.language].length; i++) {
+              let item = {}
+              item.address = CollaConstant.connectAddressOptionsISO[myself.myselfPeerClient.language][i].value
+              _that.connectArray.push(item)
+            }
           }
         }
-      }
-      await p2pPeer.start([_that.connectArray[0].address])
-      console.info('p2pPeer:' + clientPeerId + ' is started! enjoy it')
-      // 选择连接速度最快的定位器
-      /*for (let j = 0; j < _that.connectArray.length; j++) {
-        console.log(j + '-ping:' + _that.connectArray[j].address)
-        let latency = await p2pPeer.ping(_that.connectArray[j].address)
-        console.log(j + '-latency:' + latency)
-        _that.connectArray[j].connectTime = latency
-      }
-      CollaUtil.sortByKey(_that.connectArray, 'connectTime', 'asc')
-      console.log(_that.connectArray)
-      await _that.buildSocket(_that.connectArray[0].address)*/
-      let ps = []
-      for (let i = 0; i < _that.connectArray.length; i++) {
-        let promise = p2pPeer.ping(_that.connectArray[i].address)
-        ps.push(promise)
-      }
-      let responses = await Promise.all(ps)
-      if (responses && responses.length > 0) {
-        for (let i = 0; i < responses.length; ++i) {
-          console.log(i + '-pingLatency:' + _that.connectArray[i].address + ',' + responses[i])
-          _that.connectArray[i].connectTime = responses[i]
+        await p2pPeer.start([_that.connectArray[0].address])
+        console.info('p2pPeer:' + clientPeerId + ' is started! enjoy it')
+        // 选择连接速度最快的定位器
+        /*for (let j = 0; j < _that.connectArray.length; j++) {
+          console.log(j + '-ping:' + _that.connectArray[j].address)
+          let latency = await p2pPeer.ping(_that.connectArray[j].address)
+          console.log(j + '-latency:' + latency)
+          _that.connectArray[j].connectTime = latency
         }
         CollaUtil.sortByKey(_that.connectArray, 'connectTime', 'asc')
         console.log(_that.connectArray)
-        await _that.buildSocket()
+        await _that.buildSocket(_that.connectArray[0].address)*/
+        let ps = []
+        for (let i = 0; i < _that.connectArray.length; i++) {
+          let promise = p2pPeer.ping(_that.connectArray[i].address)
+          ps.push(promise)
+        }
+        let responses = await Promise.all(ps)
+        if (responses && responses.length > 0) {
+          for (let i = 0; i < responses.length; ++i) {
+            console.log(i + '-pingLatency:' + _that.connectArray[i].address + ',' + responses[i])
+            _that.connectArray[i].connectTime = responses[i]
+          }
+          CollaUtil.sortByKey(_that.connectArray, 'connectTime', 'asc')
+          console.log(_that.connectArray)
+          await _that.buildSocket()
+        }
+      } catch (e) {
+        logService.log(e, 'setupSocketError')
       }
     },
     buildSocket: async function () {
       let _that = this
       let store = this.$store
       let connectAddress = _that.connectArray[0].address
-      let connectTime = _that.connectArray[0].connectTime
+      /*let connectTime = _that.connectArray[0].connectTime
       let heartbeatTimerInterval = 55
-      /*if (connectTime === 999999999) {
+      if (connectTime === 999999999) {
         heartbeatTimerInterval = 5
       }*/
       let myselfPeerClient = myself.myselfPeerClient
