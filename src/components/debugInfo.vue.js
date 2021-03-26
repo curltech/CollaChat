@@ -68,6 +68,38 @@ export default {
       _that.logResultList = await logService.search(_that.searchText, _that.logLevel, searchTimestamp)
       console.log(JSON.stringify(_that.logResultList))
     },
+    async clean() {
+      let _that = this
+      _that.$q.bottomSheet({
+        message: _that.$i18n.t('Confirm the deletion?'),
+        actions: [
+          {},
+          {
+            label: _that.$i18n.t('Confirm'),
+            classes: 'text-red',
+            icon: 'check_circle',
+            id: 'confirm'
+          },
+          {},
+          {
+            label: _that.$i18n.t('Cancel'),
+            icon: 'cancel',
+            id: 'cancel'
+          }
+        ]
+      }).onOk(async action => {
+        // console.log('Action chosen:', action.id)
+        if (action.id === 'confirm') {
+          await logService.clean()
+          _that.logResultList = []
+          _that.searching = false
+        }
+      }).onCancel(() => {
+        // console.log('Dismissed')
+      }).onDismiss(() => {
+        // console.log('I am triggered on both OK and Cancel')
+      })
+    },
     formate(createTimestamp) {
       return date.formatDate(new Date(createTimestamp), 'YYYY-MM-DD HH:mm')
     }
