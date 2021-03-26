@@ -65,7 +65,7 @@
       q-tab-panel(name="search" class="q-pa-none")
         q-toolbar.header-toolbar
           q-btn(v-if="searchResult !== 'allResult'" flat round icon="keyboard_arrow_left" @click="resultBack()")
-          q-input.c-field(:disable="$store.state.myselfPeerClient.localDataCryptoSwitch===true" debounce="100" filled dense v-model="searchText" :placeholder="placeholder2" input-class="iconfont" style="width: 86%" autofocus @keyup="searchKeyup" @input="searchinput")
+          q-input.c-field(:disable="$store.state.myselfPeerClient.localDataCryptoSwitch===true" debounce="100" filled dense v-model="searchText" :placeholder="placeholder2" input-class="iconfont" style="width: 86%" autofocus @keyup="searchKeyup" @input="searchInput")
             template(slot="append")
               q-icon(v-if="searchText" name="cancel" class="cursor-pointer" @click.stop="searchText = null;searching = false")
           q-btn.btnIcon(flat round icon="close" @click="searchBack()")

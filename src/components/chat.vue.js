@@ -429,7 +429,7 @@ export default {
       let _that = this
       _that.subKind = 'search'
     },
-    searchinput(value) {
+    searchInput(value) {
       let _that = this
       _that.searching = false
     },

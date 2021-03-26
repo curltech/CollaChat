@@ -24,6 +24,7 @@
               q-item-label {{$t('Enable Developer Options')}}
             q-item-section(side)
               q-toggle(v-model="developerOption" @input="applyDeveloperOption")
+          q-separator.c-separator(style="height:8px;margin-left:0px;margin-right:0px")
           q-item(clickable v-ripple @click="subKind = 'developerOptions'")
             q-item-section
               q-item-label {{$t('Developer Options')}}

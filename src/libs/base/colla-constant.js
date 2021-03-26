@@ -18,6 +18,25 @@ export const ColorVariables = {
   'GREY-14': '#616161'
 }
 
+export const logLevelOptions = [
+  {
+    label: 'None',
+    value: 'none'
+  },
+  {
+    label: 'Info',
+    value: 'log'
+  },
+  {
+    label: 'Warn',
+    value: 'warn'
+  },
+  {
+    label: 'Error',
+    value: 'error'
+  }
+]
+
 export const languageOptions = [
     {
       label: '中文',

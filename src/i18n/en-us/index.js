@@ -324,6 +324,7 @@ export default {
   "Auto Download File": "Auto Download File",
   "Developer Options": "Developer Options",
   "System Info": "System Info",
+  "Debug Level": "Debug Level",
   "Debug Info": "Debug Info",
   "Enable Developer Options": "Enable Developer Options",
   "Enable UDP": "Enable UDP",

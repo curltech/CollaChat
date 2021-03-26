@@ -230,7 +230,7 @@ export default {
           await _that.buildSocket()
         }
       } catch (e) {
-        logService.log(e, 'setupSocketError')
+        await logService.log(e, 'setupSocketError')
       }
     },
     buildSocket: async function () {

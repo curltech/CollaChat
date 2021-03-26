@@ -332,6 +332,7 @@
   "Auto Download File": "自動ダウンロードファイル",
   "Developer Options": "開発者向けオプション",
   "System Info": "システムメッセージ",
+  "Debug Level": "デバッグレベル",
   "Debug Info": "デバッグ情報",
   "Enable Developer Options": "開発者オプション",
   "Enable UDP": "UDPを有効にする",

@@ -330,6 +330,7 @@
   "Auto Download File": "自動下載文件",
   "Developer Options": "開發者選項",
   "System Info": "系統信息",
+  "Debug Level": "調試級別",
   "Debug Info": "調試信息",
   "Enable Developer Options": "開發者選項",
   "Enable UDP": "啟用UDP",

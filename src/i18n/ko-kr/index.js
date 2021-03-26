@@ -332,6 +332,7 @@
   "Auto Download File": "파일 자동 다운로드",
   "Developer Options": "개발자 옵션",
   "System Info": "시스템 메시지",
+  "Debug Level": "디버그 수준",
   "Debug Info": "디버그 정보",
   "Enable Developer Options": "개발 자 옵션",
   "Enable UDP": "UDP 사용 하기",

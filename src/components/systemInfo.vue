@@ -23,11 +23,17 @@
             lines="4",
             v-for="(mediaDevice, index) in mediaDevices",
             :key="index"
-          ) {{ mediaDevice.kind + ':' + mediaDevice.label }}
+          ) {{ mediaDevice.kind + ': ' + mediaDevice.label }}
+      q-item
+        q-item-section
+          q-item-label.text-h6 {{ $t('Webrtc') }}
+          q-item-label(caption, lines="1") {{ $t('isSupportInsertableStream: ') + isSupportInsertableStream }}
+          q-item-label(caption, lines="1") {{ $t('getUserMedia: ') + getUserMedia }}
+          q-item-label(caption, lines="1") {{ $t('getDisplayMedia: ') + getDisplayMedia }}
       q-item
         q-item-section
           q-item-label.text-h6 {{ $t('Constraints') }}
-          q-item-label(caption, lines="4") {{ $t('constraints: ') + constraints }}
+          q-item-label(caption, lines="4") {{ constraints }}
       q-item
         q-item-section
           q-item-label.text-h6 {{ $t('MimeType') }}
@@ -37,11 +43,5 @@
             v-for="(mimeType, index) in mimeTypes",
             :key="index"
           ) {{ mimeType }}
-      q-item
-        q-item-section
-          q-item-label.text-h6 {{ $t('Webrtc') }}
-          q-item-label(caption, lines="1") {{ $t('isSupportInsertableStream: ') + isSupportInsertableStream }}
-          q-item-label(caption, lines="1") {{ $t('getUserMedia: ') + getUserMedia }}
-          q-item-label(caption, lines="1") {{ $t('getDisplayMedia: ') + getDisplayMedia }}
 </template>
 <script src="./systemInfo.vue.js" />

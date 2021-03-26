@@ -253,7 +253,7 @@
       q-tab-panel(name="searchChatHistory" style="padding:0px 0px")
         q-toolbar
           q-btn(v-if="$store.messageEntry === 'search'" flat round dense icon="keyboard_arrow_left" @click="resultBack()")
-          q-input.c-field(:disable="$store.state.myselfPeerClient.localDataCryptoSwitch===true" debounce="100" filled dense v-model="searchText" :placeholder="placeholder2" input-class="iconfont" style="width: 86%" :prefix="searchPrefix" @keyup="searchKeyup" @input="searchinput")
+          q-input.c-field(:disable="$store.state.myselfPeerClient.localDataCryptoSwitch===true" debounce="100" filled dense v-model="searchText" :placeholder="placeholder2" input-class="iconfont" style="width: 86%" :prefix="searchPrefix" @keyup="searchKeyup" @input="searchInput")
             template(slot="append")
               q-icon(v-if="searchText" name="cancel" class="cursor-pointer" @click.stop="searchText = null;searching = false")
           q-btn.btnIcon(flat round dense icon="close" @click="searchBack()")

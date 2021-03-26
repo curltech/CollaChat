@@ -333,6 +333,7 @@ export default {
   "Auto Download File": "自动下载文件",
   "Developer Options": "开发者选项",
   "System Info": "系统信息",
+  "Debug Level": "调试级别",
   "Debug Info": "调试信息",
   "Enable Developer Options": "开发者选项",
   "Enable UDP": "启用UDP",

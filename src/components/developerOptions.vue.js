@@ -1,3 +1,7 @@
+import { myself, peerProfileService, logService } from 'libcolla'
+
+import * as CollaConstant from '@/libs/base/colla-constant'
+
 import SystemInfo from '@/components/systemInfo'
 import DebugInfo from '@/components/debugInfo'
 
@@ -9,7 +13,9 @@ export default {
   },
   data() {
     return {
-      subKind: 'default'
+      subKind: 'default',
+      logLevel: myself.myselfPeerClient && myself.myselfPeerClient.logLevel ? myself.myselfPeerClient.logLevel : 'none',
+      logLevelOptions: CollaConstant.logLevelOptions
     }
   },
   computed: {
@@ -20,8 +26,20 @@ export default {
     }
   },
   methods: {
-  },
-  mounted() {
+    changeLogLevel: async function () {
+      let currentDate = new Date()
+      let myselfPeerClient = myself.myselfPeerClient
+      myselfPeerClient.logLevel = this.logLevel
+      this.$store.state.myselfPeerClient = myselfPeerClient
+
+      let peerProfile = myself.peerProfile
+      peerProfile.logLevel = this.logLevel
+      peerProfile.updateDate = currentDate
+      peerProfile = await peerProfileService.update(peerProfile)
+      myself.peerProfile = peerProfile
+
+      logService.setLogLevel(this.logLevel)
+    },
   },
   created() {
     let _that = this
@@ -31,5 +49,8 @@ export default {
     }
   },
   watch: {
+    async logLevel(val) {
+      await this.changeLogLevel()
+    }
   }
 }

@@ -73,9 +73,5 @@ export default {
     })
 
     this.mimeTypes = mediaStreamComponent.isTypeSupported()
-  },
-  mounted() {
-  },
-  watch: {
   }
 }

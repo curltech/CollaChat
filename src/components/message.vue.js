@@ -2354,7 +2354,7 @@ export default {
         await _that.refreshChatHistory()
       }
     },
-    searchinput(value) {
+    searchInput(value) {
       let _that = this
       _that.searching = false
     },
