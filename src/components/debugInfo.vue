@@ -18,13 +18,14 @@
               q-date(v-model="searchDate" @input="searchDateInput" minimal mask="YYYY-MM-DD")
     q-list(v-if="searching")
       div(
-          v-for="(log, index) in logResultList",
-          :key="index"
-        )
+        v-for="(log, index) in logResultList",
+        :key="index"
+      )
         q-item(clickable v-ripple)
-          q-item-section(side top) {{ formate(log.createTimestamp) }}
           q-item-section
-            q-item-label( lines="1") {{ log.level }}
+            q-item-label(caption) {{ formate(log.createTimestamp) }}
+          q-item-section
+            q-item-label(caption) {{ log.level }}
           q-item-section
             q-item-label(caption v-html="log.highlightingCode ? log.highlightingCode : log.code")
           q-item-section
