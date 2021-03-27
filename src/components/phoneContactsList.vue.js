@@ -110,7 +110,6 @@ export default {
       store.findContactsEntry = 'phoneContactsList'
       _that.subKind = 'findContacts'
     },
-
     onCopySuccess: function (e) {
       this.$q.notify({
         message: "copy success",
@@ -172,10 +171,6 @@ export default {
       return peerContactFilteredArray
     }
   },
-  mounted() {
-    let _that = this
-    let store = _that.$store
-  },
   async created() {
     let _that = this
     let store = _that.$store
@@ -186,6 +181,5 @@ export default {
       statusBarComponent.style(true, '#ffffff')
     }*/
     _that.init()
-  },
-  watch: {}
+  }
 }

@@ -24,6 +24,13 @@ export default {
       placeholder: '\ue672' + ' ' + this.$i18n.t('Search')
     }
   },
+  computed: {
+    heightStyle() {
+      return {
+        height: `${this.$q.screen.height}px`
+      }
+    }
+  },
   methods: {
     async unblock(blockedLinkman) {
       let _that = this

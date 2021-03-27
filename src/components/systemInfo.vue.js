@@ -64,8 +64,6 @@ export default {
       return false
     }
   },
-  methods: {
-  },
   created() {
     let _this = this
     mediaStreamComponent.enumerateDevices().then(function (mediaDevices) {

@@ -1,7 +1,7 @@
 <template lang="pug">
   div.bg-c-grey-0
     q-tab-panels(v-model="subKind" animated transition-prev="slide-right" transition-next="slide-left")
-      q-tab-panel(name="default" style="padding:0px 0px")
+      q-tab-panel(:style="heightStyle" name="default" style="padding:0px 0px")
         q-toolbar
           q-btn(flat round icon="keyboard_arrow_left" @click="$store.changePrivacySubKind('default')")
           q-toolbar-title(align="center" style="padding-right:54px") {{$t('Locklist') + '(' + LockList.length + ')'}}

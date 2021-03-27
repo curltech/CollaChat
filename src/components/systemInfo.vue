@@ -1,5 +1,5 @@
 <template lang="pug">
-  div.bg-c-grey-0
+  div.bg-c-grey-0(:style="heightStyle")
     q-toolbar
       q-btn(flat round icon="keyboard_arrow_left" @click="$store.changeDeveloperOptionsSubKind('default')")
       q-toolbar-title(align="center" style="padding-right:54px") {{$t('System Info')}}

@@ -41,6 +41,11 @@ export default {
     }
   },
   computed: {
+    heightStyle() {
+      return {
+        height: `${this.$q.screen.height}px`
+      }
+    },
     LockList() {
       let _that = this
       let store = _that.$store
@@ -69,17 +74,11 @@ export default {
       return LockArray
     }
   },
-  mounted() {
-    let _that = this
-    let store = _that.$store
-  },
   created() {
     let _that = this
     let store = _that.$store
     store.changeLockListSubKind = function (subKind) {
       _that.subKind = subKind
     }
-  },
-  watch: {
   }
 }

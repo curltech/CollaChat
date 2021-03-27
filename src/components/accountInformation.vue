@@ -91,7 +91,7 @@
                 canvas#qrCode
               q-card-section(class="q-pt-none")
                 div(class="text-center text-c-grey-10 text-caption") {{$t('Scan QR code to add me into your contacts')}}
-      q-tab-panel(:style="heightStyle" name="selectChat" style="padding:0px 0px")
+      q-tab-panel(name="selectChat" style="padding:0px 0px")
         selectChat.drawcontent
       q-tab-panel(:style="heightStyle" name="name" style="padding:0px 0px")
         q-toolbar

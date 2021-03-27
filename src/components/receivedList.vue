@@ -1,7 +1,7 @@
 <template lang="pug">
   div.bg-c-grey-0
     q-tab-panels(v-model="subKind" animated transition-prev="slide-right" transition-next="slide-left")
-      q-tab-panel(name="default" style="padding:0px 0px")
+      q-tab-panel(:style="heightStyle" name="default" style="padding:0px 0px")
         q-toolbar
           q-btn(:class="ifMobileSize || $store.state.ifMobileStyle ? '' : 'hidden'" flat round dense icon="keyboard_arrow_left" @click="$store.toggleDrawer(false)")
           q-toolbar-title(align="center" :style="ifMobileSize || $store.state.ifMobileStyle ? '' : 'padding-left:54px'") {{$t('Contacts Requests')}}

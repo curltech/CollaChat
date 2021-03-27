@@ -113,12 +113,11 @@
           q-item-section.text-primary(side) {{ $t('Add Contacts') }}
           q-item-section
     q-tab-panel(
-      :style="heightStyle",
       name="contactsDetails",
       style="padding:0px 0px"
     )
       contactsDetails.drawcontent
-    //q-tab-panel(:style="heightStyle" name="phoneContactsList" style="padding:0px 0px")
+    //q-tab-panel(name="phoneContactsList" style="padding:0px 0px")
       phoneContactsList.drawcontent
     q-tab-panel(
       :style="heightStyle",

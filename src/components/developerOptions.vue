@@ -23,9 +23,9 @@
               q-item-label {{$t('Debug Info')}}
             q-item-section(avatar)
               q-icon(name="keyboard_arrow_right")
-      q-tab-panel(:style="heightStyle" name="systemInfo" style="padding:0px 0px")
+      q-tab-panel(name="systemInfo" style="padding:0px 0px")
         systemInfo.drawcontent
-      q-tab-panel(:style="heightStyle" name="debugInfo" style="padding:0px 0px")
+      q-tab-panel(name="debugInfo" style="padding:0px 0px")
         debugInfo.drawcontent
 </template>
 <script src="./developerOptions.vue.js" />

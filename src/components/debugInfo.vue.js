@@ -24,9 +24,6 @@ export default {
       return {
         height: `${this.$q.screen.height}px`
       }
-    },
-    ifMobileSize() {
-      return (!window.device && this.$q.screen.width < 481)
     }
   },
   methods: {

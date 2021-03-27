@@ -46,11 +46,12 @@ export default {
   computed: {
     ifMobileSize() {
       return (!window.device && this.$q.screen.width < 481)
+    },
+    heightStyle() {
+      return {
+        height: `${this.$q.screen.height}px`
+      }
     }
-  },
-  mounted() {
-    let _that = this
-    let store = _that.$store
   },
   created() {
     let _that = this
@@ -58,7 +59,5 @@ export default {
     store.changeReceivedListSubKind = function (subKind) {
       _that.subKind = subKind
     }
-  },
-  watch: {
   }
 }

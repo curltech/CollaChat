@@ -30,9 +30,9 @@
               q-item-label {{$t('Developer Options')}}
             q-item-section(avatar)
               q-icon(name="keyboard_arrow_right")
-      q-tab-panel(:style="heightStyle" name="myPeerEndPoints" style="padding:0px 0px")
+      q-tab-panel(name="myPeerEndPoints" style="padding:0px 0px")
         myPeerEndPoints.drawcontent
-      q-tab-panel(:style="heightStyle" name="developerOptions" style="padding:0px 0px")
+      q-tab-panel(name="developerOptions" style="padding:0px 0px")
         developerOptions.drawcontent
     q-dialog(v-model="restoreDialog" persistent)
       q-card(style="width: 250px")

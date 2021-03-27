@@ -16,6 +16,13 @@ export default {
       subKind: 'default',
     }
   },
+  computed: {
+    heightStyle() {
+      return {
+        height: `${this.$q.screen.height}px`
+      }
+    }
+  },
   methods: {
     initLocalBackup: function() {
       let _that = this

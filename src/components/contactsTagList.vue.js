@@ -279,11 +279,12 @@ export default {
   computed: {
     ifMobileSize() {
       return (!window.device && this.$q.screen.width < 481)
+    },
+    heightStyle() {
+      return {
+        height: `${this.$q.screen.height}px`
+      }
     }
-  },
-  mounted() {
-    let _that = this
-    let store = _that.$store
   },
   async created() {
     let _that = this
@@ -327,7 +328,5 @@ export default {
       }
     }
     _that.linkmanTags = linkmanTagDBItems
-  },
-  watch: {
   }
 }

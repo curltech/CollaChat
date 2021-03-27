@@ -68,9 +68,9 @@
               q-item-label {{$t('Storage')}}
             q-item-section(avatar)
               q-icon(name="keyboard_arrow_right" color="c-grey-5")
-      q-tab-panel.bg-c-grey-0(:style="heightStyle" name="backupMigration" style="padding:0px 0px")
+      q-tab-panel.bg-c-grey-0(name="backupMigration" style="padding:0px 0px")
         backupMigration.drawcontent
-      q-tab-panel.bg-c-grey-0(:style="heightStyle" name="storage" style="padding:0px 0px")
+      q-tab-panel.bg-c-grey-0(name="storage" style="padding:0px 0px")
         storage.drawcontent
     q-dialog(v-model="restoreDialog" persistent)
       q-card(style="width: 100%")
