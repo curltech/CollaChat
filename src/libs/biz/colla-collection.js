@@ -371,8 +371,7 @@ export class CollectionComponent {
 					attach.collectionId = current._id
 				}
 				if (attach.content) {
-					let payload = { needCompress: 'none', data: attach.content }
-					let result = await SecurityPayload.encrypt(payload, securityParams)
+					let result = await SecurityPayload.encrypt(attach.content, securityParams)
 					if (result) {
 						attach.securityContext = current.SecurityContext
 						attach.payloadKey = result.PayloadKey
