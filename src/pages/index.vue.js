@@ -1545,7 +1545,9 @@ export default {
           linkman.avatar = content.avatar
           linkman.publicKey = content.publicKey
           linkman.signalPublicKey = content.signalPublicKey
+          if(linkman.signalPublicKey !== content.signalPublicKey){
           console.log('receive signalPublicKey' + linkman.name + linkman.signalPublicKey)
+          }
           signalProtocol.signalPublicKeys.set(linkmanPeerId,linkman.signalPublicKey)
           linkman.downloadSwitch = content.downloadSwitch
           linkman.localDataCryptoSwitch = content.localDataCryptoSwitch
@@ -1570,11 +1572,6 @@ export default {
               }
               await contactComponent.update(ContactDataType.LINKMAN, linkmen, null)
             }
-            let _message = {
-              messageType: P2pChatMessageType.SESSION_REFRESH,
-              content: null
-            }
-            await store.p2pSend(_message,linkmanPeerId)
             await _that.sendUnsentMessage(linkmanPeerId)
           }, 200)
         }
