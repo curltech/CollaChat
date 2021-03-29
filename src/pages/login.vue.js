@@ -219,11 +219,14 @@ export default {
     async initeSignalProtocol(name){
       let _that = this
       let myselfPeer = myself.myselfPeer
-      await signalProtocol.init()
-      //myselfPeer.signalPrivateKey = await signalProtocol.export(_that.loginData.password_)
-      myselfPeer.signalPublicKey = await signalProtocol.exportPublic(name)
-      let aaa = await signalProtocol.importPublic(myselfPeer.signalPublicKey)
-      await myselfPeerService.update(myselfPeer)
+      if(!myselfPeer.signalPrivateKey){
+        await signalProtocol.init()
+        myselfPeer.signalPrivateKey = await signalProtocol.export(_that.loginData.password_)
+        myselfPeer.signalPublicKey = await signalProtocol.exportPublic(name)
+        await myselfPeerService.update(myselfPeer)
+      }else{
+        await signalProtocol.import(myselfPeer.signalPrivateKey,_that.loginData.password_)
+      }
     },
     upload: function (files) {
       let _that = this
