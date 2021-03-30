@@ -775,16 +775,16 @@ export default {
       this.options = this.countryOptions
       this.loginData.countryRegion_ = this.options[CollaConstant.countryCodeISO[val].indexOf(this.loginData.code_)]
       this.registerData.countryRegion_ = this.options[CollaConstant.countryCodeISO[val].indexOf(this.registerData.code_)]
-      /*try {
+      try {
         let httpClient = new HttpClient()
         if (httpClient) {
           let serviceData = await httpClient.get("https://curltech.io/conf/" + "nodeList-" + val + ".conf?time=" + new Date().getTime())
           this.connectAddressOptions = serviceData.data
         }
       } catch (e) {
-        console.error(e)*/
+        console.error(e)
         this.connectAddressOptions = CollaConstant.connectAddressOptionsISO[val]
-      /*}*/
+      }
     }
   }
 }
