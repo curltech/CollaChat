@@ -1572,7 +1572,21 @@ export default {
               }
               await contactComponent.update(ContactDataType.LINKMAN, linkmen, null)
             }
-            await _that.sendUnsentMessage(linkmanPeerId)
+            let webrtcPeers = await webrtcPeerPool.get(linkmanPeerId)
+            if (webrtcPeers && webrtcPeers.length > 0) {
+              for (let webrtcPeer of webrtcPeers) {
+                if(!webrtcPeer._options.initiator){
+                  let _message = {
+                  messageType: P2pChatMessageType.SESSION_REFRESH,
+                  content: `SESSION_REFRESH`
+                  }
+                  await store.p2pSend(_message,linkmanPeerId)
+                  await _that.sendUnsentMessage(linkmanPeerId)
+                }
+              }
+              
+            }
+            
           }, 200)
         }
       }
@@ -1997,6 +2011,20 @@ export default {
       }
       else if(messageType === P2pChatMessageType.CHAT_LINKMAN){
         await store.insertReceivedMessage(message)
+      }else if (messageType === P2pChatMessageType.SESSION_REFRESH){
+        let webrtcPeers = await webrtcPeerPool.get(peerId)
+            if (webrtcPeers && webrtcPeers.length > 0) {
+              for (let webrtcPeer of webrtcPeers) {
+                if(webrtcPeer._options.initiator){
+                  let _message = {
+                  messageType: P2pChatMessageType.SESSION_REFRESH,
+                  content: `SESSION_REFRESH`
+                  }
+                  await store.p2pSend(_message,peerId)
+                  await _that.sendUnsentMessage(peerId)
+                }
+              }
+            }
       }
     },
     async webrtcConnect(evt){
@@ -2191,6 +2219,8 @@ export default {
           return
         }
         message = await signalSession.encrypt(JSON.stringify(message))
+      }else if(message.messageType === P2pChatMessageType.SYNC_LINKMAN_INFO){
+        
       }
       await p2pChatAction.chat(null,message,peerId)
     },
