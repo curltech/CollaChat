@@ -354,11 +354,13 @@ class ContactComponent {
       let leftPeerContacts = peerContactMap.values()
       if (leftPeerContacts) {
         for (let leftPeerContact of leftPeerContacts) {
-          this.refreshByLinkman(leftPeerContact, linkmans)
-          if (leftPeerContact.isLinkman !== true) {
-            await this.refreshPeerContact(leftPeerContact)
+          let pc = this.refreshByLinkman(leftPeerContact, linkmans)
+          if (!pc) {
+            pc = await this.refreshPeerContact(leftPeerContact)
           }
-          this.insert(ContactDataType.PEER_CONTACT, leftPeerContact)
+          if (pc) {
+            this.insert(ContactDataType.PEER_CONTACT, leftPeerContact)
+          }
           peerContacts.push(leftPeerContact)
         }
       }
@@ -380,10 +382,13 @@ class ContactComponent {
           peerContact.publicKey = linkman.publicKey
           peerContact.avatar = linkman.avatar
           peerContact.isLinkman = true
-          break
+
+          return peerContact
         }
       }
     }
+
+    return null
   }
   // 从服务器端获取是否有peerClient
   async refreshPeerContact(peerContact) {
@@ -399,9 +404,13 @@ class ContactComponent {
           peerContact.status = peerClient.status
           peerContact.publicKey = peerClient.publicKey
           peerContact.avatar = peerClient.avatar
+
+          return peerContact
         }
       }
     }
+
+    return null
   }
 
   async loadLinkmanRequest(originCondition, sort, from, limit) {

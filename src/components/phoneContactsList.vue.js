@@ -35,7 +35,7 @@ export default {
     async refresh() {
       let _that = this
       let store = _that.$store
-      await contactComponent.refreshPeerContact(this.currentPeerContact)
+      let pc = await contactComponent.refreshPeerContact(this.currentPeerContact)
       let conditionBean = {
         mobile: this.currentPeerContact.mobile
       }
@@ -46,9 +46,11 @@ export default {
           for (let pContact of pContacts) {
             contactComponent.remove(ContactDataType.PEER_CONTACT, pContact)
           }
-          _that.currentPeerContact._id = undefined
-          _that.currentPeerContact._rev = undefined
-          contactComponent.insert(ContactDataType.PEER_CONTACT, _that.currentPeerContact)
+          if (pc) {
+            _that.currentPeerContact._id = undefined
+            _that.currentPeerContact._rev = undefined
+            contactComponent.insert(ContactDataType.PEER_CONTACT, _that.currentPeerContact)
+          }
         }
       })
     },
