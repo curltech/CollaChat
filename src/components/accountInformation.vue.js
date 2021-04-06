@@ -220,14 +220,14 @@ export default {
           console.log(result)
           if (result === 'OK') {
             this.$q.notify({
-              message: "change avatar success",
+              message: this.$i18n.t("Change avatar successfully"),
               timeout: 3000,
               type: "info",
               color: "info"
             })
           } else {
             this.$q.notify({
-              message: "change avatar failure",
+              message: this.$i18n.t("Change avatar failed"),
               timeout: 3000,
               type: "warning",
               color: "warning"
@@ -272,14 +272,14 @@ export default {
         console.log(result)
         if (result === 'OK') {
           this.$q.notify({
-            message: "change name success",
+            message: this.$i18n.t("Change name successfully"),
             timeout: 3000,
             type: "info",
             color: "info"
           })
         } else {
           this.$q.notify({
-            message: "change name failure",
+            message: this.$i18n.t("Change name failed"),
             timeout: 3000,
             type: "warning",
             color: "warning"
@@ -329,14 +329,14 @@ export default {
           console.log(result)
           if (result === 'OK') {
             this.$q.notify({
-              message: "change mobile success",
+              message: this.$i18n.t("Change mobile successfully"),
               timeout: 3000,
               type: "info",
               color: "info"
             })
           } else {
             this.$q.notify({
-              message: "change mobile failure",
+              message: this.$i18n.t("Change mobile failed"),
               timeout: 3000,
               type: "warning",
               color: "warning"
@@ -450,7 +450,7 @@ export default {
               function (msg) {
                 console.log(msg)
                 _that.$q.notify({
-                  message: "save success",
+                  message: _that.$i18n.t("Save successfully"),
                   timeout: 3000,
                   type: "info",
                   color: "info",
@@ -459,7 +459,7 @@ export default {
               function (err) {
                 console.log(err)
                 _that.$q.notify({
-                  message: "save failure",
+                  message: _that.$i18n.t("Save failed"),
                   timeout: 3000,
                   type: "warning",
                   color: "warning",
@@ -567,7 +567,7 @@ export default {
               function (msg) {
                 console.log(msg)
                 _that.$q.notify({
-                  message: "save success",
+                  message: _that.$i18n.t("Save successfully"),
                   timeout: 3000,
                   type: "info",
                   color: "info",
@@ -576,7 +576,7 @@ export default {
               function (err) {
                 console.log(err)
                 _that.$q.notify({
-                  message: "save failure",
+                  message: _that.$i18n.t("Save failed"),
                   timeout: 3000,
                   type: "warning",
                   color: "warning",
@@ -632,7 +632,7 @@ export default {
     },
     onCopySuccess: function (e) {
       this.$q.notify({
-        message: "copy success",
+        message: this.$i18n.t("Copy successfully"),
         timeout: 3000,
         type: "info",
         color: "info",
@@ -640,7 +640,7 @@ export default {
     },
     onCopyFailure: function (e) {
       this.$q.notify({
-        message: "copy failure",
+        message: this.$i18n.t("Copy failed"),
         timeout: 3000,
         type: "warning",
         color: "warning",

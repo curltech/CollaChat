@@ -26,7 +26,7 @@ export default {
   methods: {
     onCopySuccess: function (e) {
       this.$q.notify({
-        message: "copy success",
+        message: this.$i18n.t("Copy successfully"),
         timeout: 3000,
         type: "info",
         color: "info",
@@ -34,7 +34,7 @@ export default {
     },
     onCopyFailure: function (e) {
       this.$q.notify({
-        message: "copy failure",
+        message: this.$i18n.t("Copy failed"),
         timeout: 3000,
         type: "warning",
         color: "warning",
@@ -87,7 +87,7 @@ export default {
               function (msg) {
                 console.log(msg)
                 _that.$q.notify({
-                  message: "save success",
+                  message: _that.$i18n.t("Save successfully"),
                   timeout: 3000,
                   type: "info",
                   color: "info",
@@ -96,7 +96,7 @@ export default {
               function (err) {
                 console.log(err)
                 _that.$q.notify({
-                  message: "save failure",
+                  message: _that.$i18n.t("Save failed"),
                   timeout: 3000,
                   type: "warning",
                   color: "warning",

@@ -114,7 +114,7 @@ export default {
     },
     onCopySuccess: function (e) {
       this.$q.notify({
-        message: "copy success",
+        message: this.$i18n.t("Copy successfully"),
         timeout: 3000,
         type: "info",
         color: "info",
@@ -122,7 +122,7 @@ export default {
     },
     onCopyFailure: function (e) {
       this.$q.notify({
-        message: "copy failure",
+        message: this.$i18n.t("Copy failed"),
         timeout: 3000,
         type: "warning",
         color: "warning",

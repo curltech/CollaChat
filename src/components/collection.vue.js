@@ -432,7 +432,7 @@ export default {
         } catch (error) {
           console.error(error)
           this.$q.notify({
-            message: "save failure",
+            message: this.$i18n.t("Save failed"),
             timeout: 3000,
             type: "warning",
             color: "warning"
@@ -1144,7 +1144,7 @@ export default {
               function (msg) {
                 console.log(msg)
                 _that.$q.notify({
-                  message: "save success",
+                  message: _that.$i18n.t("Save successfully"),
                   timeout: 3000,
                   type: "info",
                   color: "info",
@@ -1153,7 +1153,7 @@ export default {
               function (err) {
                 console.log(err)
                 _that.$q.notify({
-                  message: "save failure",
+                  message: _that.$i18n.t("Save failed"),
                   timeout: 3000,
                   type: "warning",
                   color: "warning",

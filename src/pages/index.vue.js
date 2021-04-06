@@ -289,7 +289,7 @@ export default {
         if (peers === 'mobileOccupied') {
           // 校验手机号失败
           /*_that.$q.notify({
-            message: "Account already exists with same mobile number",
+            message: _that.$i18n.t("Account already exists with same mobile number"),
             timeout: 3000,
             type: "warning",
             color: "warning",
@@ -901,7 +901,7 @@ export default {
       let saveResult = await chatBlockComponent.save(current,_peers)
       if (!saveResult) {
         _that.$q.notify({
-          message: _that.$i18n.t("Saved failed"),
+          message: _that.$i18n.t("Save failed"),
           timeout: 3000,
           type: "warning",
           color: "info",
@@ -1080,7 +1080,7 @@ export default {
           if (err) {
             console.error(err)
             _that.$q.notify({
-              message: 'Failed to read the qr code',
+              message: _that.$i18n.t('Failed to read the qr code'),
               timeout: 3000,
               type: "warning",
               color: "warning",

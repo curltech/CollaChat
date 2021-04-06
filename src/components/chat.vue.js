@@ -258,7 +258,7 @@ export default {
       let store = _that.$store
       if (store.state.lockContactsSwitch && _that.password !== myself.password) {
         _that.$q.notify({
-          message: "wrong password",
+          message: _that.$i18n.t("Wrong password"),
           timeout: 3000,
           type: "warning",
           color: "warning",
@@ -350,7 +350,7 @@ export default {
           if (err) {
             console.error(err)
             _that.$q.notify({
-              message: 'Failed to read the qr code',
+              message: _that.$i18n.t('Failed to read the qr code'),
               timeout: 3000,
               type: "warning",
               color: "warning",

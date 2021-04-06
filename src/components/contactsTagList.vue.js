@@ -105,7 +105,7 @@ export default {
       let mapId = store.state.linkmanTagNameMap[name]
       if ((!_id && mapId) || (_id && mapId && _id !== mapId)) {
         _that.$q.notify({
-          message: "tag name already exists",
+          message: _that.$i18n.t("tag name already exists"),
           timeout: 3000,
           type: "warning",
           color: "warning",

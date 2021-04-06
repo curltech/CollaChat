@@ -449,7 +449,7 @@ export default {
           }
         }
         _that.$q.notify({
-          message: "restore success",
+          message: _that.$i18n.t("Restore successfully"),
           timeout: 3000,
           type: "info",
           color: "info",

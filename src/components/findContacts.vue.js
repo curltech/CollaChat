@@ -225,7 +225,7 @@ export default {
       payload.createDate = currentTime
       await chatAction.chat(null, payload, peerId)
       _that.$q.notify({
-        message: "Send contacts request and add contacts success",
+        message: _that.$i18n.t("Send contacts request and add contacts successfully"),
         timeout: 3000,
         type: "info",
         color: "info",
@@ -360,7 +360,7 @@ export default {
       await chatAction.chat(null, payload, peerId)
       webrtcPeerPool.create(peerId)
       _that.$q.notify({
-        message: "Accept contacts request and add contacts success",
+        message: _that.$i18n.t("Accept contacts request and add contacts successfully"),
         timeout: 3000,
         type: "info",
         color: "info",
@@ -440,7 +440,7 @@ export default {
           if (err) {
             console.error(err)
             _that.$q.notify({
-              message: 'Failed to read the qr code',
+              message: _that.$i18n.t('Failed to read the qr code'),
               timeout: 3000,
               type: "warning",
               color: "warning",

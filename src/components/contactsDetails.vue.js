@@ -278,7 +278,7 @@ export default {
       payload.createDate = currentTime
       await chatAction.chat(null, payload, peerId)
       _that.$q.notify({
-        message: "Send contacts request and add contacts success",
+        message: _that.$i18n.t("Send contacts request and add contacts successfully"),
         timeout: 3000,
         type: "info",
         color: "info",
@@ -686,7 +686,7 @@ export default {
               function (msg) {
                 console.log(msg)
                 _that.$q.notify({
-                  message: "save success",
+                  message: _that.$i18n.t("Save successfully"),
                   timeout: 3000,
                   type: "info",
                   color: "info",
@@ -695,7 +695,7 @@ export default {
               function (err) {
                 console.log(err)
                 _that.$q.notify({
-                  message: "save failure",
+                  message: _that.$i18n.t("Save failed"),
                   timeout: 3000,
                   type: "warning",
                   color: "warning",

@@ -71,7 +71,7 @@ export default {
       let store = _that.$store
       if (store.state.lockContactsSwitch && _that.password !== myself.password) {
         _that.$q.notify({
-          message: "wrong password",
+          message: _that.$i18n.t("Wrong password"),
           timeout: 3000,
           type: "warning",
           color: "warning",

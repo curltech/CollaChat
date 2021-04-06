@@ -42,14 +42,14 @@ export default {
       // 校验密码
       if (_that.changePasswordData.oldPassword !== myself.password) {
         _that.$q.notify({
-          message: "wrong password",
+          message: _that.$i18n.t("Wrong password"),
           timeout: 3000,
           type: "warning",
           color: "warning",
         })
       } else if (_that.changePasswordData.newPassword !== _that.changePasswordData.newRepeatPassword) {
         _that.$q.notify({
-          message: "inconsistent new passwords",
+          message: _that.$i18n.t("Inconsistent passwords"),
           timeout: 3000,
           type: "warning",
           color: "warning",
@@ -63,7 +63,7 @@ export default {
           console.error(e)
           if (e.message === 'WrongPassword') {
             _that.$q.notify({
-              message: "wrong old password",
+              message: _that.$i18n.t("Wrong password"),
               timeout: 3000,
               type: "warning",
               color: "warning"
@@ -85,7 +85,7 @@ export default {
       // 校验密码
       if (_that.password !== myself.password) {
         _that.$q.notify({
-          message: "wrong password",
+          message: _that.$i18n.t("Wrong password"),
           timeout: 3000,
           type: "warning",
           color: "warning",
@@ -101,14 +101,14 @@ export default {
         let result = await store.connect(config.appParams.connectPeerId[0])
         if (result) {
           _that.$q.notify({
-            message: "reset key success",
+            message: _that.$i18n.t("Reset key successfully"),
             timeout: 3000,
             type: "info",
             color: "info",
           })
         } else {
           _that.$q.notify({
-            message: "reset key failure",
+            message: _that.$i18n.t("Reset key failed"),
             timeout: 3000,
             type: "warning",
             color: "warning"
@@ -129,7 +129,7 @@ export default {
       let store = _that.$store
       if (_that.password !== myself.password) {
         _that.$q.notify({
-          message: "wrong password",
+          message: _that.$i18n.t("Wrong password"),
           timeout: 3000,
           type: "warning",
           color: "warning",
@@ -203,7 +203,7 @@ export default {
               function (msg) {
                 console.log(msg)
                 _that.$q.notify({
-                  message: "save success",
+                  message: _that.$i18n.t("Save successfully"),
                   timeout: 3000,
                   type: "info",
                   color: "info",
@@ -212,7 +212,7 @@ export default {
               function (err) {
                 console.log(err)
                 _that.$q.notify({
-                  message: "save failure",
+                  message: _that.$i18n.t("Save failed"),
                   timeout: 3000,
                   type: "warning",
                   color: "warning",
@@ -274,7 +274,7 @@ export default {
       let store = _that.$store
       if (_that.password !== myself.password) {
         _that.$q.notify({
-          message: "wrong password",
+          message: _that.$i18n.t("Wrong password"),
           timeout: 3000,
           type: "warning",
           color: "warning",

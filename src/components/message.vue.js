@@ -612,49 +612,41 @@ export default {
       let _that = this
       let store = _that.$store
       let messageId = message.messageId
-      let fileData;
-      if (chatComponent.localFileDataMap[messageId]) {
-        fileData = chatComponent.localFileDataMap[messageId]
-      } else {
+      let fileData = chatComponent.localFileDataMap[messageId]
+      if (!fileData) {
         let localAttachs
         localAttachs = await chatBlockComponent.loadLocalAttach(message.messageId)
         if (localAttachs && localAttachs.length > 0) {
           fileData = localAttachs[0].content
-        }
-        if (!fileData) {
+        } else {
           let connectPeerId = message.connectPeerId
           let block = await dataBlockService.findTxPayload(connectPeerId, message.blockId)
-          if(block && block.length > 0){
-            let attach = block[0].attachs[0]
-            attach.ownerPeerId = myself.myselfPeerClient.peerId
-            await chatBlockComponent.saveLocalAttach({attachs : [attach]})
-            fileData = attach.content
-            if (message.contentType === ChatContentType.VIDEO) {
-              fileData = mediaComponent.fixVideoUrl(fileData)
+          if (block && block.length > 0 && block[0]) {
+            if (block[0].attachs && block[0].attachs.length > 0) {
+              let attach = block[0].attachs[0]
+              if (attach) {
+                attach.ownerPeerId = myself.myselfPeerClient.peerId
+                await chatBlockComponent.saveLocalAttach({attachs : [attach]})
+                fileData = attach.content
+                if (message.contentType === ChatContentType.VIDEO) {
+                  fileData = mediaComponent.fixVideoUrl(fileData)
+                }
+                if (attach.originalMessageId) {
+                  message.fileoriginalMessageId = attach.originalMessageId
+                }
+              }
             }
-            if(attach.originalMessageId){
-              message.fileoriginalMessageId = attach.originalMessageId
-            }
-          }else{
-            _that.$q.notify({
-              message: _that.$i18n.t("this file has expired"),
-              timeout: 3000,
-              type: "warning",
-              color: "warning",
-            })
-            return;
           }
         }
         chatComponent.localFileDataMap[message.messageId] = fileData
       }
       if (!fileData) {
         _that.$q.notify({
-          message: _that.$i18n.t("this file has expired"),
+          message: _that.$i18n.t("This file has expired"),
           timeout: 3000,
           type: "warning",
           color: "warning",
         })
-        return;
       }
       return fileData
     },
@@ -1052,7 +1044,7 @@ export default {
       inserted.content = await collectionUtil.getInsertHtml(files)
       await collectionUtil.save('collection', inserted)
       _that.$q.notify({
-        message: _that.$i18n.t("Save Collection Success"),
+        message: _that.$i18n.t("Save Collection successfully"),
         timeout: 3000,
         type: "info",
         color: "info",
@@ -1076,7 +1068,7 @@ export default {
       document.execCommand("copy");
       document.body.removeChild(aux);
       _that.$q.notify({
-        message: _that.$i18n.t("Copy Success"),
+        message: _that.$i18n.t("Copy successfully"),
         timeout: 3000,
         type: "info",
         color: "info",
@@ -2248,7 +2240,7 @@ export default {
         function (err) {
           console.log(err)
           _that.$q.notify({
-            message: _that.$i18n.t("Saved failed"),
+            message: _that.$i18n.t("Save failed"),
             timeout: 3000,
             type: "warning",
             color: "warning",

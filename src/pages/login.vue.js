@@ -125,7 +125,7 @@ export default {
       if (success === false) {
         console.error('validation failure')
         _that.$q.notify({
-          message: "validation failure",
+          message: _that.$i18n.t("Validation failed"),
           timeout: 3000,
           type: "warning",
           color: "warning",
@@ -150,21 +150,21 @@ export default {
         console.log(e)
         if (e.message === 'InvalidAccount' || e.message === 'VerifyNotPass') {
           _that.$q.notify({
-            message: "invalid account",
+            message: _that.$i18n.t("Invalid account"),
             timeout: 3000,
             type: "warning",
             color: "warning",
           })
         } else if (e.message === 'WrongPassword') {
           _that.$q.notify({
-            message: "wrong password",
+            message: _that.$i18n.t("Wrong password"),
             timeout: 3000,
             type: "warning",
             color: "warning"
           })
         } else if (e.message === 'AccountNotExists') {
           _that.$q.notify({
-            message: "account does not exist",
+            message: _that.$i18n.t("Account does not exist"),
             timeout: 3000,
             type: "warning",
             color: "warning",
@@ -182,7 +182,7 @@ export default {
       if (!myself) {
         console.error('login failure')
         _that.$q.notify({
-          message: "login failure",
+          message: _that.$i18n.t("Login failed"),
           timeout: 3000,
           type: "warning",
           color: "warning",
@@ -249,7 +249,7 @@ export default {
           if (err) {
             console.error(err)
             _that.$q.notify({
-              message: 'Failed to read the qr code',
+              message: _that.$i18n.t('Failed to read the qr code'),
               timeout: 3000,
               type: "warning",
               color: "warning",
@@ -300,7 +300,7 @@ export default {
           _that.loginData.mobile_ = mobileObject.getNationalNumber() + ''
           _that.loginData.countryRegion_ = _that.options[CollaConstant.countryCodeISO[_that.language].indexOf(_that.loginData.code_)]
           _that.$q.notify({
-            message: "import success",
+            message: _that.$i18n.t("Import successfully"),
             timeout: 3000,
             type: "info",
             color: "info",
@@ -310,14 +310,14 @@ export default {
         console.log(e)
         if (e.message === 'InvalidID') {
           _that.$q.notify({
-            message: "invalid ID",
+            message: _that.$i18n.t("Invalid account"),
             timeout: 3000,
             type: "warning",
             color: "warning",
           })
         } else if (e.message === 'AccountExists') {
           _that.$q.notify({
-            message: "account already exists",
+            message: _that.$i18n.t("Account already exists"),
             timeout: 3000,
             type: "warning",
             color: "warning",
@@ -340,7 +340,7 @@ export default {
       if (success === false) {
         console.error('validation failure')
         _that.$q.notify({
-          message: "validation failure",
+          message: _that.$i18n.t("Validation failed"),
           timeout: 3000,
           type: "warning",
           color: "warning",
@@ -361,14 +361,14 @@ export default {
         console.log(e)
         if (e.message === 'ErrorPassword') {
           _that.$q.notify({
-            message: "inconsistent password",
+            message: _that.$i18n.t("Inconsistent passwords"),
             timeout: 3000,
             type: "warning",
             color: "warning",
           })
         } else if (e.message === 'AccountExists') {
           _that.$q.notify({
-            message: "account already exists",
+            message: _that.$i18n.t("Account already exists"),
             timeout: 3000,
             type: "warning",
             color: "warning",
@@ -386,7 +386,7 @@ export default {
       if (!myself) {
         console.error('registration failure')
         _that.$q.notify({
-          message: _that.$i18n.t("registration failure"),
+          message: _that.$i18n.t("Registration failed"),
           timeout: 3000,
           type: "warning",
           color: "warning",
@@ -477,7 +477,7 @@ export default {
           if (err) {
             console.error(err)
             _that.$q.notify({
-              message: 'Failed to read the qr code',
+              message: _that.$i18n.t('Failed to read the qr code'),
               timeout: 3000,
               type: "warning",
               color: "warning",

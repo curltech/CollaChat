@@ -72,7 +72,7 @@ export default {
       } else {
         if (this.developerOption === true && this.password !== 'iamdeveloper' && this.password !== 'iamprogrammer') {
           this.$q.notify({
-            message: "wrong password",
+            message: this.$i18n.t("Wrong password"),
             timeout: 3000,
             type: "warning",
             color: "warning",

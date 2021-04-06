@@ -38,7 +38,7 @@ export default {
       // 校验密码
       if (_that.password !== myself.password) {
         _that.$q.notify({
-          message: "wrong password",
+          message: _that.$i18n.t("Wrong password"),
           timeout: 3000,
           type: "warning",
           color: "warning",
@@ -80,14 +80,14 @@ export default {
         console.log(result)
         if (result === 'OK') {
           this.$q.notify({
-            message: "change visibility setting success",
+            message: this.$i18n.t("Change visibility setting successfully"),
             timeout: 3000,
             type: "info",
             color: "info"
           })
         } else {
           this.$q.notify({
-            message: "change visibility setting failure",
+            message: this.$i18n.t("Change visibility setting failed"),
             timeout: 3000,
             type: "warning",
             color: "warning"

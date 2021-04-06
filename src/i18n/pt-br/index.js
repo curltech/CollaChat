@@ -94,7 +94,7 @@ export default {
   "Confirm the bulk delete operation？": "Você confirma a operação de exclusão em lote？",
   "Successfully deleted": "Excluído com sucesso",
   "Successfully removed": "Removído com sucesso",
-  "Batch delete succeeded": "Exclusão em lote realizada com sucesso",
+  "Batch delete successfully": "Exclusão em lote realizada com sucesso",
   Save: "Gravar",
   "Saved successfully": "Gravado com sucesso",
   Search: "Pesquisar",
