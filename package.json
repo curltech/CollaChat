@@ -52,7 +52,7 @@
   ],
   "dependencies": {
     "@quasar/extras": "^1.9.5",
-    "alloycrop4curltech": "^1.0.4-curltech",
+    "alloycrop-curltech": "^1.0.4",
     "alloyfinger": "^0.1.16",
     "compressorjs": "^1.0.6",
     "css3transform": "^1.2.3",
