@@ -29,31 +29,35 @@ const Router = new VueRouter({
 
 const whiteList = ['/403', '/p2p', '/'] // 设置白名单，避免死循环
 
-//地址栏改变，比$route(to)先触发
+// 地址栏改变，比$route(to)先触发
 Router.beforeEach(async (to, from, next) => {
-  if (whiteList.indexOf(to.path) !== -1) { // 在免登录白名单，直接进入
-    next()
+  if (store.peers) {
+    console.log('***ignore***')
     return
-  }
-
-  let token = store.state.myselfPeerClient;
-  //已经登录连接成功
-  if (token) {
-    next()
-  } else { //没有登录连接成功
-    next('/')
+  } else {
+    if (whiteList.indexOf(to.path) !== -1) { // 在免登录白名单，直接进入
+      next()
+      return
+    }
+    let token = store.state.myselfPeerClient;
+    // 已经登录连接成功
+    if (token) {
+      next()
+    } else { // 没有登录连接成功
+      next('/')
+    }
   }
   /*let token = store.state.authToken.token;
-  //已经登录
+  // 已经登录
   if (token && token.username) {
     let currentUser = store.state.user.currentUser;
-    //存在当前用户
+    // 存在当前用户
     if (currentUser && currentUser.loginName) {
       next()
     } else {
       next('/login')
     }
-  } else { //没有登录
+  } else { // 没有登录
     next('/login')
   }
   //let menu = MenuUtil.getMenuByName(to.name, store.getters.accessMenu);
