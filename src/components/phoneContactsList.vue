@@ -120,9 +120,9 @@
           q-item-section
             q-item-label {{ $t('Mobile') }}
           q-item-section(side) {{ currentPeerContact.mobile }}
-        q-separator.c-separator(
-          style="margin-left:16px;width:calc(100% - 16px)"
-        )
+        //q-separator.c-separator(
+            style="margin-left:16px;width:calc(100% - 16px)"
+          )
         q-item(clickable, v-ripple, v-if="currentPeerContact.peerId")
           q-item-section
             q-item-label {{ $t('Peer Id') }}
@@ -137,17 +137,20 @@
               v-clipboard:success="onCopySuccess",
               v-clipboard:error="onCopyFailure"
             )
-        q-separator.c-separator(
+        q-separator.c-separator(v-if="currentPeerContact.peerId"
           style="margin-left:16px;width:calc(100% - 16px)"
         )
         q-item(clickable, v-ripple, v-if="currentPeerContact.peerId")
           q-item-section
             q-item-label {{ $t('UserName') }}
           q-item-section(side) {{ currentPeerContact.name }}
+        //q-separator.c-separator(
+            style="margin-left:16px;width:calc(100% - 16px)"
+          )
         q-separator.c-separator(
-          style="margin-left:16px;width:calc(100% - 16px)"
+          style="height:8px;margin-left:0px;margin-right:0px"
         )
-        q-item(clickable, v-ripple, v-if="currentPeerContact.peerId")
+        //q-item(clickable, v-ripple, v-if="currentPeerContact.peerId")
           q-item-section
             q-item-label {{ $t('isLinkman') }}
           q-item-section(side, v-if="!currentPeerContact.isLinkman === true")
@@ -160,37 +163,55 @@
             )
           q-item-section(side, v-if="currentPeerContact.isLinkman === true")
             q-icon(color="primary", name="group")
-        q-separator.c-separator(
-          style="margin-left:16px;width:calc(100% - 16px)"
-        )
-        q-item(clickable, v-ripple, v-if="currentPeerContact.peerId")
+        //q-separator.c-separator(
+            style="margin-left:16px;width:calc(100% - 16px)"
+          )
+        q-item(clickable, v-ripple, v-if="currentPeerContact.isLinkman === true" @click="$store.gotoChat(currentPeerContact.peerId)")
+          q-item-section
+          q-item-section(side, style="padding-left:0px")
+            q-icon(
+              name="chat",
+              :color="$store.state.currentLinkman && $store.state.currentLinkman.activeStatus === ActiveStatus.UP ? 'primary' : 'c-grey'"
+            )
+          q-item-section(
+            side,
+            :class="$store.state.currentLinkman && $store.state.currentLinkman.activeStatus === ActiveStatus.UP ? 'text-primary' : ''"
+          ) {{ $t('Goto Chat') }}
+          q-item-section
+        q-item(clickable, v-ripple, v-if="currentPeerContact.peerId && currentPeerContact.isLinkman !== true" @click="showAddContacts")
+          q-item-section
+          q-item-section(side, style="padding-left:0px")
+            q-icon(name="person_add" color="primary")
+          q-item-section.text-primary(side) {{ $t('Add Contacts') }}
+          q-item-section
+        //q-item(clickable, v-ripple, v-if="currentPeerContact.peerId")
           q-item-section
             q-item-label {{ $t('givenName') }}
           q-item-section(side) {{ currentPeerContact.givenName }}
-        q-separator.c-separator(
-          style="margin-left:16px;width:calc(100% - 16px)"
-        )
-        q-item(clickable, v-ripple, v-if="currentPeerContact.peerId")
+        //q-separator.c-separator(
+            style="margin-left:16px;width:calc(100% - 16px)"
+          )
+        //q-item(clickable, v-ripple, v-if="currentPeerContact.peerId")
           q-item-section
             q-item-label {{ $t('publicKey') }}
             q-item-label(caption, lines="3") {{ currentPeerContact.publicKey }}
-        q-separator.c-separator(
-          style="margin-left:16px;width:calc(100% - 16px)"
-        )
-        q-item(clickable, v-ripple, v-if="currentPeerContact.peerId")
+        //q-separator.c-separator(
+            style="margin-left:16px;width:calc(100% - 16px)"
+          )
+        //q-item(clickable, v-ripple, v-if="currentPeerContact.peerId")
           q-item-section
             q-item-label {{ $t('locked') }}
           q-item-section(side) {{ currentPeerContact.locked }}
-        q-separator.c-separator(
-          style="margin-left:16px;width:calc(100% - 16px)"
-        )
-        q-item(clickable, v-ripple, v-if="currentPeerContact.peerId")
+        //q-separator.c-separator(
+            style="margin-left:16px;width:calc(100% - 16px)"
+          )
+        //q-item(clickable, v-ripple, v-if="currentPeerContact.peerId")
           q-item-section
             q-item-label {{ $t('status') }}
           q-item-section(side) {{ currentPeerContact.status }}
-        q-separator.c-separator(
-          style="margin-left:16px;width:calc(100% - 16px)"
-        )
+        //q-separator.c-separator(
+            style="margin-left:16px;width:calc(100% - 16px)"
+          )
     q-tab-panel(name="contactsDetails", style="padding:0px 0px")
       contactsDetails.drawcontent
     q-tab-panel(name="findContacts", style="padding:0px 0px")
