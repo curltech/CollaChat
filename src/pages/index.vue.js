@@ -2259,6 +2259,20 @@ export default {
       await _that.setNetworkStatus(false)
     })
     if (window.device) {
+        document.addEventListener('deviceready', async function () {
+          if(window.device.platform === 'Android'){
+                  document.addEventListener('backbutton', function (e) {
+                    navigator.app.clearHistory()
+                    if(!(_that.$refs[`mainDrawer`] && _that.$refs[`mainDrawer`].value)){
+                      navigator.Backbutton.goHome(function() {
+                        console.log('goHome success')
+                      }, function() {
+                        console.log('goHome fail')
+                      })
+                    }
+                  },false)
+          }
+        })
         cordova.plugins.backgroundMode.enable();
         cordova.plugins.backgroundMode.on('activate', function() {
           cordova.plugins.backgroundMode.disableWebViewOptimizations();

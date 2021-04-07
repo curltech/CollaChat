@@ -156,7 +156,7 @@ q-layout
   q-drawer.mainDrawer(
     v-if="!$store.state.ifScan",
     :no-swipe-close="noSwipeClose",
-    v-model="drawer",
+    v-model="drawer",ref='mainDrawer',
     side="right",
     :overlay="ifMobileSize || $store.state.ifMobileStyle",
     :width="width",

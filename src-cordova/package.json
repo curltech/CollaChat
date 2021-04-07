@@ -19,6 +19,7 @@
     "cordova-plugin-add-swift-support": "^2.0.2",
     "cordova-plugin-audio-recorder-api-curltech": "^0.0.6",
     "cordova-plugin-audioinput-curltech": "^1.0.2",
+    "cordova-plugin-backbutton": "^0.3.0",
     "cordova-plugin-background-mode": "^0.7.3",
     "cordova-plugin-badge": "^0.8.8",
     "cordova-plugin-battery-status": "~2.0.3",
@@ -117,7 +118,8 @@
       "sqli-cordova-disk-space-plugin": {},
       "cordova-plugin-photokandy-video-thumbnail": {},
       "cordova-plugin-badge": {},
-      "cordova-plugin-background-mode": {}
+      "cordova-plugin-background-mode": {},
+      "cordova-plugin-backbutton": {}
     },
     "platforms": [
       "ios",
