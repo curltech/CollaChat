@@ -232,7 +232,6 @@ export default {
       } catch (e) {
         await logService.log(e, 'setupSocketError', 'error')
       }
-      await logService.log('test', 'test', 'error')
     },
     buildSocket: async function () {
       let _that = this

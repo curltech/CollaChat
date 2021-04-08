@@ -31,7 +31,7 @@ const whiteList = ['/403', '/p2p', '/'] // 设置白名单，避免死循环
 
 // 地址栏改变，比$route(to)先触发
 Router.beforeEach(async (to, from, next) => {
-  if (store.peers) {
+  if (to.name === 'rootRouter' && store.peers) {
     console.log('***ignore***')
     return
   } else {
