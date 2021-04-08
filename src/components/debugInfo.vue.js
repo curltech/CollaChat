@@ -29,13 +29,11 @@ export default {
   methods: {
     async searchDateInput(value) {
       let _that = this
-      let store = _that.$store
       await _that.search()
       _that.$refs.qDateProxy.hide()
     },
     async cleanSearchDate() {
       let _that = this
-      let store = _that.$store
       _that.searchDate = null
       await _that.search()
     },
@@ -56,14 +54,25 @@ export default {
     },
     async search() {
       let _that = this
-      let store = _that.$store
       _that.searching = true
       let searchTimestamp = 0
       if (_that.searchDate) {
         searchTimestamp = new Date(new Date(_that.searchDate).toLocaleDateString()).getTime()
       }
-      _that.logResultList = await logService.search(_that.searchText, _that.logLevel, searchTimestamp)
-      console.log(JSON.stringify(_that.logResultList))
+      if (_that.searchText) {
+        _that.logResultList = await logService.search(_that.searchText, _that.logLevel, searchTimestamp)
+      } else {
+        let condition = {}
+        if (_that.logLevel) {
+          condition['level'] = _that.logLevel
+        }
+        if (searchTimestamp) {
+          condition['createTimestamp'] = { $gte: searchTimestamp, $lt: searchTimestamp + 24 * 60 * 60 * 1000 }
+        } else {
+          condition['createTimestamp'] = { $gt: null }
+        }
+        _that.logResultList = await logService.find(condition, [{ createTimestamp: 'desc' }], null)
+      }
     },
     async clean() {
       let _that = this
@@ -101,9 +110,19 @@ export default {
       return date.formatDate(new Date(createTimestamp), 'YYYY-MM-DD HH:mm')
     }
   },
+  async created() {
+    let _that = this
+    await _that.search()
+  },
   watch: {
     async logLevel(val) {
       await this.search()
+    },
+    async searchText(val) {
+      let _that = this
+      if (!val) {
+        await _that.search()
+      }
     }
   }
 }
