@@ -128,7 +128,7 @@
   "Remove this chat (together with chat records)?": "このチャットを削除する（チャット記録を含む）？",
   "Remove this group chat (together with chat records)?": "このグループのチャット（チャット記録を含む）を削除しますか？",
   "Ownership Handover": "群主身分譲渡",
-  "Please handover your owner ship first！": "まず,グループのリーダーシップを譲渡してください。",
+  "Please handover your ownership first!": "まず,グループのリーダーシップを譲渡してください！",
   "Search Chat History": "チャットの内容を探す",
   "Clean Chat History": "空回りチャット記録",
   "Alert New Message": "メッセージは邪魔しないでください",

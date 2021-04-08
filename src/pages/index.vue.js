@@ -1351,7 +1351,7 @@ export default {
           await store.addCHATSYSMessage(chat, chatMessage)
         }
         _that.$q.notify({
-          message: "Receive contacts request from " + srcName + (linkman ? ", auto accept it as the requestor is already in your contacts list" : ""),
+          message: _that.$i18n.t("Receive contacts request from ") + srcName + (linkman ? _that.$i18n.t(", auto accept it as the requestor is already in your contacts list") : ""),
           timeout: 3000,
           type: "info",
           color: "info",

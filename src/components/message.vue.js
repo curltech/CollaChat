@@ -1315,7 +1315,7 @@ export default {
       }
       if (groupChat.groupOwnerPeerId === myselfPeerClient.peerId && remainingLinkmanCount > 0) {
         _that.$q.notify({
-          message: "Please handover your ownership first!",
+          message: _that.$i18n.t("Please handover your ownership first!"),
           timeout: 3000,
           type: "info",
           color: "info",
