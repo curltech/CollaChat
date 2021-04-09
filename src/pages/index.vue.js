@@ -430,8 +430,8 @@ export default {
               },
               {
                 urls: `turn:${ _connectAddress }:3478`,
-                username: `wf`,
-                credential: `wf123`
+                username: myselfPeerClient.peerId,
+                credential: myselfPeerClient.peerPublicKey
               }
           ]
           config.appParams.iceServer = [iceServer]
