@@ -2552,6 +2552,8 @@ export default {
     window.$store = store
     chatAction.registReceiver('chat', _that.chatReceiver)
     p2pChatAction.registReceiver('p2pChat', _that.p2pChatReceiver)
+    webrtcPeerPool.peerId = myself.myselfPeerClient.peerId
+    webrtcPeerPool.peerPublicKey = myself.myselfPeerClient.peerPublicKey
     webrtcPeerPool.registEvent('connect',_that.webrtcConnect)
     webrtcPeerPool.registEvent('close',_that.webrtcClose)
     webrtcPeerPool.registEvent('stream',async function(evt){
