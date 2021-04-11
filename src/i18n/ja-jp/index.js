@@ -25,7 +25,7 @@
   "South Korea": "韓国",
   "USA-Virginia": "米国-バージニア",
   "Code": "コード",
-  "Node Address(IP:Port)": "ポジショナアドレス（IP:ポート）",
+  "Node Address": "ポジショナアドレス",
   "Use Custom Node": "カスタムポジショナ",
   "Default": "デフォルト",
   "Custom": "カスタム",

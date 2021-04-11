@@ -108,9 +108,9 @@
                 q-select.c-field(style="width:280px;padding-bottom:20px" :label="$t('Language')" filled dense v-model="language" emit-value map-options :options="languageOptions")
                 //div(style="width:280px" align="left" class="q-pa-sm")
                   q-toggle(v-model="connectAddressType" false-value="default" true-value="custom" left-label :label="$t('Use Custom Node')")
-                //q-input.c-field(style="width:280px" :disable="connectAddressType !== 'custom'?true:false" filled dense clearable v-model="connectAddress" lazy-rules :rules="[val => (connectAddressType === 'default' || (connectAddressType === 'custom' && val && val.length > 0)) || $t('Please input Node Address')]" :label="$t('Node Address(IP:Port)')")
+                //q-input.c-field(style="width:280px" :disable="connectAddressType !== 'custom'?true:false" filled dense clearable v-model="connectAddress" lazy-rules :rules="[val => (connectAddressType === 'default' || (connectAddressType === 'custom' && val && val.length > 0)) || $t('Please input Node Address')]" :label="$t('Node Address')")
                 q-select.c-field(style="width: 280px !important;padding-bottom:5px" :label="$t('MyNodes')" filled dense clearable v-model="connectAddress" emit-value map-options :options="connectAddressOptions")
-                q-input.c-field(style="width:280px !important" :class="connectAddress === 'custom' ? '' : 'hidden'" filled dense clearable v-model="customConnectAddress" lazy-rules :rules="[val => (connectAddress !== 'custom' || (connectAddress === 'custom' && val && val.length > 0)) || $t('Please input Node Address')]" :label="$t('Node Address(IP:Port)')")
+                q-input.c-field(style="width:280px !important" :class="connectAddress === 'custom' ? '' : 'hidden'" filled dense clearable v-model="customConnectAddress" lazy-rules :rules="[val => (connectAddress !== 'custom' || (connectAddress === 'custom' && val && val.length > 0)) || $t('Please input Node Address')]" :label="$t('Node Address')")
 </template>
 <script src="./login.vue.js" />
 <style lang="stylus" src="../css/login.styl"/>

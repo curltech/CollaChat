@@ -25,7 +25,7 @@ export default {
   "South Korea": "韩国",
   "USA-Virginia": "美国-弗吉尼亚",
   "Code": "区号",
-  "Node Address(IP:Port)": "定位器地址（IP:端口）",
+  "Node Address": "定位器地址",
   "Use Custom Node": "自定义定位器",
   "Default": "默认",
   "Custom": "自定义",

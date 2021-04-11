@@ -554,6 +554,9 @@ export default {
           break
         }
       }
+      if (!label) {
+        label = _that.$i18n.t("Use Custom Node") + ' (' + address + ')'
+      }
       return label
     }
   },

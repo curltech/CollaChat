@@ -25,7 +25,7 @@
   "South Korea": "한국",
   "USA-Virginia": "미국 - 버 지 니 아",
   "Code": "지역 번호",
-  "Node Address(IP:Port)": "위치 지정 기 주소 (IP: 포트)",
+  "Node Address": "위치 지정 기 주소",
   "Use Custom Node": "사용자 정의 위치 지정 기",
   "Default": "묵인",
   "Custom": "사용자 정의",

@@ -25,7 +25,7 @@
   "South Korea": "韓國",
   "USA-Virginia": "美國-弗吉尼亞",
   "Code": "區號",
-  "Node Address(IP:Port)": "定位器地址（IP:端口）",
+  "Node Address": "定位器地址",
   "Use Custom PeerEndPoint": "自定義定位器",
   "Default": "默認",
   "Custom": "自定義",

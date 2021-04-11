@@ -25,7 +25,7 @@ export default {
   "South Korea": "South Korea",
   "USA-Virginia": "USA-Virginia",
   "Code": "Code",
-  "Node Address(IP:Port)": "Node Address(IP:Port)",
+  "Node Address": "Node Address",
   "Use Custom Node": "Use Custom Node",
   "Default": "Default",
   "Custom": "Custom",
