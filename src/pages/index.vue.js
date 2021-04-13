@@ -321,15 +321,11 @@ export default {
           let linkmanRecord = null
           for (let peer of store.peerClients) {
             if (peer.clientId === myselfPeerClient.clientId && peer.peerId === myselfPeerClient.peerId && Date.parse(peer.lastUpdateTime) > Date.parse(myselfPeerClient.lastUpdateTime)) {
-              myselfPeerClient.avatar = peer.avatar
-              myselfPeerClient.name = peer.name
               //myselfPeerClient.mobile = peer.mobile
               //myselfPeerClient.publicKey = peer.publicKey
               //myselfPeerClient.privateKey = peer.privateKey
               myselfPeerClient.visibilitySetting = peer.visibilitySetting
 
-              myselfPeer.avatar = peer.avatar
-              myselfPeer.name = peer.name
               //myselfPeer.mobile = peer.mobile
               //myselfPeer.publicKey = peer.publicKey
               //myselfPeer.privateKey = peer.privateKey
@@ -337,6 +333,12 @@ export default {
 
               // 更新对应linkman
               if (myselfPeerClient.avatar !== peer.avatar || myselfPeerClient.name !== peer.name) {
+                myselfPeerClient.avatar = peer.avatar
+                myselfPeerClient.name = peer.name
+
+                myselfPeer.avatar = peer.avatar
+                myselfPeer.name = peer.name
+                
                 linkman.avatar = peer.avatar
                 linkman.name = peer.name
                 linkman.pyName = pinyinUtil.getPinyin(peer.name)

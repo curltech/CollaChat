@@ -297,7 +297,7 @@ export default {
       let myselfPeerClient = myself.myselfPeerClient
       let isPhoneNumberValid = false
       try {
-        isPhoneNumberValid = MobileNumberUtil.isPhoneNumberValid(mobile_, MobileNumberUtil.getRegionCodeForCountryCode(this.code_))
+        isPhoneNumberValid = MobileNumberUtil.isPhoneNumberValid(this.mobile_, MobileNumberUtil.getRegionCodeForCountryCode(this.code_))
       } catch (e) {
         console.log(e)
       }
