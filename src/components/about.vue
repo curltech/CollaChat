@@ -20,7 +20,7 @@
                 q-item-section
                   q-item-label {{$t('Current Version')}}
                 q-item-section(side)
-                  q-item-label V0.2.14
+                  q-item-label {{ $store.currentVersion }}
                 //q-item-section(side)
                   q-icon(name="keyboard_arrow_right")
               q-separator.c-separator

@@ -6,10 +6,11 @@ import { webrtcPeerPool } from 'libcolla'
 import { signalProtocol } from 'libcolla'
 import { PeerEndpoint, peerEndpointService } from 'libcolla'
 import { libp2pClientPool, config, peerClientService, p2pPeer, myself, myselfPeerService, ChatMessageType, chatAction, p2pChatAction, logService } from 'libcolla'
+import { HttpClient } from 'libcolla'
 
 import pinyinUtil from '@/libs/base/colla-pinyin'
 import * as CollaConstant from '@/libs/base/colla-constant'
-import { statusBarComponent, deviceComponent, localNotificationComponent } from '@/libs/base/colla-cordova'
+import { statusBarComponent, deviceComponent, localNotificationComponent, inAppBrowserComponent } from '@/libs/base/colla-cordova'
 import { cameraComponent, systemAudioComponent, mediaComponent } from '@/libs/base/colla-media'
 import { CollectionType } from '@/libs/biz/colla-collection'
 import { ChatDataType, ChatContentType, P2pChatMessageType, SubjectType, chatComponent, chatBlockComponent} from '@/libs/biz/colla-chat'
@@ -137,6 +138,24 @@ export default {
         ]
       }
     },
+    checkVersion(currentVersion, latestVersion) {
+      currentVersion = currentVersion ? currentVersion.replace(/[vV]/, "") : "0.0.0"
+      latestVersion = latestVersion ? latestVersion.replace(/[vV]/, "") : "0.0.0"
+      if (currentVersion == latestVersion) {
+        return false
+      }
+      let currentVersionArr = currentVersion.split(".")
+      let latestVersionArr = latestVersion.split(".")
+      let len = Math.max(currentVersionArr.length, latestVersionArr.length)
+      for (let i = 0; i < len; i++) {
+          let currentVer = ~~currentVersionArr[i]
+          let latestVer = ~~latestVersionArr[i]
+          if (currentVer < latestVer) {
+              return true
+          }
+      }
+      return false
+    },
     /**
      * 1）登录时不选择或者输入定位器，且当前账号localdb-myselfPeerEndPoints集合为空的（首次登录），从官方定位器列表集合中选择ping延时最小的连接，根据connect返回的closest节点集合【初始化】当前账号localdb-myselfPeerEndPoints集合（连接节点priority=1）；
      * 2）登录时不选择或者输入定位器，且当前账号localdb-myselfPeerEndPoints集合不为空的，从该集合中选择ping延时最小的连接，根据connect返回的closest节点集合【更新】当前账号localdb-myselfPeerEndPoints集合（连接节点原priority-X不为1的，更新为1，原priority-1的节点priorty更新为X）；
@@ -146,6 +165,53 @@ export default {
     setupSocket: async function () {
       let _that = this
       let store = this.$store
+      store.currentVersion = '0.2.14'
+      let latestVersion = store.currentVersion
+      let versionHistory = [latestVersion]
+      try {
+        let httpClient = new HttpClient()
+        if (httpClient) {
+          let serviceData = await httpClient.get("https://curltech.io/conf/versionHistory.conf?time=" + new Date().getTime())
+          versionHistory = serviceData.data
+        }
+      } catch (e) {
+        console.error(e)
+      }
+      let mandatory = false
+      let no = 1
+      for (let version of versionHistory) {
+        if (_that.checkVersion(store.currentVersion, version)) {
+          if (no === 1) {
+            latestVersion = version
+          }
+          if (version.substring(0, 1) === 'V') {
+            mandatory = true
+            break
+          }
+        } else {
+          break
+        }
+        no++
+      }
+      if (latestVersion !== store.currentVersion) {
+        Dialog.create({
+          title: _that.$i18n.t('Confirm'),
+          message: mandatory ? _that.$i18n.t('Please upgrade to the new version!') : _that.$i18n.t('There is a new version available, would you like to upgrade now?'),
+          cancel: {"label":mandatory ? _that.$i18n.t('Logout') : _that.$i18n.t('Cancel'),"color":"primary","unelevated":true,"no-caps":true},
+          ok: {"label":_that.$i18n.t('Ok'),"color":"primary","unelevated":true,"no-caps":true},
+          persistent: true
+        }).onOk(async () => {
+          if (store.ifMobile()) {
+            let inAppBrowser = inAppBrowserComponent.open('https://apps.apple.com/cn/app/collachat/id1546363298', '_blank', 'location=no')
+          } else {
+            window.open('https://apps.apple.com/cn/app/collachat/id1546363298', '_blank')
+          }
+        }).onCancel(async () => {
+          if (mandatory) {
+            await store.logout()
+          }
+        })
+      }
       try {
         store.state.networkStatus = 'CONNECTING'
         let myselfPeerClient = myself.myselfPeerClient
