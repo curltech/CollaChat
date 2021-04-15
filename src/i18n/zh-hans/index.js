@@ -52,6 +52,8 @@ export default {
   "Account Name": "账号名称",
   "Country/Region": "国家/地区",
   "Account already exists with same mobile number": "已经存在身份与相同手机号关联",
+  "Please upgrade to the new version!": "请升级到新版本！",
+  "There is a new version available, upgrade now?": "检测到新版本，是否现在升级？",
 
   // Contacts
   "LastConnectTime: ": "最近连接时间：",

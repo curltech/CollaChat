@@ -52,6 +52,8 @@
   "Account Name": "アカウント名",
   "Country/Region": "国家/地域",
   "Account already exists with same mobile number": "すでに身分が同じ携帯番号と関連があります",
+  "Please upgrade to the new version!": "新しいバージョンにアップグレードしてください！",
+  "There is a new version available, upgrade now?": "新しいバージョンが検出されました，今すぐアップグレードしますか？",
 
   // Contacts
   "LastConnectTime: ": "最近の接続時間：",

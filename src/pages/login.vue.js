@@ -1,4 +1,4 @@
-import { colors } from 'quasar'
+import { colors, Dialog } from 'quasar'
 import { required } from 'vuelidate/lib/validators'
 import QrCode from 'qrcode-reader'
 
@@ -11,7 +11,7 @@ import { config, myselfPeerService, peerProfileService, ClientDevice, EntityStat
 import * as CollaConstant from '@/libs/base/colla-constant'
 import pinyinUtil from '@/libs/base/colla-pinyin'
 import { cameraComponent, systemAudioComponent } from '@/libs/base/colla-media'
-import { deviceComponent, statusBarComponent, simComponent } from '@/libs/base/colla-cordova'
+import { deviceComponent, statusBarComponent, simComponent, inAppBrowserComponent } from '@/libs/base/colla-cordova'
 import { ContactDataType, LinkmanStatus, ActiveStatus, contactComponent } from '@/libs/biz/colla-contact'
 
 import defaultActiveAvatar from '@/assets/colla-o1.png'
@@ -558,6 +558,84 @@ export default {
         label = _that.$i18n.t("Use Custom Node") + ' (' + address + ')'
       }
       return label
+    },
+    checkVersion(currentVersion, latestVersion) {
+      currentVersion = currentVersion ? currentVersion.replace(/[vV]/, "") : "0.0.0"
+      latestVersion = latestVersion ? latestVersion.replace(/[vV]/, "") : "0.0.0"
+      if (currentVersion == latestVersion) {
+        return false
+      }
+      let currentVersionArr = currentVersion.split(".")
+      let latestVersionArr = latestVersion.split(".")
+      let len = Math.max(currentVersionArr.length, latestVersionArr.length)
+      for (let i = 0; i < len; i++) {
+          let currentVer = ~~currentVersionArr[i]
+          let latestVer = ~~latestVersionArr[i]
+          if (currentVer < latestVer) {
+              return true
+          }
+      }
+      return false
+    },
+    async upgradeVersion(start) {
+      let _that = this
+      let store = this.$store
+      store.currentVersion = '0.2.15'
+      let latestVersion = store.currentVersion
+      let versionHistory = [latestVersion]
+      let type = 'others'
+      if (store.ios === true) {
+        type = 'ios'
+      } else if (store.android === true) {
+        type = 'android'
+      } else if (store.safari === true) {
+        type = 'safari'
+      }
+      try {
+        let httpClient = new HttpClient()
+        if (httpClient) {
+          let serviceData = await httpClient.get("https://curltech.io/conf/versionHistory-" + type + ".conf?time=" + new Date().getTime())
+          versionHistory = serviceData.data
+        }
+      } catch (e) {
+        console.error(e)
+      }
+      let mandatory = false
+      let no = 1
+      for (let version of versionHistory) {
+        if (_that.checkVersion(store.currentVersion, version)) {
+          if (no === 1) {
+            latestVersion = version
+          }
+          if (version.substring(0, 1) === 'V') {
+            mandatory = true
+            break
+          }
+        } else {
+          break
+        }
+        no++
+      }
+      if (latestVersion !== store.currentVersion) {
+        Dialog.create({
+          title: _that.$i18n.t('Alert'),
+          message: start && mandatory ? _that.$i18n.t('Please upgrade to the new version!') : _that.$i18n.t('There is a new version available, upgrade now?'),
+          cancel: start && mandatory ? false : {"label":_that.$i18n.t('Cancel'),"color":"primary","unelevated":true,"no-caps":true},
+          ok: {"label":_that.$i18n.t('Ok'),"color":"primary","unelevated":true,"no-caps":true},
+          persistent: true
+        }).onOk(() => {
+          if (store.ios === true) {
+            let inAppBrowser = inAppBrowserComponent.open('https://apps.apple.com/cn/app/collachat/id1546363298', '_self', 'location=no')
+          } else if (store.android === true) {
+            let inAppBrowser = inAppBrowserComponent.open('https://curltech.io', '_self', 'location=no')
+          } else if (store.safari === true) {
+            window.open('https://apps.apple.com/cn/app/collachat/id1546363298', '_self')
+          } else {
+            window.open('https://curltech.io/#/CollaChatDownload', '_self')
+          }
+        }).onCancel(() => {
+        })
+      }
     }
   },
   computed: {
@@ -750,6 +828,8 @@ export default {
     config.appParams.clientType = window.device ? deviceComponent.getDeviceProperty('model') : 'PC'
     config.appParams.clientDevice = store.ifMobile() ? ClientDevice.MOBILE : ClientDevice.DESKTOP
     config.appParams.language = _that.$i18n.locale
+    store.upgradeVersion = _that.upgradeVersion
+    await _that.upgradeVersion(true)
   },
   watch: {
     loginDataCountryRegion(val) {

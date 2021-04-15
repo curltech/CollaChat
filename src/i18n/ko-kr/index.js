@@ -52,6 +52,8 @@
   "Account Name": "계 정 이름",
   "Country/Region": "국가 / 지역",
   "Account already exists with same mobile number": "같은 핸드폰 번호 와 신분 이 연 결 돼 있다",
+  "Please upgrade to the new version!": "새 버전으로 업그레이드하세요！",
+  "There is a new version available, upgrade now?": "새 버전이 감지되었습니다，지금 업그레이드 하시겠습니까？",
 
   // Contacts
   "LastConnectTime: ": "최근 접속 시간：",

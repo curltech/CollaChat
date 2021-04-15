@@ -603,46 +603,64 @@ export default {
     },
     // 删除
     async del(current) {
+      let _that = this
       if (!current) {
-        current = this.myCollections.c_meta.current
+        current = _that.myCollections.c_meta.current
       } else {
-        this.myCollections.c_meta.current = current
+        _that.myCollections.c_meta.current = current
       }
-      Dialog.create({
-        title: this.$i18n.t('Confirm'),
-        message: this.$i18n.t('Confirm the deletion?'),
-        cancel: {"label":this.$i18n.t('Cancel'),"color":"primary","unelevated":true,"no-caps":true},
-        ok: {"label":this.$i18n.t('Ok'),"color":"primary","unelevated":true,"no-caps":true},
-        persistent: true
-      }).onOk(async () => {
-        await collectionComponent.delete(current, this.myCollections)
-        this.myCollections.c_meta.currentIndex = -1
-        this.myCollections.c_meta.current = null
-        this.subKind = 'default'
-        // 云端cloud保存
-        if (this.$store.collectionWorkerEnabler) {
-          let dbLogs = await collectionUtil.deleteBlock(current, false, BlockType.Collection)
-          let options = {}
-          options.privateKey = myself.privateKey
-          openpgp.clonePackets(options)
-          let worker = this.initCollectionUploadWorker()
-          worker.postMessage(['one', dbLogs, myself.myselfPeerClient, options.privateKey])
-        } else {
-          let dbLogs = await collectionUtil.deleteBlock(current, true, BlockType.Collection)
-          // 刷新syncFailed标志
-          if (dbLogs && dbLogs.length > 0) {
-            for (let dbLog of dbLogs) {
-              for (let myCollection of this.myCollections) {
-                if (myCollection.blockId === dbLog.blockId) {
-                  myCollection.syncFailed = true
-                  break
+      _that.$q.bottomSheet({
+        message: _that.$i18n.t('Confirm the deletion?'),
+        actions: [
+          {},
+          {
+            label: _that.$i18n.t('Confirm'),
+            classes: 'text-red',
+            icon: 'check_circle',
+            id: 'confirm'
+          },
+          {},
+          {
+            label: _that.$i18n.t('Cancel'),
+            icon: 'cancel',
+            id: 'cancel'
+          }
+        ]
+      }).onOk(async action => {
+        // console.log('Action chosen:', action.id)
+        if (action.id === 'confirm') {
+          await collectionComponent.delete(current, _that.myCollections)
+          _that.myCollections.c_meta.currentIndex = -1
+          _that.myCollections.c_meta.current = null
+          _that.subKind = 'default'
+          // 云端cloud保存
+          if (this.$store.collectionWorkerEnabler) {
+            let dbLogs = await collectionUtil.deleteBlock(current, false, BlockType.Collection)
+            let options = {}
+            options.privateKey = myself.privateKey
+            openpgp.clonePackets(options)
+            let worker = _that.initCollectionUploadWorker()
+            worker.postMessage(['one', dbLogs, myself.myselfPeerClient, options.privateKey])
+          } else {
+            let dbLogs = await collectionUtil.deleteBlock(current, true, BlockType.Collection)
+            // 刷新syncFailed标志
+            if (dbLogs && dbLogs.length > 0) {
+              for (let dbLog of dbLogs) {
+                for (let myCollection of _that.myCollections) {
+                  if (myCollection.blockId === dbLog.blockId) {
+                    myCollection.syncFailed = true
+                    break
+                  }
                 }
               }
             }
+            _that.$forceUpdate()
           }
-          this.$forceUpdate()
         }
       }).onCancel(() => {
+        // console.log('Dismissed')
+      }).onDismiss(() => {
+        // console.log('I am triggered on both OK and Cancel')
       })
     },
     async insertEditor(files) {

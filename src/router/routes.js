@@ -13,8 +13,7 @@ const rootRouter = {
     path: 'index',
     name: 'index',
     component: () => import('@/pages/index')
-  }
-  ]
+  }]
 };
 // 作为layout组件的子页面展示并且在左侧菜单显示的路由写在menuRouter里(children至少包含一个子路由)
 const blockChainRouter = {

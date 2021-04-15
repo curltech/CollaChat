@@ -16,7 +16,7 @@
                   q-icon.menuIcon(name="info" color="primary")
                 q-item-label(header) {{$t('About Colla')}}
               q-separator.c-separator
-              q-item(clickable v-ripple @click="")
+              q-item(clickable v-ripple @click="$store.upgradeVersion(false)")
                 q-item-section
                   q-item-label {{$t('Current Version')}}
                 q-item-section(side)

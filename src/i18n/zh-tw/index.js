@@ -52,6 +52,8 @@
   "Account Name": "賬號名稱",
   "Country/Region": "國家/地區",
   "Account already exists with same mobile number": "已經存在身份與相同手機號關聯",
+  "Please upgrade to the new version!": "請升級到新版本！",
+  "There is a new version available, upgrade now?": "檢測到新版本，是否現在升級？",
 
   // Contacts
   "LastConnectTime: ": "最近連接時間：",

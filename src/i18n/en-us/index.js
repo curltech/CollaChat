@@ -52,6 +52,8 @@ export default {
   "Account Name": "Account Name",
   "Country/Region": "Country/Region",
   "Account already exists with same mobile number": "Account already exists with same mobile number",
+  "Please upgrade to the new version!": "Please upgrade to the new version!",
+  "There is a new version available, upgrade now?": "There is a new version available, upgrade now?",
 
   // Contacts
   "LastConnectTime: ": "LastConnectTime: ",
