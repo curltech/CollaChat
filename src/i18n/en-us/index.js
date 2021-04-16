@@ -360,6 +360,7 @@ export default {
   "Scroll back up...": "Scroll back up...",
   "About Colla": "About Colla",
   "Current Version": "Current Version",
+  "Version Update": "Version Update",
   "Terms Of Service": "Terms Of Service",
   "FAQ": "FAQ",
   "Privacy Policy": "Privacy Policy",

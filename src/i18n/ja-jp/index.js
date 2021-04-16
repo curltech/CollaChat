@@ -366,6 +366,7 @@
   "Scroll back up...": "上に転げ…",
   "About Colla": "Collaについて",
   "Current Version": "現行版",
+  "Version Update": "新しいバージョンの更新",
   "Terms Of Service": "利用規約",
   "FAQ": "よくある問題",
   "Privacy Policy": "個人情報保護方針",

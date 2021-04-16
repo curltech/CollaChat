@@ -366,6 +366,7 @@
   "Scroll back up...": "向上回滾...",
   "About Colla": "關於Colla",
   "Current Version": "當前版本",
+  "Version Update": "版本更新",
   "Terms Of Service": "服務條款",
   "FAQ": "常見問題",
   "Privacy Policy": "隱私政策",

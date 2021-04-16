@@ -121,6 +121,10 @@ export default {
     async login() {
       let _that = this
       let store = _that.$store
+      let needUpdate = await _that.upgradeVersion('login')
+      if (needUpdate) {
+        return
+      }
       let success = await _that.$refs['frmLogin'].validate()
       if (success === false) {
         console.error('validation failure')
@@ -559,30 +563,44 @@ export default {
       }
       return label
     },
-    checkVersion(currentVersion, latestVersion) {
+    checkVersion(currentVersion, version) {
       currentVersion = currentVersion ? currentVersion.replace(/[vV]/, "") : "0.0.0"
-      latestVersion = latestVersion ? latestVersion.replace(/[vV]/, "") : "0.0.0"
-      if (currentVersion == latestVersion) {
+      version = version ? version.replace(/[vV]/, "") : "0.0.0"
+      if (currentVersion == version) {
         return false
       }
-      let currentVersionArr = currentVersion.split(".")
-      let latestVersionArr = latestVersion.split(".")
-      let len = Math.max(currentVersionArr.length, latestVersionArr.length)
+      let currentVerArr = currentVersion.split(".")
+      let verArr = version.split(".")
+      let len = Math.max(currentVerArr.length, verArr.length)
       for (let i = 0; i < len; i++) {
-          let currentVer = ~~currentVersionArr[i]
-          let latestVer = ~~latestVersionArr[i]
-          if (currentVer < latestVer) {
+          let currentVer = ~~currentVerArr[i]
+          let ver = ~~verArr[i]
+          if (currentVer < ver) {
               return true
           }
       }
       return false
     },
-    async upgradeVersion(start) {
+    versionUpdate() {
       let _that = this
-      let store = this.$store
-      store.currentVersion = '0.2.15'
-      let latestVersion = store.currentVersion
-      let versionHistory = [latestVersion]
+      let store = _that.$store
+      if (store.ios === true) {
+        let inAppBrowser = inAppBrowserComponent.open('https://apps.apple.com/cn/app/collachat/id1546363298', '_blank', 'location=no')
+      } else if (store.android === true) {
+        let inAppBrowser = inAppBrowserComponent.open('https://curltech.io/#/CollaChatDownload', '_blank', 'location=no')
+      } else if (store.safari === true) {
+        window.open('https://apps.apple.com/cn/app/collachat/id1546363298', '_blank')
+      } else {
+        window.open('https://curltech.io/#/CollaChatDownload', '_blank')
+      }
+    },
+    async upgradeVersion(flag) {
+      let _that = this
+      let store = _that.$store
+      store.currentVersion = '0.2.16'
+      store.latestVersion = store.currentVersion
+      store.mandatory = false
+      let versionHistory = [store.latestVersion]
       let type = 'others'
       if (store.ios === true) {
         type = 'ios'
@@ -600,15 +618,14 @@ export default {
       } catch (e) {
         console.error(e)
       }
-      let mandatory = false
       let no = 1
       for (let version of versionHistory) {
         if (_that.checkVersion(store.currentVersion, version)) {
           if (no === 1) {
-            latestVersion = version
+            store.latestVersion = version
           }
           if (version.substring(0, 1) === 'V') {
-            mandatory = true
+            store.mandatory = true
             break
           }
         } else {
@@ -616,26 +633,24 @@ export default {
         }
         no++
       }
-      if (latestVersion !== store.currentVersion) {
-        Dialog.create({
-          title: _that.$i18n.t('Alert'),
-          message: start && mandatory ? _that.$i18n.t('Please upgrade to the new version!') : _that.$i18n.t('There is a new version available, upgrade now?'),
-          cancel: start && mandatory ? false : {"label":_that.$i18n.t('Cancel'),"color":"primary","unelevated":true,"no-caps":true},
-          ok: {"label":_that.$i18n.t('Ok'),"color":"primary","unelevated":true,"no-caps":true},
-          persistent: true
-        }).onOk(() => {
-          if (store.ios === true) {
-            let inAppBrowser = inAppBrowserComponent.open('https://apps.apple.com/cn/app/collachat/id1546363298', '_self', 'location=no')
-          } else if (store.android === true) {
-            let inAppBrowser = inAppBrowserComponent.open('https://curltech.io', '_self', 'location=no')
-          } else if (store.safari === true) {
-            window.open('https://apps.apple.com/cn/app/collachat/id1546363298', '_self')
-          } else {
-            window.open('https://curltech.io/#/CollaChatDownload', '_self')
-          }
-        }).onCancel(() => {
-        })
+      if (store.latestVersion !== store.currentVersion) {
+        if (flag === 'start' || (flag === 'login' && store.mandatory)) {
+          Dialog.create({
+            title: _that.$i18n.t('Alert'),
+            message: store.mandatory ? _that.$i18n.t('Please upgrade to the new version!') : _that.$i18n.t('There is a new version available, upgrade now?'),
+            cancel: store.mandatory ? false : {"label":_that.$i18n.t('Cancel'),"color":"primary","unelevated":true,"no-caps":true},
+            ok: {"label":_that.$i18n.t('Ok'),"color":"primary","unelevated":true,"no-caps":true},
+            persistent: true
+          }).onOk(() => {
+            _that.versionUpdate()
+          }).onCancel(() => {
+          })
+        }
+        if ((flag === 'login' && store.mandatory) || flag === 'about') {
+          return true
+        }
       }
+      return false
     }
   },
   computed: {
@@ -829,7 +844,8 @@ export default {
     config.appParams.clientDevice = store.ifMobile() ? ClientDevice.MOBILE : ClientDevice.DESKTOP
     config.appParams.language = _that.$i18n.locale
     store.upgradeVersion = _that.upgradeVersion
-    await _that.upgradeVersion(true)
+    store.versionUpdate = _that.versionUpdate
+    await _that.upgradeVersion('start')
   },
   watch: {
     loginDataCountryRegion(val) {

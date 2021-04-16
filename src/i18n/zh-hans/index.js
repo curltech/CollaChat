@@ -367,6 +367,7 @@ export default {
   "Scroll back up...": "向上回滚...",
   "About Colla": "关于Colla",
   "Current Version": "当前版本",
+  "Version Update": "版本更新",
   "Terms Of Service": "服务条款",
   "FAQ": "常见问题",
   "Privacy Policy": "隐私政策",

@@ -16,12 +16,13 @@
                   q-icon.menuIcon(name="info" color="primary")
                 q-item-label(header) {{$t('About Colla')}}
               q-separator.c-separator
-              q-item(clickable v-ripple @click="$store.upgradeVersion(false)")
+              q-item(clickable v-ripple @click="$store.versionUpdate()")
                 q-item-section
-                  q-item-label {{$t('Current Version')}}
+                  q-item-label {{$t('Version Update')}}
                 q-item-section(side)
                   q-item-label {{ $store.currentVersion }}
-                //q-item-section(side)
+                  q-badge(v-if="$store.upgradeVersion('about')", color="red", floating) New
+                q-item-section(side)
                   q-icon(name="keyboard_arrow_right")
               q-separator.c-separator
               q-item(clickable v-ripple @click="subKind = 'tos'")

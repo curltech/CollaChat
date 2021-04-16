@@ -366,6 +366,7 @@
   "Scroll back up...": "위로 스크롤 백...",
   "About Colla": "Colla 에 관 하여",
   "Current Version": "현재 버전",
+  "Version Update": "새 버전 업데이트",
   "Terms Of Service": "서비스 약관",
   "FAQ": "흔 한 문제",
   "Privacy Policy": "개인 정보 정책",
