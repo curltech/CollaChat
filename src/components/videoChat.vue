@@ -7,7 +7,7 @@
           span(ref="mediaTimer")
         q-btn.btnIcon(v-if = "$store.state.currentCallChat.stream" unelevated round color="primary" :icon="chatMute?'volume_off':'volume_up'" @click="changeChatMute")
         q-space(v-if = "$store.state.currentCallChat.stream")
-        q-btn.btnIcon(unelevated round color="red" icon="call_end" v-close-popup @click="closeCall")
+        q-btn.btnIcon(unelevated round color="red" icon="call_end" @click="closeCall")
         q-space(v-if = "$store.state.currentCallChat.stream")
         q-btn.btnIcon(v-if = "$store.state.currentCallChat.stream" unelevated round color="primary" :icon="chatMic?'mic':'mic_off'"  @click="changeChatMic")
         q-space(v-if="canCall()===true")

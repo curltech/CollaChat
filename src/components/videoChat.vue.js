@@ -236,15 +236,7 @@ export default {
       if (store.state.currentCallChat.subjectType === SubjectType.CHAT) {
         await _that.sendCallMessage()
         store.state.videoDialog = true
-        let localStream = await mediaStreamComponent.openUserMedia(options)
-        _that.saveStream(store.state.currentCallChat.ownerPeerId,localStream)
-        _that.$nextTick(async () => {
-          if (type === 'video') {
-            let currentVideoDom = _that.$refs.currentVideo
-            currentVideoDom.srcObject = localStream
-          } else { }
-          systemAudioComponent.mediaInvitationAudioPlay()
-        })
+        systemAudioComponent.mediaInvitationAudioPlay()
       }
       //initiateGroupCallRequest
       else if (store.state.currentCallChat.subjectType === SubjectType.GROUP_CHAT) {
@@ -542,6 +534,14 @@ export default {
         )
       } else {
         if(store.state.currentCallChat.callMessage.senderPeerId === myself.myselfPeerClient.peerId){//发起方--这里需要addStream给对方
+          let localStream = await mediaStreamComponent.openUserMedia(store.state.currentCallChat.options)
+          _that.saveStream(store.state.currentCallChat.ownerPeerId,localStream)
+          _that.$nextTick(async () => {
+            if (store.state.currentCallChat.callType === 'video') {
+              let currentVideoDom = _that.$refs.currentVideo
+              currentVideoDom.srcObject = localStream
+            } else { }
+          })
           let webrtcPeers = await webrtcPeerPool.get(peerId)
           if (webrtcPeers && webrtcPeers.length > 0) {
             let ps = []
@@ -660,7 +660,7 @@ export default {
       let store = _that.$store
       let callChat = store.state.currentCallChat
       let senderPeerId = message.senderPeerId
-      if (callChat.subjectType === SubjectType.CHAT) {
+      if (callChat && callChat.subjectType === SubjectType.CHAT) {
         message.subjectId = message.senderPeerId
       }
       if (!callChat || !store.state.videoDialog || message.subjectId !== callChat.subjectId) return;
