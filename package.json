@@ -3,6 +3,7 @@
   "version": "0.2.17",
   "description": "CollaChat",
   "productName": "CollaChat",
+  "author": "curltech <github@curltech.io>",
   "leadMaintainer": "hujs888 <hujs@colla.cc>",
   "contributors": [
     "visualfengs <visualfengs@gmail.com>",
