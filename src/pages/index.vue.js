@@ -237,11 +237,12 @@ export default {
       let _that = this
       let store = this.$store
       let connectAddress = _that.connectArray[0].address
-      /*let connectTime = _that.connectArray[0].connectTime
+      let connectTime = _that.connectArray[0].connectTime
       let heartbeatTimerInterval = 55
       if (connectTime === 999999999) {
         heartbeatTimerInterval = 5
-      }*/
+      }
+      console.log(heartbeatTimerInterval)
       let myselfPeerClient = myself.myselfPeerClient
       let clientPeerId = myselfPeerClient.peerId
       config.appParams.connectPeerId = [connectAddress]
@@ -251,9 +252,9 @@ export default {
         clearInterval(_that.heartbeatTimer)
         delete _that.heartbeatTimer
       }
-      /*_that.heartbeatTimer = setInterval(async function () {
+      _that.heartbeatTimer = setInterval(async function () {
         let latency = await p2pPeer.ping(connectAddress)
-        console.log('heartbeatTimer-pingLatency:' + connectAddress + ',' + latency)
+        //console.log('heartbeatTimer-pingLatency:' + connectAddress + ',' + latency)
         if (latency === 999999999) {
           if (store.peers) {
             store.peers = null
@@ -276,7 +277,7 @@ export default {
             await _that.connect(connectAddress)
           }
         }
-      }, heartbeatTimerInterval * 1000)*/
+      }, heartbeatTimerInterval * 1000)
       libp2pClientPool.closeAll()
       await _that.connect(connectAddress)
     },
@@ -422,26 +423,7 @@ export default {
           ret = await peerEndpointService.find(condition, [{ priority: 'asc' }], null, null, null)
           let result = ret ? ret : []
           console.log(result)
-
-          //connect webrtc
-          store.webrtcPeerPool = webrtcPeerPool
-          let _connectAddress = myselfPeerClient.connectPeerId.match(/\/dns4\/(\S*)\/tcp/)[1]
-          let iceServer = [
-              {
-                urls: `stun:${ _connectAddress }:3478`
-              },
-              {
-                urls: `turn:${ _connectAddress }:3478`,
-                username: myselfPeerClient.peerId,
-                credential: myselfPeerClient.peerPublicKey
-              }
-          ]
-          config.appParams.iceServer = [iceServer]
-          for (let linkman of store.state.linkmans) {
-            if(linkman.peerId !== myselfPeerClient.peerId){
-              webrtcPeerPool.create(linkman.peerId)
-            }
-          }
+          await _that.webrtcInit()
           return peers[0]
         } else {
           console.log("primaryEndPoint connect failure")
@@ -449,6 +431,28 @@ export default {
         }
       /*}*/
       //return null
+    },
+    async webrtcInit(){
+      //webrtc connect
+      let myselfPeerClient = myself.myselfPeerClient
+      store.webrtcPeerPool = webrtcPeerPool
+      let _connectAddress = myselfPeerClient.connectPeerId.match(/\/dns4\/(\S*)\/tcp/)[1]
+      let iceServer = [
+          {
+            urls: `stun:${ _connectAddress }:3478`
+          },
+          {
+            urls: `turn:${ _connectAddress }:3478`,
+            username: myselfPeerClient.peerId,
+            credential: myselfPeerClient.peerPublicKey
+          }
+      ]
+      config.appParams.iceServer = [iceServer]
+      for (let linkman of store.state.linkmans) {
+        if(linkman.peerId !== myselfPeerClient.peerId){
+          webrtcPeerPool.create(linkman.peerId)
+        }
+      }
     },
     async sendUnsentMessage(linkmanPeerId) {
       
@@ -1245,6 +1249,8 @@ export default {
         }
       } else {
         store.state.networkStatus = 'DISCONNECTED'
+        webrtcPeerPool.clear()
+        signalProtocol.clear()
       }
     },
     async chatReceiver(data) {
@@ -1574,21 +1580,7 @@ export default {
               }
               await contactComponent.update(ContactDataType.LINKMAN, linkmen, null)
             }
-            let webrtcPeers = await webrtcPeerPool.get(linkmanPeerId)
-            if (webrtcPeers && webrtcPeers.length > 0) {
-              for (let webrtcPeer of webrtcPeers) {
-                if(!webrtcPeer._options.initiator){
-                  let _message = {
-                  messageType: P2pChatMessageType.SESSION_REFRESH,
-                  content: `SESSION_REFRESH`
-                  }
-                  await store.p2pSend(_message,linkmanPeerId)
-                  await _that.sendUnsentMessage(linkmanPeerId)
-                }
-              }
-              
-            }
-            
+            await _that.sendUnsentMessage(peerId)
           }, 200)
         }
       }
@@ -2013,20 +2005,6 @@ export default {
       }
       else if(messageType === P2pChatMessageType.CHAT_LINKMAN){
         await store.insertReceivedMessage(message)
-      }else if (messageType === P2pChatMessageType.SESSION_REFRESH){
-        let webrtcPeers = await webrtcPeerPool.get(peerId)
-            if (webrtcPeers && webrtcPeers.length > 0) {
-              for (let webrtcPeer of webrtcPeers) {
-                if(webrtcPeer._options.initiator){
-                  let _message = {
-                  messageType: P2pChatMessageType.SESSION_REFRESH,
-                  content: `SESSION_REFRESH`
-                  }
-                  await store.p2pSend(_message,peerId)
-                  await _that.sendUnsentMessage(peerId)
-                }
-              }
-            }
       }
     },
     async webrtcConnect(evt){
