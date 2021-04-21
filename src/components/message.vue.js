@@ -1,5 +1,5 @@
 import { date, Platform } from 'quasar'
-import VEmojiPicker from 'v-emoji-picker'
+import { VEmojiPicker, emojisDefault, categoriesDefault } from 'v-emoji-picker'
 import Vue from 'vue'
 import { EntityState } from 'libcolla'
 import { CollaUtil, TypeUtil, BlobUtil, UUID } from 'libcolla'

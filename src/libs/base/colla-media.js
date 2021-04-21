@@ -1595,9 +1595,7 @@ class SystemAudioComponent {
     this.mediaCloseAudio = new Audio()
     this.mediaCloseAudio.src = mediaCloseAudioSrc
 
-    this.mediaInvitationAudio = new Audio()
-    this.mediaInvitationAudio.src = mediaInvitationAudioSrc
-    this.mediaInvitationAudio.loop = 'loop'
+    
 
     this.scanAudio = new Audio()
     this.scanAudio.src = scanAudioSrc
@@ -1607,35 +1605,38 @@ class SystemAudioComponent {
   }
   alertStop() {
     this.alertAudio.pause()
-    this.alertAudio.currentTime = 0;
+    this.alertAudio.currentTime = 0
   }
   audioMessageSendPlay() {
     this.audioMessageSendAudio.play()
   }
   audioMessageSendStop() {
     this.audioMessageSendAudio.pause()
-    this.audioMessageSendAudio.currentTime = 0;
+    this.audioMessageSendAudio.currentTime = 0
   }
   mediaCloseAudioPlay() {
     this.mediaCloseAudio.play()
   }
   mediaCloseAudioStop() {
     this.mediaCloseAudio.pause()
-    this.mediaCloseAudio.currentTime = 0;
+    this.mediaCloseAudio.currentTime = 0
   }
   mediaInvitationAudioPlay() {
+    this.mediaInvitationAudio = new Audio()
+    this.mediaInvitationAudio.src = mediaInvitationAudioSrc
+    this.mediaInvitationAudio.loop = 'loop'
     this.mediaInvitationAudio.play()
   }
   mediaInvitationAudioStop() {
     this.mediaInvitationAudio.pause()
-    this.mediaInvitationAudio.currentTime = 0;
+    this.mediaInvitationAudio = null
   }
   scanAudioPlay() {
     this.scanAudio.play()
   }
   scanAudioStop() {
     this.scanAudio.pause()
-    this.scanAudio.currentTime = 0;
+    this.scanAudio.currentTime = 0
   }
 }
 export let systemAudioComponent = new SystemAudioComponent()
