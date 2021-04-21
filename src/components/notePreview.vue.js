@@ -1,11 +1,13 @@
-import { CollaUtil } from 'libcolla'
-import { Attach, Collection, collectionComponent, SrcChannelType, SrcEntityType, CollectionDataType, CollectionType } from '@/libs/biz/colla-collection'
-import { myself } from 'libcolla'
 import { date } from 'quasar'
+
+import { CollaUtil } from 'libcolla'
+import { myself } from 'libcolla'
+
+import { SrcChannelType, SrcEntityType, CollectionType } from '@/libs/biz/colla-collection'
 
 export default {
   name: 'NotePreview',
-  props: ['entry','item'],
+  props: ['entry', 'item'],
   data() {
     return {
       CollaUtil: CollaUtil,
@@ -57,6 +59,17 @@ export default {
         return updateDate
       }
     },
+    SyncFailed() {
+      let _that = this
+      let store = _that.$store
+      return function (blockId) {
+        if (store.state.dbLogMap[blockId]) {
+          return true
+        } else {
+          return false
+        }
+      }
+    }
   },
   methods: {
     getSrcEntityName(item) {
@@ -84,7 +97,7 @@ export default {
   },
   mounted() {
     let _that = this
-    let store = this.$store
+    let store = _that.$store
   },
   created() {
     let _that = this

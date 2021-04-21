@@ -398,47 +398,49 @@ export default {
     },
     // 保存
     async save(type, current) {
+      let _that = this
+      let store = _that.$store
       if (!type || type === 'attach' || type === 'collection') {
-        this.$q.loading.show()
+        _that.$q.loading.show()
         if (!current) {
-          current = this.myCollections.c_meta.current
+          current = _that.myCollections.c_meta.current
         }
         try {
-          await collectionUtil.save(type, current, this.myCollections)
-          this.backupContent = current['blockId'] + ':' + current['content']
+          await collectionUtil.save(type, current, _that.myCollections)
+          _that.backupContent = current['blockId'] + ':' + current['content']
           // 云端cloud保存
-          if (this.$store.collectionWorkerEnabler) {
+          if (store.collectionWorkerEnabler) {
             let dbLogs = await collectionUtil.saveBlock(current, false, BlockType.Collection)
             let options = {}
             options.privateKey = myself.privateKey
             openpgp.clonePackets(options)
-            let worker = this.initCollectionUploadWorker()
+            let worker = _that.initCollectionUploadWorker()
             worker.postMessage(['one', dbLogs, myself.myselfPeerClient, options.privateKey])
           } else {
             let dbLogs = await collectionUtil.saveBlock(current, true, BlockType.Collection)
             // 刷新syncFailed标志
+            let newDbLogMap = CollaUtil.clone(store.state.dbLogMap)
             if (dbLogs && dbLogs.length > 0) {
               for (let dbLog of dbLogs) {
-                for (let myCollection of this.myCollections) {
-                  if (myCollection.blockId === dbLog.blockId) {
-                    myCollection.syncFailed = true
-                    break
-                  }
+                let dl = newDbLogMap[dbLog.blockId]
+                if (!dl) {
+                  newDbLogMap[dbLog.blockId] = true
+                  console.log('add dbLog, blockId:' + dbLog.blockId)
                 }
               }
             }
-            this.$forceUpdate()
+            store.state.dbLogMap = newDbLogMap
           }
         } catch (error) {
           console.error(error)
-          this.$q.notify({
-            message: this.$i18n.t("Save failed"),
+          _that.$q.notify({
+            message: _that.$i18n.t("Save failed"),
             timeout: 3000,
             type: "warning",
             color: "warning"
           })
         } finally {
-          this.$q.loading.hide()
+          _that.$q.loading.hide()
         }
       }
     },
@@ -604,6 +606,7 @@ export default {
     // 删除
     async del(current) {
       let _that = this
+      let store = _that.$store
       if (!current) {
         current = _that.myCollections.c_meta.current
       } else {
@@ -644,17 +647,17 @@ export default {
           } else {
             let dbLogs = await collectionUtil.deleteBlock(current, true, BlockType.Collection)
             // 刷新syncFailed标志
+            /*let newDbLogMap = CollaUtil.clone(store.state.dbLogMap)
             if (dbLogs && dbLogs.length > 0) {
               for (let dbLog of dbLogs) {
-                for (let myCollection of _that.myCollections) {
-                  if (myCollection.blockId === dbLog.blockId) {
-                    myCollection.syncFailed = true
-                    break
-                  }
+                let dl = newDbLogMap[dbLog.blockId]
+                if (!dl) {
+                  newDbLogMap[dbLog.blockId] = true
+                  console.log('add dbLog, blockId:' + dbLog.blockId)
                 }
               }
             }
-            _that.$forceUpdate()
+            store.state.dbLogMap = newDbLogMap*/
           }
         }
       }).onCancel(() => {
@@ -1393,19 +1396,17 @@ export default {
               } else {
                 dbLogs = await collectionUtil.upload(dbLogs, BlockType.Collection)
                 // 刷新syncFailed标志
-                for (let myCollection of _that.myCollections) {
-                  let syncFailed = false
-                  if (dbLogs && dbLogs.length > 0) {
-                    for (let dbLog of dbLogs) {
-                      if (myCollection.blockId === dbLog.blockId) {
-                        syncFailed = true
-                        break
-                      }
+                let newDbLogMap = CollaUtil.clone(store.state.dbLogMap)
+                if (dbLogs && dbLogs.length > 0) {
+                  for (let dbLog of dbLogs) {
+                    let dl = newDbLogMap[dbLog.blockId]
+                    if (!dl) {
+                      newDbLogMap[dbLog.blockId] = true
+                      console.log('add dbLog, blockId:' + dbLog.blockId)
                     }
                   }
-                  myCollection.syncFailed = syncFailed
                 }
-                _that.$forceUpdate()
+                store.state.dbLogMap = newDbLogMap
               }
             }
           }
@@ -1568,15 +1569,19 @@ export default {
         if (responses && responses.length > 0) {
           for (let i = 0; i < responses.length; ++i) {
             let response = responses[i]
-            if (response) {
-              console.log("response:" + JSON.stringify(response))
+            console.log("response:" + JSON.stringify(response))
+            if (response &&
+              response.MessageType === MsgType[MsgType.CONSENSUS_REPLY] &&
+              response.Payload === MsgType[MsgType.OK]) {
+              // 如果上传不成功，需要保留blockLog在以后继续处理，否则删除
               dbLogs[i].state = EntityState.Deleted
+              console.log('delete dbLog, blockId:' + dbLogs[i].blockId + ';sliceNumber:' + dbLogs[i].sliceNumber)
             }
           }
           await blockLogComponent.save(dbLogs, null, dbLogs)
         }
         // 刷新syncFailed标志
-        if (flag === 'one') {
+        /*if (flag === 'one') {
           if (dbLogs && dbLogs.length > 0) {
             for (let dbLog of dbLogs) {
               for (let myCollection of _that.myCollections) {
@@ -1600,8 +1605,18 @@ export default {
             }
             myCollection.syncFailed = syncFailed
           }
+        }*/
+        let newDbLogMap = CollaUtil.clone(store.state.dbLogMap)
+        if (dbLogs && dbLogs.length > 0) {
+          for (let dbLog of dbLogs) {
+            let dl = newDbLogMap[dbLog.blockId]
+            if (!dl) {
+              newDbLogMap[dbLog.blockId] = true
+              console.log('add dbLog, blockId:' + dbLog.blockId)
+            }
+          }
         }
-        _that.$forceUpdate()
+        store.state.dbLogMap = newDbLogMap
       }
       return worker
     },
@@ -1663,7 +1678,6 @@ export default {
         data.PayloadType === PayloadType.ConsensusLog) {
           let consensusLog = data.Payload
           console.log(consensusLog)
-          // 刷新syncFailed标志
           let condition = {}
           condition['ownerPeerId'] = myself.myselfPeerClient.peerId
           let dbLogs = await blockLogComponent.load(condition, null, null)
@@ -1677,19 +1691,24 @@ export default {
               }
             }
           }
-          for (let myCollection of this.myCollections) {
+          // 刷新syncFailed标志
+          let newDbLogMap = CollaUtil.clone(store.state.dbLogMap)
+          for (let blockId in newDbLogMap) {
             let syncFailed = false
             if (dbLogs && dbLogs.length > 0) {
               for (let dbLog of dbLogs) {
-                if (myCollection.blockId === dbLog.blockId) {
+                if (dbLog.blockId === blockId) {
                   syncFailed = true
                   break
                 }
               }
             }
-            myCollection.syncFailed = syncFailed
+            if (!syncFailed) {
+              delete newDbLogMap[blockId]
+              console.log('delete dbLogMap, blockId:' + blockId)
+            }
           }
-          this.$forceUpdate()
+          store.state.dbLogMap = newDbLogMap
       }
     }
   },

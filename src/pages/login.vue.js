@@ -585,13 +585,13 @@ export default {
       let _that = this
       let store = _that.$store
       if (store.ios === true) {
-        let inAppBrowser = inAppBrowserComponent.open('https://apps.apple.com/cn/app/collachat/id1546363298', '_blank', 'location=no')
+        let inAppBrowser = inAppBrowserComponent.open('https://apps.apple.com/cn/app/collachat/id1546363298', '_system', 'location=no')
       } else if (store.android === true) {
-        let inAppBrowser = inAppBrowserComponent.open('https://curltech.io/#/CollaChatDownload', '_blank', 'location=no')
+        let inAppBrowser = inAppBrowserComponent.open('https://curltech.io/#/CollaChatDownload', '_system', 'location=no')
       } else if (store.safari === true) {
-        window.open('https://apps.apple.com/cn/app/collachat/id1546363298', '_blank')
+        window.open('https://apps.apple.com/cn/app/collachat/id1546363298', '_system')
       } else {
-        window.open('https://curltech.io/#/CollaChatDownload', '_blank')
+        window.open('https://curltech.io/#/CollaChatDownload', '_system')
       }
     },
     async upgradeVersion(flag) {

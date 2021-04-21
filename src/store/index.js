@@ -57,7 +57,8 @@ let stateObj = {
   videoRecordMessageViewDialog:false,
   videoRecordMessageSrc:null,
   currentPhoneContact:null,
-  currentCollection:null
+  currentCollection:null,
+  dbLogMap: {}
 }
 const store = new Vuex.Store({
   state: deepClone(stateObj) ,

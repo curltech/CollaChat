@@ -144,7 +144,7 @@ import { collectionComponent, CollectionType} from '@/libs/biz/colla-collection'
                   let counter = 0
                   while (currentFirstAudioDuration === 0 && counter < 5) {
                     let dur = await audioMediaComponent.getDurationAsync(audioMedia)
-                    console.log('=======================' + new Date().getTime() + '-getDuration-' + counter + '-' + dur + '=======================')
+                    console.log(new Date().getTime() + '-getDuration-' + counter + '-' + dur)
                     if (dur > 0) {
                       currentFirstAudioDuration = dur
                     }
@@ -403,6 +403,7 @@ import { collectionComponent, CollectionType} from '@/libs/biz/colla-collection'
               response.Payload === MsgType[MsgType.OK]) {
               if (blockType !== BlockType.ChatAttach) { // 如果上传不成功，需要保留blockLog在以后继续处理，否则删除
                 dbLogs[i].state = EntityState.Deleted
+                console.log('delete dbLog, blockId:' + dbLogs[i].blockId + ';sliceNumber:' + dbLogs[i].sliceNumber)
               }
             } else {
               ifFailed = true
