@@ -1628,8 +1628,10 @@ class SystemAudioComponent {
     this.mediaInvitationAudio.play()
   }
   mediaInvitationAudioStop() {
-    this.mediaInvitationAudio.pause()
-    this.mediaInvitationAudio = null
+    if(this.mediaInvitationAudio){
+     this.mediaInvitationAudio.pause()
+    this.mediaInvitationAudio = null 
+    }
   }
   scanAudioPlay() {
     this.scanAudio.play()

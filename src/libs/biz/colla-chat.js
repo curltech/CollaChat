@@ -77,8 +77,7 @@ export let P2pChatMessageType = {
   'CHAT_RECEIVE_CALLBACK': 'CHAT_RECEIVE_CALLBACK', // 接收回复
   'CHAT_READ_CALLBACK': 'CHAT_READ_CALLBACK', // 已阅回复
   'CALL_CLOSE': 'CALL_CLOSE',
-  'CALL_REQUEST': 'CALL_REQUEST', // 通话请求
-  'SESSION_REFRESH': 'SESSION_REFRESH'
+  'CALL_REQUEST': 'CALL_REQUEST' // 通话请求
 }
 
 export let SubjectType = {
