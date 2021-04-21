@@ -254,7 +254,7 @@ export default {
       }
       _that.heartbeatTimer = setInterval(async function () {
         let latency = await p2pPeer.ping(connectAddress)
-        console.log('heartbeatTimer-pingLatency:' + connectAddress + ',' + latency)
+        //console.log('heartbeatTimer-pingLatency:' + connectAddress + ',' + latency)
         if (latency === 999999999) {
           if (store.peers) {
             store.peers = null
