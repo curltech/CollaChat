@@ -435,6 +435,7 @@ export default {
     async webrtcInit(){
       //webrtc connect
       let myselfPeerClient = myself.myselfPeerClient
+      webrtcPeerPool.clientId = myselfPeerClient.clientId
       store.webrtcPeerPool = webrtcPeerPool
       let _connectAddress = myselfPeerClient.connectPeerId.match(/\/dns4\/(\S*)\/tcp/)[1]
       let iceServer = [
@@ -1237,17 +1238,18 @@ export default {
       let _that = this
       let store = _that.$store
       if (ifOnline) {
-        if (!store.peers) {
-          // re-setupSocket
-          if (_that.pendingSetupSocket === true) {
-            _that.pendingSetupSocket = false
-            console.log('re-setupSocket')
-            await _that.setupSocket()
+        if (store.peers) {
+          store.peers = null
           }
-        } else {
-          store.state.networkStatus = 'CONNECTED'
+        // re-setupSocket
+        if (_that.pendingSetupSocket === true) {
+          _that.pendingSetupSocket = false
+          console.log('re-setupSocket')
+          await _that.setupSocket()
         }
+        
       } else {
+        _that.pendingSetupSocket = true
         store.state.networkStatus = 'DISCONNECTED'
         webrtcPeerPool.clear()
         signalProtocol.clear()
@@ -1552,9 +1554,9 @@ export default {
           linkman.mobile = content.mobile
           linkman.avatar = content.avatar
           linkman.publicKey = content.publicKey
-          linkman.signalPublicKey = content.signalPublicKey
           if(linkman.signalPublicKey !== content.signalPublicKey){
-          console.log('receive signalPublicKey' + linkman.name + linkman.signalPublicKey)
+            linkman.signalPublicKey = content.signalPublicKey
+            console.log('receive signalPublicKey' + linkman.name + linkman.signalPublicKey)
           }
           signalProtocol.signalPublicKeys.set(linkmanPeerId,linkman.signalPublicKey)
           linkman.downloadSwitch = content.downloadSwitch
