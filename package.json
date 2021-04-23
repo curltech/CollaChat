@@ -1,6 +1,6 @@
 {
   "name": "collachat",
-  "version": "0.2.17",
+  "version": "0.2.18",
   "description": "CollaChat",
   "productName": "CollaChat",
   "author": "curltech <github@curltech.io>",
@@ -58,7 +58,7 @@
     "compressorjs": "^1.0.6",
     "css3transform": "^1.2.3",
     "html2canvas": "^1.0.0-rc.7",
-    "libcolla": "^0.0.30",
+    "libcolla": "^0.0.31",
     "ly-tab": "^2.1.2",
     "pinyin": "^2.9.1",
     "qr-code-with-logo": "^1.1.0",
