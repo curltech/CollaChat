@@ -554,7 +554,7 @@ export default {
       let _that = this
       let store = _that.$store
       let fileData = _that.videoUrl
-      await saveFileAndSendMessage(store.state.currentChat,fileData, ChatContentType.VIDEO, null)
+      await store.saveFileAndSendMessage(store.state.currentChat,fileData, ChatContentType.VIDEO, null)
     },
     async reverseCamera() {
       let _that = this
