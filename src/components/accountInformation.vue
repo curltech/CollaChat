@@ -32,7 +32,7 @@
           q-item(clickable v-ripple)
             q-item-section
               q-item-label {{$t('Peer Id')}}
-              q-item-label(caption lines="1") {{ $store.state.myselfPeerClient && $store.state.myselfPeerClient.peerId ? $store.state.myselfPeerClient.peerId : '' }}
+              q-item-label(caption lines="2" stlye='word-break:break-all') {{ $store.state.myselfPeerClient && $store.state.myselfPeerClient.peerId ? $store.state.myselfPeerClient.peerId : '' }}
             q-item-section(side)
               q-btn.btnIcon(flat dense round icon="content_copy" v-clipboard:copy="$store.state.myselfPeerClient && $store.state.myselfPeerClient.peerId ? $store.state.myselfPeerClient.peerId : ''" v-clipboard:success="onCopySuccess" v-clipboard:error="onCopyFailure")
           q-separator.c-separator(style="margin-left:16px;width:calc(100% - 16px)")
