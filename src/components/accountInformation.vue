@@ -11,7 +11,7 @@
               q-item-label {{$t('Avatar')}}
             q-item-section(avatar)
               q-avatar(size="32px")
-                img( :src="$store.state.myselfPeerClient.avatar ? $store.state.myselfPeerClient.avatar : $store.defaultActiveAvatar")
+                img(:src="$store.state.myselfPeerClient.avatar ? $store.state.myselfPeerClient.avatar : $store.defaultActiveAvatar")
             q-item-section(avatar)
               q-icon(name="keyboard_arrow_right")
           q-separator.c-separator(style="margin-left:16px;width:calc(100% - 16px)")
@@ -30,11 +30,12 @@
               q-icon(name="keyboard_arrow_right")
           q-separator.c-separator(style="margin-left:16px;width:calc(100% - 16px)")
           q-item(clickable v-ripple)
-            q-item-section
-              q-item-label {{$t('Peer Id')}}
-              q-item-label(caption lines="2" stlye='word-break:break-all') {{ $store.state.myselfPeerClient && $store.state.myselfPeerClient.peerId ? $store.state.myselfPeerClient.peerId : '' }}
             q-item-section(side)
-              q-btn.btnIcon(flat dense round icon="content_copy" v-clipboard:copy="$store.state.myselfPeerClient && $store.state.myselfPeerClient.peerId ? $store.state.myselfPeerClient.peerId : ''" v-clipboard:success="onCopySuccess" v-clipboard:error="onCopyFailure")
+              q-item-label {{$t('Peer Id')}}
+            q-item-section
+              q-item-label(caption lines="3" style="word-break:break-all") {{ $store.state.myselfPeerClient ? $store.state.myselfPeerClient.peerId : '' }}
+            q-item-section(side)
+              q-btn.btnIcon(flat dense round icon="content_copy" v-clipboard:copy="$store.state.myselfPeerClient ? $store.state.myselfPeerClient.peerId : ''" v-clipboard:success="onCopySuccess" v-clipboard:error="onCopyFailure")
           q-separator.c-separator(style="margin-left:16px;width:calc(100% - 16px)")
           q-item(clickable v-ripple @click="enterQRCode")
             q-item-section
@@ -46,14 +47,24 @@
           q-separator.c-separator(style="height:8px;margin-left:0px;margin-right:0px")
           q-item(class="text-c-grey-10")
             q-item-section(side)
-              q-item-label(caption) {{$t('Instances') + '(' + ($store.peerClients ? $store.peerClients.length : 0) + ')'}}
+              q-item-label(caption) {{$t('Instances') + '(' + ($store.peerClients ? $store.peerClients.length + 1 : 1) + ')'}}
+          q-item(clickable v-ripple active-class="text-primary" active)
+              q-item-section(avatar)
+                  q-icon(:name="$store.state.myselfPeerClient.clientDevice === 'DESKTOP' ? 'desktop_windows' : 'smartphone'")
+              q-item-section
+                q-item-label(caption lines="1") {{ $t('Id: ') + $store.state.myselfPeerClient.clientId }}
+                  q-icon(class="q-pl-sm" name="person" color="secondary")
+                q-item-label(caption lines="1") {{ $t('Device: ') + $store.state.myselfPeerClient.clientType }}
+                q-item-label(caption lines="1") {{ $t('LastAccessTime: ') + date.formatDate($store.state.myselfPeerClient.lastAccessTime, 'YYYY-MM-DD HH:mm:ss') }}
+                q-item-label(caption lines="1") {{ $t('LastAccessNode: ') + $store.getAddressLabel($store.state.myselfPeerClient.connectPeerId) }}
+          q-separator.c-separator(inset="item" v-if="$store.peerClients && $store.peerClients.length > 0")
           div(v-for="(peerClient, index) in ($store.peerClients ? $store.peerClients : [])" :key="peerClient.clientId")
-            q-item(clickable v-ripple active-class="text-primary" :active="peerClient.clientId === $store.state.myselfPeerClient.clientId")
+            q-item(clickable v-ripple)
               q-item-section(avatar)
                   q-icon(:name="peerClient.clientDevice === 'DESKTOP' ? 'desktop_windows' : 'smartphone'")
               q-item-section
-                q-item-label(caption lines="1") {{ $t('Id: ') + (peerClient.clientId ? peerClient.clientId : '') }}
-                  q-icon(class="q-pl-sm" name="person" :color="peerClient.clientDevice === $store.state.myselfPeerClient.clientDevice ? (peerClient.clientId === $store.state.myselfPeerClient.clientId ? 'secondary' : 'c-grey') : (peerClient.activeStatus === 'Up' ? 'secondary' : 'c-grey')")
+                q-item-label(caption lines="1") {{ $t('Id: ') + peerClient.clientId }}
+                  q-icon(class="q-pl-sm" name="person" :color="peerClient.clientDevice === $store.state.myselfPeerClient.clientDevice ? 'c-grey' : (peerClient.activeStatus === 'Up' ? 'secondary' : 'c-grey')")
                 q-item-label(caption lines="1") {{ $t('Device: ') + peerClient.clientType }}
                 q-item-label(caption lines="1") {{ $t('LastAccessTime: ') + date.formatDate(peerClient.lastAccessTime, 'YYYY-MM-DD HH:mm:ss') }}
                 q-item-label(caption lines="1") {{ $t('LastAccessNode: ') + $store.getAddressLabel(peerClient.connectPeerId) }}

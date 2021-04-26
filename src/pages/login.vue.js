@@ -7,6 +7,7 @@ import { MobileNumberUtil } from 'libcolla'
 import { webrtcPeerPool } from 'libcolla'
 import { signalProtocol } from 'libcolla'
 import { config, myselfPeerService, peerProfileService, ClientDevice, EntityStatus, myself } from 'libcolla'
+import { logService } from 'libcolla'
 
 import * as CollaConstant from '@/libs/base/colla-constant'
 import pinyinUtil from '@/libs/base/colla-pinyin'
@@ -201,20 +202,21 @@ export default {
         if (myself.peerProfile.language) {
           _that.language = myself.peerProfile.language
         }
-        if (myself.peerProfile.lightDarkMode) {
-          if (myself.peerProfile.lightDarkMode === 'true') {
-            _that.$q.dark.set(true)
-          } else if (myself.peerProfile.lightDarkMode === 'false') {
-            _that.$q.dark.set(false)
-          } else if (myself.peerProfile.lightDarkMode === 'auto') {
-            _that.$q.dark.set('auto')
-          }
+        if (myself.peerProfile.lightDarkMode === 'true') {
+          _that.$q.dark.set(true)
+        } else if (myself.peerProfile.lightDarkMode === 'false') {
+          _that.$q.dark.set(false)
+        } else if (myself.peerProfile.lightDarkMode === 'auto') {
+          _that.$q.dark.set('auto')
         }
         if (myself.peerProfile.primaryColor) {
           colors.setBrand('primary', myself.peerProfile.primaryColor)
         }
         if (myself.peerProfile.secondaryColor) {
           colors.setBrand('secondary', myself.peerProfile.secondaryColor)
+        }
+        if (myself.peerProfile.logLevel) {
+          logService.setLogLevel(myself.peerProfile.logLevel)
         }
       }
       // 跳转页面
@@ -597,7 +599,7 @@ export default {
     async upgradeVersion(flag) {
       let _that = this
       let store = _that.$store
-      store.currentVersion = '0.2.18'
+      store.currentVersion = '0.2.19'
       store.latestVersion = store.currentVersion
       store.mandatory = false
       let versionHistory = [store.latestVersion]

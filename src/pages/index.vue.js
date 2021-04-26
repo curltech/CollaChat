@@ -66,7 +66,6 @@ export default {
       contactsKind: null,
       channelKind: null,
       meKind: null,
-      webSocket: null,
       light: false,
       chatLoadingDone: false,
       noSwipeClose: false,
@@ -137,15 +136,34 @@ export default {
         ]
       }
     },
+    async preSetupSocket() {
+      let _that = this
+      let store = _that.$store
+      if (!_that.logoutFlag) {
+        store.peers = null
+        if (store.state.linkmans && store.state.linkmans.length > 0) {
+          webrtcPeerPool.clear()
+          signalProtocol.clear()
+        }
+        let onlineStatus = deviceComponent.getOnlineStatus()
+        console.log('getOnlineStatus:' + onlineStatus)
+        if (onlineStatus) {
+          console.log('re-setupSocket')
+          await _that.setupSocket()
+        } else {
+          await _that.setNetworkStatus(false)
+        }
+      }
+    },
     /**
      * 1）登录时不选择或者输入定位器，且当前账号localdb-myselfPeerEndPoints集合为空的（首次登录），从官方定位器列表集合中选择ping延时最小的连接，根据connect返回的closest节点集合【初始化】当前账号localdb-myselfPeerEndPoints集合（连接节点priority=1）；
      * 2）登录时不选择或者输入定位器，且当前账号localdb-myselfPeerEndPoints集合不为空的，从该集合中选择ping延时最小的连接，根据connect返回的closest节点集合【更新】当前账号localdb-myselfPeerEndPoints集合（连接节点原priority-X不为1的，更新为1，原priority-1的节点priorty更新为X）；
      * 3）登录时选择或者输入定位器（在当前账号localdb-myselfPeerEndPoints集合中），根据connect返回的closest节点集合【更新】当前账号localdb-myselfPeerEndPoints集合（连接节点原priority-X不为1的，更新为1，原priority-1的节点priorty更新为X）；
      * 4）登录时选择或者输入新的定位器（不在当前账号localdb-myselfPeerEndPoints集合中），根据connect返回的closest节点集合【重置】当前账号localdb-myselfPeerEndPoints集合（连接节点priority=1）。
      */
-    setupSocket: async function () {
+    async setupSocket() {
       let _that = this
-      let store = this.$store
+      let store = _that.$store
       try {
         store.state.networkStatus = 'CONNECTING'
         let myselfPeerClient = myself.myselfPeerClient
@@ -202,12 +220,12 @@ export default {
             }
           }
         }
-        await p2pPeer.start([_that.connectArray[0].address])
+        await p2pPeer.start([_that.connectArray[0].address], { WebSockets: { debug: false, timeoutInterval: 5000, binaryType: 'arraybuffer' }})
         console.info('p2pPeer:' + clientPeerId + ' is started! enjoy it')
         // 选择连接速度最快的定位器
         /*for (let j = 0; j < _that.connectArray.length; j++) {
           console.log(j + '-ping:' + _that.connectArray[j].address)
-          let latency = await p2pPeer.ping(_that.connectArray[j].address)
+          let latency = await p2pPeer.ping(_that.connectArray[j].address, 6000)
           console.log(j + '-latency:' + latency)
           _that.connectArray[j].connectTime = latency
         }
@@ -216,7 +234,8 @@ export default {
         await _that.buildSocket(_that.connectArray[0].address)*/
         let ps = []
         for (let i = 0; i < _that.connectArray.length; i++) {
-          let promise = p2pPeer.ping(_that.connectArray[i].address)
+          //let promise = p2pPeer.ping(_that.connectArray[i].address, 6000)
+          let promise = p2pPeer.host.ping(_that.connectArray[i].address)
           ps.push(promise)
         }
         let responses = await Promise.all(ps)
@@ -233,34 +252,61 @@ export default {
         await logService.log(e, 'setupSocketError', 'error')
       }
     },
-    buildSocket: async function () {
+    async buildSocket() {
       let _that = this
-      let store = this.$store
+      let store = _that.$store
       let connectAddress = _that.connectArray[0].address
-      let connectTime = _that.connectArray[0].connectTime
+      /*let connectTime = _that.connectArray[0].connectTime
       let heartbeatTimerInterval = 55
       if (connectTime === 999999999) {
         heartbeatTimerInterval = 5
       }
-      console.log(heartbeatTimerInterval)
+      console.log(heartbeatTimerInterval)*/
       let myselfPeerClient = myself.myselfPeerClient
       let clientPeerId = myselfPeerClient.peerId
       config.appParams.connectPeerId = [connectAddress]
-      await p2pPeer.start(null)
+      await p2pPeer.start(null, { WebSockets: { debug: false, timeoutInterval: 5000, binaryType: 'arraybuffer' }})
       console.info('p2pPeer:' + clientPeerId + ' is started! enjoy it')
-      if (_that.heartbeatTimer) {
+      libp2pClientPool.closeAll()
+
+      let webSocket = p2pPeer.host.transportManager._transports.get('WebSockets')
+      webSocket.onopen = function (evt) {
+        console.log('WebSocket Connected!' + webSocket.url)
+        _that._heartbeatTimer = setInterval(function () {
+          webSocket.send(JSON.stringify({
+            contentType: "Heartbeat"
+          })
+        )}, 55 * 1000)
+      }
+      webSocket.onmessage = function (evt) {
+        //console.log('WebSocket Message:' + webSocket.url)
+      }
+      webSocket.onerror = async function (evt) {
+        console.error('WebSocket Error!' + webSocket.url)
+        if (_that._heartbeatTimer) {
+          clearInterval(_that._heartbeatTimer)
+          delete _that._heartbeatTimer
+        }
+        await _that.preSetupSocket()
+      }
+      webSocket.onclose = async function (evt) {
+        console.log('WebSocket Closed!' + webSocket.url)
+        if (_that._heartbeatTimer) {
+          clearInterval(_that._heartbeatTimer)
+          delete _that._heartbeatTimer
+        }
+        await _that.preSetupSocket()
+      }
+      /*if (_that.heartbeatTimer) {
         clearInterval(_that.heartbeatTimer)
         delete _that.heartbeatTimer
       }
       _that.heartbeatTimer = setInterval(async function () {
-        let latency = await p2pPeer.ping(connectAddress)
+        let latency = await p2pPeer.ping(connectAddress, 6000)
         //console.log('heartbeatTimer-pingLatency:' + connectAddress + ',' + latency)
         if (latency === 999999999) {
-          if (store.peers) {
-            store.peers = null
-          }
+          store.peers = null
           if (!_that.logoutFlag) {
-            // re-setupSocket
             if (_that.heartbeatTimer) {
               clearInterval(_that.heartbeatTimer)
               delete _that.heartbeatTimer
@@ -277,11 +323,10 @@ export default {
             await _that.connect(connectAddress)
           }
         }
-      }, heartbeatTimerInterval * 1000)
-      libp2pClientPool.closeAll()
+      }, heartbeatTimerInterval * 1000)*/
       await _that.connect(connectAddress)
     },
-    connect: async function (connectAddress) {
+    async connect(connectAddress) {
       let _that = this
       let store = _that.$store
         // 建立primaryEndPoint连接
@@ -320,36 +365,43 @@ export default {
           let linkmanPeerId = myselfPeerClient.peerId
           let linkman = store.state.linkmanMap[linkmanPeerId]
           let linkmanRecord = null
+          let i = 0
           for (let peer of store.peerClients) {
-            if (peer.clientId === myselfPeerClient.clientId && peer.peerId === myselfPeerClient.peerId && Date.parse(peer.lastUpdateTime) > Date.parse(myselfPeerClient.lastUpdateTime)) {
-              //myselfPeerClient.mobile = peer.mobile
-              //myselfPeerClient.publicKey = peer.publicKey
-              //myselfPeerClient.privateKey = peer.privateKey
-              myselfPeerClient.visibilitySetting = peer.visibilitySetting
+            if (peer.clientId === myselfPeerClient.clientId && peer.peerId === myselfPeerClient.peerId) {
+              myselfPeerClient.lastAccessTime = peer.lastAccessTime
+              if (Date.parse(peer.lastUpdateTime) > Date.parse(myselfPeerClient.lastUpdateTime)) {
+                //myselfPeerClient.mobile = peer.mobile
+                //myselfPeerClient.publicKey = peer.publicKey
+                //myselfPeerClient.privateKey = peer.privateKey
+                myselfPeerClient.visibilitySetting = peer.visibilitySetting
 
-              //myselfPeer.mobile = peer.mobile
-              //myselfPeer.publicKey = peer.publicKey
-              //myselfPeer.privateKey = peer.privateKey
-              myselfPeer.visibilitySetting = peer.visibilitySetting
+                //myselfPeer.mobile = peer.mobile
+                //myselfPeer.publicKey = peer.publicKey
+                //myselfPeer.privateKey = peer.privateKey
+                myselfPeer.visibilitySetting = peer.visibilitySetting
 
-              // 更新对应linkman
-              if (myselfPeerClient.avatar !== peer.avatar || myselfPeerClient.name !== peer.name) {
-                myselfPeerClient.avatar = peer.avatar
-                myselfPeerClient.name = peer.name
+                // 更新对应linkman
+                if (myselfPeerClient.avatar !== peer.avatar || myselfPeerClient.name !== peer.name) {
+                  myselfPeerClient.avatar = peer.avatar
+                  myselfPeerClient.name = peer.name
 
-                myselfPeer.avatar = peer.avatar
-                myselfPeer.name = peer.name
-                
-                linkman.avatar = peer.avatar
-                linkman.name = peer.name
-                linkman.pyName = pinyinUtil.getPinyin(peer.name)
+                  myselfPeer.avatar = peer.avatar
+                  myselfPeer.name = peer.name
+                  
+                  linkman.avatar = peer.avatar
+                  linkman.name = peer.name
+                  linkman.pyName = pinyinUtil.getPinyin(peer.name)
 
-                linkmanRecord = await contactComponent.get(ContactDataType.LINKMAN, linkman._id)
-                linkmanRecord.avatar = linkman.avatar
-                linkmanRecord.name = linkman.name
-                linkmanRecord.pyName = linkman.pyName
+                  linkmanRecord = await contactComponent.get(ContactDataType.LINKMAN, linkman._id)
+                  linkmanRecord.avatar = linkman.avatar
+                  linkmanRecord.name = linkman.name
+                  linkmanRecord.pyName = linkman.pyName
+                }
               }
+              store.peerClients.splice(i, 1)
               break
+            } else {
+              i++
             }
           }
           store.state.myselfPeerClient = myselfPeerClient
@@ -432,7 +484,7 @@ export default {
       /*}*/
       //return null
     },
-    async webrtcInit(){
+    async webrtcInit() {
       //webrtc connect
       let myselfPeerClient = myself.myselfPeerClient
       webrtcPeerPool.clientId = myselfPeerClient.clientId
@@ -456,7 +508,6 @@ export default {
       }
     },
     async sendUnsentMessage(linkmanPeerId) {
-      
       let _that = this
       let store = _that.$store
       //linkman
@@ -532,7 +583,9 @@ export default {
         ownerPeerId: myself.myselfPeerClient.peerId,
         messageId: message.messageId
       })
-      if(receivedMessages && receivedMessages.length > 0){return;}
+      if (receivedMessages && receivedMessages.length > 0) {
+        return
+      }
       if (message.subjectType === SubjectType.CHAT) {
         let ownerPeerId = message.ownerPeerId
         message.ownerPeerId = message.subjectId
@@ -548,7 +601,7 @@ export default {
       } else if (message.contentType == ChatContentType.IMAGE || message.contentType == ChatContentType.VIDEO) {
         message.percent = null
       } else if (message.contentType == ChatContentType.CHAT) {
-        await store.receiveMergeMessage(message);
+        await store.receiveMergeMessage(message)
       }
       let currentChat = await store.getChat(subjectId)
       currentChat.content = store.getChatContent(message.contentType, message.content)
@@ -584,16 +637,16 @@ export default {
           message.countDown = message.destroyTime / 1000
           let countDownInterval = setInterval(async function () {
             if (!message.countDown) {
-              clearInterval(countDownInterval);
+              clearInterval(countDownInterval)
               let currentChatMessages = store.state.chatMap[subjectId].messages
               for (let i = currentChatMessages.length - 1; i >= 0; i--) {
                 if (message == currentChatMessages[i]) {
                   await chatComponent.remove(ChatDataType.MESSAGE, message, messages)
                 }
               }
-              return;
+              return
             }
-            message.countDown--;
+            message.countDown--
             console.log(message.countDown)
           }, 1000)
         }
@@ -602,7 +655,7 @@ export default {
       }
       await store.handleChatTime(message, currentChat)
       _that.$nextTick(() => {
-        let alert;
+        let alert
         if (message.subjectType === SubjectType.CHAT) {
           alert = store.state.linkmanMap[subjectId].notAlert
         } else if (message.subjectType === SubjectType.GROUP_CHAT) {
@@ -625,39 +678,39 @@ export default {
       }
     },
     getChatContent(contentType, content) {
-      let result;
       let _that = this
+      let result
       switch (contentType) {
         case ChatContentType.TEXT:
           if (content) {
             content = content.replace(/<\/?.+?>/g, '')
           }
           result = content
-          break;
+          break
         case ChatContentType.FILE:
           result = `[${_that.$i18n.t("file")}]`
-          break;
+          break
         case ChatContentType.IMAGE:
           result = `[${_that.$i18n.t("image")}]`
-          break;
+          break
         case ChatContentType.AUDIO_INVITATION:
           result = `[${_that.$i18n.t("audioInvitation")}]`
-          break;
+          break
         case ChatContentType.VIDEO_INVITATION:
           result = `[${_that.$i18n.t("videoInvitation")}]`
-          break;
+          break
         case ChatContentType.AUDIO:
           result = `[${_that.$i18n.t("audio")}]`
-          break;
+          break
         case ChatContentType.VIDEO:
           result = `[${_that.$i18n.t("video")}]`
-          break;
+          break
         case ChatContentType.CARD:
           result = `[${_that.$i18n.t("card")}]`
-          break;
+          break
         case ChatContentType.NOTE:
           result = `[${_that.$i18n.t("note")}]`
-          break;
+          break
         default:
           result = content
       }
@@ -755,8 +808,8 @@ export default {
           }
         }
       }
-      if(message.messageType === P2pChatMessageType.CALL_CLOSE || message.contentType === ChatContentType.CALL_JOIN_REQUEST || (message.subjectType === SubjectType.CHAT && message.messageType === P2pChatMessageType.CALL_REQUEST)){
-        return;
+      if (message.messageType === P2pChatMessageType.CALL_CLOSE || message.contentType === ChatContentType.CALL_JOIN_REQUEST || (message.subjectType === SubjectType.CHAT && message.messageType === P2pChatMessageType.CALL_REQUEST)) {
+        return
       }
       await store.handleChatTime(message, chat)
       await chatComponent.insert(ChatDataType.MESSAGE, message, chat.messages)
@@ -775,7 +828,9 @@ export default {
     async handleChatTime(current, chat) {
       let _that = this
       let store = _that.$store
-      if (current.messageType === P2pChatMessageType.CALL_CLOSE) { return; }
+      if (current.messageType === P2pChatMessageType.CALL_CLOSE) {
+        return
+      }
       let messages = chat.messages
       let currentTime = current.receiveTime
       let preTime = new Date()
@@ -913,7 +968,7 @@ export default {
           type: "warning",
           color: "info",
         })
-        return;
+        return
       }
       message.blockId = current.blockId
       message.connectPeerId = myself.myselfPeerClient.connectPeerId
@@ -1046,12 +1101,12 @@ export default {
           QRScanner.enableLight((err, status) => {
             err && console.log("[Scan.enableLight.error] " + JSON.stringify(err))
             console.log("[Scan.enableLight.status] " + JSON.stringify(status))
-          });
+          })
         } else {
           QRScanner.disableLight((err, status) => {
             err && console.log("[Scan.disableLight.error] " + JSON.stringify(err))
             console.log("[Scan.disableLight.status] " + JSON.stringify(status))
-          });
+          })
         }
       } catch (e) {
         console.log("[Scan.toggleLight.error] " + JSON.stringify(e))
@@ -1186,23 +1241,21 @@ export default {
       document.getElementById('videoDialog').style.display = 'block'
       store.state.miniVideoDialog = false
     },
-    logout: async function (data) {
+    async logout(data) {
       let _that = this
       let store = _that.$store
       _that.logoutFlag = true
+      store.peers = null
       if (store.state.linkmans && store.state.linkmans.length > 0) {
         webrtcPeerPool.clear()
         signalProtocol.clear()
       }
-      // 断开primaryEndPoint连接
-      console.log('primaryEndPoint disconnect')
-      store.peers = null
       await p2pPeer.stop()
       libp2pClientPool.closeAll()
-      if (_that.heartbeatTimer) {
+      /*if (_that.heartbeatTimer) {
         clearInterval(_that.heartbeatTimer)
         delete _that.heartbeatTimer
-      }
+      }*/
       // 跳转页面
       _that.$router.push('/')
       if (store.state.ifMobileStyle) {
@@ -1238,26 +1291,19 @@ export default {
       let _that = this
       let store = _that.$store
       if (ifOnline) {
-        if (store.peers) {
-          store.peers = null
-          }
-        // re-setupSocket
         if (_that.pendingSetupSocket === true) {
           _that.pendingSetupSocket = false
           console.log('re-setupSocket')
           await _that.setupSocket()
         }
-        
       } else {
         _that.pendingSetupSocket = true
         store.state.networkStatus = 'DISCONNECTED'
-        webrtcPeerPool.clear()
-        signalProtocol.clear()
       }
     },
     async chatReceiver(data) {
       let _that = this
-      let store = this.$store
+      let store = _that.$store
       let type = data.type
       if (!type) {
         console.error('NullChatType')
@@ -1496,7 +1542,7 @@ export default {
     },
     async p2pChatReceiver(peerId, message) {
       let _that = this
-      let store = this.$store
+      let store = _that.$store
       let myselfPeerClient = myself.myselfPeerClient
       if(!message.messageType){
         let signalSession = await _that.getSignalSession(peerId)
@@ -1997,7 +2043,7 @@ export default {
         }
       }
       else if (messageType === P2pChatMessageType.CHAT_READ_CALLBACK) {
-        await store.handleReadCallback(message);
+        await store.handleReadCallback(message)
       }
       else if (messageType === P2pChatMessageType.CALL_REQUEST) {
         await _that.receiveCallRequest(message)
@@ -2229,17 +2275,6 @@ export default {
     store.ifMobile = function () {
       return window.device && (window.device.platform === 'Android' || window.device.platform === 'iOS')
     }
-    // online status monitoring
-    console.log('getOnlineStatus:' + deviceComponent.getOnlineStatus())
-    await _that.setNetworkStatus(deviceComponent.getOnlineStatus() ? true : false)
-    deviceComponent.registOnline(async function () {
-      console.log('online')
-      await _that.setNetworkStatus(true)
-    })
-    deviceComponent.registOffline(async function () {
-      console.log('offline')
-      await _that.setNetworkStatus(false)
-    })
     if (window.device) {
         document.addEventListener('deviceready', async function () {
           if(window.device.platform === 'Android'){
@@ -2255,10 +2290,10 @@ export default {
                   },false)
           }
         })
-        cordova.plugins.backgroundMode.enable();
+        cordova.plugins.backgroundMode.enable()
         cordova.plugins.backgroundMode.on('activate', function() {
-          cordova.plugins.backgroundMode.disableWebViewOptimizations();
-          cordova.plugins.backgroundMode.disableBatteryOptimizations();
+          cordova.plugins.backgroundMode.disableWebViewOptimizations()
+          cordova.plugins.backgroundMode.disableBatteryOptimizations()
         })
         console.log('getNetworkState:' + deviceComponent.getNetworkState())
         store.ios = _that.$q.platform.is.ios
@@ -2311,7 +2346,7 @@ export default {
         /*if (window.device.platform === 'iOS') {
           document.body.addEventListener('touchmove', function (e) {
             e.preventDefault() // 阻止默认的处理方式（iOS有下拉滑动的效果）
-          }, { passive: false }); // passive参数用于兼容iOS和Android
+          }, { passive: false }) // passive参数用于兼容iOS和Android
         }*/
         console.log('device.model:' + deviceComponent.getDeviceProperty('model'))
         console.log('device.platform:' + deviceComponent.getDeviceProperty('platform'))
@@ -2332,7 +2367,7 @@ export default {
             }else if(type === 'call'){
               _that.gotoChat(data.subjectId)
             }else if(type === 'linkmanRequest'){
-              store.changeKind('receivedList', 'contacts');
+              store.changeKind('receivedList', 'contacts')
               store.toggleDrawer(true)
             }
           })
@@ -2364,11 +2399,11 @@ export default {
         let aPy = a.pyGivenName ? a.pyGivenName : a.pyName
         let bPy = b.pyGivenName ? b.pyGivenName : b.pyName
         if (aPy < bPy) {
-          return -1;
+          return -1
         } else if (aPy == bPy) {
-          return 0;
+          return 0
         } else {
-          return 1;
+          return 1
         }
       })
       store.state.linkmans = linkmanDBItems
@@ -2475,7 +2510,7 @@ export default {
       if (!(_that.ifMobileSize || store.state.ifMobileStyle) && tab) {
         _that.tab = tab
       }
-      if (kind === 'message') {//stopPropagation
+      if (kind === 'message') { // stopPropagation
         _that.noSwipeClose = true
       } else {
         _that.noSwipeClose = false
@@ -2530,17 +2565,26 @@ export default {
       _that.drawer = true
     }
 
-    await _that.setupSocket()
-    window.$store = store
     chatAction.registReceiver('chat', _that.chatReceiver)
     p2pChatAction.registReceiver('p2pChat', _that.p2pChatReceiver)
     webrtcPeerPool.peerId = myself.myselfPeerClient.peerId
     webrtcPeerPool.peerPublicKey = myself.myselfPeerClient.peerPublicKey
-    webrtcPeerPool.registEvent('connect',_that.webrtcConnect)
-    webrtcPeerPool.registEvent('close',_that.webrtcClose)
-    webrtcPeerPool.registEvent('stream',async function(evt){
-      _that.receiveRemoteStream(evt.stream,evt.source.targetPeerId)
+    webrtcPeerPool.registEvent('connect', _that.webrtcConnect)
+    webrtcPeerPool.registEvent('close', _that.webrtcClose)
+    webrtcPeerPool.registEvent('stream', async function(evt) {
+      _that.receiveRemoteStream(evt.stream, evt.source.targetPeerId)
     })
+
+    // online status monitoring
+    deviceComponent.registOnline(async function () {
+      console.log('online')
+      await _that.setNetworkStatus(true)
+    })
+    deviceComponent.registOffline(async function () {
+      console.log('offline')
+      await _that.setNetworkStatus(false)
+    })
+    await _that.preSetupSocket()
   },
   watch: {
     /*tab(val) {
