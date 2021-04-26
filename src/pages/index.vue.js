@@ -271,7 +271,8 @@ export default {
 
       let webSocket = p2pPeer.host.transportManager._transports.get('WebSockets')
       webSocket.onopen = function (evt) {
-        console.log('WebSocket Connected!' + webSocket.url)
+        console.log('WebSocket Connected!')
+        console.log(webSocket.ws)
         _that._heartbeatTimer = setInterval(function () {
           webSocket.send(JSON.stringify({
             contentType: "Heartbeat"
@@ -279,10 +280,12 @@ export default {
         )}, 55 * 1000)
       }
       webSocket.onmessage = function (evt) {
-        //console.log('WebSocket Message:' + webSocket.url)
+        //console.log('WebSocket Message!')
+        //console.log(webSocket.ws)
       }
       webSocket.onerror = async function (evt) {
-        console.error('WebSocket Error!' + webSocket.url)
+        console.error('WebSocket Error!')
+        console.log(webSocket.ws)
         if (_that._heartbeatTimer) {
           clearInterval(_that._heartbeatTimer)
           delete _that._heartbeatTimer
@@ -290,7 +293,8 @@ export default {
         await _that.preSetupSocket()
       }
       webSocket.onclose = async function (evt) {
-        console.log('WebSocket Closed!' + webSocket.url)
+        console.log('WebSocket Closed!')
+        console.log(webSocket.ws)
         if (_that._heartbeatTimer) {
           clearInterval(_that._heartbeatTimer)
           delete _that._heartbeatTimer
