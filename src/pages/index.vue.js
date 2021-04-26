@@ -1295,13 +1295,13 @@ export default {
       let _that = this
       let store = _that.$store
       if (ifOnline) {
-        if (_that.pendingSetupSocket === true) {
-          _that.pendingSetupSocket = false
+        //if (_that.pendingSetupSocket === true) {
+          //_that.pendingSetupSocket = false
           console.log('re-setupSocket')
           await _that.setupSocket()
-        }
+        //}
       } else {
-        _that.pendingSetupSocket = true
+        //_that.pendingSetupSocket = true
         store.state.networkStatus = 'DISCONNECTED'
       }
     },
@@ -1551,6 +1551,7 @@ export default {
       if(!message.messageType){
         let signalSession = await _that.getSignalSession(peerId)
         if(!signalSession){
+          console.log('signalSession dont exist')
           return
         }
         let messageString = await signalSession.decrypt(message,'string')
@@ -2248,6 +2249,7 @@ export default {
       if(typeof message === "object" && message.messageType !== P2pChatMessageType.SYNC_LINKMAN_INFO){
         let signalSession = await _that.getSignalSession(peerId)
         if(!signalSession){
+          console.log('signalSession dont exist')
           return
         }
         message = await signalSession.encrypt(JSON.stringify(message))
