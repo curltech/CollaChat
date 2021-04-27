@@ -1295,13 +1295,13 @@ export default {
       let _that = this
       let store = _that.$store
       if (ifOnline) {
-        //if (_that.pendingSetupSocket === true) {
-          //_that.pendingSetupSocket = false
+        if (_that.pendingSetupSocket === true) {
+          _that.pendingSetupSocket = false
           console.log('re-setupSocket')
           await _that.setupSocket()
-        //}
+        }
       } else {
-        //_that.pendingSetupSocket = true
+        _that.pendingSetupSocket = true
         store.state.networkStatus = 'DISCONNECTED'
       }
     },
