@@ -1551,7 +1551,7 @@ export default {
       let _that = this
       let store = _that.$store
       let myselfPeerClient = myself.myselfPeerClient
-      if(!message.messageType){
+      if(![]&&!message.messageType){
         let signalSession = await _that.getSignalSession(peerId)
         if(!signalSession){
           console.log('signalSession dont exist')
@@ -2249,7 +2249,7 @@ export default {
     },
     async p2pSend(message,peerId){
       let _that = this
-      if(typeof message === "object" && message.messageType !== P2pChatMessageType.SYNC_LINKMAN_INFO){
+      if(![] && typeof message === "object" && message.messageType !== P2pChatMessageType.SYNC_LINKMAN_INFO){
         let signalSession = await _that.getSignalSession(peerId)
         if(!signalSession){
           console.log('signalSession dont exist')
