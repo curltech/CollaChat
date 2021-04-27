@@ -273,11 +273,14 @@ export default {
       webSocket.onopen = function (evt) {
         console.log('WebSocket Connected!')
         console.log(webSocket.ws)
-        _that._heartbeatTimer = setInterval(function () {
-          webSocket.send(JSON.stringify({
-            contentType: "Heartbeat"
-          })
-        )}, 55 * 1000)
+        _that._heartbeatTimer = setInterval(async function () {
+          let payload = {}
+          payload.type = 'Heartbeat'
+          payload.srcClientId = myself.myselfPeerClient.clientId
+          payload.srcPeerId = myself.myselfPeerClient.peerId
+          payload.createTimestamp = new Date().getTime()
+          await chatAction.chat(null, payload, myself.myselfPeerClient.peerId)
+        }, 55 * 1000)
       }
       webSocket.onmessage = function (evt) {
         //console.log('WebSocket Message!')
