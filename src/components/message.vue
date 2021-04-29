@@ -39,7 +39,7 @@
               q-btn.q-mr-sm.btnIcon(round flat icon="insert_emoticon" @click="switchEmoji")
               div(v-if="emojiShow" @mouseleave = 'emojiPickerBlur')
                 vEmojiPicker.bg-c-grey-0.emoji-dialog#emojiPicker(@select="selectEmoji")
-              q-btn.q-mr-sm.btnIcon(round flat icon="videocam" @click="initiateCallRequest('video')")
+              q-btn.q-mr-sm.btnIcon(round flat icon="videocam"  :disable="!(!ifSelfChat && activeStatus($store.state.currentChat))" @click="initiateCallRequest('video')")
               q-btn.q-mr-sm.btnIcon(round flat icon="call" :disable="!(!ifSelfChat && activeStatus($store.state.currentChat))" @click="initiateCallRequest('audio')")
               q-btn.q-mr-sm.btnIcon(round flat icon="mic" @click="capture('audio')")
               q-btn.q-mr-sm.btnIcon(round flat icon="camera" @click="capture('video')")
