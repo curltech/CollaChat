@@ -14,7 +14,7 @@
     div(v-if = "message.contentType === ChatContentType.VIDEO"  @click = '$store.getMessageFileAndOpen(message)')
       q-icon.video-thumbnail-icon( size="32px" name="play_circle_outline")
       img.video-thumbnail-img(:src="message.thumbnail")
-    q-btn(v-if = "message.contentType === ChatContentType.VIDEO_INVITATION ||message.contentType == ChatContentType.AUDIO_INVITATION" color="secondary" text-color="grey-1" @click="$store.acceptGroupCall(message)" :icon="message.contentType=='videoInvitation'?'videocam':'call'" style="width: 100%")
+    q-btn(v-if = "message.contentType === ChatContentType.VIDEO_INVITATION ||message.contentType == ChatContentType.AUDIO_INVITATION" color="secondary" text-color="grey-1" @click="acceptGroupCall(message)" :icon="message.contentType=='videoInvitation'?'videocam':'call'" style="width: 100%")
       span(v-if="message.contentType === ChatContentType.VIDEO_INVITATION") {{$t('join video')}}
       span(v-if="message.contentType === ChatContentType.AUDIO_INVITATION") {{$t('join audio')}}
     q-card.personal-card(v-if="message.contentType === ChatContentType.CARD" @click="openCard(message)")
