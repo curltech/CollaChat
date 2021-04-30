@@ -1608,6 +1608,10 @@ export default {
           linkman.mobile = content.mobile
           linkman.avatar = content.avatar
           linkman.publicKey = content.publicKey
+          let signalSession = await _that.getSignalSession(linkmanPeerId)
+          if(signalSession){
+              await signalSession.close()
+          }
           if(linkman.signalPublicKey !== content.signalPublicKey){
             linkman.signalPublicKey = content.signalPublicKey
             console.log('receive signalPublicKey' + linkman.name + linkman.signalPublicKey)
