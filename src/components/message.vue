@@ -155,7 +155,7 @@
           q-separator.c-separator.message-sep-2
           q-item(clickable v-ripple @click="showOwnershipHandover")
             q-item-section
-              q-item-label {{$t('Ownership Handover')}}
+              q-item-label {{ ifIAmGroupOwner($store.state.currentChat) ? $t('Ownership Handover') : $t('Group Owner') }}
             q-item-section(side) {{ $store.state.currentChat && $store.state.groupChatMap[$store.state.currentChat.subjectId] && $store.state.groupChatMap[$store.state.currentChat.subjectId].groupOwnerPeerId ? ($store.state.groupChatMap[$store.state.currentChat.subjectId].groupOwnerPeerId === $store.state.myselfPeerClient.peerId ? $store.state.myselfPeerClient.name : ($store.state.linkmanMap[$store.state.groupChatMap[$store.state.currentChat.subjectId].groupOwnerPeerId] ? $store.state.linkmanMap[$store.state.groupChatMap[$store.state.currentChat.subjectId].groupOwnerPeerId].name : $t('NonContacts'))) : '' }}
             q-item-section(avatar v-if="ifIAmGroupOwner($store.state.currentChat)")
               q-icon(name="keyboard_arrow_right" color="c-grey-10")

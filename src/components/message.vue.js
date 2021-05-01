@@ -1313,7 +1313,7 @@ export default {
           remainingLinkmanCount++
         }
       }
-      if (groupChat.groupOwnerPeerId === myselfPeerClient.peerId && remainingLinkmanCount > 0) {
+      if (groupChat.groupOwnerPeerId === myselfPeerClient.peerId && remainingLinkmanCount > 1) {
         _that.$q.notify({
           message: _that.$i18n.t("Please handover your ownership first!"),
           timeout: 3000,
@@ -1504,17 +1504,24 @@ export default {
       this.subKind = 'selectGroupChatMember'
     },
     showOwnershipHandover() {
-      let linkmans = this.$store.state.linkmans // 实际选择的不是GroupChatMember，而是对应的linkman
+      let _that = this
+      let store = _that.$store
+      let groupChat = store.state.groupChatMap[store.state.currentChat.subjectId]
+      if (groupChat.groupOwnerPeerId !== myself.myselfPeerClient.peerId) {
+        return
+      }
+
+      let linkmans = store.state.linkmans // 实际选择的不是GroupChatMember，而是对应的linkman
       if (linkmans && linkmans.length > 0) {
         for (let linkman of linkmans) {
           linkman.selected = false
           linkman.existing = false
         }
       }
-      this.selectedGroupChatMembers = []
-      this.selectedGroupChatMemberPeerId = null
-      this.selectGroupChatMemberFlag = 'ownershipHandover'
-      this.subKind = 'selectGroupChatMember'
+      _that.selectedGroupChatMembers = []
+      _that.selectedGroupChatMemberPeerId = null
+      _that.selectGroupChatMemberFlag = 'ownershipHandover'
+      _that.subKind = 'selectGroupChatMember'
     },
     selectGroupChatMember(groupChatMember, ifCheckbox) {
       if (this.selectGroupChatMemberFlag === 'removeGroupChatMember' || this.selectGroupChatMemberFlag === 'selectedGroupCallMember') {
