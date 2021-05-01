@@ -124,9 +124,10 @@
             style="margin-left:16px;width:calc(100% - 16px)"
           )
         q-item(clickable, v-ripple, v-if="currentPeerContact.peerId")
-          q-item-section
+          q-item-section(side)
             q-item-label {{ $t('Peer Id') }}
-            q-item-label(caption, lines="2") {{ currentPeerContact.peerId }}
+          q-item-section
+            q-item-label(caption, lines="3", style="word-break:break-all") {{ currentPeerContact.peerId }}
           q-item-section(side)
             q-btn.btnIcon(
               flat,

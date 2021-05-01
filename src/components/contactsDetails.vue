@@ -40,7 +40,7 @@
                 :color="$store.state.currentLinkman && $store.state.currentLinkman.activeStatus === ActiveStatus.UP ? 'secondary' : 'c-grey'"
               )
             q-item-label(caption, lines="1") {{ $t('UserName: ') + ($store.state.currentLinkman ? $store.state.currentLinkman.name : '') }}
-            q-item-label(caption, lines="2") {{ $t('PeerId: ') + ($store.state.currentLinkman ? $store.state.currentLinkman.peerId : '') }}
+            q-item-label(caption, lines="3", style="word-break:break-all") {{ $t('PeerId: ') + ($store.state.currentLinkman ? $store.state.currentLinkman.peerId : '') }}
             q-item-label(caption, lines="1") {{ $t('CreateDate: ') + ($store.state.currentLinkman ? date.formatDate($store.state.currentLinkman.createDate, 'YYYY-MM-DD HH:mm:ss') : '') }}
             q-item-label(v-if="$store.state.currentLinkman && $store.state.currentLinkman.peerId !== $store.state.myselfPeerClient.peerId" caption, lines="1") {{ $t('LastConnectTime: ') + ($store.state.currentLinkman && $store.state.currentLinkman.lastConnectTime ? date.formatDate($store.state.currentLinkman.lastConnectTime, 'YYYY-MM-DD HH:mm:ss') : '') }}
             q-item-label(v-if="$store.state.currentLinkman && $store.state.currentLinkman.peerId !== $store.state.myselfPeerClient.peerId" caption, lines="1") {{ $t('SourceType: ') + ($store.state.currentLinkman ? $t($store.state.currentLinkman.sourceType) : '') }}
