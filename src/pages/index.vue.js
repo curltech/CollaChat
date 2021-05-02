@@ -806,8 +806,7 @@ export default {
               messageId: message.messageId,
               createDate: message.createDate,
               receiverPeerId: groupMember.memberPeerId ? groupMember.memberPeerId : groupMember,
-              receiveTime: message.createDate,
-              actualReceiveTime : null
+              receiveTime: null
             }
             if(message.messageType !== P2pChatMessageType.CALL_CLOSE){
               await chatComponent.insert(ChatDataType.RECEIVE, receive, null)
@@ -1586,7 +1585,7 @@ export default {
               receiverPeerId: message.senderPeerId
             })
           if (receives && receives.length > 0) {
-            receives[0].receiveTime = receives.receiveTime
+            receives[0].receiveTime = message.receiveTime
             await chatComponent.update(ChatDataType.RECEIVE, receives[0], null)
           }
         }
