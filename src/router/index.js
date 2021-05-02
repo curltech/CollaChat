@@ -1,10 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 //import MenuUtil from 'libcolla'
-import {
-  routes
-} from './routes'
-import credential from 'libcolla'
+import {routes} from './routes'
 import store from '@/store'
 
 Vue.use(VueRouter)
