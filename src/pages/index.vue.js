@@ -945,7 +945,7 @@ export default {
       if(chat.subjectType === SubjectType.CHAT){
         _peers.push(store.state.linkmanMap[peerId])
       }else if(chat.subjectType === SubjectType.GROUP_CHAT){
-        let groupMembers = store.state.groupChatMap[subjectId].groupMembers
+        let groupMembers = store.state.groupChatMap[peerId].groupMembers
         for (let groupMember of groupMembers) {
           let linkman = store.state.linkmanMap[groupMember.memberPeerId]
           if(linkman && groupMember.memberPeerId !== myself.myselfPeerClient.peerId){
