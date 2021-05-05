@@ -1851,7 +1851,7 @@ export default {
             gms = []
           }
           let inviterName
-          let groupMemberNames
+          let addedGroupMemberNames
           let includeNonContacts = false
           for (let gm of content.data) {
             if ((!newCreated && gm.dirtyFlag === 'NEW') || newCreated) {
@@ -1877,7 +1877,7 @@ export default {
                 if (gm.memberPeerId === content.senderPeerId) {
                   inviterName = (linkman.givenName ? linkman.givenName : linkman.name)
                 } else {
-                  groupMemberNames = (groupMemberNames ? groupMemberNames + _that.$i18n.t(", ") : '') + (linkman.givenName ? linkman.givenName : linkman.name)
+                  addedGroupMemberNames = (addedGroupMemberNames ? addedGroupMemberNames + _that.$i18n.t(", ") : '') + (linkman.givenName ? linkman.givenName : linkman.name)
                 }
               } else if (gm.memberPeerId !== myselfPeerClient.peerId) {
                 includeNonContacts = true

@@ -236,6 +236,18 @@ module.exports = function (ctx) {
         productName: 'Colla',
         appId: 'io.curltech.colla',
         copyright: 'Copyright @ 2020 CURL TECH PTE. LTD.',
+        "directories": {
+          "buildResources": "src-electron/icons",
+          "output": "dist"
+        },
+        "appx": {
+          "identityName": "CURLTECHPTE.LTD.CollaChat",
+          "publisher": "CN=E290B387-CBB6-4E15-8EE0-F7A909BA5212",
+          "publisherDisplayName": "CURL TECH PTE. LTD.",
+          "applicationId": "CollaChat",
+          "displayName": "CollaChat",
+          "backgroundColor": "#ffffff"
+        },
         afterSign: 'src-electron/notarize.js',
         asar: false,
         mac: {
