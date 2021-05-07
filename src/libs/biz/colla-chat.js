@@ -726,7 +726,7 @@ export class ChatBlockComponent {
           securityParams.PayloadKey = payloadKey
           if (content_) {
             let payload = await SecurityPayload.decrypt(content_, securityParams)
-            d.content = StringUtil.decodeURI(payload)
+            //d.content = StringUtil.decodeURI(payload)
           }
         }
         return data

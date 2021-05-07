@@ -218,7 +218,7 @@ export class CollectionComponent {
 					if (content_) {
 						securityParams.NeedCompress = true
 						let payload = await SecurityPayload.decrypt(content_, securityParams)
-						d.content = StringUtil.decodeURI(payload)
+						//d.content = StringUtil.decodeURI(payload)
 					}
 					if (thumbnail_) {
 						securityParams.NeedCompress = false
@@ -275,7 +275,7 @@ export class CollectionComponent {
 					let content_ = d.content_
 					if (content_) {
 						let payload = await SecurityPayload.decrypt(content_, securityParams)
-						d.content = StringUtil.decodeURI(payload)
+						//d.content = StringUtil.decodeURI(payload)
 					}
 				}
 			} else {
