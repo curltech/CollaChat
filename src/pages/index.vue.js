@@ -607,10 +607,9 @@ export default {
       message.receiveTime = currentDate
       message.actualReceiveTime = currentDate
       let subjectId = message.subjectId
-      if (message.contentType == ChatContentType.FILE) {
+      if (message.contentType == ChatContentType.FILE || message.contentType == ChatContentType.IMAGE || message.contentType == ChatContentType.VIDEO) {
         message.percent = null
-      } else if (message.contentType == ChatContentType.IMAGE || message.contentType == ChatContentType.VIDEO) {
-        message.percent = null
+        message.loading = false
       } else if (message.contentType == ChatContentType.CHAT) {
         await store.receiveMergeMessage(message)
       }
@@ -970,7 +969,9 @@ export default {
         tag: "",
         updateDate: new Date().getTime()
       }
+      this.$q.loading.show()
       let saveResult = await chatBlockComponent.save(current,_peers)
+      this.$q.loading.hide()
       if (!saveResult) {
         _that.$q.notify({
           message: _that.$i18n.t("Save failed"),

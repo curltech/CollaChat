@@ -6,7 +6,7 @@ import { CollaUtil, TypeUtil, BlobUtil, UUID } from 'libcolla'
 import { myself, dataBlockService, peerClientService } from 'libcolla'
 
 import pinyinUtil from '@/libs/base/colla-pinyin'
-import { audioCaptureComponent, mediaCaptureComponent, mediaComponent, cameraComponent, mediaPickerComponent, mediaRecorderComponent, mediaStreamComponent, audioInputComponent } from '@/libs/base/colla-media'
+import { audioCaptureComponent, mediaCaptureComponent, mediaComponent, cameraComponent, alloyFingerComponent, mediaPickerComponent, mediaRecorderComponent, mediaStreamComponent, audioInputComponent } from '@/libs/base/colla-media'
 import { statusBarComponent, fileComponent, photoLibraryComponent } from '@/libs/base/colla-cordova'
 import { chatComponent, ChatContentType, ChatDataType, P2pChatMessageType, SubjectType, chatBlockComponent } from '@/libs/biz/colla-chat'
 import { ActiveStatus, contactComponent, ContactDataType, MemberType, RequestStatus, RequestType } from '@/libs/biz/colla-contact'
@@ -457,7 +457,7 @@ export default {
       } else {
           console.error('Not support browser safari!')
       }
-    }, 
+    },
     async saveChatMediaFile() {
       let _that = this
       let store = _that.$store
@@ -620,6 +620,7 @@ export default {
           fileData = localAttachs[0].content
         } else {
           let connectPeerId = message.connectPeerId
+          message.loading = true
           let block = await dataBlockService.findTxPayload(connectPeerId, message.blockId)
           if (block && block.length > 0 && block[0]) {
             if (block[0].attachs && block[0].attachs.length > 0) {
@@ -637,6 +638,7 @@ export default {
               }
             }
           }
+         message.loading = false
         }
         chatComponent.localFileDataMap[message.messageId] = fileData
       }
@@ -658,6 +660,14 @@ export default {
         store.state.imageMessageSrc = fileData
         _that.$nextTick(() => {
           store.state.imageMessageViewDialog = true
+            _that.$nextTick(() => {
+                if (store.ifMobile()) {
+                  setTimeout(function () {
+                      alloyFingerComponent.initImage('#dialog-image')
+                      alloyFingerComponent.initLongSingleTap('#dialog-image-container', _that.mediaHold, _that.fullscreenBack)
+                  },500)
+                }
+            })
         })
       } else if (message.contentType === ChatContentType.AUDIO) {
         store.state.audioRecordMessageSrc = fileData
@@ -694,6 +704,13 @@ export default {
         (window.URL || window.webkitURL).revokeObjectURL(hyperlink.href);
       }
     },
+    fullscreenBack() {
+          let _that = this
+          let bottomSheet = document.getElementsByClassName('q-bottom-sheet')
+          if (!bottomSheet || !bottomSheet[0] || bottomSheet[0].style.display === 'none') { // 排除longTap触发的singleTapCallback
+              store.state.imageMessageViewDialog = false
+          }
+      },
     uploadMessageFile: async function (file) {
       let _that = this
       let store = _that.$store
@@ -2195,7 +2212,7 @@ export default {
         }
       }
     },
-    mediaHold(type) {
+    mediaHold() {
       let _that = this;
       let store = _that.$store
       _that.$q.bottomSheet({
