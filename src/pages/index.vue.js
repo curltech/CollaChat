@@ -1,5 +1,6 @@
 import { date, Dialog } from 'quasar'
-import QrCode from 'qrcode-reader'
+import jsQR from 'jsqr'
+import jimp from 'jimp'
 
 import { CollaUtil, UUID } from 'libcolla'
 import { webrtcPeerPool } from 'libcolla'
@@ -1143,19 +1144,14 @@ export default {
       let store = _that.$store
       let params = null //{ targetHeight: 256, targetWidth: 256 }
       cameraComponent.getPicture(Camera.PictureSourceType.SAVEDPHOTOALBUM, params).then(function (imageUri) {
-        let qr = new QrCode()
-        qr.callback = async function (err, result) {
-          if (err) {
-            console.error(err)
-            _that.$q.notify({
-              message: _that.$i18n.t('Failed to read the qr code'),
-              timeout: 3000,
-              type: "warning",
-              color: "warning",
-            })
-          } else {
-            console.log(result)
-            if (result.result) {
+        let base64 = 'data:image/jpeg;base64,' + imageUri
+        console.log('base64:' + imageUri)
+        jimp.read(base64).then(async (res) => {
+          const { data, width, height } = res.bitmap
+          try {
+            const resolve = await jsQR(data, width, height, { inversionAttempts: 'dontInvert' })
+            if (resolve && resolve.data) {
+              console.log(resolve.data)
               systemAudioComponent.scanAudioPlay()
               store.scanSwitch(false)
               store.findLinkman = null
@@ -1174,11 +1170,18 @@ export default {
               if (store.state.ifMobileStyle) {
                 document.querySelector("body").classList.add('bgc')
               }
-              await _that.findContacts('qrCode', result.result)
+              await _that.findContacts('qrCode', resolve.data)
             }
+          } catch (err) {
+            console.error(err)
+            _that.$q.notify({
+              message: _that.$i18n.t('Failed to read the qr code'),
+              timeout: 3000,
+              type: "warning",
+              color: "warning",
+            })
           }
-        }
-        qr.decode('data:image/jpeg;base64,' + imageUri)
+        })
       })
     },
     scanSwitch(ifScan) {

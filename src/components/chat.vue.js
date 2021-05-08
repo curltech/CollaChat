@@ -1,10 +1,11 @@
 import { date } from 'quasar'
-import QrCode from 'qrcode-reader'
+import jsQR from 'jsqr'
+import jimp from 'jimp'
 
 import { CollaUtil } from 'libcolla'
 import { myself } from 'libcolla'
 
-import { deviceComponent, statusBarComponent } from '@/libs/base/colla-cordova'
+import { statusBarComponent } from '@/libs/base/colla-cordova'
 import { systemAudioComponent } from '@/libs/base/colla-media'
 import { chatComponent, ChatContentType, ChatDataType, P2pChatMessageType, SubjectType } from '@/libs/biz/colla-chat'
 import { ActiveStatus, contactComponent, ContactDataType } from '@/libs/biz/colla-contact'
@@ -345,19 +346,13 @@ export default {
       let reader = new FileReader()
       reader.onload = function (e) {
         let base64 = e.target.result
-        let qr = new QrCode()
-        qr.callback = async function (err, result) {
-          if (err) {
-            console.error(err)
-            _that.$q.notify({
-              message: _that.$i18n.t('Failed to read the qr code'),
-              timeout: 3000,
-              type: "warning",
-              color: "warning",
-            })
-          } else {
-            console.log(result)
-            if (result.result) {
+        console.log('base64:' + base64)
+        jimp.read(base64).then(async (res) => {
+          const { data, width, height } = res.bitmap
+          try {
+            const resolve = await jsQR(data, width, height, { inversionAttempts: 'dontInvert' })
+            if (resolve && resolve.data) {
+              console.log(resolve.data)
               systemAudioComponent.scanAudioPlay()
               store.findLinkman = null
               store.state.findLinkmanData = {
@@ -369,11 +364,18 @@ export default {
               store.state.findContactsSubKind = 'default'
               store.findContactsEntry = 'chat'
               store.changeKind('findContacts')
-              await store.findContacts('qrCode', result.result)
+              await store.findContacts('qrCode', resolve.data)
             }
+          } catch (err) {
+            console.error(err)
+            _that.$q.notify({
+              message: _that.$i18n.t('Failed to read the qr code'),
+              timeout: 3000,
+              type: "warning",
+              color: "warning",
+            })
           }
-        }
-        qr.decode(base64)
+        })
       }
       reader.readAsDataURL(file)
       _that.$refs.upload.reset()

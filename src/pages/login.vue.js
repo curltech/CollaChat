@@ -1,6 +1,7 @@
 import { colors, Dialog } from 'quasar'
 import { required } from 'vuelidate/lib/validators'
-import QrCode from 'qrcode-reader'
+import jsQR from 'jsqr'
+import jimp from 'jimp'
 
 import { HttpClient } from 'libcolla'
 import { MobileNumberUtil } from 'libcolla'
@@ -239,20 +240,18 @@ export default {
       let store = _that.$store
       let file = files[0]
       let reader = new FileReader()
-      /*reader.onload = async function () {
-        if (reader.result) {
-          let json = reader.result
-          await _that.importID(json)
-        }
-      })
-      reader.readAsText(file)
-      _that.$refs.upload.reset()*/
       reader.onload = function (e) {
         let base64 = e.target.result
         console.log('base64:' + base64)
-        let qr = new QrCode()
-        qr.callback = async function (err, result) {
-          if (err) {
+        jimp.read(base64).then(async (res) => {
+          const { data, width, height } = res.bitmap
+          try {
+            const resolve = await jsQR(data, width, height, { inversionAttempts: 'dontInvert' })
+            if (resolve && resolve.data) {
+              systemAudioComponent.scanAudioPlay()
+              await _that.importID(resolve.data)
+            }
+          } catch (err) {
             console.error(err)
             _that.$q.notify({
               message: _that.$i18n.t('Failed to read the qr code'),
@@ -260,15 +259,8 @@ export default {
               type: "warning",
               color: "warning",
             })
-          } else {
-            console.log(result)
-            if (result.result) {
-              systemAudioComponent.scanAudioPlay()
-              await _that.importID(result.result)
-            }
           }
-        }
-        qr.decode(base64)
+        })
       }
       reader.readAsDataURL(file)
       _that.$refs.upload.reset()
@@ -478,9 +470,21 @@ export default {
       let store = _that.$store
       let params = null //{ targetHeight: 256, targetWidth: 256 }
       cameraComponent.getPicture(Camera.PictureSourceType.SAVEDPHOTOALBUM, params).then(function (imageUri) {
-        let qr = new QrCode()
-        qr.callback = async function (err, result) {
-          if (err) {
+        let base64 = 'data:image/jpeg;base64,' + imageUri
+        console.log('base64:' + imageUri)
+        jimp.read(base64).then(async (res) => {
+          const { data, width, height } = res.bitmap
+          try {
+            const resolve = await jsQR(data, width, height, { inversionAttempts: 'dontInvert' })
+            if (resolve && resolve.data) {
+              systemAudioComponent.scanAudioPlay()
+              _that.scanSwitch(false)
+              /*if (store.state.ifMobileStyle) {
+                document.querySelector("body").classList.add('bgc')
+              }*/
+              await _that.importID(resolve.data)
+            }
+          } catch (err) {
             console.error(err)
             _that.$q.notify({
               message: _that.$i18n.t('Failed to read the qr code'),
@@ -488,19 +492,8 @@ export default {
               type: "warning",
               color: "warning",
             })
-          } else {
-            console.log(result)
-            if (result.result) {
-              systemAudioComponent.scanAudioPlay()
-              _that.scanSwitch(false)
-              /*if (store.state.ifMobileStyle) {
-                document.querySelector("body").classList.add('bgc')
-              }*/
-              await _that.importID(result.result)
-            }
           }
-        }
-        qr.decode('data:image/jpeg;base64,' + imageUri)
+        })
       })
     },
     scanSwitch(ifScan) {

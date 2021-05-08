@@ -1,4 +1,5 @@
-import QrCode from 'qrcode-reader'
+import jsQR from 'jsqr'
+import jimp from 'jimp'
 
 import { EntityState } from 'libcolla'
 import { chatAction, myself } from 'libcolla'
@@ -435,19 +436,12 @@ export default {
       reader.onload = function (e) {
         let base64 = e.target.result
         console.log('base64:' + base64)
-        let qr = new QrCode()
-        qr.callback = async function (err, result) {
-          if (err) {
-            console.error(err)
-            _that.$q.notify({
-              message: _that.$i18n.t('Failed to read the qr code'),
-              timeout: 3000,
-              type: "warning",
-              color: "warning",
-            })
-          } else {
-            console.log(result)
-            if (result.result) {
+        jimp.read(base64).then(async (res) => {
+          const { data, width, height } = res.bitmap
+          try {
+            const resolve = await jsQR(data, width, height, { inversionAttempts: 'dontInvert' })
+            if (resolve && resolve.data) {
+              console.log(resolve.data)
               systemAudioComponent.scanAudioPlay()
               store.findLinkman = null
               store.state.findLinkmanData = {
@@ -456,11 +450,18 @@ export default {
                 givenName: null,
                 tag: null
               }
-              await store.findContacts('qrCode', result.result)
+              await store.findContacts('qrCode', resolve.data)
             }
+          } catch (err) {
+            console.error(err)
+            _that.$q.notify({
+              message: _that.$i18n.t('Failed to read the qr code'),
+              timeout: 3000,
+              type: "warning",
+              color: "warning",
+            })
           }
-        }
-        qr.decode(base64)
+        })
       }
       reader.readAsDataURL(file)
       _that.$refs.upload.reset()
