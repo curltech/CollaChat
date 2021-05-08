@@ -1696,7 +1696,7 @@ export default {
               groupOwnerPeerId = gm.memberPeerId
             }
             let linkman = store.state.linkmanMap[gm.memberPeerId]
-            if (linkman) {
+            if (linkman && gm.memberPeerId !== myselfPeerClient.peerId) {
               linkman.groupChats.unshift(groupChat)
               if (linkman.activeStatus === ActiveStatus.UP && groupChat.activeStatus !== ActiveStatus.UP) {
                 groupChat.activeStatus = ActiveStatus.UP
@@ -1706,7 +1706,8 @@ export default {
               } else {
                 groupMemberNames = (groupMemberNames ? groupMemberNames + _that.$i18n.t(", ") : '') + (linkman.givenName ? linkman.givenName : linkman.name)
               }
-            } else if (gm.memberPeerId !== myselfPeerClient.peerId) {
+            }
+            if (!linkman && gm.memberPeerId !== myselfPeerClient.peerId) {
               includeNonContacts = true
             }
           }
@@ -1857,6 +1858,7 @@ export default {
           let addedGroupMemberNames
           let includeNonContacts = false
           for (let gm of content.data) {
+            let linkman = store.state.linkmanMap[gm.memberPeerId]
             if ((!newCreated && gm.dirtyFlag === 'NEW') || newCreated) {
               let groupMember = {}
               groupMember.ownerPeerId = myselfPeerClient.peerId
@@ -1866,25 +1868,24 @@ export default {
               groupMember.createDate = gm.createDate
               groupMember.status = gm.status
               await contactComponent.insert(ContactDataType.GROUP_MEMBER, groupMember, gms)
-              if (gm.memberType === MemberType.OWNER) {
-                groupOwnerPeerId = gm.memberPeerId
+              if (linkman && gm.memberPeerId !== content.senderPeerId && gm.memberPeerId !== myselfPeerClient.peerId) {
+                addedGroupMemberNames = (addedGroupMemberNames ? addedGroupMemberNames + _that.$i18n.t(", ") : '') + (linkman.givenName ? linkman.givenName : linkman.name)
               }
-              let linkman = store.state.linkmanMap[gm.memberPeerId]
-              if (linkman) {
-                if (newCreated) {
-                  linkman.groupChats.unshift(groupChat)
-                }
+              if (!linkman && gm.memberPeerId !== myselfPeerClient.peerId) {
+                includeNonContacts = true
+              }
+              if (linkman && gm.memberPeerId !== myselfPeerClient.peerId) {
+                linkman.groupChats.unshift(groupChat)
                 if (linkman.activeStatus === ActiveStatus.UP && groupChat.activeStatus !== ActiveStatus.UP) {
                   groupChat.activeStatus = ActiveStatus.UP
                 }
-                if (gm.memberPeerId === content.senderPeerId) {
-                  inviterName = (linkman.givenName ? linkman.givenName : linkman.name)
-                } else {
-                  addedGroupMemberNames = (addedGroupMemberNames ? addedGroupMemberNames + _that.$i18n.t(", ") : '') + (linkman.givenName ? linkman.givenName : linkman.name)
-                }
-              } else if (gm.memberPeerId !== myselfPeerClient.peerId) {
-                includeNonContacts = true
               }
+            }
+            if (gm.memberType === MemberType.OWNER) {
+              groupOwnerPeerId = gm.memberPeerId
+            }
+            if (gm.memberPeerId === content.senderPeerId && linkman) {
+              inviterName = (linkman.givenName ? linkman.givenName : linkman.name)
             }
           }
 
@@ -1922,48 +1923,129 @@ export default {
         let _id = content._id
         let currentTime = new Date()
         let groupChat = store.state.groupChatMap[content.groupId]
-        // 删除群组成员
         let gms = groupChat.groupMembers
+        let removeGroupChat = false
         for (let gm of content.data) {
-          let groupMembers = await contactComponent.loadGroupMember(
-            {
-              ownerPeerId: myselfPeerClient.peerId,
-              groupId: gm.groupId,
-              memberPeerId: gm.memberPeerId
-            }
-          )
-          if (groupMembers && groupMembers.length > 0) {
-            await contactComponent.remove(ContactDataType.GROUP_MEMBER, groupMembers, gms)
-          }
-
-          let linkman = store.state.linkmanMap[gm.memberPeerId]
-          if (linkman) {
-            let _index = 0
-            for (let gc of linkman.groupChats) {
-              if (gc.groupId === groupChat.groupId) {
-                linkman.groupChats.splice(_index, 1)
-                break
-              }
-              _index++
-            }
+          if (gm.memberPeerId === myselfPeerClient.peerId) {
+            removeGroupChat = true
           }
         }
-        // 更新groupChat activeStatus
-        if (groupChat.activeStatus === ActiveStatus.UP) {
-          let hasActiveGroupMember = false
+        if (removeGroupChat) {
+          // 删除聊天记录
+          let messages = await chatComponent.loadMessage({
+            ownerPeerId: myselfPeerClient.peerId,
+            subjectId: groupChat.groupId
+          })
+          if (messages && messages.length > 0) {
+            await chatComponent.remove(ChatDataType.MESSAGE, messages)
+          }
+          let chat = store.state.chatMap[groupChat.groupId]
+          chat = await chatComponent.get(ChatDataType.CHAT, chat._id)
+          if (chat) {
+            await chatComponent.remove(ChatDataType.CHAT, chat, store.state.chats)
+          }
+          delete store.state.chatMap[groupChat.groupId]
+
+          // 删除群组成员
+          let removeGroupMembers = await contactComponent.loadGroupMember({
+            ownerPeerId: myselfPeerClient.peerId,
+            groupId: groupChat.groupId
+          })
+          if (removeGroupMembers && removeGroupMembers.length > 0) {
+            await contactComponent.remove(ContactDataType.GROUP_MEMBER, removeGroupMembers)
+          }
+
+          // 删除群组
+          let groupChatRecord = await contactComponent.get(ContactDataType.GROUP, groupChat._id)
+          await contactComponent.remove(ContactDataType.GROUP, groupChatRecord, store.state.groupChats)
+          delete store.state.groupChatMap[groupChat.groupId]
+          if (store.state.currentChat.subjectId === groupChat.groupId) {
+            store.state.currentChat = null
+            _that.subKind = "default"
+            if (store.state.ifMobileStyle) {
+              store.toggleDrawer(false)
+            }
+          }
+        } else {
+          // 删除群组成员
+          let fromGroupOwner = false
           for (let groupChatMember of gms) {
-            let linkman = store.state.linkmanMap[groupChatMember.memberPeerId]
-            if (linkman && linkman.activeStatus === ActiveStatus.UP) {
-              hasActiveGroupMember = true
+            if (groupChatMember.memberType === MemberType.OWNER && groupChatMember.memberPeerId === content.senderPeerId) {
+              fromGroupOwner = true
               break
             }
           }
-          if (!hasActiveGroupMember) {
-            groupChat.activeStatus = ActiveStatus.DOWN
+          let inviterName
+          let removedGroupMemberNames
+          let includeNonContacts = false
+          for (let groupChatMember of gms) {
+            if (groupChatMember.memberPeerId === content.senderPeerId) {
+              let linkman = store.state.linkmanMap[groupChatMember.memberPeerId]
+              if (linkman) {
+                inviterName = (linkman.givenName ? linkman.givenName : linkman.name)
+              }
+              break
+            }
           }
+          for (let gm of content.data) {
+            let linkman = store.state.linkmanMap[gm.memberPeerId]
+            if (fromGroupOwner) {
+              if (linkman) {
+                removedGroupMemberNames = (removedGroupMemberNames ? removedGroupMemberNames + _that.$i18n.t(", ") : '') + (linkman.givenName ? linkman.givenName : linkman.name)
+              } else if (gm.memberPeerId !== myselfPeerClient.peerId) {
+                includeNonContacts = true
+              }
+            }
+            let groupMembers = await contactComponent.loadGroupMember(
+              {
+                ownerPeerId: myselfPeerClient.peerId,
+                groupId: gm.groupId,
+                memberPeerId: gm.memberPeerId
+              }
+            )
+            if (groupMembers && groupMembers.length > 0) {
+              await contactComponent.remove(ContactDataType.GROUP_MEMBER, groupMembers, gms)
+            }
+            if (linkman && gm.memberPeerId !== myselfPeerClient.peerId) {
+              let _index = 0
+              for (let gc of linkman.groupChats) {
+                if (gc.groupId === groupChat.groupId) {
+                  linkman.groupChats.splice(_index, 1)
+                  break
+                }
+                _index++
+              }
+            }
+          }
+          // 更新groupChat activeStatus
+          if (groupChat.activeStatus === ActiveStatus.UP) {
+            let hasActiveGroupMember = false
+            for (let groupChatMember of gms) {
+              let linkman = store.state.linkmanMap[groupChatMember.memberPeerId]
+              if (linkman && linkman.activeStatus === ActiveStatus.UP) {
+                hasActiveGroupMember = true
+                break
+              }
+            }
+            if (!hasActiveGroupMember) {
+              groupChat.activeStatus = ActiveStatus.DOWN
+            }
+          }
+          groupChat.groupMembers = gms
+          store.state.groupChatMap[content.groupId] = groupChat
+
+          let chat = await store.getChat(groupChat.groupId)
+          let chatMessage = {
+            messageType: P2pChatMessageType.CHAT_SYS,
+            contentType: ChatContentType.EVENT,
+            content: fromGroupOwner ?
+            inviterName + _that.$i18n.t(" has removed ") + removedGroupMemberNames + (includeNonContacts ? _that.$i18n.t(" and ") + _that.$i18n.t("other NonContacts") : '') + _that.$i18n.t(" from group chat")
+            :
+            inviterName + _that.$i18n.t(" has left the group chat")
+          }
+          await store.addCHATSYSMessage(chat, chatMessage)
         }
-        groupChat.groupMembers = gms
-        store.state.groupChatMap[content.groupId] = groupChat
+
         // 发送Receive收条
         let linkmanRequest = {}
         linkmanRequest._id = _id

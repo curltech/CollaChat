@@ -1405,9 +1405,11 @@ export default {
       let groupChatRecord = await contactComponent.get(ContactDataType.GROUP, store.state.groupChatMap[store.state.currentChat.subjectId]._id)
       await contactComponent.remove(ContactDataType.GROUP, groupChatRecord, store.state.groupChats)
       delete store.state.groupChatMap[currentGroupChatGroupId]
-      store.state.groupChatMap[store.state.currentChat.subjectId] = null
       store.state.currentChat = null
       _that.subKind = "default"
+      if (store.state.ifMobileStyle) {
+        store.toggleDrawer(false)
+      }
 
       if (groupChatLinkmans.length > 0) {
         // 新增Sent请求
