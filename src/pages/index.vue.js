@@ -1959,7 +1959,7 @@ export default {
           let groupChatRecord = await contactComponent.get(ContactDataType.GROUP, groupChat._id)
           await contactComponent.remove(ContactDataType.GROUP, groupChatRecord, store.state.groupChats)
           delete store.state.groupChatMap[groupChat.groupId]
-          if (store.state.currentChat.subjectId === groupChat.groupId) {
+          if (store.state.currentChat && store.state.currentChat.subjectId === groupChat.groupId) {
             store.state.currentChat = null
             _that.subKind = "default"
             if (store.state.ifMobileStyle) {
