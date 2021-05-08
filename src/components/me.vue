@@ -32,6 +32,7 @@
           q-icon.menuIcon(name="settings" color="primary")
         q-item-section {{$t('Settings')}}
         q-item-section(avatar)
+          q-badge(v-if="upgradeVersion" color="red" floating rounded) New
           q-icon(v-if="ifMobileSize || $store.state.ifMobileStyle" name="keyboard_arrow_right")
       //q-separator.c-separator
 </template>

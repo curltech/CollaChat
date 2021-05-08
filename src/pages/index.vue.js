@@ -125,6 +125,9 @@ export default {
         }
       }
       return ReceivedArray
+    },
+    upgradeVersion() {
+      return this.$store.upgradeVersion('about')
     }
   },
   methods: {
@@ -2367,8 +2370,6 @@ export default {
     window.store = store
     console.log('screen.availWidth:' + screen.availWidth + ',screen.availHeight:' + screen.availHeight + ',window.devicePixelRatio:' + window.devicePixelRatio)
     store.screenHeight = _that.$q.screen.height
-    store.chrome = _that.$q.platform.is.chrome
-    store.safari = _that.$q.platform.is.safari
     store.ifMobile = function () {
       return window.device && (window.device.platform === 'Android' || window.device.platform === 'iOS')
     }
@@ -2393,8 +2394,6 @@ export default {
           cordova.plugins.backgroundMode.disableBatteryOptimizations()
         })
         console.log('getNetworkState:' + deviceComponent.getNetworkState())
-        store.ios = _that.$q.platform.is.ios
-        store.android = _that.$q.platform.is.android
         if ((_that.$q.screen.width < 481 || _that.$q.screen.height < 481) && (window.device.platform === 'Android' || window.device.platform === 'iOS')) {
           deviceComponent.lockScreen('portrait')
         }

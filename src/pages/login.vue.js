@@ -613,6 +613,7 @@ export default {
       } catch (e) {
         console.error(e)
       }
+      console.log('type:' + type + ',versionHistory:' + versionHistory)
       let no = 1
       for (let version of versionHistory) {
         if (_that.checkVersion(store.currentVersion, version)) {
@@ -628,6 +629,7 @@ export default {
         }
         no++
       }
+      console.log('latestVersion:' + store.latestVersion + ',currentVersion:' + store.currentVersion)
       if (store.latestVersion !== store.currentVersion) {
         if (flag === 'start' || (flag === 'login' && store.mandatory)) {
           Dialog.create({
@@ -697,6 +699,8 @@ export default {
     condition['updateDate'] = { $gt: null }
     let pcs = await myselfPeerService.find(condition, [{ updateDate: 'desc' }], null)
     let myselfPeer = null
+    store.chrome = _that.$q.platform.is.chrome
+    store.safari = _that.$q.platform.is.safari
     if (window.device) {
       document.addEventListener('deviceready', async function () {
         // Just for iOS devices.
@@ -772,6 +776,8 @@ export default {
           }
         }
       })
+      store.ios = _that.$q.platform.is.ios
+      store.android = _that.$q.platform.is.android
     }
     if (!myselfPeer && pcs && pcs.length > 0) {
       myselfPeer = pcs[0]

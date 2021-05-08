@@ -21,7 +21,7 @@
                   q-item-label {{$t('Version Update')}}
                 q-item-section(side)
                   q-item-label {{ $store.currentVersion }}
-                  q-badge(v-if="$store.upgradeVersion('about') === true" color="red" floating) New
+                  q-badge(v-if="upgradeVersion" color="red" floating rounded) New
                 q-item-section(side)
                   q-icon(name="keyboard_arrow_right")
               q-separator.c-separator
