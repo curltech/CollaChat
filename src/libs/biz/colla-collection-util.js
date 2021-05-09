@@ -73,32 +73,35 @@ import { collectionComponent, CollectionType} from '@/libs/biz/colla-collection'
     let content = current['content']
     if (content) {
       let plainContent = content.replace(/<[^>]+>/g, '').replace(/^\s*/g, '')
+      let pliContent = content.replace(/<(?!\/p|\/li).*?>/g, '').replace(/^\s*/g, '')
+      while (pliContent.indexOf('</p>') === 0 || pliContent.indexOf('</li>') === 0) {
+        if (pliContent.indexOf('</p>') === 0) {
+          pliContent = pliContent.substring(4).replace(/^\s*/g, '')
+        } else if (pliContent.indexOf('</li>') === 0) {
+          pliContent = pliContent.substring(5).replace(/^\s*/g, '')
+        }
+      }
       if (plainContent) {
         let firstChar = plainContent.substring(0, 1)
-        let firstCharPos = content.indexOf(firstChar)
-        while (firstCharPos > -1 && firstCharPos < content.length - 1 && content.substring(firstCharPos - 1, firstCharPos) === '<') {
-          firstCharPos = content.substring(firstCharPos + 1).indexOf(firstChar)
-        }
+        let firstCharPos = pliContent.indexOf(firstChar)
         const tagArr = ['</p>', '</li>']
-        let tagPosArr = [2]
+        let tagPosArr = [pliContent.length - firstCharPos]
         for (let i = 0; i < tagArr.length; i++) {
-          tagPosArr[i] = content.substring(firstCharPos).indexOf(tagArr[i])
+          tagPosArr[i + 1] = pliContent.substring(firstCharPos).indexOf(tagArr[i])
         }
         tagPosArr.sort(function (a, b) {
           return a - b
         })
-        let minTagPos = -1
+        let minTagPos
         for (let i = 0; i < tagPosArr.length; i++) {
           if (tagPosArr[i] > -1) {
             minTagPos = tagPosArr[i]
             break
           }
         }
-        if (minTagPos > -1) {
-          minTagPos = minTagPos + firstCharPos
-          contentTitle = content.substring(firstCharPos, minTagPos).replace(/<[^<>]+>/g, '').replace(/\s*$/g, '')
-          contentBody = content.substring(minTagPos).replace(/<[^>]+>/g, '').replace(/^\s*|\s*$/g, '')
-        }
+        minTagPos = minTagPos + firstCharPos
+        contentTitle = pliContent.substring(firstCharPos, minTagPos).replace(/<[^<>]+>/g, '').replace(/\s*$/g, '')
+        contentBody = pliContent.substring(minTagPos).replace(/<[^>]+>/g, '').replace(/^\s*|\s*$/g, '')
       }
 
       // 查找mediaTag
