@@ -30,9 +30,6 @@ export default {
       return {
         height: `${this.$q.screen.height}px`
       }
-    },
-    upgradeVersion() {
-      return this.$store.upgradeVersion('about')
     }
   },
   methods: {

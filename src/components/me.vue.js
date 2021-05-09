@@ -19,9 +19,6 @@ export default {
   computed: {
     ifMobileSize() {
       return (!window.device && this.$q.screen.width < 481)
-    },
-    upgradeVersion() {
-      return this.$store.upgradeVersion('about')
     }
   },
   methods: {

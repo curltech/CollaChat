@@ -125,9 +125,6 @@ export default {
         }
       }
       return ReceivedArray
-    },
-    upgradeVersion() {
-      return this.$store.upgradeVersion('about')
     }
   },
   methods: {
@@ -487,6 +484,7 @@ export default {
           let result = ret ? ret : []
           console.log(result)
           await _that.webrtcInit()
+          await store.upgradeVersion('about')
           return peers[0]
         } else {
           console.log("primaryEndPoint connect failure")

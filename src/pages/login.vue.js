@@ -123,8 +123,8 @@ export default {
     async login() {
       let _that = this
       let store = _that.$store
-      let needUpdate = await _that.upgradeVersion('login')
-      if (needUpdate) {
+      await _that.upgradeVersion('login')
+      if (store.latestVersion !== store.currentVersion && store.mandatory) {
         return
       }
       let success = await _that.$refs['frmLogin'].validate()
@@ -592,7 +592,7 @@ export default {
     async upgradeVersion(flag) {
       let _that = this
       let store = _that.$store
-      store.currentVersion = '0.2.24'
+      store.currentVersion = '0.2.25'
       store.latestVersion = store.currentVersion
       store.mandatory = false
       let versionHistory = [store.latestVersion]
@@ -618,7 +618,7 @@ export default {
       for (let version of versionHistory) {
         if (_that.checkVersion(store.currentVersion, version)) {
           if (no === 1) {
-            store.latestVersion = version
+            store.latestVersion = version.replace(/[vV]/, "")
           }
           if (version.substring(0, 1) === 'V') {
             store.mandatory = true
@@ -643,11 +643,7 @@ export default {
           }).onCancel(() => {
           })
         }
-        if ((flag === 'login' && store.mandatory) || flag === 'about') {
-          return true
-        }
       }
-      return false
     }
   },
   computed: {
