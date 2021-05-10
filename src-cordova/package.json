@@ -58,8 +58,10 @@
   "devDependencies": {
     "cordova-android": "^8.1.0",
     "cordova-ios": "^6.1.1",
+    "cordova-plugin-android-permissions": "^1.1.2",
     "cordova-sms-plugin": "^1.0.0",
-    "cordova-sqlite-storage": "^5.1.0"
+    "cordova-sqlite-storage": "^5.1.0",
+    "cordova.plugins.diagnostic": "^6.0.3"
   },
   "cordova": {
     "plugins": {
@@ -119,7 +121,11 @@
       "cordova-plugin-photokandy-video-thumbnail": {},
       "cordova-plugin-badge": {},
       "cordova-plugin-background-mode": {},
-      "cordova-plugin-backbutton": {}
+      "cordova-plugin-backbutton": {},
+      "cordova-plugin-android-permissions": {},
+      "cordova.plugins.diagnostic": {
+        "ANDROIDX_VERSION": "1.+"
+      }
     },
     "platforms": [
       "ios",
