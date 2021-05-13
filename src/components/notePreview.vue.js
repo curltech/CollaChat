@@ -23,7 +23,7 @@ export default {
       let store = _that.$store
       return function (item) {
         let outline = ''
-        let collectionType = item.collectionType
+        let collectionType = _that.entry !=='message' ? item.collectionType : item.contentType
         if (collectionType === CollectionType.NOTE) {
           let srcEntityName = _that.getSrcEntityName(item)
           outline = _that.$i18n.t(CollectionType.NOTE) + ' | ' + srcEntityName
@@ -80,7 +80,7 @@ export default {
       let srcEntityName = item.srcEntityName
       let name = ''
       if (srcEntityId) {
-        if (srcEntityType === SrcEntityType.MYSELF || srcEntityId === myself.myselfPeerClient.peerId) {
+        if ((srcEntityType === SrcEntityType.MYSELF && _that.entry !== 'message') || srcEntityId === myself.myselfPeerClient.peerId) {
           name = _that.$i18n.t('Me')
         } else if (srcEntityType === SrcEntityType.LINKMAN || store.state.linkmanMap[srcEntityId]) {
           let givenName = store.state.linkmanMap[srcEntityId].givenName

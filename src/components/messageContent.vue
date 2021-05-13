@@ -35,6 +35,6 @@
       p {{$t('Chat Records')}}
     q-card.personal-card(v-if="message.contentType === ChatContentType.NOTE" @click="openNoteMessage(message)")
       notePreview(v-bind:item = "message" entry = "message")
-    q-spinner-dots(size="2rem" v-if = "(message.contentType === ChatContentType.IMAGE || message.contentType === ChatContentType.VIDEO || message.contentType === ChatContentType.FILE) && message.loading")
+    q-spinner-dots(size="2rem" v-if = "(message.contentType === ChatContentType.IMAGE || message.contentType === ChatContentType.VIDEO || message.contentType === ChatContentType.FILE || message.contentType === ChatContentType.NOTE) && message.loading")
 </template>
 <script src="./messageContent.vue.js"/>

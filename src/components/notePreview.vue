@@ -10,11 +10,11 @@
                 q-icon(v-if="item.thumbType==='video' || item.thumbType==='image&video'" size="32px" name="play_circle_outline" color="c-white" style="top: 50%; left: 50%; margin-top: -16px; margin-left: -16px;")
                 div(v-if="(item.contentIVAmount + item.attachIVAmount) > 1" class="note-caption-small" style="backgroundColor: transparent; padding: 0; right: 0; bottom: 0") {{ '(' + (item.contentIVAmount + item.attachIVAmount) + ')' }}
             q-item-section(:class="item.thumbnail ? 'q-px-sm' : ''" style="justify-content: flex-start")
-              q-item-label(v-if="item.content" lines="1" class="q-pa-none note-title") {{ CollaUtil.htmlDecode(item.contentTitle) }}
+              q-item-label(v-if="item.content || entry === 'message'" lines="1" class="q-pa-none note-title") {{ CollaUtil.htmlDecode(item.contentTitle) }}
               q-item-label(v-if="(item.contentAAmount + item.attachAAmount) > 0" caption lines="1" class="q-pa-none text-c-grey-10 note-caption" style="word-wrap: break-word;word-break: break-all") {{ '[' + $t('Audio') + '] ' + item.firstAudioDuration + ((item.contentAAmount + item.attachAAmount) > 1 ? '... (' + (item.contentAAmount + item.attachAAmount) + ')' : '') }}
               q-item-label(v-if="item.attachOAmount > 0" caption lines="1" class="q-pa-none text-c-grey-10 note-caption" style="word-wrap: break-word;word-break: break-all") {{ '[' + $t('File') + '] ' + item.firstFileInfo + (item.attachOAmount > 1 ? '... (' + item.attachOAmount + ')' : '') }}
-              q-item-label(v-if="item.content" caption :lines="3 - ((item.contentAAmount + item.attachAAmount) > 0 ? 1 : 0) - (item.attachOAmount > 0 ? 1 : 0)" class="q-pa-none text-c-grey-10 note-caption" style="word-wrap: break-word;word-break: break-all") {{ CollaUtil.htmlDecode(item.contentBody) }}
-              q-item-label(v-if="!item.content && !item.attachIVAmount && !item.attachAAmount && !item.attachOAmount" class="q-pa-none note-title") {{ $t('[Blank]') }}
+              q-item-label(v-if="item.content || entry === 'message'" caption :lines="3 - ((item.contentAAmount + item.attachAAmount) > 0 ? 1 : 0) - (item.attachOAmount > 0 ? 1 : 0)" class="q-pa-none text-c-grey-10 note-caption" style="word-wrap: break-word;word-break: break-all") {{ CollaUtil.htmlDecode(item.contentBody) }}
+              q-item-label(v-if="!item.content && entry !== 'message'  && !item.attachIVAmount && !item.attachAAmount && !item.attachOAmount" class="q-pa-none note-title") {{ $t('[Blank]') }}
         q-card-section(class="q-px-none q-pt-sm q-pb-none")
           q-item(class="q-pa-none" style="min-height: 18px")
             q-item-section(v-if="entry === 'collection' && SyncFailed(item.blockId)" side style="padding-right:0px")
@@ -27,14 +27,14 @@
         q-icon(v-if="item.thumbType==='video' || item.thumbType==='image&video'" size="32px" name="play_circle_outline" color="c-white" style="top: 50%; left: 50%; margin-top: -16px; margin-left: -16px;")
         div(v-if="(item.contentIVAmount + item.attachIVAmount) > 1" class="note-caption-small" style="backgroundColor: transparent; padding: 0; right: 0; bottom: 0") {{ '(' + (item.contentIVAmount + item.attachIVAmount) + ')' }}
     q-item-section(v-if="!(ifMobileSize || $store.state.ifMobileStyle)" :class="item.thumbnail ? 'q-px-sm' : ''" style="justify-content: flex-start")
-      q-item-label(v-if="item.content" lines="1" class="q-pa-none note-title") {{ CollaUtil.htmlDecode(item.contentTitle) }}
+      q-item-label(v-if="item.content || entry === 'message'" lines="1" class="q-pa-none note-title") {{ CollaUtil.htmlDecode(item.contentTitle) }}
       q-item-label(v-if="(item.contentAAmount + item.attachAAmount) > 0" caption lines="1" class="q-pa-none text-c-grey-10 note-caption" style="word-wrap: break-word;word-break: break-all") {{ '[' + $t('Audio') + '] ' + item.firstAudioDuration + ((item.contentAAmount + item.attachAAmount) > 1 ? '... (' + (item.contentAAmount + item.attachAAmount) + ')' : '') }}
       q-item-label(v-if="item.attachOAmount > 0" caption lines="1" class="q-pa-none text-c-grey-10 note-caption" style="word-wrap: break-word;word-break: break-all") {{ '[' + $t('File') + '] ' + item.firstFileInfo + (item.attachOAmount > 1 ? '... (' + item.attachOAmount + ')' : '') }}
-      q-item-label(v-if="item.content" caption :lines="3 - ((item.contentAAmount + item.attachAAmount) > 0 ? 1 : 0) - (item.attachOAmount > 0 ? 1 : 0)" class="q-pa-none text-c-grey-10 note-caption" style="word-wrap: break-word;word-break: break-all") {{ CollaUtil.htmlDecode(item.contentBody) }}
-      q-item-label(v-if="!item.content && !item.attachIVAmount && !item.attachAAmount && !item.attachOAmount" class="q-pa-none note-title") {{ $t('[Blank]') }}
+      q-item-label(v-if="item.content || entry === 'message'" caption :lines="3 - ((item.contentAAmount + item.attachAAmount) > 0 ? 1 : 0) - (item.attachOAmount > 0 ? 1 : 0)" class="q-pa-none text-c-grey-10 note-caption" style="word-wrap: break-word;word-break: break-all") {{ CollaUtil.htmlDecode(item.contentBody) }}
+      q-item-label(v-if="!item.content && entry !== 'message' && !item.attachIVAmount && !item.attachAAmount && !item.attachOAmount" class="q-pa-none note-title") {{ $t('[Blank]') }}
     q-item-section(v-if="!(ifMobileSize || $store.state.ifMobileStyle) && entry ==='collection' && SyncFailed(item.blockId)" side style="padding-right:0px")
       q-icon(name="sync" color="primary" size="16px")
-    q-item-section(v-if="!(ifMobileSize || $store.state.ifMobileStyle)" :side = "entry ==='collection'")
+    q-item-section(v-if="!(ifMobileSize || $store.state.ifMobileStyle)" :side = "entry ==='collection'" style="min-width:50px")
       q-item-label(caption class="text-c-grey-10 note-caption-small") {{ UpdateDate(item) }}
       q-item-label(caption class="text-c-grey-10 note-caption-small") {{ Outline(item) }}
 </template>

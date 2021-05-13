@@ -4,8 +4,8 @@
       q-card.bg-c-grey-0(style="min-width:40vw")
         q-toolbar
           q-btn.btnIcon(flat round icon="clear" v-close-popup @click="closeNoteMessageDialog")
-        q-card-section(v-if="$store.state.currentNoteMessage")
-          div(v-html = "$store.state.currentNoteMessage.content")
+        q-card-section(v-if="$store.state.noteMessageSrc")
+          div(v-html = "$store.state.noteMessageSrc")
 
 </template>
 <script src="./noteMessageDialog.vue.js" />
