@@ -204,29 +204,34 @@ export class CollectionComponent {
 			condition['$and'] = qs
 		}
 		console.log('will load more data, collectionType:' + collectionType + ';searchText' + searchText)
+		let start = new Date().getTime()
 		let page = await pounchDb.findPage('myCollection', condition, [{ updateDate: 'desc' }], null, null, limit)
+		let end = new Date().getTime()
+		console.log('collection findPage time:' + (end - start))
 		let data = page.result
 		if (data && data.length > 0) {
 			let securityParams = {}
 			securityParams.NeedEncrypt = true
 			for (let d of data) {
 				let payloadKey = d.payloadKey
-				let content_ = d.content_
-				let thumbnail_ = d.thumbnail_
 				if (payloadKey) {
+					start = new Date().getTime()
 					securityParams.PayloadKey = payloadKey
+					let content_ = d.content_
 					if (content_) {
 						securityParams.NeedCompress = true
 						let payload = await SecurityPayload.decrypt(content_, securityParams)
 						//d.content = StringUtil.decodeURI(payload)
+						d.content = payload
 					}
+					let thumbnail_ = d.thumbnail_
 					if (thumbnail_) {
 						securityParams.NeedCompress = false
 						let payload = await SecurityPayload.decrypt(thumbnail_, securityParams)
 						d.thumbnail = payload
 					}
-				} else {
-					console.warn('NoPayloadKey')
+					end = new Date().getTime()
+          			console.log('collection decrypt time:' + (end - start))
 				}
 			}
 		}
@@ -269,6 +274,7 @@ export class CollectionComponent {
 			let payloadKey = currentCollection.payloadKey
 			if (payloadKey) {
 				let securityParams = {}
+				securityParams.PayloadKey = payloadKey
 				securityParams.NeedCompress = true
 				securityParams.NeedEncrypt = true
 				for (let d of data) {
@@ -276,10 +282,9 @@ export class CollectionComponent {
 					if (content_) {
 						let payload = await SecurityPayload.decrypt(content_, securityParams)
 						//d.content = StringUtil.decodeURI(payload)
+						d.content = payload
 					}
 				}
-			} else {
-				console.warn('NoPayloadKey')
 			}
 		}
 
@@ -313,40 +318,47 @@ export class CollectionComponent {
 				current.updateDate = now
 			}
 		}
-		if (EntityState.Deleted !== state) {
-			current.securityContext = myself.myselfPeer.securityContext
-			let securityParams = {}
-			securityParams.PayloadKey = payloadKey
-			securityParams.NeedEncrypt = true
-			let result = null
-			if (content) {
-				securityParams.NeedCompress = true
-				result = await SecurityPayload.encrypt(content, securityParams)
-				if (result) {
-					current.payloadKey = result.PayloadKey
-					current.needCompress = result.NeedCompress
-					current.content_ = result.TransportPayload
-					current.payloadHash = result.PayloadHash
-					securityParams.PayloadKey = result.PayloadKey
-				}
-			}
-			let thumbnailResult = null
-			if (thumbnail) {
-				securityParams.NeedCompress = false
-				thumbnailResult = await SecurityPayload.encrypt(thumbnail, securityParams)
-				if (thumbnailResult) {
-					if (!result) {
-						current.payloadKey = thumbnailResult.PayloadKey
-					}
-					current.thumbnail_ = thumbnailResult.TransportPayload
-				}
-			}
-		}
 		let ignore = ['attachs']
-		if (myself.myselfPeerClient && myself.myselfPeerClient.localDataCryptoSwitch === true) {
+		if (myself.myselfPeerClient.localDataCryptoSwitch === true) {
+			if (EntityState.Deleted !== state) {
+				current.securityContext = myself.myselfPeer.securityContext
+				let securityParams = {}
+				securityParams.PayloadKey = payloadKey
+				securityParams.NeedEncrypt = true
+				let result = null
+				let start = new Date().getTime()
+				if (content) {
+					securityParams.NeedCompress = true
+					result = await SecurityPayload.encrypt(content, securityParams)
+					if (result) {
+						current.payloadKey = result.PayloadKey
+						current.needCompress = result.NeedCompress
+						current.content_ = result.TransportPayload
+						current.payloadHash = result.PayloadHash
+						securityParams.PayloadKey = result.PayloadKey
+					}
+				}
+				let thumbnailResult = null
+				if (thumbnail) {
+					securityParams.NeedCompress = false
+					thumbnailResult = await SecurityPayload.encrypt(thumbnail, securityParams)
+					if (thumbnailResult) {
+						if (!result) {
+							current.payloadKey = thumbnailResult.PayloadKey
+						}
+						current.thumbnail_ = thumbnailResult.TransportPayload
+					}
+				}
+				let end = new Date().getTime()
+				console.log('collection encrypt time:' + (end - start))
+				console.log('collection after encrypt length:' + JSON.stringify(current).length)
+			}
 			ignore = ['plainContent', 'pyPlainContent', 'content', 'thumbnail', 'attachs']
 		}
+		let start = new Date().getTime()
 		await pounchDb.run('myCollection', current, ignore, parent)
+		let end = new Date().getTime()
+        console.log('collection save run time:' + (end - start))
 		delete current['content_']
 		delete current['thumbnail_']
 	}
@@ -370,18 +382,24 @@ export class CollectionComponent {
 				} else {
 					attach.collectionId = current._id
 				}
-				if (attach.content) {
-					let result = await SecurityPayload.encrypt(attach.content, securityParams)
-					if (result) {
-						attach.securityContext = current.SecurityContext
-						attach.payloadKey = result.PayloadKey
-						attach.needCompress = result.NeedCompress
-						attach.content_ = result.TransportPayload
-						attach.payloadHash = result.PayloadHash
+				if (myself.myselfPeerClient.localDataCryptoSwitch === true) {
+					if (attach.content) {
+						let result = await SecurityPayload.encrypt(attach.content, securityParams)
+						if (result) {
+							attach.securityContext = current.SecurityContext
+							attach.payloadKey = result.PayloadKey
+							attach.needCompress = result.NeedCompress
+							attach.content_ = result.TransportPayload
+							attach.payloadHash = result.PayloadHash
+						}
 					}
 				}
 			}
-			await pounchDb.execute('myAttach', current.attachs, ['content'], current.attachs)
+			let ignore = []
+			if (myself.myselfPeerClient.localDataCryptoSwitch === true) {
+				ignore = ['content']
+			}
+			await pounchDb.execute('myAttach', current.attachs, ignore, current.attachs)
 			for (let attach of current.attachs) {
 				delete attach['content_']
 			}

@@ -317,7 +317,7 @@ export class ChatComponent {
     if (notDecrypt) {
       return data
     } else {
-      if (myself.myselfPeerClient && myself.myselfPeerClient.localDataCryptoSwitch) {
+      if (myself.myselfPeerClient.localDataCryptoSwitch) {
         if (data && data.length > 0) {
           let dataMap = new Map()
           let encryptPayloadMap = new Map()
@@ -460,7 +460,7 @@ export class ChatComponent {
       entities = [entities]
     }
     if (ChatDataType.MESSAGE == dataType) {
-      if (myself.myselfPeerClient && myself.myselfPeerClient.localDataCryptoSwitch) {
+      if (myself.myselfPeerClient.localDataCryptoSwitch) {
         if (entities.length > 0) {
           let securityParams = {}
           securityParams.NeedCompress = true
@@ -469,7 +469,7 @@ export class ChatComponent {
             let state = current.state
             if (EntityState.Deleted !== state) {             
               securityParams.PayloadKey = current.payloadKey
-              let payload = current.content
+              let content = current.content
               if (content) {
                 let result = await SecurityPayload.encrypt(payload, securityParams)
                 if (result) {
@@ -716,23 +716,23 @@ export class ChatBlockComponent {
       condition['$and'] = qs
     }
     let data = await pounchDb.find('chatAttach', condition, null)
-    if (data && data.length > 0 && data[0].content_) {
+    if (data && data.length > 0) {
       let securityParams = {}
         securityParams.NeedCompress = true
         securityParams.NeedEncrypt = true
         for (let d of data) {
           let payloadKey = d.payloadKey
-          let content_ = d.content_
-          securityParams.PayloadKey = payloadKey
-          if (content_) {
-            let payload = await SecurityPayload.decrypt(content_, securityParams)
-            //d.content = StringUtil.decodeURI(payload)
+          if (payloadKey) {
+            securityParams.PayloadKey = payloadKey
+            let content_ = d.content_
+            if (content_) {
+              let payload = await SecurityPayload.decrypt(content_, securityParams)
+              //d.content = StringUtil.decodeURI(payload)
+            }
           }
         }
-        return data
-    } else {
-      return data
     }
+    return data
   }
 }
 export let chatBlockComponent = new ChatBlockComponent()

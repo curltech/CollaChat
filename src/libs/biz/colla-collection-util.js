@@ -245,12 +245,18 @@ import { collectionComponent, CollectionType} from '@/libs/biz/colla-collection'
   async save(type, entities, parent) {
     if (!type || type === 'attach' || type === 'collection') {
       // 考虑到新增场景，需先保存collection，再保存attach
+      console.log('collection before preview length:' + JSON.stringify(entities).length)
+      let start = new Date().getTime()
       await this.setCollectionPreview(entities)
+      let end = new Date().getTime()
+      console.log('collection preview time:' + (end - start))
+      console.log('collection after preview length:' + JSON.stringify(entities).length)
       entities.versionFlag = 'local'
-      if (myself.myselfPeerClient && myself.myselfPeerClient.localDataCryptoSwitch !== true) {
+      if (myself.myselfPeerClient.localDataCryptoSwitch !== true) {
         entities.plainContent = entities.content.replace(/<[^>]+>/g, '').replace(/^\s*/g, '').replace(/\&nbsp\;/g, '')
         entities.pyPlainContent = pinyinUtil.getPinyin(entities.plainContent)
       }
+      console.log('collection after pyPlainContent length:' + JSON.stringify(entities).length)
       await collectionComponent.saveCollection(entities, null) // 新增时手工从头部插入，故不传parent参数，否则底层API会从尾部插入
       if (!type || type === 'attach') {
         await collectionComponent.saveAttach(entities) // 需要确保所有的附件都已经加载到attachs中
@@ -333,8 +339,14 @@ import { collectionComponent, CollectionType} from '@/libs/biz/colla-collection'
     }
     let payload = { payload: CollaUtil.clone(bizObj), metadata: bizObj.tag, expireDate: expireDate }
     let dataBlock = DataBlockService.create(blockId, bizObj._id, blockType, bizObj.updateDate, payload, peers)
+    console.log('collection dataBlock length:' + JSON.stringify(dataBlock).length)
+    let start = new Date().getTime()
     await dataBlockService.encrypt(dataBlock)
+    let end = new Date().getTime()
+    console.log('collection dataBlock encrypt time:' + (end - start))
     let dataBlocks = await DataBlockService.slice(dataBlock)
+    let end2 = new Date().getTime()
+    console.log('collection dataBlock slice time:' + (end2 - end))
     let dbLogs = []
     for (let dataBlock of dataBlocks) {
       let dbLog = { ownerPeerId: myself.myselfPeer.peerId, blockId: dataBlock.blockId, createTimestamp: dataBlock.createTimestamp, dataBlock: dataBlock, sliceNumber: dataBlock.sliceNumber, state: EntityState.New }
@@ -344,9 +356,13 @@ import { collectionComponent, CollectionType} from '@/libs/biz/colla-collection'
       // 存储待上传云端的分片粒度的blockLog记录
       await blockLogComponent.save(dbLogs, null, null)
     }
+    let end3 = new Date().getTime()
+    console.log('collection blockLog save time:' + (end3 - end2))
     if (ifUpload === true) {
       dbLogs = await this.upload(dbLogs, blockType)
     }
+    let end4 = new Date().getTime()
+    console.log('collection upload time:' + (end4 - end3))
     return dbLogs
   }
   /**
@@ -397,6 +413,7 @@ import { collectionComponent, CollectionType} from '@/libs/biz/colla-collection'
         console.error(err)
         ifFailed = true
       } finally {
+        let start = new Date().getTime()
         if (responses && responses.length > 0) {
           for (let i = 0; i < responses.length; ++i) {
             let response = responses[i]
@@ -420,6 +437,8 @@ import { collectionComponent, CollectionType} from '@/libs/biz/colla-collection'
             }
           }
         }
+        let end = new Date().getTime()
+        console.log('collection upload blockLog save time:' + (end - start))
       }
     }
     return dbLogs

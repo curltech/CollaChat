@@ -1622,8 +1622,8 @@ export default {
           }
           signalProtocol.signalPublicKeys.set(linkmanPeerId,linkman.signalPublicKey)
           linkman.downloadSwitch = content.downloadSwitch
-          linkman.localDataCryptoSwitch = content.localDataCryptoSwitch
-          linkman.fullTextSearchSwitch = content.fullTextSearchSwitch
+          //linkman.localDataCryptoSwitch = content.localDataCryptoSwitch
+          //linkman.fullTextSearchSwitch = content.fullTextSearchSwitch
           linkman.udpSwitch = content.udpSwitch
           store.state.linkmanMap[linkmanPeerId] = linkman
           setTimeout(async function () {
@@ -1638,8 +1638,8 @@ export default {
                 linkman.avatar = content.avatar
                 linkman.publicKey = content.publicKey
                 linkman.downloadSwitch = content.downloadSwitch
-                linkman.localDataCryptoSwitch = content.localDataCryptoSwitch
-                linkman.fullTextSearchSwitch = content.fullTextSearchSwitch
+                //linkman.localDataCryptoSwitch = content.localDataCryptoSwitch
+                //linkman.fullTextSearchSwitch = content.fullTextSearchSwitch
                 linkman.udpSwitch = content.udpSwitch
               }
               await contactComponent.update(ContactDataType.LINKMAN, linkmen, null)

@@ -406,7 +406,10 @@ export default {
           current = _that.myCollections.c_meta.current
         }
         try {
+          let start = new Date().getTime()
           await collectionUtil.save(type, current, _that.myCollections)
+          let end = new Date().getTime()
+          console.log('collection save time:' + (end - start))
           _that.backupContent = current['blockId'] + ':' + current['content']
           // 云端cloud保存
           if (store.collectionWorkerEnabler) {
@@ -417,7 +420,10 @@ export default {
             let worker = _that.initCollectionUploadWorker()
             worker.postMessage(['one', dbLogs, myself.myselfPeerClient, options.privateKey])
           } else {
+            start = new Date().getTime()
             let dbLogs = await collectionUtil.saveBlock(current, true, BlockType.Collection)
+            end = new Date().getTime()
+            console.log('collection saveBlock time:' + (end - start))
             // 刷新syncFailed标志
             let newDbLogMap = CollaUtil.clone(store.state.dbLogMap)
             if (dbLogs && dbLogs.length > 0) {
@@ -486,7 +492,10 @@ export default {
             meta['from'] = new Date().getTime()
             console.log('first from:' + meta['from'])
           }
+          let start = new Date().getTime()
           data = await collectionComponent.load(ownerPeerId, this.collectionType, this.searchTag, this.searchText, meta['from'], meta['rowsPerPage'])
+          let end = new Date().getTime()
+          console.log('collection load time:' + (end - start))
         } else if (this.source === 'cloud') {
           let metadata = this.searchText // TODO
           if (!meta['from']) {
@@ -1677,7 +1686,7 @@ export default {
         (data.MessageType === MsgType[MsgType.CONSENSUS_REPLY] || data.MessageType === MsgType[MsgType.CONSENSUS_RAFT_REPLY] || data.MessageType === MsgType[MsgType.CONSENSUS_PBFT_REPLY]) &&
         data.PayloadType === PayloadType.ConsensusLog) {
           let consensusLog = data.Payload
-          console.log(consensusLog)
+          console.log('consensusReceiver time:' + new Date())
           let condition = {}
           condition['ownerPeerId'] = myself.myselfPeerClient.peerId
           let dbLogs = await blockLogComponent.load(condition, null, null)
