@@ -78,7 +78,6 @@ export default {
       //richTextEditor
       editor: null,
       currentMergeMessage: null,
-      currentNoteMessage: null,
       selectFocusMemberFilter: null,
       focusGroupMemberDialog: false,
       emojiShow: false,
@@ -860,8 +859,8 @@ export default {
             await _that.recursiveMergeMessages(chat, mergeMessage)
           }
           if ((message.contentType === ChatContentType.VIDEO || message.contentType === ChatContentType.FILE || message.contentType === ChatContentType.IMAGE)) {
-            let fileData = await store.getMessageFile(singleMessage)
-            await store.saveFileInMessage(chat,message,fileData, message.contentType,null,singleMessage.fileoriginalMessageId)
+            let fileData = await store.getMessageFile(mergeMessage)
+            await store.saveFileInMessage(chat,message,fileData, message.contentType,null,mergeMessage.fileoriginalMessageId)
           }
         }
         await store.sendChatMessage(chat, message)

@@ -128,7 +128,7 @@ export default {
     async openNoteMessage(message) {
       let _that = this
       let store = _that.$store
-      store.state.currentNoteMessage = message
+      store.state.noteMessageSrc = await store.getMessageFile(message)
       store.state.noteMessageDialog = true
     },
   },

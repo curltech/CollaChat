@@ -605,7 +605,7 @@ export default {
       message.receiveTime = currentDate
       message.actualReceiveTime = currentDate
       let subjectId = message.subjectId
-      if (message.contentType == ChatContentType.FILE || message.contentType == ChatContentType.IMAGE || message.contentType == ChatContentType.VIDEO) {
+      if (message.contentType == ChatContentType.FILE || message.contentType == ChatContentType.IMAGE || message.contentType == ChatContentType.VIDEO || message.contentType == ChatContentType.NOTE) {
         message.percent = null
         message.loading = false
       } else if (message.contentType == ChatContentType.CHAT) {
@@ -898,7 +898,7 @@ export default {
         let fileData = item.content
         let name = item.contentTitle
         let type = item.collectionType
-        await store.saveFileAndSendMessage(chat,fileData, type, name)
+        await store.saveFileAndSendMessage(chat, fileData, type, name)
       } else {
         let message = {}
         message.title = item.contentTitle
@@ -921,15 +921,19 @@ export default {
           message.firstAudioDuration = item.firstAudioDuration
           message.firstFileInfo = item.firstFileInfo
           message.contentBody = item.contentBody
-          message.content = item.content
+          //message.content = item.content
           message.srcEntityType = item.srcEntityType
           message.srcEntityId = item.srcEntityId
           message.srcEntityName = item.srcEntityName
+          message.messageId = UUID.string(null, null)
+          message.messageType = P2pChatMessageType.CHAT_LINKMAN
+          await store.saveFileInMessage(chat, message, item.content, item.collectionType, item.title, message.messageId)
         } else {
           message.content = item.content
         }
         message.messageType = P2pChatMessageType.CHAT_LINKMAN
         message.contentType = item.collectionType
+        console.log(message)
         await store.sendChatMessage(chat, message)
         _that.setCurrentChat(chat.subjectId)
       }
@@ -1555,6 +1559,9 @@ export default {
       let _that = this
       let store = _that.$store
       let myselfPeerClient = myself.myselfPeerClient
+        console.log('p2pChatReceiver')
+        console.log(message)
+        message = JSON.parse(message)
       if(!message.messageType){
         let signalSession = await _that.getSignalSession(peerId)
         if(!signalSession){
@@ -2326,14 +2333,8 @@ export default {
           await contactComponent.update(ContactDataType.LINKMAN, linkmen, null)
         }
         console.log('activeStatus => Down, peerId:' + peerId)
-        if (_that.closeCall && store.state.currentCallChat && store.state.currentCallChat.subjectId === linkman.peerId) {
-        _that.$q.notify({
-          message: _that.$i18n.t('Chat already ended'),
-          timeout: 3000,
-          type: "warning",
-          color: "warning",
-        })
-          _that.closeCall()
+        if (_that.pendingCall && store.state.currentCallChat && store.state.currentCallChat.streamMap && store.state.currentCallChat.streamMap[peerId]) {
+          _that.pendingCall()
         }
       }
     },
@@ -2346,9 +2347,11 @@ export default {
           return
         }
         message = await signalSession.encrypt(JSON.stringify(message))
+
       }else if(message.messageType === P2pChatMessageType.SYNC_LINKMAN_INFO){
         
       }
+      message = JSON.stringify(message)
       await p2pChatAction.chat(null,message,peerId)
     },
     async getSignalSession(peerId){

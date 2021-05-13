@@ -46,9 +46,7 @@
               span {{$store.state.currentCallChat.stream.length}}
               span {{addStreamCount}}
             q-item-section.group-video-par(style="width:100%" v-if="$store.state.currentCallChat.callType == 'video' && ($store.state.currentCallChat.streamMap && $store.state.currentCallChat.streamMap[memberPeerId])")
-              //.video-w
               video(:ref='`memberVideo${memberPeerId}`' :muted = '(memberPeerId === $store.state.currentCallChat.ownerPeerId || chatMute) ? true : false' autoplay = 'autoplay')
-              //img(style="position:absolute;top:0;left:0;z-index:9;width:100%;padding:0;height:100%;" :src="$store.state.linkmanMap[memberPeerId].avatar")
             q-item-section(v-else)
               q-avatar(style = 'width:100%;height:auto;')
                 img(:src="($store.state.linkmanMap[memberPeerId] && $store.state.linkmanMap[memberPeerId].avatar) ? $store.state.linkmanMap[memberPeerId].avatar : $store.defaultActiveAvatar")
