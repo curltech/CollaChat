@@ -111,11 +111,7 @@ export default {
     changeChatMute(){
       let _that = this
       let store = _that.$store
-      if(_that.chatMute){
-        _that.chatMute = false
-      }else{
-        _that.chatMute = true
-      }
+      _that.chatMute = !_that.chatMute
       let mediaChat = store.state.currentCallChat
       if(mediaChat.mediaProperty.type === 'audio'){
         if(mediaChat.audio){
@@ -134,14 +130,10 @@ export default {
       let store = _that.$store
       let callChat = store.state.currentCallChat
       let stream = callChat.streamMap[callChat.ownerPeerId]
-      if(_that.chatMic){
-        _that.chatMic = false
-      }else{
-        _that.chatMic = true
-      }
+      _that.chatMic = !_that.chatMic
       if(stream.getAudioTracks() && stream.getAudioTracks()[0]){
         let track = stream.getAudioTracks()[0]
-        track.enabled = _that.chatMic;
+        track.enabled = _that.chatMic
       }
 
     },
@@ -585,6 +577,17 @@ export default {
     answererReceiveStream(){
 
     },
+    async pendingCall(){
+      let _that = this
+      let store = _that.$store
+      await _that.closeCall()
+      _that.$q.notify({
+        message: _that.$i18n.t('Chat already ended'),
+        timeout: 3000,
+        type: "warning",
+        color: "warning",
+      })
+    },
     async closeCall(isReceived) {
       let _that = this
       let store = _that.$store
@@ -752,7 +755,7 @@ export default {
     Vue.prototype.initiateCallRequest = _that.initiateCallRequest
     Vue.prototype.acceptGroupCall = _that.acceptGroupCall
     Vue.prototype.sendCallCloseMessage  = _that.sendCallCloseMessage
-    Vue.prototype.closeCall = _that.closeCall
+    Vue.prototype.pendingCall = _that.pendingCall
   },
   created() {
   }

@@ -2333,14 +2333,8 @@ export default {
           await contactComponent.update(ContactDataType.LINKMAN, linkmen, null)
         }
         console.log('activeStatus => Down, peerId:' + peerId)
-        if (_that.closeCall && store.state.currentCallChat && store.state.currentCallChat.subjectId === linkman.peerId) {
-        _that.$q.notify({
-          message: _that.$i18n.t('Chat already ended'),
-          timeout: 3000,
-          type: "warning",
-          color: "warning",
-        })
-          _that.closeCall()
+        if (_that.pendingCall && store.state.currentCallChat && store.state.currentCallChat.streamMap && store.state.currentCallChat.streamMap[peerId]) {
+          _that.pendingCall()
         }
       }
     },
