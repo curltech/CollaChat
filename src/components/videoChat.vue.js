@@ -491,13 +491,13 @@ export default {
         return;
       }
       if (callChat.subjectType === SubjectType.GROUP_CHAT) {
-        if (callChat.streamMap && callChat.streamMap[peerId]) return
-        if(!(callChat.callMessage.hasAddStream && callChat.callMessage.hasAddStream[peerId])){//发起方--这里需要addStream给对方
+        if(!(callChat.callMessage.hasAddStream && callChat.callMessage.hasAddStream[peerId]) || (callChat.streamMap && callChat.streamMap[peerId] && callChat.streamMap[peerId].pending)){//发起方--这里需要addStream给对方
           let webrtcPeers = await webrtcPeerPool.get(peerId)
           if (webrtcPeers && webrtcPeers.length > 0) {
             for (let webrtcPeer of webrtcPeers) {
                 let _cloneStream = callChat.streamMap[callChat.ownerPeerId].stream.clone()
                 _that.localCloneStream[peerId] = _cloneStream
+                console.log('addStream --------')
                 webrtcPeer.addStream(_cloneStream)
             }
           }
@@ -525,7 +525,7 @@ export default {
           }
         )
       } else {
-        if(store.state.currentCallChat.callMessage.senderPeerId === myself.myselfPeerClient.peerId || (store.state.currentCallChat && store.state.currentCallChat.streamMap && store.state.currentCallChat.streamMap[peerId] && store.state.currentCallChat.streamMap[peerId].pending)){//发起方--这里需要addStream给对方
+        if(store.state.currentCallChat.callMessage.senderPeerId === myself.myselfPeerClient.peerId  || (callChat.streamMap && callChat.streamMap[peerId] && callChat.streamMap[peerId].pending)){//发起方--这里需要addStream给对方
           let localStream = await mediaStreamComponent.openUserMedia(store.state.currentCallChat.options)
           _that.saveStream(store.state.currentCallChat.ownerPeerId,localStream)
           _that.$nextTick(async () => {
