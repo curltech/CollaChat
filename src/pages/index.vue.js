@@ -515,8 +515,9 @@ export default {
       for (let linkman of store.state.linkmans) {
         if(linkman.peerId !== myselfPeerClient.peerId){
           let option = {}
-          if(store.state.currentCallChat && store.state.currentCallChat.streamMap && store.state.currentCallChat.streamMap[linkman.peerId]){
+          if(store.state.currentCallChat && store.state.currentCallChat.streamMap && store.state.currentCallChat.streamMap[linkman.peerId] && store.state.currentCallChat.streamMap[linkman.peerId].pending ){
               option.stream = store.state.currentCallChat.streamMap[myselfPeerClient.peerId].stream
+              store.state.currentCallChat.streamMap[linkman.peerId].pending = false
               console.log('index.vue -add stream')
           }
           webrtcPeerPool.create(linkman.peerId, option)

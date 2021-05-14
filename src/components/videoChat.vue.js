@@ -167,7 +167,7 @@ export default {
               webrtcPeer.removeStream()
             }
           }
-          if(_peerId === myself.myselfPeerClient.peerId){
+          if(_peerId === myself.myselfPeerClient.peerId && callChat.streamMap[_peerId] && callChat.streamMap[_peerId].stream){
             callChat.streamMap[_peerId].stream.getTracks().forEach((track) => {
               track.stop();
             });
@@ -525,7 +525,7 @@ export default {
           }
         )
       } else {
-        if(store.state.currentCallChat.callMessage.senderPeerId === myself.myselfPeerClient.peerId){//发起方--这里需要addStream给对方
+        if(store.state.currentCallChat.callMessage.senderPeerId === myself.myselfPeerClient.peerId || (store.state.currentCallChat && store.state.currentCallChat.streamMap && store.state.currentCallChat.streamMap[peerId] && store.state.currentCallChat.streamMap[peerId].pending)){//发起方--这里需要addStream给对方
           let localStream = await mediaStreamComponent.openUserMedia(store.state.currentCallChat.options)
           _that.saveStream(store.state.currentCallChat.ownerPeerId,localStream)
           _that.$nextTick(async () => {
@@ -545,7 +545,7 @@ export default {
         systemAudioComponent.mediaInvitationAudioStop()
         for(let track of stream.getTracks()) {
           track.onended = function(event) {
-            _that.closeCall()
+           _that.pendingCall(peerId)
           }
         }
         _that.saveStream(peerId,stream)
@@ -581,18 +581,21 @@ export default {
       let _that = this
       let store = _that.$store
       let currentCallChat = store.state.currentCallChat
+      if(!currentCallChat || !currentCallChat.streamMap || !currentCallChat.streamMap[peerId] || currentCallChat.streamMap[peerId].pending)return
       currentCallChat.streamMap[peerId].pending = true
+      _that.$forceUpdate()
       let pendingCallTimeOut = setTimeout(async function(){
         if(currentCallChat.streamMap[peerId].pending){
+            _that.$q.notify({
+                message: _that.$i18n.t('Chat already ended'),
+                timeout: 3000,
+                type: "warning",
+                color: "warning",
+            })
             await _that.closeCall()
         }
       },10000)
-      _that.$q.notify({
-        message: _that.$i18n.t('Chat already ended'),
-        timeout: 3000,
-        type: "warning",
-        color: "warning",
-      })
+
     },
     async closeCall(isReceived) {
       let _that = this
