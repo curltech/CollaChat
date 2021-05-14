@@ -129,7 +129,7 @@ export default {
       let _that = this
       let store = _that.$store
       let callChat = store.state.currentCallChat
-      let stream = callChat.streamMap[callChat.ownerPeerId]
+      let stream = callChat.streamMap[callChat.ownerPeerId].stream
       _that.chatMic = !_that.chatMic
       if(stream.getAudioTracks() && stream.getAudioTracks()[0]){
         let track = stream.getAudioTracks()[0]
@@ -148,7 +148,7 @@ export default {
         peerId : peerId,
         stream : stream
       })
-      streamMap[peerId] = stream
+      streamMap[peerId] = {stream:stream, pending:false}
     },
      async removeStream(peerId){
       let _that = this
@@ -168,7 +168,7 @@ export default {
             }
           }
           if(_peerId === myself.myselfPeerClient.peerId){
-            callChat.streamMap[_peerId].getTracks().forEach((track) => {
+            callChat.streamMap[_peerId].stream.getTracks().forEach((track) => {
               track.stop();
             });
           }
@@ -469,7 +469,7 @@ export default {
           let webrtcPeers = await webrtcPeerPool.get(senderPeerId)
           if (webrtcPeers && webrtcPeers.length > 0) {
             for (let webrtcPeer of webrtcPeers) {
-              let _cloneStream = callChat.streamMap[callChat.ownerPeerId].clone()
+              let _cloneStream = callChat.streamMap[callChat.ownerPeerId].stream.clone()
               _that.localCloneStream[senderPeerId] = _cloneStream
               webrtcPeer.addStream(_cloneStream)
             }
@@ -496,7 +496,7 @@ export default {
           let webrtcPeers = await webrtcPeerPool.get(peerId)
           if (webrtcPeers && webrtcPeers.length > 0) {
             for (let webrtcPeer of webrtcPeers) {
-                let _cloneStream = callChat.streamMap[callChat.ownerPeerId].clone()
+                let _cloneStream = callChat.streamMap[callChat.ownerPeerId].stream.clone()
                 _that.localCloneStream[peerId] = _cloneStream
                 webrtcPeer.addStream(_cloneStream)
             }
@@ -538,7 +538,7 @@ export default {
           if (webrtcPeers && webrtcPeers.length > 0) {
             let ps = []
             for (let webrtcPeer of webrtcPeers) {
-              webrtcPeer.addStream(store.state.currentCallChat.streamMap[store.state.currentCallChat.ownerPeerId])
+              webrtcPeer.addStream(store.state.currentCallChat.streamMap[store.state.currentCallChat.ownerPeerId].stream)
             }
           }
         }
@@ -577,10 +577,16 @@ export default {
     answererReceiveStream(){
 
     },
-    async pendingCall(){
+    async pendingCall(peerId){
       let _that = this
       let store = _that.$store
-      await _that.closeCall()
+      let currentCallChat = store.state.currentCallChat
+      currentCallChat.streamMap[peerId].pending = true
+      let pendingCallTimeOut = setTimeout(async function(){
+        if(currentCallChat.streamMap[peerId].pending){
+            await _that.closeCall()
+        }
+      },10000)
       _that.$q.notify({
         message: _that.$i18n.t('Chat already ended'),
         timeout: 3000,
@@ -693,7 +699,7 @@ export default {
       let store = _that.$store
       let callChat = store.state.currentCallChat
       let options
-      if (callChat.streamMap[callChat.ownerPeerId].getVideoTracks().length > 0) {
+      if (callChat.streamMap[callChat.ownerPeerId].stream.getVideoTracks().length > 0) {
         options = { audio: true, video: false }
       } else {
         options = { audio: true, video: true }
@@ -728,16 +734,16 @@ export default {
       let currentVideoDom = _that.$refs.currentVideo
       let zoomVideoDom = _that.$refs.zoomVideo
       
-      if(currentVideoDom.srcObject === callChat.streamMap[callChat.ownerPeerId]){
+      if(currentVideoDom.srcObject === callChat.streamMap[callChat.ownerPeerId].stream){
         if(zoomVideoDom){
-          zoomVideoDom.srcObject = callChat.streamMap[callChat.ownerPeerId]
+          zoomVideoDom.srcObject = callChat.streamMap[callChat.ownerPeerId].stream
         }
-        currentVideoDom.srcObject = callChat.streamMap[callChat.subjectId]
+        currentVideoDom.srcObject = callChat.streamMap[callChat.subjectId].stream
       }else{
         if(zoomVideoDom){
-          zoomVideoDom.srcObject = callChat.streamMap[callChat.subjectId]
+          zoomVideoDom.srcObject = callChat.streamMap[callChat.subjectId].stream
         }
-        currentVideoDom.srcObject = callChat.streamMap[callChat.ownerPeerId]
+        currentVideoDom.srcObject = callChat.streamMap[callChat.ownerPeerId].stream
       }
     },
     canCall() {
@@ -756,6 +762,7 @@ export default {
     Vue.prototype.acceptGroupCall = _that.acceptGroupCall
     Vue.prototype.sendCallCloseMessage  = _that.sendCallCloseMessage
     Vue.prototype.pendingCall = _that.pendingCall
+      window._that = this
   },
   created() {
   }

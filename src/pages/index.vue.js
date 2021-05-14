@@ -495,6 +495,8 @@ export default {
     },
     async webrtcInit() {
       //webrtc connect
+      let _that = this
+      let store = _that.$store
       let myselfPeerClient = myself.myselfPeerClient
       webrtcPeerPool.clientId = myselfPeerClient.clientId
       store.webrtcPeerPool = webrtcPeerPool
@@ -512,7 +514,12 @@ export default {
       config.appParams.iceServer = [iceServer]
       for (let linkman of store.state.linkmans) {
         if(linkman.peerId !== myselfPeerClient.peerId){
-          webrtcPeerPool.create(linkman.peerId)
+          let option = {}
+          if(store.state.currentCallChat && store.state.currentCallChat.streamMap && store.state.currentCallChat.streamMap[linkman.peerId]){
+              option.stream = store.state.currentCallChat.streamMap[myselfPeerClient.peerId].stream
+              console.log('index.vue -add stream')
+          }
+          webrtcPeerPool.create(linkman.peerId, option)
         }
       }
     },
@@ -2334,7 +2341,7 @@ export default {
         }
         console.log('activeStatus => Down, peerId:' + peerId)
         if (_that.pendingCall && store.state.currentCallChat && store.state.currentCallChat.streamMap && store.state.currentCallChat.streamMap[peerId]) {
-          _that.pendingCall()
+          _that.pendingCall(peerId)
         }
       }
     },
