@@ -58,7 +58,7 @@
                     q-input.c-field(prefix="+" filled dense clearable v-model="loginData.code_" lazy-rules :rules="[val => val && val.length > 0 || $t('Code')]")
                       //template(v-slot:prepend)
                         q-icon(name="add" size="10px")
-                  div(class="col-8" class="q-pl-md")
+                  div(class="col-8 q-pl-md")
                     q-input.c-field(filled dense clearable v-model="loginData.mobile_" lazy-rules :rules="[val => val && val.length > 0 || $t('Please input Mobile')]" :label="$t('Mobile')")
                 q-input.c-field(style="width:280px" type="password" filled dense clearable v-model="loginData.password_" lazy-rules :rules="[val => val && val.length > 0 || $t('Please input Password')]" :label="$t('Password')")
                 q-btn(style="width:280px;height:40px" type="submit" color="primary" unelevated :label="$t('Login')" no-caps)
@@ -92,7 +92,7 @@
                     q-input.c-field(prefix="+" filled dense clearable v-model="registerData.code_" lazy-rules :rules="[val => val && val.length > 0 || $t('Code')]")
                       //template(v-slot:prepend)
                         q-icon(name="add" size="12px")
-                  div(class="col-8" class="q-pl-md")
+                  div(class="col-8 q-pl-md")
                     q-input.c-field(filled dense clearable v-model="registerData.mobile_" lazy-rules :rules="[val => val && val.length > 0 || $t('Please input Mobile')]" :label="$t('Mobile')")
                 q-input.c-field(style="width:280px" type="password" filled dense clearable v-model="registerData.password_" lazy-rules :rules="[val => val && val.length > 0 || $t('Please input Password')]" :label="$t('Password')")
                 q-input.c-field(style="width:280px" type="password" filled dense clearable v-model="registerData.repeatPassword_" lazy-rules :rules="[val => val && val.length > 0 || $t('Please input RepeatPassword')]" :label="$t('RepeatPassword')")
@@ -110,7 +110,23 @@
                   q-toggle(v-model="connectAddressType" false-value="default" true-value="custom" left-label :label="$t('Use Custom Node')")
                 //q-input.c-field(style="width:280px" :disable="connectAddressType !== 'custom'?true:false" filled dense clearable v-model="connectAddress" lazy-rules :rules="[val => (connectAddressType === 'default' || (connectAddressType === 'custom' && val && val.length > 0)) || $t('Please input Node Address')]" :label="$t('Node Address')")
                 q-select.c-field(style="width: 280px !important;padding-bottom:5px" :label="$t('MyNodes')" filled dense clearable v-model="connectAddress" emit-value map-options :options="connectAddressOptions")
-                q-input.c-field(style="width:280px !important" :class="connectAddress === 'custom' ? '' : 'hidden'" filled dense clearable v-model="customConnectAddress" lazy-rules :rules="[val => (connectAddress !== 'custom' || (connectAddress === 'custom' && val && val.length > 0)) || $t('Please input Node Address')]" :label="$t('Node Address')")
+                p
+                div(:class="connectAddress === 'custom' ? '' : 'hidden'")
+                  div(style="width:280px" class="row justify-between")
+                    div(class="col-8")
+                      q-input.c-field(style="!important"
+                        filled dense clearable v-model="customConnectHost"
+                        lazy-rules :rules="[val => (connectAddress !== 'custom' || (connectAddress === 'custom' && val && val.length > 0)) || $t('Please input Node Address')]"
+                        :label="$t('Node Host')")
+                    div :
+                    div(class="col-3")
+                      q-input.c-field(style="!important"
+                        filled dense clearable v-model="customConnectPort"
+                        lazy-rules :rules="[val => (connectAddress !== 'custom' || (connectAddress === 'custom' && val && val.length > 0)) || $t('')]")
+                  q-input.c-field(style="width:280px !important"
+                    filled dense clearable v-model="customConnectPeerId"
+                    lazy-rules :rules="[val => (connectAddress !== 'custom' || (connectAddress === 'custom' && val && val.length > 0)) || $t('Please input Node Address')]"
+                    :label="$t('Node PeerId')")
 </template>
 <script src="./login.vue.js" />
 <style lang="stylus" src="../css/login.styl"/>

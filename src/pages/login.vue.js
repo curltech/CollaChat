@@ -79,6 +79,9 @@ export default {
       connectAddressOptions: null,
       connectAddress: null,
       customConnectAddress: null,
+      customConnectHost: null,
+      customConnectPort: null,
+      customConnectPeerId: null,
       light: false,
       bgNo: 11
     }
@@ -141,7 +144,7 @@ export default {
       if (!_that.connectAddress) {
         store.connectAddress = null
       } else if (_that.connectAddress === 'custom') {
-        store.connectAddress = _that.customConnectAddress
+        store.connectAddress = '/dns4/'+_that.customConnectHost+'/tcp/'+_that.customConnectPort+'/wss/p2p/'+_that.customConnectPeerId
       } else {
         store.connectAddress = _that.connectAddress
       }
