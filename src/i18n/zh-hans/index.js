@@ -153,7 +153,7 @@ export default {
   "Hold to talk": "按住 说话",
   "Release to stop": "松开 结束",
   "Release your finger and cancel send": "松开手指，取消发送",
-  "Desdroy": "销毁",
+  "Destroy": "销毁",
   "Album": "相册",
   "Take Video": "拍摄",
   "Voice Call": "语音通话",

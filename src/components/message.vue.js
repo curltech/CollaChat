@@ -67,7 +67,6 @@ export default {
       date: date,
       percent: {},
       destroyClock: false,
-      destroyTime: 0,
       clockOptions: [
         { label: this.$i18n.t('10 min'), value: 600000 },
         { label: this.$i18n.t('5 min'), value: 300000 },
@@ -806,7 +805,6 @@ export default {
       let message = {
         content: editorContent,
         contentType: ChatContentType.TEXT,
-        destroyTime: _that.destroyTime,
         messageType: P2pChatMessageType.CHAT_LINKMAN
       }
 
@@ -1107,12 +1105,15 @@ export default {
             let currentMes = messages[i]
             if (currentMes.messageId === mes.messageId) {
               currentMes.readTime = mes.readTime
+                console.log(JSON.stringify(currentMes))
               await chatComponent.update(ChatDataType.MESSAGE, currentMes, messages)
+                console.log(JSON.stringify(currentMes))
               //count down
               currentMes.countDown = currentMes.destroyTime / 1000
               let countDownInterval = setInterval(async function () {
                 if (!currentMes.countDown) {
                   clearInterval(countDownInterval)
+                    console.log(JSON.stringify(currentMes))
                   await chatComponent.remove(ChatDataType.MESSAGE, currentMes, messages)
                   return;
                 }
