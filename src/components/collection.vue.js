@@ -1686,6 +1686,7 @@ export default {
         (data.MessageType === MsgType[MsgType.CONSENSUS_REPLY] || data.MessageType === MsgType[MsgType.CONSENSUS_RAFT_REPLY] || data.MessageType === MsgType[MsgType.CONSENSUS_PBFT_REPLY]) &&
         data.PayloadType === PayloadType.ConsensusLog) {
           let consensusLog = data.Payload
+          console.log('consensusReceiver consensusLog:' + JSON.stringify(consensusLog))
           console.log('consensusReceiver time:' + new Date())
           let condition = {}
           condition['ownerPeerId'] = myself.myselfPeerClient.peerId

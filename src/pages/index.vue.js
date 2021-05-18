@@ -280,7 +280,9 @@ export default {
           payload.srcClientId = myself.myselfPeerClient.clientId
           payload.srcPeerId = myself.myselfPeerClient.peerId
           payload.createTimestamp = new Date().getTime()
-          await chatAction.chat(null, payload, myself.myselfPeerClient.peerId)
+          let connectAddressArr = connectAddress.split('/')
+          let targetPeerId = connectAddressArr[connectAddressArr.length - 1]
+          await chatAction.chat(null, payload, targetPeerId)
         }, 55 * 1000)
       }
       webSocket.onmessage = function (evt) {
