@@ -150,7 +150,7 @@
   "Hold to talk": "按住 說話",
   "Release to stop": "松開 結束",
   "Release your finger and cancel send": "松開手指，取消發送",
-  "Desdroy": "銷毀",
+  "Destroy": "銷毀",
   "Album": "相冊",
   "Take Video": "拍攝",
   "Voice Call": "語音通話",

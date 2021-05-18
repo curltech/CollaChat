@@ -150,7 +150,7 @@ export default {
   "Hold to talk": "Hold to talk",
   "Release to stop": "Release to stop",
   "Release your finger and cancel send": "Release your finger and cancel send",
-  "Desdroy": "Desdroy",
+  "Destroy": "Destroy",
   "Album": "Album",
   "Take Video": "Take Video",
   "Voice Call": "Voice Call",

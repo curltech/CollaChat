@@ -150,7 +150,7 @@
   "Hold to talk": "눌 러 말 하기",
   "Release to stop": "풀 림 끝",
   "Release your finger and cancel send": "손가락 을 풀 고 발송 을 취소 합 니 다",
-  "Desdroy": "소각",
+  "Destroy": "소각",
   "Album": "앨범",
   "Take Video": "촬영",
   "Voice Call": "음성 통화",

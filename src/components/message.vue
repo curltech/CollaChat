@@ -33,9 +33,9 @@
         .message-editor-wrap
           .message-editor-area
             q-toolbar.text-c-grey-10.row(style="height:40px;min-height:40px" v-if="!Platform.is.mobile && !messageMultiSelectMode")
-              q-btn.q-mr-sm.btnIcon(round flat icon="alarm"  :disable ='!(!ifSelfChat && activeStatus($store.state.currentChat))' @click='destroyClock = true')
+              q-btn.q-mr-sm.btnIcon(round flat icon="alarm" :disable ='!(!ifSelfChat && activeStatus($store.state.currentChat) && ($store.state.currentChat && $store.state.currentChat.subjectType === SubjectType.CHAT))' @click='destroyClock = true')
                 q-popup-edit(v-model="destroyClock" content-class="" style='width:100px')
-                  q-option-group(:options="clockOptions" label="Notifications" type="radio" v-model="destroyTime")
+                  q-option-group(:options="clockOptions" label="Notifications" type="radio" v-model="$store.state.currentChat.destroyTime")
               q-btn.q-mr-sm.btnIcon(round flat icon="insert_emoticon" @click="switchEmoji")
               div(v-if="emojiShow" @mouseleave = 'emojiPickerBlur')
                 vEmojiPicker.bg-c-grey-0.emoji-dialog#emojiPicker(@select="selectEmoji")
@@ -63,9 +63,9 @@
                 q-carousel(v-model="slide" swipeable animated padding control-text-color="c-grey" style="height: 210px")
                   q-carousel-slide(name="slide1" class="q-pa-md")
                     q-btn-group(flat spread stretch)
-                      q-btn.btnIcon.btnMessage(flat stack no-caps :label="$t('Desdroy')" icon="alarm" @click="destroyClock = true")
+                      q-btn.btnIcon.btnMessage(flat stack no-caps :label="$t('Destroy')" icon="alarm" :disable ='!(!ifSelfChat && activeStatus($store.state.currentChat) && ($store.state.currentChat && $store.state.currentChat.subjectType === SubjectType.CHAT))' @click="destroyClock = true")
                         q-popup-edit(v-model="destroyClock" content-class="" style='width:100px')
-                          q-option-group(:options="clockOptions" label="Notification" type="radio" v-model="destroyTime")
+                          q-option-group(:options="clockOptions" label="Notification" type="radio" v-model="$store.state.currentChat.destroyTime")
                       q-btn.btnIcon.btnMessage(flat stack no-caps :label="$t('Album')" icon="image" @click="uploadMobileMessageImage")
                       q-btn.btnIcon.btnMessage(flat stack no-caps :label="$t('Take Photo')" icon="photo_camera" @click="capture('image')")
                       q-btn.btnIcon.btnMessage(flat stack no-caps :label="$t('Take Video')" icon="camera" @click="capture('video')")

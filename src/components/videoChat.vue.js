@@ -113,7 +113,7 @@ export default {
       let store = _that.$store
       _that.chatMute = !_that.chatMute
       let mediaChat = store.state.currentCallChat
-      if(mediaChat.mediaProperty.type === 'audio'){
+      if(mediaChat.callType === 'audio'){
         if(mediaChat.audio){
           for(let ind in mediaChat.stream){
             let streamObj  = mediaChat.stream[ind]
@@ -124,18 +124,19 @@ export default {
           }
         }
       }
+      _that.$forceUpdate()
     },
     changeChatMic(){
       let _that = this
       let store = _that.$store
       let callChat = store.state.currentCallChat
-      let stream = callChat.streamMap[callChat.ownerPeerId]
+      let stream = callChat.streamMap[callChat.ownerPeerId].stream
       _that.chatMic = !_that.chatMic
       if(stream.getAudioTracks() && stream.getAudioTracks()[0]){
         let track = stream.getAudioTracks()[0]
         track.enabled = _that.chatMic
       }
-
+      _that.$forceUpdate()
     },
     startMediaTimer() {
       let _that = this
@@ -148,7 +149,7 @@ export default {
         peerId : peerId,
         stream : stream
       })
-      streamMap[peerId] = stream
+      streamMap[peerId] = {stream:stream, pending:false}
     },
      async removeStream(peerId){
       let _that = this
@@ -167,8 +168,8 @@ export default {
               webrtcPeer.removeStream()
             }
           }
-          if(_peerId === myself.myselfPeerClient.peerId){
-            callChat.streamMap[_peerId].getTracks().forEach((track) => {
+          if(_peerId === myself.myselfPeerClient.peerId && callChat.streamMap[_peerId] && callChat.streamMap[_peerId].stream){
+            callChat.streamMap[_peerId].stream.getTracks().forEach((track) => {
               track.stop();
             });
           }
@@ -469,7 +470,7 @@ export default {
           let webrtcPeers = await webrtcPeerPool.get(senderPeerId)
           if (webrtcPeers && webrtcPeers.length > 0) {
             for (let webrtcPeer of webrtcPeers) {
-              let _cloneStream = callChat.streamMap[callChat.ownerPeerId].clone()
+              let _cloneStream = callChat.streamMap[callChat.ownerPeerId].stream.clone()
               _that.localCloneStream[senderPeerId] = _cloneStream
               webrtcPeer.addStream(_cloneStream)
             }
@@ -491,13 +492,13 @@ export default {
         return;
       }
       if (callChat.subjectType === SubjectType.GROUP_CHAT) {
-        if (callChat.streamMap && callChat.streamMap[peerId]) return
-        if(!(callChat.callMessage.hasAddStream && callChat.callMessage.hasAddStream[peerId])){//发起方--这里需要addStream给对方
+        if(!(callChat.callMessage.hasAddStream && callChat.callMessage.hasAddStream[peerId]) || (callChat.streamMap && callChat.streamMap[peerId] && callChat.streamMap[peerId].pending)){//发起方--这里需要addStream给对方
           let webrtcPeers = await webrtcPeerPool.get(peerId)
           if (webrtcPeers && webrtcPeers.length > 0) {
             for (let webrtcPeer of webrtcPeers) {
-                let _cloneStream = callChat.streamMap[callChat.ownerPeerId].clone()
+                let _cloneStream = callChat.streamMap[callChat.ownerPeerId].stream.clone()
                 _that.localCloneStream[peerId] = _cloneStream
+                console.log('addStream --------')
                 webrtcPeer.addStream(_cloneStream)
             }
           }
@@ -525,7 +526,7 @@ export default {
           }
         )
       } else {
-        if(store.state.currentCallChat.callMessage.senderPeerId === myself.myselfPeerClient.peerId){//发起方--这里需要addStream给对方
+        if(store.state.currentCallChat.callMessage.senderPeerId === myself.myselfPeerClient.peerId  || (callChat.streamMap && callChat.streamMap[peerId] && callChat.streamMap[peerId].pending)){//发起方--这里需要addStream给对方
           let localStream = await mediaStreamComponent.openUserMedia(store.state.currentCallChat.options)
           _that.saveStream(store.state.currentCallChat.ownerPeerId,localStream)
           _that.$nextTick(async () => {
@@ -538,14 +539,14 @@ export default {
           if (webrtcPeers && webrtcPeers.length > 0) {
             let ps = []
             for (let webrtcPeer of webrtcPeers) {
-              webrtcPeer.addStream(store.state.currentCallChat.streamMap[store.state.currentCallChat.ownerPeerId])
+              webrtcPeer.addStream(store.state.currentCallChat.streamMap[store.state.currentCallChat.ownerPeerId].stream)
             }
           }
         }
         systemAudioComponent.mediaInvitationAudioStop()
         for(let track of stream.getTracks()) {
           track.onended = function(event) {
-            _that.closeCall()
+           _that.pendingCall(peerId)
           }
         }
         _that.saveStream(peerId,stream)
@@ -577,16 +578,25 @@ export default {
     answererReceiveStream(){
 
     },
-    async pendingCall(){
+    async pendingCall(peerId){
       let _that = this
       let store = _that.$store
-      await _that.closeCall()
-      _that.$q.notify({
-        message: _that.$i18n.t('Chat already ended'),
-        timeout: 3000,
-        type: "warning",
-        color: "warning",
-      })
+      let currentCallChat = store.state.currentCallChat
+      if(!currentCallChat || !currentCallChat.streamMap || !currentCallChat.streamMap[peerId] || currentCallChat.streamMap[peerId].pending)return
+      currentCallChat.streamMap[peerId].pending = true
+      _that.$forceUpdate()
+      let pendingCallTimeOut = setTimeout(async function(){
+        if(currentCallChat.streamMap[peerId].pending){
+            _that.$q.notify({
+                message: _that.$i18n.t('Chat already ended'),
+                timeout: 3000,
+                type: "warning",
+                color: "warning",
+            })
+            await _that.closeCall()
+        }
+      },10000)
+
     },
     async closeCall(isReceived) {
       let _that = this
@@ -693,7 +703,7 @@ export default {
       let store = _that.$store
       let callChat = store.state.currentCallChat
       let options
-      if (callChat.streamMap[callChat.ownerPeerId].getVideoTracks().length > 0) {
+      if (callChat.streamMap[callChat.ownerPeerId].stream.getVideoTracks().length > 0) {
         options = { audio: true, video: false }
       } else {
         options = { audio: true, video: true }
@@ -728,22 +738,32 @@ export default {
       let currentVideoDom = _that.$refs.currentVideo
       let zoomVideoDom = _that.$refs.zoomVideo
       
-      if(currentVideoDom.srcObject === callChat.streamMap[callChat.ownerPeerId]){
+      if(currentVideoDom.srcObject === callChat.streamMap[callChat.ownerPeerId].stream){
         if(zoomVideoDom){
-          zoomVideoDom.srcObject = callChat.streamMap[callChat.ownerPeerId]
+          zoomVideoDom.srcObject = callChat.streamMap[callChat.ownerPeerId].stream
         }
-        currentVideoDom.srcObject = callChat.streamMap[callChat.subjectId]
+        currentVideoDom.srcObject = callChat.streamMap[callChat.subjectId].stream
       }else{
         if(zoomVideoDom){
-          zoomVideoDom.srcObject = callChat.streamMap[callChat.subjectId]
+          zoomVideoDom.srcObject = callChat.streamMap[callChat.subjectId].stream
         }
-        currentVideoDom.srcObject = callChat.streamMap[callChat.ownerPeerId]
+        currentVideoDom.srcObject = callChat.streamMap[callChat.ownerPeerId].stream
       }
     },
     canCall() {
       let _that = this
       let store = _that.$store
       return store.state.currentCallChat && !store.state.currentCallChat.stream  && store.state.currentCallChat.callMessage &&(store.state.currentCallChat.callMessage.senderPeerId !== store.state.currentCallChat.ownerPeerId)
+    },
+    ifCurrentMute(){
+      let _that = this
+      let store = _that.$store
+      return _that.$refs.currentVideo  && store.state.currentCallChat.streamMap[store.state.currentCallChat.ownerPeerId] && _that.$refs.currentVideo.srcObject === store.state.currentCallChat.streamMap[store.state.currentCallChat.ownerPeerId].stream  || _that.chatMute
+    },
+    ifZoomMute(){
+      let _that = this
+      let store = _that.$store
+      return _that.$refs.zoomVideo  && store.state.currentCallChat.streamMap[store.state.currentCallChat.ownerPeerId] && _that.$refs.zoomVideo.srcObject === store.state.currentCallChat.streamMap[store.state.currentCallChat.ownerPeerId].stream  || _that.chatMute
     }
   },
   mounted() {
@@ -756,6 +776,7 @@ export default {
     Vue.prototype.acceptGroupCall = _that.acceptGroupCall
     Vue.prototype.sendCallCloseMessage  = _that.sendCallCloseMessage
     Vue.prototype.pendingCall = _that.pendingCall
+      window._that = this
   },
   created() {
   }

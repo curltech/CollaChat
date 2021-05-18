@@ -150,7 +150,7 @@
   "Hold to talk": "話を押さえる",
   "Release to stop": "リリース終了",
   "Release your finger and cancel send": "指を離し，送信をキャンセルする",
-  "Desdroy": "廃棄",
+  "Destroy": "廃棄",
   "Album": "アルバム",
   "Take Video": "撮影",
   "Voice Call": "音声通話",

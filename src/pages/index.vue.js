@@ -497,6 +497,8 @@ export default {
     },
     async webrtcInit() {
       //webrtc connect
+      let _that = this
+      let store = _that.$store
       let myselfPeerClient = myself.myselfPeerClient
       webrtcPeerPool.clientId = myselfPeerClient.clientId
       store.webrtcPeerPool = webrtcPeerPool
@@ -514,7 +516,13 @@ export default {
       config.appParams.iceServer = [iceServer]
       for (let linkman of store.state.linkmans) {
         if(linkman.peerId !== myselfPeerClient.peerId){
-          webrtcPeerPool.create(linkman.peerId)
+          let option = {}
+          if(store.state.currentCallChat && store.state.currentCallChat.streamMap && store.state.currentCallChat.streamMap[linkman.peerId] && store.state.currentCallChat.streamMap[linkman.peerId].pending){
+              option.stream = store.state.currentCallChat.streamMap[myselfPeerClient.peerId].stream
+              store.state.currentCallChat.streamMap[linkman.peerId].pending = false
+              console.log('index.vue -add stream')
+          }
+          webrtcPeerPool.create(linkman.peerId, option)
         }
       }
     },
@@ -749,6 +757,7 @@ export default {
           await chatComponent.insert(ChatDataType.CHAT, chat, null)
         }
         chat.unReadCount = 0
+        chat.destroyTime = 0
         chat.mediaProperty = null
         chat.content = ""
         chat.noMoreMessageTag = false
@@ -778,6 +787,7 @@ export default {
       message.ownerPeerId = myselfPeerId
       message.subjectType = subjectType
       message.subjectId = subjectId
+      message.destroyTime = chat.destroyTime
       message.messageId = message.messageId ? message.messageId : UUID.string(null, null)
       message.senderPeerId = myselfPeerId
       message.createDate = new Date().getTime()
@@ -1581,16 +1591,31 @@ export default {
       let content = message.content
       if(messageType === P2pChatMessageType.CHAT_RECEIVE_CALLBACK) {
         if(message.preSubjectType === SubjectType.CHAT) {
-          let messages = await chatComponent.loadMessage(
-            {
-              ownerPeerId: myselfPeerClient.peerId,
-              messageId: message.messageId,
-            })
-          if(messages && messages.length > 0) {
-            let preMessage = messages[0]
-            preMessage.actualReceiveTime = message.receiveTime
-            await chatComponent.update(ChatDataType.MESSAGE, preMessage, null)
+
+
+          let currentMes
+          let chatMessages = store.state.chatMap[message.senderPeerId].messages
+          if (chatMessages && chatMessages.length > 0) {
+              for (let i = chatMessages.length; i--; i > -1) {
+                  let _currentMes = chatMessages[i]
+                  if (_currentMes.messageId === message.messageId) {
+                      currentMes = _currentMes
+                  }
+              }
           }
+          if(!currentMes){
+              let messages = await chatComponent.loadMessage(
+                  {
+                      ownerPeerId: myselfPeerClient.peerId,
+                      messageId: message.messageId,
+                  })
+            if(messages && messages.length > 0) {
+              currentMes = messages[0]
+            }
+          }
+          currentMes.actualReceiveTime = message.receiveTime
+          await chatComponent.update(ChatDataType.MESSAGE, currentMes, null)
+
         } else {
           let receives = await chatComponent.loadReceive(
             {
@@ -2336,7 +2361,7 @@ export default {
         }
         console.log('activeStatus => Down, peerId:' + peerId)
         if (_that.pendingCall && store.state.currentCallChat && store.state.currentCallChat.streamMap && store.state.currentCallChat.streamMap[peerId]) {
-          _that.pendingCall()
+          _that.pendingCall(peerId)
         }
       }
     },
