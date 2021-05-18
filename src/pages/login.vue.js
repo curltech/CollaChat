@@ -741,6 +741,37 @@ export default {
             simPermission = await simComponent.requestReadPermission()
             console.info(simPermission)
           }
+          let permissions = cordova.plugins.permissions;
+          let list = [
+            permissions.CAMERA,
+            permissions.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
+            permissions.WAKE_LOCK,
+            permissions.FOREGROUND_SERVICE,
+            permissions.MODIFY_AUDIO_SETTINGS,
+            permissions.READ_PHONE_STATE,
+            permissions.WRITE_EXTERNAL_STORAGE,
+            permissions.READ_CONTACTS,
+            permissions.WRITE_CONTACTS,
+            permissions.GET_ACCOUNTS,
+            permissions.USE_BIOMETRIC,
+            permissions.ACCESS_COARSE_LOCATION,
+            permissions.RECORD_VIDEO,
+            permissions.RECORD_AUDIO,
+            permissions.READ_EXTERNAL_STORAGE,
+            permissions.ACCESS_NETWORK_STATE,
+            permissions.MANAGE_DOCUMENTS,
+            permissions.VIBRATE
+          ];
+          function requestPermissionError(e) {
+            console.warn('permission is not turned on');
+            console.warn(e);
+          }
+          permissions.requestPermissions(
+            list,
+            function(status) {
+              if( !status.hasPermission ) error();
+            },
+            requestPermissionError);
         }
         if (simPermission) {
           let sim = await simComponent.getSimInfo()
