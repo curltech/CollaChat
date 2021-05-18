@@ -757,7 +757,7 @@ export default {
     },
     ifCurrentMute(){
       let _that = this
-      let store = _that.$stor
+      let store = _that.$store
       return _that.$refs.currentVideo  && store.state.currentCallChat.streamMap[store.state.currentCallChat.ownerPeerId] && _that.$refs.currentVideo.srcObject === store.state.currentCallChat.streamMap[store.state.currentCallChat.ownerPeerId].stream  || _that.chatMute
     },
     ifZoomMute(){
