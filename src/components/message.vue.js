@@ -689,17 +689,50 @@ export default {
         }
       }
       else if (message.contentType === ChatContentType.FILE) {
-        let hyperlink = document.createElement("a"),
+        let filename = message.content
+        if (store.ios === true || store.android === true) {
+          let storageLocation = ''
+          if (window.device) {
+            if (window.device.platform === 'Android') {
+              storageLocation = 'file:///storage/emulated/0/'
+            } else if (window.device.platform === 'iOS') {
+              storageLocation = cordova.file.documentsDirectory //cordova.file.applicationStorageDirectory, dataDirectory
+            }
+          }
+          console.log('storageLocation:' + storageLocation)
+          let dirEntry = await fileComponent.getDirEntry(storageLocation)
+          await fileComponent.createDirectory(dirEntry, 'Colla')
+          let dirPath = storageLocation + 'Colla/'
+          let fileEntry = await fileComponent.createNewFileEntry(filename, dirPath)
+          fileComponent.writeFile(fileEntry, BlobUtil.base64ToBlob(fileData), false).then(function () {
+            _that.$q.notify({
+              message: "save success",
+              timeout: 3000,
+              type: "info",
+              color: "info",
+            })
+          }).catch(function (err) {
+            console.error(JSON.stringify(err))
+            _that.$q.notify({
+              message: "save failure",
+              timeout: 3000,
+              type: "warning",
+              color: "warning",
+            })
+          })
+        } else {
+          let hyperlink = document.createElement("a"),
           mouseEvent = new MouseEvent('click', {
             view: window,
             bubbles: true,
             cancelable: true
           });
-        hyperlink.href = fileData;
-        hyperlink.target = '_blank';
-        hyperlink.download = message.content;
-        hyperlink.dispatchEvent(mouseEvent);
-        (window.URL || window.webkitURL).revokeObjectURL(hyperlink.href);
+          hyperlink.href = fileData;
+          hyperlink.target = '_blank';
+          hyperlink.download = message.content;
+          hyperlink.dispatchEvent(mouseEvent);
+          (window.URL || window.webkitURL).revokeObjectURL(hyperlink.href);
+        }
       }
     },
     fullscreenBack() {

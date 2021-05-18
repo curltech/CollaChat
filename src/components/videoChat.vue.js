@@ -113,7 +113,7 @@ export default {
       let store = _that.$store
       _that.chatMute = !_that.chatMute
       let mediaChat = store.state.currentCallChat
-      if(mediaChat.mediaProperty.type === 'audio'){
+      if(mediaChat.callType === 'audio'){
         if(mediaChat.audio){
           for(let ind in mediaChat.stream){
             let streamObj  = mediaChat.stream[ind]
@@ -124,6 +124,7 @@ export default {
           }
         }
       }
+      _that.$forceUpdate()
     },
     changeChatMic(){
       let _that = this
@@ -135,7 +136,7 @@ export default {
         let track = stream.getAudioTracks()[0]
         track.enabled = _that.chatMic
       }
-
+      _that.$forceUpdate()
     },
     startMediaTimer() {
       let _that = this
@@ -753,6 +754,16 @@ export default {
       let _that = this
       let store = _that.$store
       return store.state.currentCallChat && !store.state.currentCallChat.stream  && store.state.currentCallChat.callMessage &&(store.state.currentCallChat.callMessage.senderPeerId !== store.state.currentCallChat.ownerPeerId)
+    },
+    ifCurrentMute(){
+      let _that = this
+      let store = _that.$stor
+      return _that.$refs.currentVideo  && store.state.currentCallChat.streamMap[store.state.currentCallChat.ownerPeerId] && _that.$refs.currentVideo.srcObject === store.state.currentCallChat.streamMap[store.state.currentCallChat.ownerPeerId].stream  || _that.chatMute
+    },
+    ifZoomMute(){
+      let _that = this
+      let store = _that.$store
+      return _that.$refs.zoomVideo  && store.state.currentCallChat.streamMap[store.state.currentCallChat.ownerPeerId] && _that.$refs.zoomVideo.srcObject === store.state.currentCallChat.streamMap[store.state.currentCallChat.ownerPeerId].stream  || _that.chatMute
     }
   },
   mounted() {
