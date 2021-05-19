@@ -595,7 +595,7 @@ export default {
     async upgradeVersion(flag) {
       let _that = this
       let store = _that.$store
-      store.currentVersion = '0.2.25'
+      store.currentVersion = '0.2.26'
       store.latestVersion = store.currentVersion
       store.mandatory = false
       let versionHistory = [store.latestVersion]
