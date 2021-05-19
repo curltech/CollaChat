@@ -17,7 +17,7 @@
         q-item(style="display:none")
           q-item-section
             span {{addStreamCount}}
-        video(ref='currentVideo' :class="ifMobileSize || $store.state.ifMobileStyle ?'full-height':'current-linkman-video'" :muted = 'ifCurrentMute()===true' autoplay = 'autoplay')
+        video(ref='currentVideo' :class="ifMobileSize || $store.state.ifMobileStyle ?'full-height':'current-linkman-video'" autoplay = 'autoplay')
       q-card-section.linkman-video-section(v-if="$store.state.currentCallChat && $store.state.currentCallChat.stream && $store.state.currentCallChat.stream.length === 1 && !Platform.is.ios")
         q-item
           q-item-section(avatar)
@@ -26,7 +26,7 @@
       q-card-section.linkman-avatar-section(v-if="$store.state.currentCallChat && !$store.state.currentCallChat.stream")
         img(:src="Avatar($store.state.currentCallChat.subjectId)")
       q-card-section.zoom-video-section(v-if="!Platform.is.ios" @click="zoomVideoChange" v-show = "$store.state.currentCallChat && $store.state.currentCallChat.stream")
-        video(ref='zoomVideo' autoplay='autoplay'  :muted = 'ifZoomMute()===true')
+        video(ref='zoomVideo' autoplay='autoplay')
       q-card-section.mini-btn-section(v-if = "!Platform.is.ios && $store.state.currentCallChat.stream" )
         q-btn.btnIcon(flat round color="primary" icon="remove_circle" @click="changeMiniVideoDialog")
       q-card-section.call-pending-section(v-if = '$store.state.currentCallChat.streamMap && $store.state.currentCallChat.streamMap[$store.state.currentCallChat.subjectId] && $store.state.currentCallChat.streamMap[$store.state.currentCallChat.subjectId].pending')
@@ -48,7 +48,7 @@
               span {{$store.state.currentCallChat.stream.length}}
               span {{addStreamCount}}
             q-item-section.group-video-par(style="width:100%" v-if="$store.state.currentCallChat.callType == 'video' && ($store.state.currentCallChat.streamMap && $store.state.currentCallChat.streamMap[memberPeerId])")
-              video(:ref='`memberVideo${memberPeerId}`' :muted = '(memberPeerId === $store.state.currentCallChat.ownerPeerId || chatMute) === true' autoplay = 'autoplay')
+              video(:ref='`memberVideo${memberPeerId}`' autoplay = 'autoplay')
             q-item-section(v-else)
               q-avatar(style = 'width:100%;height:auto;')
                 img(:src="($store.state.linkmanMap[memberPeerId] && $store.state.linkmanMap[memberPeerId].avatar) ? $store.state.linkmanMap[memberPeerId].avatar : $store.defaultActiveAvatar")

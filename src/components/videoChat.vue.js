@@ -112,31 +112,35 @@ export default {
       let _that = this
       let store = _that.$store
       _that.chatMute = !_that.chatMute
-      let mediaChat = store.state.currentCallChat
-      if(mediaChat.callType === 'audio'){
-        if(mediaChat.audio){
-          for(let ind in mediaChat.stream){
-            let streamObj  = mediaChat.stream[ind]
-            if(streamObj.peerId !== myself.myselfPeerClient.peerId){
-              let audioItem = mediaChat.audio[streamObj.peerId]
-              audioItem.muted = _that.chatMute
+      let callChat = store.state.currentCallChat
+      for (let streamObj of callChat.stream) {
+        let _stream = streamObj.stream
+        if (_stream && streamObj.peerId !== callChat.ownerPeerId && _stream.getAudioTracks().length > 0) {
+          let  audioTrack = _stream.getAudioTracks()[0]
+          _that.chatMute ? audioTrack.enabled = false : audioTrack.enabled = true
+        }
+      }
+    },
+    async changeChatMic(){
+      let _that = this
+      let store = _that.$store
+      let callChat = store.state.currentCallChat
+      _that.chatMic = !_that.chatMic
+      for (let streamObj of callChat.stream) {
+        let _peerId = streamObj.peerId
+        if (_peerId!== callChat.ownerPeerId) {
+          let webrtcPeers = await webrtcPeerPool.get(_peerId)
+          if (webrtcPeers && webrtcPeers.length > 0) {
+            for (let webrtcPeer of webrtcPeers) {
+              if (webrtcPeer.localStreams.length > 0){
+                let _stream = webrtcPeer.localStreams[0]
+                let  audioTrack = _stream.getAudioTracks()[0]
+                _that.chatMic ? audioTrack.enabled = true : audioTrack.enabled = false
+              }
             }
           }
         }
       }
-      _that.$forceUpdate()
-    },
-    changeChatMic(){
-      let _that = this
-      let store = _that.$store
-      let callChat = store.state.currentCallChat
-      let stream = callChat.streamMap[callChat.ownerPeerId].stream
-      _that.chatMic = !_that.chatMic
-      if(stream.getAudioTracks() && stream.getAudioTracks()[0]){
-        let track = stream.getAudioTracks()[0]
-        track.enabled = _that.chatMic
-      }
-      _that.$forceUpdate()
     },
     startMediaTimer() {
       let _that = this
@@ -177,11 +181,11 @@ export default {
             if(callChat.callMessage.hasAddStream && callChat.callMessage.hasAddStream[_peerId]){
               callChat.callMessage.hasAddStream[_peerId] = null
             }
-            if(_that.localCloneStream[_peerId]){
-              _that.localCloneStream[_peerId].getTracks().forEach((track) => {
-                track.stop();
-              });
-            }
+          }
+          if(_that.localCloneStream[_peerId]){
+            _that.localCloneStream[_peerId].getTracks().forEach((track) => {
+              track.stop();
+            });
           }
           callChat.streamMap[_peerId] = null
           _that.$forceUpdate()
@@ -382,9 +386,9 @@ export default {
         _that.addStreamCount++
         let webrtcPeers = await webrtcPeerPool.get(peerId)
         if (webrtcPeers && webrtcPeers.length > 0) {
-          let ps = []
           for (let webrtcPeer of webrtcPeers) {
-            webrtcPeer.addStream(localStream)
+            _that.localCloneStream[peerId] = localStream.clone()
+            webrtcPeer.addStream(_that.localCloneStream[peerId])
           }
         }
       })
@@ -441,6 +445,7 @@ export default {
           if (localStream.getVideoTracks().length > 0) {//video
             let currentVideoDom = _that.$refs[`memberVideo${store.state.currentCallChat.ownerPeerId}`][0]
             currentVideoDom.srcObject = localStream
+            currentVideoDom.muted = true
           } else {//audio
             if (!store.state.currentCallChat.audio) {
               store.state.currentCallChat.audio = {}
@@ -537,12 +542,13 @@ export default {
           })
           let webrtcPeers = await webrtcPeerPool.get(peerId)
           if (webrtcPeers && webrtcPeers.length > 0) {
-            let ps = []
             for (let webrtcPeer of webrtcPeers) {
-              webrtcPeer.addStream(store.state.currentCallChat.streamMap[store.state.currentCallChat.ownerPeerId].stream)
+              _that.localCloneStream[peerId] = localStream.clone()
+              webrtcPeer.addStream(_that.localCloneStream[peerId])
             }
           }
         }
+        store.state.currentCallChat.streamMap[store.state.currentCallChat.ownerPeerId].stream.getAudioTracks()[0].enabled = false
         systemAudioComponent.mediaInvitationAudioStop()
         for(let track of stream.getTracks()) {
           track.onended = function(event) {
@@ -755,16 +761,6 @@ export default {
       let store = _that.$store
       return store.state.currentCallChat && !store.state.currentCallChat.stream  && store.state.currentCallChat.callMessage &&(store.state.currentCallChat.callMessage.senderPeerId !== store.state.currentCallChat.ownerPeerId)
     },
-    ifCurrentMute(){
-      let _that = this
-      let store = _that.$store
-      return _that.$refs.currentVideo  && store.state.currentCallChat.streamMap[store.state.currentCallChat.ownerPeerId] && _that.$refs.currentVideo.srcObject === store.state.currentCallChat.streamMap[store.state.currentCallChat.ownerPeerId].stream  || _that.chatMute
-    },
-    ifZoomMute(){
-      let _that = this
-      let store = _that.$store
-      return _that.$refs.zoomVideo  && store.state.currentCallChat.streamMap[store.state.currentCallChat.ownerPeerId] && _that.$refs.zoomVideo.srcObject === store.state.currentCallChat.streamMap[store.state.currentCallChat.ownerPeerId].stream  || _that.chatMute
-    }
   },
   mounted() {
     let _that = this

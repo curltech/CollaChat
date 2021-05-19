@@ -519,6 +519,7 @@ export default {
           let option = {}
           if(store.state.currentCallChat && store.state.currentCallChat.streamMap && store.state.currentCallChat.streamMap[linkman.peerId] && store.state.currentCallChat.streamMap[linkman.peerId].pending){
               option.stream = store.state.currentCallChat.streamMap[myselfPeerClient.peerId].stream
+              option.stream.getAudioTracks()[0].enable = true
               store.state.currentCallChat.streamMap[linkman.peerId].pending = false
               console.log('index.vue -add stream')
           }
