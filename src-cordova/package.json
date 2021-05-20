@@ -60,8 +60,7 @@
     "cordova-ios": "^6.1.1",
     "cordova-plugin-android-permissions": "^1.1.2",
     "cordova-sms-plugin": "^1.0.0",
-    "cordova-sqlite-storage": "^5.1.0",
-    "cordova.plugins.diagnostic": "^6.0.3"
+    "cordova-sqlite-storage": "^5.1.0"
   },
   "cordova": {
     "plugins": {
@@ -123,9 +122,7 @@
       "cordova-plugin-background-mode": {},
       "cordova-plugin-backbutton": {},
       "cordova-plugin-android-permissions": {},
-      "cordova.plugins.diagnostic": {
-        "ANDROIDX_VERSION": "1.+"
-      }
+      "cordova-plugin-compat": {}
     },
     "platforms": [
       "ios",

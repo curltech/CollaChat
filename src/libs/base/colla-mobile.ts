@@ -92,7 +92,7 @@ export let permissionHelper = new PermissionHelper()
  EXTERNAL_STORAGE - Android
  */
 class DiagnosticHelper {
-    private diagnostic:any = cordova.plugins.diagnostic
+    private diagnostic:any //= cordova.plugins.diagnostic
 
     constructor() {
     }
