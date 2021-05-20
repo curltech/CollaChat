@@ -1,12 +1,14 @@
 /**
  cordova-plugin-android-permissions插件的实现
  */
-let cordova: any
 
 class PermissionHelper {
-    private permissions:any = cordova.plugins.permissions
+    private permissions:any
     constructor() {
 
+    }
+    init(permissions:any){
+        this.permissions = permissions
     }
 
     /**

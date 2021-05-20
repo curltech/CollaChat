@@ -8,6 +8,7 @@ import { signalProtocol } from 'libcolla'
 import { PeerEndpoint, peerEndpointService } from 'libcolla'
 import { libp2pClientPool, config, peerClientService, p2pPeer, myself, myselfPeerService, ChatMessageType, chatAction, p2pChatAction, logService } from 'libcolla'
 
+import {permissionHelper} from '@/libs/base/colla-mobile'
 import pinyinUtil from '@/libs/base/colla-pinyin'
 import * as CollaConstant from '@/libs/base/colla-constant'
 import { statusBarComponent, deviceComponent, localNotificationComponent } from '@/libs/base/colla-cordova'
@@ -2406,6 +2407,29 @@ export default {
     if (window.device) {
         document.addEventListener('deviceready', async function () {
           if(window.device.platform === 'Android'){
+                  let permissions = cordova.plugins.permissions
+                  permissionHelper.init(permissions)
+                  let list = [
+                    'android.permission.CAMERA',
+                    'android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS',
+                    'android.permission.WAKE_LOCK',
+                    'android.permission.FOREGROUND_SERVICE',
+                    'android.permission.MODIFY_AUDIO_SETTINGS',
+                    'android.permission.READ_PHONE_STATE',
+                    'android.permission.WRITE_EXTERNAL_STORAGE',
+                    'android.permission.READ_CONTACTS',
+                    'android.permission.WRITE_CONTACTS',
+                    'android.permission.GET_ACCOUNTS',
+                    'android.permission.USE_BIOMETRIC',
+                    'android.permission.ACCESS_COARSE_LOCATION',
+                    'android.permission.RECORD_VIDEO',
+                    'android.permission.RECORD_AUDIO',
+                    'android.permission.READ_EXTERNAL_STORAGE',
+                    'android.permission.ACCESS_NETWORK_STATE',
+                    'android.permission.MANAGE_DOCUMENTS',
+                    'android.permission.VIBRATE'
+                  ]
+                  await permissionHelper.requestPermissions(list)
                   document.addEventListener('backbutton', function (e) {
                     navigator.app.clearHistory()
                     if(!(_that.$refs[`mainDrawer`] && _that.$refs[`mainDrawer`].value)){
