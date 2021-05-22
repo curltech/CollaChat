@@ -1575,7 +1575,6 @@ export default {
       let myselfPeerClient = myself.myselfPeerClient
         console.log('p2pChatReceiver')
         console.log(message)
-        message = JSON.parse(message)
       if(!message.messageType){
         let signalSession = await _that.getSignalSession(peerId)
         if(!signalSession){
@@ -1652,10 +1651,7 @@ export default {
           if(signalSession){
               await signalSession.close()
           }
-          if(linkman.signalPublicKey !== content.signalPublicKey){
-            linkman.signalPublicKey = content.signalPublicKey
-            console.log('receive signalPublicKey' + linkman.name + linkman.signalPublicKey)
-          }
+          linkman.signalPublicKey = content.signalPublicKey
           signalProtocol.signalPublicKeys.set(linkmanPeerId,linkman.signalPublicKey)
           linkman.downloadSwitch = content.downloadSwitch
           //linkman.localDataCryptoSwitch = content.localDataCryptoSwitch
@@ -1674,6 +1670,7 @@ export default {
                 linkman.avatar = content.avatar
                 linkman.publicKey = content.publicKey
                 linkman.downloadSwitch = content.downloadSwitch
+                linkman.signalPublicKey = content.signalPublicKey
                 //linkman.localDataCryptoSwitch = content.localDataCryptoSwitch
                 //linkman.fullTextSearchSwitch = content.fullTextSearchSwitch
                 linkman.udpSwitch = content.udpSwitch
@@ -2378,9 +2375,7 @@ export default {
         message = await signalSession.encrypt(JSON.stringify(message))
 
       }else if(message.messageType === P2pChatMessageType.SYNC_LINKMAN_INFO){
-        
       }
-      message = JSON.stringify(message)
       await p2pChatAction.chat(null,message,peerId)
     },
     async getSignalSession(peerId){
