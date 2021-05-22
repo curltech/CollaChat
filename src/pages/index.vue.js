@@ -7,6 +7,7 @@ import { webrtcPeerPool } from 'libcolla'
 import { signalProtocol } from 'libcolla'
 import { PeerEndpoint, peerEndpointService } from 'libcolla'
 import { libp2pClientPool, config, peerClientService, p2pPeer, myself, myselfPeerService, ChatMessageType, chatAction, p2pChatAction, logService } from 'libcolla'
+import { BlockType, dataBlockService, DataBlockService } from 'libcolla'
 
 import {permissionHelper} from '@/libs/base/colla-mobile'
 import pinyinUtil from '@/libs/base/colla-pinyin'
@@ -1573,8 +1574,9 @@ export default {
       let _that = this
       let store = _that.$store
       let myselfPeerClient = myself.myselfPeerClient
-        console.log('p2pChatReceiver')
-        console.log(message)
+      console.log('p2pChatReceiver')
+      console.log(message)
+      message = JSON.parse(message)
       if(!message.messageType){
         let signalSession = await _that.getSignalSession(peerId)
         if(!signalSession){
@@ -2376,7 +2378,13 @@ export default {
 
       }else if(message.messageType === P2pChatMessageType.SYNC_LINKMAN_INFO){
       }
-      await p2pChatAction.chat(null,message,peerId)
+      message = JSON.stringify(message)
+      let createTimestamp = new Date().getTime()
+      let payload = { payload: message, metadata: null, expireDate: 0 }
+      let dataBlock = DataBlockService.create(UUID.string(null, null), null, BlockType.P2pChat, createTimestamp, payload, [])
+      await dataBlockService.encrypt(dataBlock)
+      dataBlock.payload = message // for webrtc send
+      await p2pChatAction.chat(null,dataBlock,peerId)
     },
     async getSignalSession(peerId){
       let linkman = store.state.linkmanMap[peerId]
