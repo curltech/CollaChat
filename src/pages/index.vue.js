@@ -7,7 +7,7 @@ import { webrtcPeerPool } from 'libcolla'
 import { signalProtocol } from 'libcolla'
 import { PeerEndpoint, peerEndpointService } from 'libcolla'
 import { libp2pClientPool, config, peerClientService, p2pPeer, myself, myselfPeerService, ChatMessageType, chatAction, p2pChatAction, logService } from 'libcolla'
-import { BlockType, dataBlockService, DataBlockService } from 'libcolla'
+import { BlockType, dataBlockService, DataBlockService, queryValueAction } from 'libcolla'
 
 import {permissionHelper} from '@/libs/base/colla-mobile'
 import pinyinUtil from '@/libs/base/colla-pinyin'
@@ -17,6 +17,7 @@ import { cameraComponent, systemAudioComponent, mediaComponent } from '@/libs/ba
 import { CollectionType } from '@/libs/biz/colla-collection'
 import { ChatDataType, ChatContentType, P2pChatMessageType, SubjectType, chatComponent, chatBlockComponent} from '@/libs/biz/colla-chat'
 import { ContactDataType, RequestType, RequestStatus, LinkmanStatus, ActiveStatus, contactComponent, MemberType } from '@/libs/biz/colla-contact'
+import { collectionUtil } from '@/libs/biz/colla-collection-util'
 import Chat from '@/components/chat'
 import Contacts from '@/components/contacts'
 import ReceivedList from '@/components/receivedList'
@@ -489,6 +490,7 @@ export default {
           console.log(result)
           await _that.webrtcInit()
           await store.upgradeVersion('about')
+          await _that.cloudSyncP2pChat()
           return peers[0]
         } else {
           console.log("primaryEndPoint connect failure")
@@ -2366,25 +2368,31 @@ export default {
         }
       }
     },
-    async p2pSend(message,peerId){
+    async p2pSend(message, peerId) {
       let _that = this
-      if(typeof message === "object" && message.messageType !== P2pChatMessageType.SYNC_LINKMAN_INFO){
+      if (typeof message === "object" && message.messageType !== P2pChatMessageType.SYNC_LINKMAN_INFO) {
         let signalSession = await _that.getSignalSession(peerId)
-        if(!signalSession){
-          console.log('signalSession dont exist')
+        if (!signalSession) {
+          console.error('signalSession does not exist')
           return
         }
         message = await signalSession.encrypt(JSON.stringify(message))
-
-      }else if(message.messageType === P2pChatMessageType.SYNC_LINKMAN_INFO){
+      } else if (message.messageType === P2pChatMessageType.SYNC_LINKMAN_INFO) {
+        
       }
       message = JSON.stringify(message)
       let createTimestamp = new Date().getTime()
       let payload = { payload: message, metadata: null, expireDate: 0 }
-      let dataBlock = DataBlockService.create(UUID.string(null, null), null, BlockType.P2pChat, createTimestamp, payload, [])
+      let dataBlock = DataBlockService.create(UUID.string(null, null), peerId, BlockType.P2pChat, createTimestamp, payload, [])
       await dataBlockService.encrypt(dataBlock)
+      let dataBlocks = await DataBlockService.slice(dataBlock)
+      if (dataBlocks.length !== 1) {
+        console.error('P2pChat DataBlock sliceSize is greater than 1')
+        return
+      }
+      dataBlock = dataBlocks[0]
       dataBlock.payload = message // for webrtc send
-      await p2pChatAction.chat(null,dataBlock,peerId)
+      await p2pChatAction.chat(null, dataBlock, peerId)
     },
     async getSignalSession(peerId){
       let linkman = store.state.linkmanMap[peerId]
@@ -2396,6 +2404,40 @@ export default {
       }
       let signalSession = await signalProtocol.get(peerId,linkman.connectPeerId,linkman.connectSessionId)
       return signalSession
+    },
+    async cloudSyncP2pChat() {
+      let _that = this
+      let store = _that.$store
+      // 查询cloud全量DataBlock索引信息
+      let conditionBean = {}
+      conditionBean['businessNumber'] = myself.myselfPeerClient.peerId
+      conditionBean['getAllBlockIndex'] = true
+      conditionBean['blockType'] = BlockType.P2pChat
+      let downloadList = await queryValueAction.queryValue(null, conditionBean)
+      console.log('downloadList:' + JSON.stringify(downloadList))
+      // 下载
+      if (downloadList && downloadList.length > 0) {
+        if (store.p2pChatWorkerEnabler) {
+          /*let options = {}
+          options.privateKey = myself.privateKey
+          openpgp.clonePackets(options)
+          let worker = _that.initP2pChatDownloadWorker()
+          worker.postMessage([downloadList, myself.myselfPeerClient, options.privateKey])*/
+        } else {
+          let responses = await collectionUtil.download(downloadList)
+          if (responses && responses.length > 0) {
+            for (let i = 0; i < responses.length; ++i) {
+              let dataBlocks = responses[i]
+              if (dataBlocks && dataBlocks.length > 0) {
+                let dataBlock = dataBlocks[0]
+                if (dataBlock) {
+                  _that.p2pChatReceiver(dataBlock.peerId, dataBlock.payload)
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   async created() {

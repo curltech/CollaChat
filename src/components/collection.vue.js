@@ -1354,12 +1354,14 @@ export default {
           conditionBean['receiverPeerId'] = clientPeerId
           conditionBean['receiverPeer'] = true
           conditionBean['getAllBlockIndex'] = true
+          conditionBean['blockType'] = BlockType.Collection
           let cloudBlockIndices = await queryValueAction.queryValue(null, conditionBean)
+          //console.log('cloudBlockIndices:' + JSON.stringify(cloudBlockIndices))
           // 查询local全量collection索引信息
           let condition = {}
           condition['ownerPeerId'] = clientPeerId
           let localBlockIndices = await collectionComponent.loadCollection(condition, null, ['_id', 'updateDate', 'versionFlag'])
-          console.log('localBlockIndices:' + JSON.stringify(localBlockIndices))
+          //console.log('localBlockIndices:' + JSON.stringify(localBlockIndices))
           // 查询local失败记录
           let dbLogs = await blockLogComponent.load(condition, null, null)
           console.log("dbLogs-start:" + JSON.stringify(dbLogs))
