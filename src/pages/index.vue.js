@@ -499,6 +499,17 @@ export default {
       /*}*/
       //return null
     },
+    ifConnected(peerId){
+        let webrtcPeers  = webrtcPeerPool.getConnected(peerId)
+        if(webrtcPeers && webrtcPeers.length > 0){
+          return true
+        }
+        let webSocket = p2pPeer.host.transportManager._transports.get('WebSockets')
+        if(webSocket.ws && webSocket.ws.readyState === 1 ){
+          return true
+        }
+        return false
+    },
     async webrtcInit() {
       //webrtc connect
       let _that = this
@@ -594,15 +605,15 @@ export default {
       let _that = this
       let store = _that.$store
       let currentDate = new Date().getTime()
-      let _message = {
-        messageType: P2pChatMessageType.CHAT_RECEIVE_CALLBACK,
-        preSubjectType: message.subjectType,
-        preSubjectId: message.subjectId,
-        senderPeerId: myself.myselfPeerClient.peerId,
-        messageId: message.messageId,
-        receiveTime: currentDate
-      }
-      await store.p2pSend( _message ,message.senderPeerId)
+      // let _message = {
+      //   messageType: P2pChatMessageType.CHAT_RECEIVE_CALLBACK,
+      //   preSubjectType: message.subjectType,
+      //   preSubjectId: message.subjectId,
+      //   senderPeerId: myself.myselfPeerClient.peerId,
+      //   messageId: message.messageId,
+      //   receiveTime: currentDate
+      // }
+      // await store.p2pSend( _message ,message.senderPeerId)
       let receivedMessages = await chatComponent.loadMessage({
         ownerPeerId: myself.myselfPeerClient.peerId,
         messageId: message.messageId
@@ -798,12 +809,15 @@ export default {
       message.createDate = new Date().getTime()
       message.countDown = 0
       message.receiveTime = message.createDate
-      if(subjectId !== myselfPeerId && (message.messageType !== P2pChatMessageType.CALL_REQUEST)){
-        message.actualReceiveTime = null
-      }else{
-        message.actualReceiveTime = message.createDate
-      }
+      // if(subjectId !== myselfPeerId && (message.messageType !== P2pChatMessageType.CALL_REQUEST)){
+      message.actualReceiveTime = null
+      // }else{
+      //   message.actualReceiveTime = message.createDate
+      // }
       if (subjectType === SubjectType.CHAT && subjectId !== myselfPeerId) {
+        if(_that.ifConnected(subjectId)){
+            message.actualReceiveTime = message.createDate
+        }
         await store.p2pSend(message,subjectId)
       } else if (subjectType === SubjectType.GROUP_CHAT) {
         let groupMembers
@@ -824,7 +838,7 @@ export default {
               messageId: message.messageId,
               createDate: message.createDate,
               receiverPeerId: groupMember.memberPeerId ? groupMember.memberPeerId : groupMember,
-              receiveTime: null
+              receiveTime: _that.ifConnected(subjectId) ? message.createDate : null
             }
             if(message.messageType !== P2pChatMessageType.CALL_CLOSE){
               await chatComponent.insert(ChatDataType.RECEIVE, receive, null)
@@ -2378,7 +2392,7 @@ export default {
         }
         message = await signalSession.encrypt(JSON.stringify(message))
       } else if (message.messageType === P2pChatMessageType.SYNC_LINKMAN_INFO) {
-        
+
       }
       message = JSON.stringify(message)
       let createTimestamp = new Date().getTime()

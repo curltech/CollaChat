@@ -84,28 +84,6 @@ export default {
       let store = _that.$store
       return  !_that.ifMobileSize && store.state.currentCallChat.stream && store.state.currentCallChat.stream.length > 1
     },
-    ifConnected(){
-      let _that = this
-      let store = _that.$store
-      let currentChat = store.state.currentCallChat
-      if(currentChat){
-        if(currentChat.subjectType === SubjectType.CHAT){
-          if(store.state.currentCallChat.stream){
-            return true
-          }else{
-            return false
-          }
-        } else if(currentChat.subjectType === SubjectType.GROUP_CHAT){
-          if(store.state.currentCallChat.stream && store.state.currentCallChat.stream.length > 1){
-            return true
-          }else{
-            return false
-          }
-        }
-      }else{
-        return false;
-      }
-    }
   },
   methods: {
     changeChatMute(){
