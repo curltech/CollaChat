@@ -803,7 +803,6 @@ export default {
       message.ownerPeerId = myselfPeerId
       message.subjectType = subjectType
       message.subjectId = subjectId
-      message.destroyTime = chat.destroyTime
       message.messageId = message.messageId ? message.messageId : UUID.string(null, null)
       message.senderPeerId = myselfPeerId
       message.createDate = new Date().getTime()
@@ -815,6 +814,11 @@ export default {
       //   message.actualReceiveTime = message.createDate
       // }
       if (subjectType === SubjectType.CHAT && subjectId !== myselfPeerId) {
+        if(store.state.linkmanMap[subjectId].activeStatus === ActiveStatus.UP){
+          message.destroyTime = chat.destroyTime
+        }else{
+          chat.destroyTime = 0
+        }
         if(_that.ifConnected(subjectId)){
             message.actualReceiveTime = message.createDate
         }
@@ -1590,8 +1594,6 @@ export default {
       let _that = this
       let store = _that.$store
       let myselfPeerClient = myself.myselfPeerClient
-      console.log('p2pChatReceiver')
-      console.log(message)
       message = JSON.parse(message)
       if(!message.messageType){
         let signalSession = await _that.getSignalSession(peerId)
@@ -2445,7 +2447,7 @@ export default {
               if (dataBlocks && dataBlocks.length > 0) {
                 let dataBlock = dataBlocks[0]
                 if (dataBlock) {
-                  _that.p2pChatReceiver(dataBlock.peerId, dataBlock.payload)
+                 await _that.p2pChatReceiver(dataBlock.peerId, dataBlock.payload)
                 }
               }
             }
