@@ -2440,18 +2440,22 @@ export default {
           let worker = _that.initP2pChatDownloadWorker()
           worker.postMessage([downloadList, myself.myselfPeerClient, options.privateKey])*/
         } else {
-          let responses = await collectionUtil.download(downloadList)
-          if (responses && responses.length > 0) {
-            for (let i = 0; i < responses.length; ++i) {
-              let dataBlocks = responses[i]
-              if (dataBlocks && dataBlocks.length > 0) {
-                let dataBlock = dataBlocks[0]
-                if (dataBlock) {
-                 await _that.p2pChatReceiver(dataBlock.peerId, dataBlock.payload)
-                }
+          let ps = []
+          for (let download of downloadList) {
+            let promise = dataBlockService.findTxPayload(null, download['blockId'])
+            ps.push(promise)
+          }
+          CollaUtil.asyncPool(10,ps,async function(result){
+            let dataBlocks = await result
+            if (dataBlocks && dataBlocks.length > 0) {
+              let dataBlock = dataBlocks[0]
+              if (dataBlock) {
+                await _that.p2pChatReceiver(dataBlock.peerId, dataBlock.payload)
+                console.log(dataBlock)
+                await collectionUtil.deleteBlock(dataBlock, false, BlockType.P2pChat)
               }
             }
-          }
+          })
         }
       }
     }
