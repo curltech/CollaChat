@@ -6,7 +6,7 @@ import { CollaUtil, UUID } from 'libcolla'
 import { webrtcPeerPool } from 'libcolla'
 import { signalProtocol } from 'libcolla'
 import { PeerEndpoint, peerEndpointService } from 'libcolla'
-import { libp2pClientPool, config, peerClientService, p2pPeer, myself, myselfPeerService, ChatMessageType, chatAction, p2pChatAction, logService } from 'libcolla'
+import { libp2pClientPool, config, peerClientService, p2pPeer, myself, myselfPeerService, ChatMessageType, pingAction, chatAction, p2pChatAction, logService } from 'libcolla'
 import { BlockType, dataBlockService, DataBlockService, queryValueAction } from 'libcolla'
 
 import {permissionHelper} from '@/libs/base/colla-mobile'
@@ -285,7 +285,7 @@ export default {
           payload.createTimestamp = new Date().getTime()
           let connectAddressArr = connectAddress.split('/')
           let targetPeerId = connectAddressArr[connectAddressArr.length - 1]
-          await chatAction.chat(null, payload, targetPeerId)
+          await pingAction.ping(null, payload, targetPeerId)
         }, 55 * 1000)
       }
       webSocket.onmessage = function (evt) {
