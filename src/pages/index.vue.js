@@ -2446,7 +2446,7 @@ export default {
             let promise = dataBlockService.findTxPayload(null, download['blockId'])
             ps.push(promise)
           }
-          CollaUtil.asyncPool(10,ps,async function(result){
+          CollaUtil.asyncPool(10, ps, async function(result) {
             let dataBlocks = await result
             if (dataBlocks && dataBlocks.length > 0) {
               let dataBlock = dataBlocks[0]

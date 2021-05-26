@@ -1496,40 +1496,37 @@ export default {
               let worker = _that.initCollectionDownloadWorker()
               worker.postMessage([downloadList, myself.myselfPeerClient, options.privateKey])
             } else {
-              let responses = await collectionUtil.download(downloadList)
-              if (responses && responses.length > 0) {
-                for (let i = 0; i < responses.length; ++i) {
-                  let collections = responses[i]
-                  if (collections && collections.length > 0) {
-                    let collection = collections[0]
-                    if (collection) {
-                      let collectionId = collection._id
-                      let local = await collectionComponent.get(CollectionDataType.COLLECTION, collectionId)
-                      if (!(local && current && current._id === collectionId && _that.subKind === 'edit')) {
-                        if (!local) {
-                          collection.state = EntityState.New
-                        } else {
-                          collection._rev = local._rev
-                          collection.state = EntityState.Modified
-                        }
-                        collection.versionFlag = 'sync'
-                        await collectionComponent.saveCollection(collection, null)
-                        if (_that.collectionTypeIndex === 0 || _that.collectionTypes[_that.collectionTypeIndex].value === collection.collectionType) {
-                          let index = 0
-                          for (let i = 0; i < _that.myCollections.length; i++) {
-                            if (_that.myCollections[i].updateDate > collection.updateDate) {
-                              index++
-                            } else {
-                              break
-                            }
+              CollaUtil.asyncPool(10, ps, async function(result) {
+                let collections = await result
+                if (collections && collections.length > 0) {
+                  let collection = collections[0]
+                  if (collection) {
+                    let collectionId = collection._id
+                    let local = await collectionComponent.get(CollectionDataType.COLLECTION, collectionId)
+                    if (!(local && current && current._id === collectionId && _that.subKind === 'edit')) {
+                      if (!local) {
+                        collection.state = EntityState.New
+                      } else {
+                        collection._rev = local._rev
+                        collection.state = EntityState.Modified
+                      }
+                      collection.versionFlag = 'sync'
+                      await collectionComponent.saveCollection(collection, null)
+                      if (_that.collectionTypeIndex === 0 || _that.collectionTypes[_that.collectionTypeIndex].value === collection.collectionType) {
+                        let index = 0
+                        for (let i = 0; i < _that.myCollections.length; i++) {
+                          if (_that.myCollections[i].updateDate > collection.updateDate) {
+                            index++
+                          } else {
+                            break
                           }
-                          _that.myCollections.splice(index, (!local ? 0 : 1), collection)
                         }
+                        _that.myCollections.splice(index, (!local ? 0 : 1), collection)
                       }
                     }
                   }
                 }
-              }
+              })
             }
           }
           // 删除
