@@ -1611,6 +1611,7 @@ export default {
       let messageType = message.messageType
       let content = message.content
       if(messageType === P2pChatMessageType.CHAT_RECEIVE_CALLBACK) {
+        return
         if(message.preSubjectType === SubjectType.CHAT) {
 
 
