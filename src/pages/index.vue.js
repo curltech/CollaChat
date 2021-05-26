@@ -2450,9 +2450,9 @@ export default {
             if (dataBlocks && dataBlocks.length > 0) {
               let dataBlock = dataBlocks[0]
               if (dataBlock) {
-                await _that.p2pChatReceiver(dataBlock.peerId, dataBlock.payload)
                 console.log(dataBlock)
-                await collectionUtil.deleteBlock(dataBlock, false, BlockType.P2pChat)
+                await _that.p2pChatReceiver(dataBlock.peerId, dataBlock.payload)
+                await collectionUtil.deleteBlock(dataBlock, true, BlockType.P2pChat)
               }
             }
           })

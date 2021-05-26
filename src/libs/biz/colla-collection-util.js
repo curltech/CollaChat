@@ -374,12 +374,15 @@ import { collectionComponent, CollectionType} from '@/libs/biz/colla-collection'
    */
   async deleteBlock(bizObj, ifUpload, blockType) {
     let blockId = bizObj.blockId
+    let businessNumber = bizObj._id ? bizObj._id : bizObj.businessNumber
     let peers = []
     peers.push(myself.myselfPeerClient)
     let now = new Date().getTime()
     // 这是一种特别的块，负载为空，服务器端发现负载为空而blockId有值，则理解为删除块
-    let dataBlock = DataBlockService.create(blockId, bizObj._id, blockType, now, null, peers)
+    let dataBlock = DataBlockService.create(blockId, businessNumber, blockType, now, null, peers)
     await dataBlockService.encrypt(dataBlock)
+    let dataBlocks = await DataBlockService.slice(dataBlock)
+    dataBlock = dataBlocks[0]
     let dbLog = { ownerPeerId: myself.myselfPeer.peerId, blockId: dataBlock.blockId, createTimestamp: dataBlock.createTimestamp, dataBlock: dataBlock, sliceNumber: dataBlock.sliceNumber, state: EntityState.New }
     let dbLogs = []
     dbLogs.push(dbLog)
@@ -399,6 +402,7 @@ import { collectionComponent, CollectionType} from '@/libs/biz/colla-collection'
    * @param {*} blockType: ChatAttach-临时block，按单事务处理，不保存blockLog日志；Collection-上传云端如果返回错误需要保留blockLog在以后继续处理，否则删除
    */
   async upload(dbLogs, blockType) {
+    console.log("upload time:" + new Date())
     if (dbLogs && dbLogs.length > 0) {
       let ps = []
       for (let dbLog of dbLogs) {
