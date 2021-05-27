@@ -322,7 +322,7 @@ import { collectionComponent, CollectionType} from '@/libs/biz/colla-collection'
    *
    * @param {*} bizObj
    * @param {*} ifUpload: true-在本方法中上传云端；反之：通过web worker等其它方法上传云端
-   * @param {*} blockType: ChatAttach-临时block，按单事务处理，不保存blockLog日志；Collection-上传云端如果返回错误需要保留blockLog在以后继续处理，否则删除
+   * @param {*} blockType: ChatAttach-临时block，按单事务处理，不保存blockLog日志；Collection-上传云端如果返回错误需要保留blockLog在以后继续处理，否则删除；P2pChat-离线消息
    * @param {*} _peers: 可访问节点
    */
   async saveBlock(bizObj, ifUpload, blockType, _peers, expireDate) {
@@ -352,7 +352,7 @@ import { collectionComponent, CollectionType} from '@/libs/biz/colla-collection'
       let dbLog = { ownerPeerId: myself.myselfPeer.peerId, blockId: dataBlock.blockId, createTimestamp: dataBlock.createTimestamp, dataBlock: dataBlock, sliceNumber: dataBlock.sliceNumber, state: EntityState.New }
       dbLogs.push(dbLog)
     }
-    if (blockType !== BlockType.ChatAttach) {
+    if (blockType === BlockType.Collection) {
       // 存储待上传云端的分片粒度的blockLog记录
       await blockLogComponent.save(dbLogs, null, null)
     }
@@ -370,7 +370,7 @@ import { collectionComponent, CollectionType} from '@/libs/biz/colla-collection'
    *
    * @param {*} bizObj
    * @param {*} ifUpload: true-在本方法中上传云端；反之：通过web worker等其它方法上传云端
-   * @param {*} blockType: ChatAttach-临时block，按单事务处理，不保存blockLog日志；Collection-上传云端如果返回错误需要保留blockLog在以后继续处理，否则删除
+   * @param {*} blockType: ChatAttach-临时block，按单事务处理，不保存blockLog日志；Collection-上传云端如果返回错误需要保留blockLog在以后继续处理，否则删除；P2pChat-离线消息
    */
   async deleteBlock(bizObj, ifUpload, blockType) {
     let blockId = bizObj.blockId
@@ -386,7 +386,7 @@ import { collectionComponent, CollectionType} from '@/libs/biz/colla-collection'
     let dbLog = { ownerPeerId: myself.myselfPeer.peerId, blockId: dataBlock.blockId, createTimestamp: dataBlock.createTimestamp, dataBlock: dataBlock, sliceNumber: dataBlock.sliceNumber, state: EntityState.New }
     let dbLogs = []
     dbLogs.push(dbLog)
-    if (blockType !== BlockType.ChatAttach) {
+    if (blockType === BlockType.Collection) {
       // 存储待上传云端的分片粒度的blockLog记录
       await blockLogComponent.save(dbLogs, null, null)
     }
@@ -399,7 +399,7 @@ import { collectionComponent, CollectionType} from '@/libs/biz/colla-collection'
    * 上传云端方法，也可以参考这里的实现通过web worker等其它方法自行处理
    *
    * @param {*} dbLogs: 分片粒度的blockLog记录
-   * @param {*} blockType: ChatAttach-临时block，按单事务处理，不保存blockLog日志；Collection-上传云端如果返回错误需要保留blockLog在以后继续处理，否则删除
+   * @param {*} blockType: ChatAttach-临时block，按单事务处理，不保存blockLog日志；Collection-上传云端如果返回错误需要保留blockLog在以后继续处理，否则删除；P2pChat-离线消息
    */
   async upload(dbLogs, blockType) {
     console.log("upload time:" + new Date())
@@ -425,7 +425,7 @@ import { collectionComponent, CollectionType} from '@/libs/biz/colla-collection'
             if (response &&
               response.MessageType === MsgType[MsgType.CONSENSUS_REPLY] &&
               response.Payload === MsgType[MsgType.OK]) {
-              if (blockType !== BlockType.ChatAttach) { // 如果上传不成功，需要保留blockLog在以后继续处理，否则删除
+              if (blockType === BlockType.Collection) { // 如果上传不成功，需要保留blockLog在以后继续处理，否则删除
                 dbLogs[i].state = EntityState.Deleted
                 console.log('delete dbLog, blockId:' + dbLogs[i].blockId + ';sliceNumber:' + dbLogs[i].sliceNumber)
               }
@@ -433,7 +433,7 @@ import { collectionComponent, CollectionType} from '@/libs/biz/colla-collection'
               ifFailed = true
             }
           }
-          if (blockType !== BlockType.ChatAttach) {
+          if (blockType === BlockType.Collection) {
             await blockLogComponent.save(dbLogs, null, dbLogs)
           } else {
             if (ifFailed) {

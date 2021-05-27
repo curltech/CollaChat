@@ -2470,20 +2470,21 @@ export default {
         let consensusLog = data.Payload
         console.log('consensusReceiver consensusLog:' + JSON.stringify(consensusLog))
         console.log('consensusReceiver time:' + new Date())
-        let condition = {}
-        condition['ownerPeerId'] = myself.myselfPeerClient.peerId
-        let dbLogs = await blockLogComponent.load(condition, null, null)
-        if (dbLogs && dbLogs.length > 0) {
-          for (let dbLog of dbLogs) {
-            if (dbLog.blockId === consensusLog.blockId && dbLog.sliceNumber === consensusLog.sliceNumber) {
-              dbLog.state = EntityState.Deleted
-              await blockLogComponent.save(dbLog, null, dbLogs)
-              console.log('delete blockLog, blockId:' + dbLog.blockId + ';sliceNumber:' + dbLog.sliceNumber)
-              break
+        if (consensusLog.blockType === BlockType.Collection) {
+          let condition = {}
+          condition['ownerPeerId'] = myself.myselfPeerClient.peerId
+          let dbLogs = await blockLogComponent.load(condition, null, null)
+          if (dbLogs && dbLogs.length > 0) {
+            for (let dbLog of dbLogs) {
+              if (dbLog.blockId === consensusLog.blockId && dbLog.sliceNumber === consensusLog.sliceNumber) {
+                dbLog.state = EntityState.Deleted
+                await blockLogComponent.save(dbLog, null, dbLogs)
+                console.log('delete blockLog, blockId:' + dbLog.blockId + ';sliceNumber:' + dbLog.sliceNumber)
+                break
+              }
             }
           }
-        }
-        if (consensusLog.blockType === BlockType.Collection) {
+
           // 刷新syncFailed标志
           let newDbLogMap = CollaUtil.clone(store.state.dbLogMap)
           for (let blockId in newDbLogMap) {
