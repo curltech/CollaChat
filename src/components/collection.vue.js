@@ -7,7 +7,7 @@ import pdf from 'vue-pdf'
 import { CollaUtil, TypeUtil, BlobUtil, UUID } from 'libcolla'
 import { EntityState } from 'libcolla'
 import { openpgp } from 'libcolla'
-import { myself, consensusAction, BlockType, queryValueAction, dataBlockService, MsgType, PayloadType } from 'libcolla'
+import { myself, BlockType, queryValueAction, dataBlockService, MsgType } from 'libcolla'
 
 import E from '@/libs/base/colla-wangEditor'
 import pinyinUtil from '@/libs/base/colla-pinyin'
@@ -1677,48 +1677,6 @@ export default {
         }
       }
       return worker
-    },
-    async consensusReceiver(data) {
-      let _that = this
-      let store = _that.$store
-      if (data &&
-        (data.MessageType === MsgType[MsgType.CONSENSUS_REPLY] || data.MessageType === MsgType[MsgType.CONSENSUS_RAFT_REPLY] || data.MessageType === MsgType[MsgType.CONSENSUS_PBFT_REPLY]) &&
-        data.PayloadType === PayloadType.ConsensusLog) {
-          let consensusLog = data.Payload
-          console.log('consensusReceiver consensusLog:' + JSON.stringify(consensusLog))
-          console.log('consensusReceiver time:' + new Date())
-          let condition = {}
-          condition['ownerPeerId'] = myself.myselfPeerClient.peerId
-          let dbLogs = await blockLogComponent.load(condition, null, null)
-          if (dbLogs && dbLogs.length > 0) {
-            for (let dbLog of dbLogs) {
-              if (dbLog.blockId === consensusLog.blockId && dbLog.sliceNumber === consensusLog.sliceNumber) {
-                dbLog.state = EntityState.Deleted
-                await blockLogComponent.save(dbLog, null, dbLogs)
-                console.log('delete blockLog, blockId:' + dbLog.blockId + ';sliceNumber:' + dbLog.sliceNumber)
-                break
-              }
-            }
-          }
-          // 刷新syncFailed标志
-          let newDbLogMap = CollaUtil.clone(store.state.dbLogMap)
-          for (let blockId in newDbLogMap) {
-            let syncFailed = false
-            if (dbLogs && dbLogs.length > 0) {
-              for (let dbLog of dbLogs) {
-                if (dbLog.blockId === blockId) {
-                  syncFailed = true
-                  break
-                }
-              }
-            }
-            if (!syncFailed) {
-              delete newDbLogMap[blockId]
-              console.log('delete dbLogMap, blockId:' + blockId)
-            }
-          }
-          store.state.dbLogMap = newDbLogMap
-      }
     }
   },
   created: async function () {
@@ -1746,7 +1704,6 @@ export default {
       collectionTags = []
     }
     store.state.collectionTags = collectionTags
-    consensusAction.registReceiver('consensus', _that.consensusReceiver)
   },
   watch: {
     subKind(val) {

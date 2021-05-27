@@ -6,8 +6,9 @@ import { CollaUtil, UUID } from 'libcolla'
 import { webrtcPeerPool } from 'libcolla'
 import { signalProtocol } from 'libcolla'
 import { PeerEndpoint, peerEndpointService } from 'libcolla'
-import { libp2pClientPool, config, peerClientService, p2pPeer, myself, myselfPeerService, ChatMessageType, pingAction, chatAction, p2pChatAction, logService } from 'libcolla'
-import { BlockType, dataBlockService, DataBlockService, queryValueAction } from 'libcolla'
+import { libp2pClientPool, config, peerClientService, p2pPeer, myself, myselfPeerService, ChatMessageType, pingAction, chatAction, p2pChatAction, consensusAction, logService } from 'libcolla'
+import { BlockType, MsgType, PayloadType, dataBlockService, DataBlockService, queryValueAction } from 'libcolla'
+import { EntityState } from 'libcolla'
 
 import {permissionHelper} from '@/libs/base/colla-mobile'
 import pinyinUtil from '@/libs/base/colla-pinyin'
@@ -17,7 +18,7 @@ import { cameraComponent, systemAudioComponent, mediaComponent } from '@/libs/ba
 import { CollectionType } from '@/libs/biz/colla-collection'
 import { ChatDataType, ChatContentType, P2pChatMessageType, SubjectType, chatComponent, chatBlockComponent} from '@/libs/biz/colla-chat'
 import { ContactDataType, RequestType, RequestStatus, LinkmanStatus, ActiveStatus, contactComponent, MemberType } from '@/libs/biz/colla-contact'
-import { collectionUtil } from '@/libs/biz/colla-collection-util'
+import { collectionUtil, blockLogComponent } from '@/libs/biz/colla-collection-util'
 import Chat from '@/components/chat'
 import Contacts from '@/components/contacts'
 import ReceivedList from '@/components/receivedList'
@@ -2459,6 +2460,50 @@ export default {
           })
         }
       }
+    },
+    async consensusReceiver(data) {
+      let _that = this
+      let store = _that.$store
+      if (data &&
+          (data.MessageType === MsgType[MsgType.CONSENSUS_REPLY] || data.MessageType === MsgType[MsgType.CONSENSUS_RAFT_REPLY] || data.MessageType === MsgType[MsgType.CONSENSUS_PBFT_REPLY]) &&
+          data.PayloadType === PayloadType.ConsensusLog) {
+        let consensusLog = data.Payload
+        console.log('consensusReceiver consensusLog:' + JSON.stringify(consensusLog))
+        console.log('consensusReceiver time:' + new Date())
+        let condition = {}
+        condition['ownerPeerId'] = myself.myselfPeerClient.peerId
+        let dbLogs = await blockLogComponent.load(condition, null, null)
+        if (dbLogs && dbLogs.length > 0) {
+          for (let dbLog of dbLogs) {
+            if (dbLog.blockId === consensusLog.blockId && dbLog.sliceNumber === consensusLog.sliceNumber) {
+              dbLog.state = EntityState.Deleted
+              await blockLogComponent.save(dbLog, null, dbLogs)
+              console.log('delete blockLog, blockId:' + dbLog.blockId + ';sliceNumber:' + dbLog.sliceNumber)
+              break
+            }
+          }
+        }
+        if (consensusLog.blockType === BlockType.Collection) {
+          // 刷新syncFailed标志
+          let newDbLogMap = CollaUtil.clone(store.state.dbLogMap)
+          for (let blockId in newDbLogMap) {
+            let syncFailed = false
+            if (dbLogs && dbLogs.length > 0) {
+              for (let dbLog of dbLogs) {
+                if (dbLog.blockId === blockId) {
+                  syncFailed = true
+                  break
+                }
+              }
+            }
+            if (!syncFailed) {
+              delete newDbLogMap[blockId]
+              console.log('delete dbLogMap, blockId:' + blockId)
+            }
+          }
+          store.state.dbLogMap = newDbLogMap
+        }
+      }
     }
   },
   async created() {
@@ -2783,6 +2828,7 @@ export default {
 
     chatAction.registReceiver('chat', _that.chatReceiver)
     p2pChatAction.registReceiver('p2pChat', _that.p2pChatReceiver)
+    consensusAction.registReceiver('consensus', _that.consensusReceiver)
     webrtcPeerPool.peerId = myself.myselfPeerClient.peerId
     webrtcPeerPool.peerPublicKey = myself.myselfPeerClient.peerPublicKey
     webrtcPeerPool.registEvent('connect', _that.webrtcConnect)
