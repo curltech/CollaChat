@@ -2503,7 +2503,7 @@ export default {
             }
           }
           store.state.dbLogMap = newDbLogMap
-        } else if (consensusLog.blockType === BlockType.P2pChat) {
+        } else if (consensusLog.blockType === BlockType.P2pChat && consensusLog.peerId) { // this is a create (otherwise delete) P2pChat consensus reply
           // 标记发送回执
         }
       }

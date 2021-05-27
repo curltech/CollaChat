@@ -374,7 +374,7 @@ import { collectionComponent, CollectionType} from '@/libs/biz/colla-collection'
    */
   async deleteBlock(bizObj, ifUpload, blockType) {
     let blockId = bizObj.blockId
-    let businessNumber = bizObj._id ? bizObj._id : bizObj.businessNumber
+    let businessNumber = bizObj._id ? bizObj._id : bizObj.businessNumber // Collection-_id, P2pChat-businessNumber
     let peers = []
     peers.push(myself.myselfPeerClient)
     let now = new Date().getTime()

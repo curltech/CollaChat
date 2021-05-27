@@ -97,7 +97,8 @@ export class Message {
     this.messageType = null // 消息类型（对应channel消息类型）
     this.senderPeerId = null // 消息发送方（作者）peerId
     this.createDate = null // 创建时间
-    this.receiveTime = null // 接收时间（本地发送消息此字段可为空，参见receive）
+    this.receiveTime = null // 接收时间
+    this.actualReceiveTime = null // 实际接收时间 1.发送端发送消息时receiveTime=createDate，actualReceiveTime=null；2.根据actualReceiveTime是否为null判断是否需要重发，收到接受回执时更新actualReceiveTime；3.聊天区按receiveTime排序，查找聊天内容按createDate排序
     this.readTime = null // 阅读时间
     this.title = null // 消息标题
     this.thumbBody = null // 预览内容（适用需预览的content，如笔记、转发聊天）
