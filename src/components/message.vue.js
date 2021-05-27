@@ -619,7 +619,7 @@ export default {
         } else {
           let connectPeerId = message.connectPeerId
           message.loading = true
-          let block = await dataBlockService.findTxPayload(connectPeerId, message.blockId)
+          let block = await dataBlockService.findTxPayload(connectPeerId, message.attachBlockId)
           if (block && block.length > 0 && block[0]) {
             if (block[0].attachs && block[0].attachs.length > 0) {
               let attach = block[0].attachs[0]
@@ -988,7 +988,7 @@ export default {
           messageCreateTime: message.createTime,
           createTime: new Date().getTime(),
           chatName: _that.ChatTitle(chat),
-          blockId: message.blockId,
+          blockId: message.attachBlockId,
           mergeMessages:message.mergeMessages
         }
         mergeMessages.push(mergeMessage)
