@@ -2503,6 +2503,8 @@ export default {
             }
           }
           store.state.dbLogMap = newDbLogMap
+        } else if (consensusLog.blockType === BlockType.P2pChat) {
+          // 标记发送回执
         }
       }
     }
