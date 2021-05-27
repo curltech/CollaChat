@@ -500,16 +500,14 @@ export default {
       /*}*/
       //return null
     },
-    ifConnected(peerId){
-        let webrtcPeers  = webrtcPeerPool.getConnected(peerId)
-        if(webrtcPeers && webrtcPeers.length > 0){
-          return true
-        }
-        let webSocket = p2pPeer.host.transportManager._transports.get('WebSockets')
-        if(webSocket.ws && webSocket.ws.readyState === 1 ){
-          return true
-        }
+    ifOnlySocketConnected(peerId){
+      let webrtcPeers  = webrtcPeerPool.getConnected(peerId)
+      let webSocket = p2pPeer.host.transportManager._transports.get('WebSockets')
+      if(webSocket.ws && webSocket.ws.readyState === 1 && (!webrtcPeers || webrtcPeers.length === 0)){
+        return true
+      }else{
         return false
+      }
     },
     async webrtcInit() {
       //webrtc connect
@@ -606,15 +604,18 @@ export default {
       let _that = this
       let store = _that.$store
       let currentDate = new Date().getTime()
-      // let _message = {
-      //   messageType: P2pChatMessageType.CHAT_RECEIVE_CALLBACK,
-      //   preSubjectType: message.subjectType,
-      //   preSubjectId: message.subjectId,
-      //   senderPeerId: myself.myselfPeerClient.peerId,
-      //   messageId: message.messageId,
-      //   receiveTime: currentDate
-      // }
-      // await store.p2pSend( _message ,message.senderPeerId)
+      let webrtcPeers  = webrtcPeerPool.getConnected(message.senderPeerId)
+      if(webrtcPeers && webrtcPeers.length > 0 && !message.actualReceiveTime){
+          let _message = {
+            messageType: P2pChatMessageType.CHAT_RECEIVE_CALLBACK,
+            preSubjectType: message.subjectType,
+            preSubjectId: message.subjectId,
+            senderPeerId: myself.myselfPeerClient.peerId,
+            messageId: message.messageId,
+            receiveTime: currentDate
+          }
+          await store.p2pSend( _message ,message.senderPeerId)
+      }
       let receivedMessages = await chatComponent.loadMessage({
         ownerPeerId: myself.myselfPeerClient.peerId,
         messageId: message.messageId
@@ -809,18 +810,18 @@ export default {
       message.createDate = new Date().getTime()
       message.countDown = 0
       message.receiveTime = message.createDate
-      // if(subjectId !== myselfPeerId && (message.messageType !== P2pChatMessageType.CALL_REQUEST)){
+      if(subjectId !== myselfPeerId && (message.messageType !== P2pChatMessageType.CALL_REQUEST)){
       message.actualReceiveTime = null
-      // }else{
-      //   message.actualReceiveTime = message.createDate
-      // }
+      }else{
+        message.actualReceiveTime = message.createDate
+      }
       if (subjectType === SubjectType.CHAT && subjectId !== myselfPeerId) {
         if(store.state.linkmanMap[subjectId].activeStatus === ActiveStatus.UP){
           message.destroyTime = chat.destroyTime
         }else{
           chat.destroyTime = 0
         }
-        if(_that.ifConnected(subjectId)){
+        if(_that.ifOnlySocketConnected(subjectId)){
             message.actualReceiveTime = message.createDate
         }
         await store.p2pSend(message,subjectId)
@@ -843,7 +844,7 @@ export default {
               messageId: message.messageId,
               createDate: message.createDate,
               receiverPeerId: groupMember.memberPeerId ? groupMember.memberPeerId : groupMember,
-              receiveTime: _that.ifConnected(subjectId) ? message.createDate : null
+              receiveTime: _that.ifOnlySocketConnected(subjectId) ? message.createDate : null
             }
             if(message.messageType !== P2pChatMessageType.CALL_CLOSE){
               await chatComponent.insert(ChatDataType.RECEIVE, receive, null)
@@ -1019,7 +1020,7 @@ export default {
         })
         return
       }
-      message.blockId = current.blockId
+      message.attachBlockId = current.blockId
       message.connectPeerId = myself.myselfPeerClient.connectPeerId
       if (type === ChatContentType.IMAGE) {
         message.thumbnail = await mediaComponent.compressImage(fileData)
@@ -1618,10 +1619,9 @@ export default {
       let messageType = message.messageType
       let content = message.content
       if(messageType === P2pChatMessageType.CHAT_RECEIVE_CALLBACK) {
-        return
+        console.log('receive CHAT_RECEIVE_CALLBACK')
+        console.log(message)
         if(message.preSubjectType === SubjectType.CHAT) {
-
-
           let currentMes
           let chatMessages = store.state.chatMap[message.senderPeerId].messages
           if (chatMessages && chatMessages.length > 0) {
@@ -2394,6 +2394,32 @@ export default {
     },
     async p2pSend(message, peerId) {
       let _that = this
+      let blockId = UUID.string(null,null)
+      if(message.subjectType === SubjectType.CHAT){
+        let currentMes
+        let messages = await chatComponent.loadMessage(
+          {
+            ownerPeerId: message.ownerPeerId,
+            messageId: message.messageId
+          })
+          if(messages && messages.length > 0) {
+            currentMes = messages[0]
+            currentMes.blockId = blockId
+            await chatComponent.update(ChatDataType.MESSAGE, currentMes, null)
+          }  
+      } else if(message.subjectType === SubjectType.GROUP_CHAT) {
+        let receives = await chatComponent.loadReceive(
+          {
+            ownerPeerId: message.ownerPeerId,
+            messageId: message.messageId,
+            receiverPeerId: peerId
+          })
+        if (receives && receives.length > 0) {
+          let receive = receives[0]
+          receive.blockId = blockId
+          await chatComponent.update(ChatDataType.RECEIVE, receives[0], null)
+        }
+      }
       if (typeof message === "object" && message.messageType !== P2pChatMessageType.SYNC_LINKMAN_INFO) {
         let signalSession = await _that.getSignalSession(peerId)
         if (!signalSession) {
@@ -2407,7 +2433,7 @@ export default {
       message = JSON.stringify(message)
       let createTimestamp = new Date().getTime()
       let payload = { payload: message, metadata: null, expireDate: 0 }
-      let dataBlock = DataBlockService.create(UUID.string(null, null), peerId, BlockType.P2pChat, createTimestamp, payload, [])
+      let dataBlock = DataBlockService.create(blockId, peerId, BlockType.P2pChat, createTimestamp, payload, [])
       await dataBlockService.encrypt(dataBlock)
       let dataBlocks = await DataBlockService.slice(dataBlock)
       if (dataBlocks.length !== 1) {
@@ -2531,6 +2557,26 @@ export default {
           store.state.dbLogMap = newDbLogMap
         } else if (consensusLog.blockType === BlockType.P2pChat) {
           // 标记发送回执
+          let blockId = data.Payload.blockId
+          let messages = await chatComponent.loadMessage(
+            {
+              blockId: blockId
+            })
+          if(messages && messages.length > 0) {
+            let currentMes = messages[0]
+            currentMes.receiveTag = true
+            await chatComponent.update(ChatDataType.MESSAGE, currentMes, null)
+          }else{
+            let receives = await chatComponent.loadReceive(
+              {
+                blockId: blockId
+              })
+            if(receives && receives.length > 0) {
+              let currentRec = receives[0]
+              currentRec.receiveTag = true
+              await chatComponent.update(ChatDataType.RECEIVE, currentRec, null)
+            }
+          }
         }
       }
     }
