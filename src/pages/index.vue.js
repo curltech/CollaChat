@@ -1602,7 +1602,13 @@ export default {
           console.log('signalSession dont exist')
           return
         }
-        let messageString = await signalSession.decrypt(message,'string')
+        let messageString
+        try{
+          messageString = await signalSession.decrypt(message,'string')
+        }catch(e){
+          console.log(message)
+          console.log(e)
+        }
         if(!messageString){
           console.log("signal deceypt failed")
           return
@@ -2447,17 +2453,37 @@ export default {
             let promise = dataBlockService.findTxPayload(null, download['blockId'])
             ps.push(promise)
           }
-          CollaUtil.asyncPool(10, ps, async function(result) {
-            let dataBlocks = await result
-            if (dataBlocks && dataBlocks.length > 0) {
-              let dataBlock = dataBlocks[0]
-              if (dataBlock) {
-                console.log(dataBlock)
-                await _that.p2pChatReceiver(dataBlock.peerId, dataBlock.payload)
-                await collectionUtil.deleteBlock(dataBlock, true, BlockType.P2pChat)
+          let responses = await Promise.allSettled(ps)
+          if (responses && responses.length > 0) {
+            let callbackPs = []
+            let _peerIds = new Map()
+            for (let i = 0; i < responses.length; ++i) {
+              let dataBlocks = responses[i].value
+              if (dataBlocks && dataBlocks.length > 0) {
+                let dataBlock = dataBlocks[0]
+                if (dataBlock) {
+                  let _callbackP = new Promise(async function(resolve, reject){
+                      console.log(dataBlock)
+                      await _that.p2pChatReceiver(dataBlock.peerId, dataBlock.payload)
+                      await collectionUtil.deleteBlock(dataBlock, true, BlockType.P2pChat)
+                      if(!_peerIds.get(dataBlock.peerId)){
+                        _peerIds.set(dataBlock.peerId,dataBlock.peerId)
+                      }
+                      resolve()
+                  })
+                  callbackPs.push(_callbackP)
+                }
               }
             }
-          })
+            Promise.all(callbackPs).then(async function(){
+              for(let _peerId of _peerIds.keys()){
+                let signalSession = await _that.getSignalSession(_peerId)
+                if(signalSession){
+                    await signalSession.close()
+                }
+              }
+            })
+          }
         }
       }
     },
