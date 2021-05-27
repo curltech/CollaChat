@@ -1496,6 +1496,11 @@ export default {
               let worker = _that.initCollectionDownloadWorker()
               worker.postMessage([downloadList, myself.myselfPeerClient, options.privateKey])
             } else {
+              let ps = []
+              for (let download of downloadList) {
+                let promise = dataBlockService.findTxPayload(null, download['blockId'])
+                ps.push(promise)
+              }
               CollaUtil.asyncPool(10, ps, async function(result) {
                 let collections = await result
                 if (collections && collections.length > 0) {
