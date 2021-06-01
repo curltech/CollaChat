@@ -530,7 +530,7 @@ export default {
         systemAudioComponent.mediaInvitationAudioStop()
         for(let track of stream.getTracks()) {
           track.onended = function(event) {
-           _that.pendingCall(peerId)
+           // _that.pendingCall(peerId)
           }
         }
         _that.saveStream(peerId,stream)
@@ -579,7 +579,7 @@ export default {
             })
             await _that.closeCall()
         }
-      },10000)
+      },20000)
 
     },
     async closeCall(isReceived) {
@@ -702,7 +702,7 @@ export default {
         if (streamObj.peerId === callChat.ownerPeerId) {
           continue;
         }
-        if (localStream.getVideoTracks().length > 0) {
+       if (localStream.getVideoTracks().length > 0) {
           webrtcPeerPool.addTrack(videoTrack, localStream)
         }
         else {

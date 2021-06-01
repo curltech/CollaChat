@@ -999,7 +999,7 @@ class LocalNotificationComponent {
     }
     sendNotification(title,text,data){
       let _this = this
-      if(![] && window.device && cordova && cordova.plugins && cordova.plugins.notification){
+      if(window.device && cordova && cordova.plugins && cordova.plugins.notification && !cordova.plugins.notification.foreground){
         this.schedule({
           title:title,
           text: text,
@@ -1011,6 +1011,7 @@ class LocalNotificationComponent {
     initialize(callback){
         let _this = this
       if(window.device && cordova && cordova.plugins && cordova.plugins.notification){
+         cordova.plugins.notification.foreground = true
         _this.on('click',callback,_this)
       }
     }

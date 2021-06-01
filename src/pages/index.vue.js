@@ -2633,6 +2633,16 @@ export default {
           cordova.plugins.backgroundMode.disableWebViewOptimizations()
           cordova.plugins.backgroundMode.disableBatteryOptimizations()
         })
+        document.addEventListener("pause", function () {
+            if(cordova.plugins.notification){
+                cordova.plugins.notification.foreground = false
+            }
+        })
+        document.addEventListener("resume", function () {
+            if(cordova.plugins.notification){
+                cordova.plugins.notification.foreground = true
+            }
+        })
         console.log('getNetworkState:' + deviceComponent.getNetworkState())
         if ((_that.$q.screen.width < 481 || _that.$q.screen.height < 481) && (window.device.platform === 'Android' || window.device.platform === 'iOS')) {
           deviceComponent.lockScreen('portrait')
