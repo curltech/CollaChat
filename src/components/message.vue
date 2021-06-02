@@ -323,6 +323,7 @@
       q-card
           q-card-section#dialog-image-container(class="row items-center" style="padding:0;margin:0")
               img#dialog-image(:src='$store.state.imageMessageSrc' style="width:100%;margin-top:0")
+              canvas#dialog-image-canvas(class="hidden")
     q-dialog(v-model="$store.state.videoRecordMessageViewDialog")
       q-card
         q-card-section(class="row items-center")

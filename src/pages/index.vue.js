@@ -2395,6 +2395,16 @@ export default {
     async p2pSend(message, peerId) {
       let _that = this
       let blockId = UUID.string(null,null)
+      let store = _that.$store
+      if(store.state.networkStatus !== 'CONNECTED'){
+        _that.$q.notify({
+          message: _that.$i18n.t('CONNECTING'),
+          timeout: 3000,
+          type: "info",
+          color: "info",
+        })
+        return
+      }
       if(message.subjectType === SubjectType.CHAT){
         let currentMes
         let messages = await chatComponent.loadMessage(

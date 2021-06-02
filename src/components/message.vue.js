@@ -661,9 +661,26 @@ export default {
             _that.$nextTick(() => {
                 if (store.ifMobile()) {
                   setTimeout(function () {
+                    var img = new Image()
+                      img.src = store.state.imageMessageSrc
+                      console.log('img.width: ' + img.width + ', img.height: ' + img.height)
+                      let selectedContainer = document.getElementById('dialog-image-container')
+                      let canvas = document.getElementById('dialog-image-canvas')
+                      let ctx = canvas.getContext('2d')
+                      canvas.width = _that.ifMobileSize || store.state.ifMobileStyle ? _that.$q.screen.width : (img.width > selectedContainer.clientWidth ? selectedContainer.clientWidth : img.width)
+                      canvas.height = canvas.width * img.height / img.width
+                      ctx.clearRect(0, 0, canvas.width, canvas.height)
+                      ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+                      let selectedImg = document.querySelector('#dialog-image')
+                      selectedImg.src = canvas.toDataURL('image/png', 1.0)
+                      let marginTop = 0
+                      marginTop = (store.screenHeight - canvas.height) / 2 // 不使用_that.$q.screen.height，避免键盘弹出时的影响
+                      marginTop = marginTop < 0 ? 0 : marginTop
+                      console.log('$q.screen.Height:' + _that.$q.screen.height + ',canvas.width:' + canvas.width + ',canvas.height:' + canvas.height + ',marginTop:' + marginTop)
+                      selectedImg.style.cssText += 'margin-top: ' + marginTop + 'px'
                       alloyFingerComponent.initImage('#dialog-image')
-                      alloyFingerComponent.initLongSingleTap('#dialog-image-container', _that.mediaHold, _that.fullscreenBack)
-                  },500)
+                      alloyFingerComponent.initLongSingleTap('#dialog-image-container', _that.mediaHold, _that.fullscreenBack)    
+                  },0)
                 }
             })
         })
