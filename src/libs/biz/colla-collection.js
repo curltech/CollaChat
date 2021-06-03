@@ -211,6 +211,7 @@ export class CollectionComponent {
 		let data = page.result
 		if (data && data.length > 0) {
 			let securityParams = {}
+			securityParams.NeedCompress = true
 			securityParams.NeedEncrypt = true
 			for (let d of data) {
 				let payloadKey = d.payloadKey
@@ -219,14 +220,12 @@ export class CollectionComponent {
 					securityParams.PayloadKey = payloadKey
 					let content_ = d.content_
 					if (content_) {
-						securityParams.NeedCompress = true
 						let payload = await SecurityPayload.decrypt(content_, securityParams)
 						//d.content = StringUtil.decodeURI(payload)
 						d.content = payload
 					}
 					let thumbnail_ = d.thumbnail_
 					if (thumbnail_) {
-						securityParams.NeedCompress = false
 						let payload = await SecurityPayload.decrypt(thumbnail_, securityParams)
 						d.thumbnail = payload
 					}
@@ -324,11 +323,11 @@ export class CollectionComponent {
 				current.securityContext = myself.myselfPeer.securityContext
 				let securityParams = {}
 				securityParams.PayloadKey = payloadKey
+				securityParams.NeedCompress = true
 				securityParams.NeedEncrypt = true
 				let result = null
 				let start = new Date().getTime()
 				if (content) {
-					securityParams.NeedCompress = true
 					result = await SecurityPayload.encrypt(content, securityParams)
 					if (result) {
 						current.payloadKey = result.PayloadKey
@@ -340,7 +339,6 @@ export class CollectionComponent {
 				}
 				let thumbnailResult = null
 				if (thumbnail) {
-					securityParams.NeedCompress = false
 					thumbnailResult = await SecurityPayload.encrypt(thumbnail, securityParams)
 					if (thumbnailResult) {
 						if (!result) {
