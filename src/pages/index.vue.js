@@ -1356,6 +1356,7 @@ export default {
     async chatReceiver(data) {
       let _that = this
       let store = _that.$store
+      let myselfPeerClient = myself.myselfPeerClient
       let type = data.type
       if (!type) {
         console.error('NullChatType')
@@ -1363,13 +1364,17 @@ export default {
       let srcClientId = data.srcClientId
       if (!srcClientId) {
         console.error('NullSrcClientId')
+      } else {
+        if (srcClientId === myselfPeerClient.clientId) {
+          console.error('SrcClientIdIsMyself')
+          return
+        }
       }
       let srcPeerId = data.srcPeerId
       if (!srcPeerId) {
         console.error('NullSrcPeerId')
       }
       console.info('receive chat type: ' + type + ' from srcClientId: ' + srcClientId + ', srcPeerId: ' + srcPeerId)
-      let myselfPeerClient = myself.myselfPeerClient
       let clientPeerId = myselfPeerClient.peerId
       let linkman = store.state.linkmanMap[srcPeerId]
       let currentTime = new Date()
