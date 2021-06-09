@@ -2,7 +2,7 @@ import { date, Dialog } from 'quasar'
 import jsQR from 'jsqr'
 import jimp from 'jimp'
 
-import { CollaUtil, UUID } from 'libcolla'
+import { CollaUtil, StringUtil,UUID } from 'libcolla'
 import { webrtcPeerPool } from 'libcolla'
 import { signalProtocol } from 'libcolla'
 import { PeerEndpoint, peerEndpointService } from 'libcolla'
@@ -1038,6 +1038,8 @@ export default {
       let message = {}
       message.messageId = UUID.string(null, null)
       message.messageType = P2pChatMessageType.CHAT_LINKMAN
+      message.fileSize = StringUtil.getSize(fileData)
+        debugger
       await store.saveFileInMessage(chat, message, fileData, type, name, message.messageId)
       await store.sendChatMessage(chat, message)
     },
@@ -1053,15 +1055,14 @@ export default {
       receiveMessage.messageId = message.content._id
       receiveMessage.createDate = message.content.createDate
       receiveMessage.receiverPeerId = groupChatLinkman.peerId
+      receiveMessage.receiveTime = message.content.createDate
       await chatComponent.insert(ChatDataType.RECEIVE, receiveMessage, null)
       // 给active的联系人发送消息
-      if (groupChatLinkman.activeStatus === ActiveStatus.UP) {
-        let rtcMessage = {
-          messageType: message.messageType,
-          content: message.content
-        }
-        await store.p2pSend( rtcMessage, groupChatLinkman.peerId)
+      let rtcMessage = {
+        messageType: message.messageType,
+        content: message.content
       }
+      await store.p2pSend( rtcMessage, groupChatLinkman.peerId)
     },
     async findContacts(findType, peerId) {
       let _that = this
