@@ -243,18 +243,18 @@ export default {
           let promise = p2pPeer.host.ping(_that.connectArray[i].address)
           ps.push(promise)
         }
-        let responses = await Promise.all(ps)
+        let responses = await Promise.allSettled(ps)
         if (responses && responses.length > 0) {
           for (let i = 0; i < responses.length; ++i) {
-            console.log(i + '-pingLatency:' + _that.connectArray[i].address + ',' + responses[i])
-            _that.connectArray[i].connectTime = responses[i]
+            console.log(i + '-pingLatency:' + _that.connectArray[i].address + ',' + responses[i].status + ':' + (responses[i].status === 'fulfilled' ? responses[i].value : responses[i].reason))
+            _that.connectArray[i].connectTime = (responses[i].status === 'fulfilled' ? responses[i].value : 999999999)
           }
           CollaUtil.sortByKey(_that.connectArray, 'connectTime', 'asc')
           console.log(_that.connectArray)
           await _that.buildSocket()
         }
       } catch (e) {
-        await logService.log(e, 'setupSocketError', 'error')
+        await logService.log(e.stack, 'setupSocketError', 'error')
       }
     },
     async buildSocket() {
@@ -2499,28 +2499,30 @@ export default {
             let callbackPs = []
             let _peerIds = new Map()
             for (let i = 0; i < responses.length; ++i) {
-              let dataBlocks = responses[i].value
-              if (dataBlocks && dataBlocks.length > 0) {
-                let dataBlock = dataBlocks[0]
-                if (dataBlock) {
-                  let _callbackP = new Promise(async function(resolve, reject){
+              if (responses[i].status === 'fulfilled') {
+                let dataBlocks = responses[i].value
+                if (dataBlocks && dataBlocks.length > 0) {
+                  let dataBlock = dataBlocks[0]
+                  if (dataBlock) {
+                    let _callbackP = new Promise(async function(resolve, reject) {
                       console.log(dataBlock)
                       await _that.p2pChatReceiver(dataBlock.peerId, dataBlock.payload)
                       await collectionUtil.deleteBlock(dataBlock, true, BlockType.P2pChat)
-                      if(!_peerIds.get(dataBlock.peerId)){
+                      if (!_peerIds.get(dataBlock.peerId)) {
                         _peerIds.set(dataBlock.peerId,dataBlock.peerId)
                       }
                       resolve()
-                  })
-                  callbackPs.push(_callbackP)
+                    })
+                    callbackPs.push(_callbackP)
+                  }
                 }
               }
             }
-            Promise.all(callbackPs).then(async function(){
-              for(let _peerId of _peerIds.keys()){
+            Promise.all(callbackPs).then(async function() {
+              for (let _peerId of _peerIds.keys()) {
                 let signalSession = await _that.getSignalSession(_peerId)
-                if(signalSession){
-                    await signalSession.close()
+                if (signalSession) {
+                  await signalSession.close()
                 }
               }
             })
