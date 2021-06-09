@@ -769,7 +769,7 @@ export default {
         fileType = file.name.substr(index + 1);
       }
       let fileData = await BlobUtil.fileObjectToBase64(file)
-      let type, name;
+      let type, name, fileSize;
       if (mediaComponent.isAssetTypeAnImage(fileType)) {
         if(file.size > 2097152){//2M
           _that.$q.notify({
@@ -791,6 +791,7 @@ export default {
         type = ChatContentType.FILE
       }
       name = file.name
+      fileSize = file.size
       await store.saveFileAndSendMessage(store.state.currentChat, fileData, type, name)
       _that.$refs.imgUpload.reset()
     },
