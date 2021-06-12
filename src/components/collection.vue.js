@@ -1,12 +1,12 @@
 import Vue from 'vue'
-import { date, Dialog } from 'quasar'
+import { date } from 'quasar'
 //import hljs from 'highlight.js'
 import pdf from 'vue-pdf'
 //import { saveAs } from 'file-saver'
 
 import { CollaUtil, TypeUtil, BlobUtil, UUID } from 'libcolla'
 import { EntityState } from 'libcolla'
-import { openpgp } from 'libcolla'
+//import { openpgp } from 'libcolla'
 import { myself, BlockType, queryValueAction, dataBlockService, MsgType } from 'libcolla'
 
 import E from '@/libs/base/colla-wangEditor'
@@ -19,8 +19,8 @@ import SelectChat from '@/components/selectChat'
 import MergeMessageDialog from '@/components/mergeMessageDialog'
 import CaptureMedia from '@/components/captureMedia'
 import NotePreview from '@/components/notePreview'
-import CollectionUploadWorker from '@/worker/collectionUpload.worker.js'
-import CollectionDownloadWorker from '@/worker/collectionDownload.worker.js'
+//import CollectionUploadWorker from '@/worker/collectionUpload.worker.js'
+//import CollectionDownloadWorker from '@/worker/collectionDownload.worker.js'
 
 let editor
 
@@ -413,12 +413,12 @@ export default {
           _that.backupContent = current['blockId'] + ':' + current['content']
           // 云端cloud保存
           if (store.collectionWorkerEnabler) {
-            let dbLogs = await collectionUtil.saveBlock(current, false, BlockType.Collection)
+            /*let dbLogs = await collectionUtil.saveBlock(current, false, BlockType.Collection)
             let options = {}
             options.privateKey = myself.privateKey
             openpgp.clonePackets(options)
             let worker = _that.initCollectionUploadWorker()
-            worker.postMessage(['one', dbLogs, myself.myselfPeerClient, options.privateKey])
+            worker.postMessage(['one', dbLogs, myself.myselfPeerClient, options.privateKey])*/
           } else {
             start = new Date().getTime()
             let dbLogs = await collectionUtil.saveBlock(current, true, BlockType.Collection)
@@ -647,12 +647,12 @@ export default {
           _that.subKind = 'default'
           // 云端cloud保存
           if (this.$store.collectionWorkerEnabler) {
-            let dbLogs = await collectionUtil.deleteBlock(current, false, BlockType.Collection)
+            /*let dbLogs = await collectionUtil.deleteBlock(current, false, BlockType.Collection)
             let options = {}
             options.privateKey = myself.privateKey
             openpgp.clonePackets(options)
             let worker = _that.initCollectionUploadWorker()
-            worker.postMessage(['one', dbLogs, myself.myselfPeerClient, options.privateKey])
+            worker.postMessage(['one', dbLogs, myself.myselfPeerClient, options.privateKey])*/
           } else {
             let dbLogs = await collectionUtil.deleteBlock(current, true, BlockType.Collection)
             // 刷新syncFailed标志
@@ -1399,11 +1399,11 @@ export default {
             // 云端cloud保存
             if (dbLogs && dbLogs.length > 0) {
               if (store.collectionWorkerEnabler) {
-                let options = {}
+                /*let options = {}
                 options.privateKey = myself.privateKey
                 openpgp.clonePackets(options)
                 let worker = _that.initCollectionUploadWorker()
-                worker.postMessage(['all', dbLogs, myself.myselfPeerClient, options.privateKey])
+                worker.postMessage(['all', dbLogs, myself.myselfPeerClient, options.privateKey])*/
               } else {
                 dbLogs = await collectionUtil.upload(dbLogs, BlockType.Collection)
                 // 刷新syncFailed标志
@@ -1490,11 +1490,11 @@ export default {
           // 下载
           if (downloadList && downloadList.length > 0) {
             if (store.collectionWorkerEnabler) {
-              let options = {}
+              /*let options = {}
               options.privateKey = myself.privateKey
               openpgp.clonePackets(options)
               let worker = _that.initCollectionDownloadWorker()
-              worker.postMessage([downloadList, myself.myselfPeerClient, options.privateKey])
+              worker.postMessage([downloadList, myself.myselfPeerClient, options.privateKey])*/
             } else {
               let ps = []
               for (let download of downloadList) {
@@ -1563,7 +1563,7 @@ export default {
         }
       }
     },
-    initCollectionUploadWorker() {
+    /*initCollectionUploadWorker() {
       let _that = this
       let store = _that.$store
       let worker = new CollectionUploadWorker()
@@ -1594,31 +1594,31 @@ export default {
           await blockLogComponent.save(dbLogs, null, dbLogs)
         }
         // 刷新syncFailed标志
-        /*if (flag === 'one') {
-          if (dbLogs && dbLogs.length > 0) {
-            for (let dbLog of dbLogs) {
-              for (let myCollection of _that.myCollections) {
-                if (myCollection.blockId === dbLog.blockId) {
-                  myCollection.syncFailed = true
-                  break
-                }
-              }
-            }
-          }
-        } else if (flag === 'all') {
-          for (let myCollection of _that.myCollections) {
-            let syncFailed = false
-            if (dbLogs && dbLogs.length > 0) {
-              for (let dbLog of dbLogs) {
-                if (myCollection.blockId === dbLog.blockId) {
-                  syncFailed = true
-                  break
-                }
-              }
-            }
-            myCollection.syncFailed = syncFailed
-          }
-        }*/
+        //if (flag === 'one') {
+        //  if (dbLogs && dbLogs.length > 0) {
+        //    for (let dbLog of dbLogs) {
+        //      for (let myCollection of _that.myCollections) {
+        //        if (myCollection.blockId === dbLog.blockId) {
+        //          myCollection.syncFailed = true
+        //          break
+        //        }
+        //      }
+        //   }
+        //  }
+        //} else if (flag === 'all') {
+        //  for (let myCollection of _that.myCollections) {
+        //    let syncFailed = false
+        //    if (dbLogs && dbLogs.length > 0) {
+        //      for (let dbLog of dbLogs) {
+        //        if (myCollection.blockId === dbLog.blockId) {
+        //          syncFailed = true
+        //          break
+        //        }
+        //      }
+        //    }
+        //    myCollection.syncFailed = syncFailed
+        //  }
+        //}
         let newDbLogMap = CollaUtil.clone(store.state.dbLogMap)
         if (dbLogs && dbLogs.length > 0) {
           for (let dbLog of dbLogs) {
@@ -1632,8 +1632,8 @@ export default {
         store.state.dbLogMap = newDbLogMap
       }
       return worker
-    },
-    initCollectionDownloadWorker() {
+    },*/
+    /*initCollectionDownloadWorker() {
       let _that = this
       let store = _that.$store
       let worker = new CollectionDownloadWorker()
@@ -1682,7 +1682,7 @@ export default {
         }
       }
       return worker
-    }
+    }*/
   },
   created: async function () {
     let _that = this

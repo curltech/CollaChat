@@ -3,7 +3,6 @@ import { required } from 'vuelidate/lib/validators'
 import jsQR from 'jsqr'
 import jimp from 'jimp'
 
-import { HttpClient } from 'libcolla'
 import { MobileNumberUtil } from 'libcolla'
 import { webrtcPeerPool } from 'libcolla'
 import { signalProtocol } from 'libcolla'
@@ -15,6 +14,7 @@ import pinyinUtil from '@/libs/base/colla-pinyin'
 import { cameraComponent, systemAudioComponent } from '@/libs/base/colla-media'
 import { deviceComponent, statusBarComponent, simComponent, inAppBrowserComponent } from '@/libs/base/colla-cordova'
 import { ContactDataType, LinkmanStatus, ActiveStatus, contactComponent } from '@/libs/biz/colla-contact'
+import GetConfigWorker from '@/worker/getConfig.worker.js'
 
 import defaultActiveAvatar from '@/assets/colla-o1.png'
 import defaultDisabledAvatar from '@/assets/colla-o-disabled.png'
@@ -77,6 +77,14 @@ export default {
       countryOptions: null,
       options: null,
       connectAddressOptions: null,
+      connectAddressOptionsISO: {
+        'zh-hans' : [],
+        'zh-tw' : [],
+        'en-us' : [],
+        'ja-jp' : [],
+        'ko-kr' : [],
+      },
+      versionHistory: [],
       connectAddress: null,
       customConnectAddress: null,
       customConnectHost: null,
@@ -126,7 +134,11 @@ export default {
     async login() {
       let _that = this
       let store = _that.$store
-      await _that.upgradeVersion('login')
+      while (!store.latestVersion) {
+        console.log('sleep 100')
+        sleep(100)
+      }
+      _that.upgradeVersion('login')
       if (store.latestVersion !== store.currentVersion && store.mandatory) {
         return
       }
@@ -564,7 +576,7 @@ export default {
     checkVersion(currentVersion, version) {
       currentVersion = currentVersion ? currentVersion.replace(/[vV]/, "") : "0.0.0"
       version = version ? version.replace(/[vV]/, "") : "0.0.0"
-      if (currentVersion == version) {
+      if (currentVersion === version) {
         return false
       }
       let currentVerArr = currentVersion.split(".")
@@ -592,61 +604,77 @@ export default {
         window.open('https://curltech.io/#/CollaChatDownload', '_system')
       }
     },
-    async upgradeVersion(flag) {
+    upgradeVersion(flag) {
       let _that = this
       let store = _that.$store
-      store.currentVersion = '0.2.36'
-      store.latestVersion = store.currentVersion
+      store.currentVersion = '0.2.37'
       store.mandatory = false
-      let versionHistory = [store.latestVersion]
-      let type = 'others'
-      if (store.ios === true) {
-        type = 'ios'
-      } else if (store.android === true) {
-        type = 'android'
-      } else if (store.safari === true) {
-        type = 'safari'
-      }
-      try {
-        let httpClient = new HttpClient()
-        if (httpClient) {
-          let serviceData = await httpClient.get("https://curltech.io/conf/versionHistory-" + type + ".conf?time=" + new Date().getTime())
-          versionHistory = serviceData.data
-        }
-      } catch (e) {
-        console.error(e)
-      }
-      console.log('type:' + type + ',versionHistory:' + versionHistory)
-      let no = 1
-      for (let version of versionHistory) {
-        if (_that.checkVersion(store.currentVersion, version)) {
-          if (no === 1) {
-            store.latestVersion = version.replace(/[vV]/, "")
-          }
-          if (version.substring(0, 1) === 'V') {
-            store.mandatory = true
+      if (_that.versionHistory && _that.versionHistory.length > 0) {
+        let no = 1
+        for (let version of _that.versionHistory) {
+          if (_that.checkVersion(store.currentVersion, version)) {
+            if (no === 1) {
+              store.latestVersion = version.replace(/[vV]/, "")
+            }
+            if (version.substring(0, 1) === 'V') {
+              store.mandatory = true
+              break
+            }
+          } else {
+            store.latestVersion = store.currentVersion
             break
           }
-        } else {
-          break
+          no++
         }
-        no++
-      }
-      console.log('latestVersion:' + store.latestVersion + ',currentVersion:' + store.currentVersion)
-      if (store.latestVersion !== store.currentVersion) {
-        if (flag === 'start' || (flag === 'login' && store.mandatory)) {
-          Dialog.create({
-            title: _that.$i18n.t('Alert'),
-            message: store.mandatory ? _that.$i18n.t('Please upgrade to the new version!') : _that.$i18n.t('There is a new version available, upgrade now?'),
-            cancel: store.mandatory ? false : {"label":_that.$i18n.t('Cancel'),"color":"primary","unelevated":true,"no-caps":true},
-            ok: {"label":_that.$i18n.t('Ok'),"color":"primary","unelevated":true,"no-caps":true},
-            persistent: true
-          }).onOk(() => {
-            _that.versionUpdate()
-          }).onCancel(() => {
-          })
+        console.log('currentVersion:' + store.currentVersion + ',latestVersion:' + store.latestVersion + ',mandatory:' + store.mandatory)
+        if (store.latestVersion !== store.currentVersion) {
+          if (flag === 'start' || (flag === 'login' && store.mandatory)) {
+            Dialog.create({
+              title: _that.$i18n.t('Alert'),
+              message: store.mandatory ? _that.$i18n.t('Please upgrade to the new version!') : _that.$i18n.t('There is a new version available, upgrade now?'),
+              cancel: store.mandatory ? false : {"label":_that.$i18n.t('Cancel'),"color":"primary","unelevated":true,"no-caps":true},
+              ok: {"label":_that.$i18n.t('Ok'),"color":"primary","unelevated":true,"no-caps":true},
+              persistent: true
+            }).onOk(() => {
+              _that.versionUpdate()
+            }).onCancel(() => {
+            })
+          }
         }
       }
+    },
+    initGetConfigWorker(configItem) {
+      let _that = this
+      let store = _that.$store
+      let worker = new GetConfigWorker()
+      worker.onerror = function (event) {
+        console.log('getConfig worker error:' + event.data)
+      }
+      worker.onmessageerror = function (event) {
+        console.log('getConfig worker message error:' + event.data)
+      }
+      worker.onmessage = async function (event) {
+        console.log('receive getConfig worker return message:' + event.data)
+        let response = event.data
+        if (configItem === 'nodeList') {
+          if (response) {
+            _that.connectAddressOptionsISO = response
+          } else {
+            _that.connectAddressOptionsISO = CollaConstant.connectAddressOptionsISO
+          }
+          _that.connectAddressOptions = _that.connectAddressOptionsISO[_that.language]
+          console.log('connectAddressOptionsISO:' + JSON.stringify(_that.connectAddressOptionsISO))
+        } else if (configItem === 'versionHistory') {
+          if (response) {
+            _that.versionHistory = response
+          } else {
+            _that.versionHistory = [store.currentVersion]
+          }
+          console.log('versionHistory:' + JSON.stringify(_that.versionHistory))
+          _that.upgradeVersion('start')
+        }
+      }
+      return worker
     }
   },
   computed: {
@@ -842,10 +870,25 @@ export default {
     store.getAddressLabel = _that.getAddressLabel
     config.appParams.clientType = window.device ? deviceComponent.getDeviceProperty('model') : 'PC'
     config.appParams.clientDevice = store.ifMobile() ? ClientDevice.MOBILE : ClientDevice.DESKTOP
-    config.appParams.language = _that.$i18n.locale
+    config.appParams.language = _that.language
     store.upgradeVersion = _that.upgradeVersion
     store.versionUpdate = _that.versionUpdate
-    await _that.upgradeVersion('start')
+    store.latestVersion = null
+    let configItem = 'nodeList'
+    let worker = _that.initGetConfigWorker(configItem)
+    worker.postMessage(configItem + 'ISO')
+    configItem = 'versionHistory'
+    worker = _that.initGetConfigWorker(configItem)
+    let type = 'others'
+    if (store.ios === true) {
+      type = 'ios'
+    } else if (store.android === true) {
+      type = 'android'
+    } else if (store.safari === true) {
+      type = 'safari'
+    }
+    console.log('type:' + type)
+    worker.postMessage(configItem + '-' + type)
   },
   watch: {
     loginDataCountryRegion(val) {
@@ -874,16 +917,7 @@ export default {
       this.options = this.countryOptions
       this.loginData.countryRegion_ = this.options[CollaConstant.countryCodeISO[val].indexOf(this.loginData.code_)]
       this.registerData.countryRegion_ = this.options[CollaConstant.countryCodeISO[val].indexOf(this.registerData.code_)]
-      try {
-        let httpClient = new HttpClient()
-        if (httpClient) {
-          let serviceData = await httpClient.get("https://curltech.io/conf/" + "nodeList-" + val + ".conf?time=" + new Date().getTime())
-          this.connectAddressOptions = serviceData.data
-        }
-      } catch (e) {
-        console.error(e)
-        this.connectAddressOptions = CollaConstant.connectAddressOptionsISO[val]
-      }
+      this.connectAddressOptions = this.connectAddressOptionsISO[val]
     }
   }
 }
