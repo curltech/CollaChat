@@ -282,12 +282,10 @@ export default {
       let _that = this
       let store = _that.$store
       let chats = []
-      let data = await chatComponent.loadChat(
-        {
-          ownerPeerId: myself.myselfPeerClient.peerId,
-        }, null, store.state.chats.length > 0 ? store.state.chats[0].updateTime : null, null)
-        if(data && data.length > 0)
-        {
+      let data = await chatComponent.loadChat({
+          ownerPeerId: myself.myselfPeerClient.peerId
+        }, null, store.state.chats.length > 0 ? store.state.chats[0].updateTime : null, null, true)
+        if (data && data.length > 0) {
           for (let chat of data) {
             let subjectType;
             if (store.state.linkmanMap[chat.subjectId]) {

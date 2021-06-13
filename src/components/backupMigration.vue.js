@@ -46,13 +46,14 @@ export default {
       })*/
       let _that = this
       let store = _that.$store
+      let clientPeerId = myself.myselfPeerClient.peerId
       if (store.ifMobile()) {
         
       } else {
         let json = ''
         // 联系人同步：跨实例云端同步功能提供前临时使用 - start
         let linkmans = await contactComponent.loadLinkman({
-          ownerPeerId: myself.myselfPeerClient.peerId,
+          ownerPeerId: clientPeerId,
         })
         if (linkmans && linkmans.length > 0) {
           let linkmansJson = JSON.stringify(linkmans)
@@ -60,7 +61,7 @@ export default {
           json = json + '[linkmansJson:]' + linkmansJson + '[:linkmansJson]'
         }
         let groups = await contactComponent.loadGroup({
-          ownerPeerId: myself.myselfPeerClient.peerId,
+          ownerPeerId: clientPeerId,
         })
         if (groups && groups.length > 0) {
           let groupsJson = JSON.stringify(groups)
@@ -68,7 +69,7 @@ export default {
           json = json + '[groupsJson:]' + groupsJson + '[:groupsJson]'
         }
         let groupMembers = await contactComponent.loadGroupMember({
-          ownerPeerId: myself.myselfPeerClient.peerId,
+          ownerPeerId: clientPeerId,
         })
         if (groupMembers && groupMembers.length > 0) {
           let groupMembersJson = JSON.stringify(groupMembers)
@@ -76,7 +77,7 @@ export default {
           json = json + '[groupMembersJson:]' + groupMembersJson + '[:groupMembersJson]'
         }
         let linkmanTags = await contactComponent.loadLinkmanTag({
-          ownerPeerId: myself.myselfPeerClient.peerId,
+          ownerPeerId: clientPeerId,
         })
         if (linkmanTags && linkmanTags.length > 0) {
           let linkmanTagsJson = JSON.stringify(linkmanTags)
@@ -84,7 +85,7 @@ export default {
           json = json + '[linkmanTagsJson:]' + linkmanTagsJson + '[:linkmanTagsJson]'
         }
         let linkmanTagLinkmans = await contactComponent.loadLinkmanTagLinkman({
-          ownerPeerId: myself.myselfPeerClient.peerId,
+          ownerPeerId: clientPeerId,
         })
         if (linkmanTagLinkmans && linkmanTagLinkmans.length > 0) {
           let linkmanTagLinkmansJson = JSON.stringify(linkmanTagLinkmans)
@@ -100,36 +101,43 @@ export default {
           }
         }
         if (subjectIds.length > 0) {
-          let messages = await chatComponent.loadMessage({
-            ownerPeerId: myself.myselfPeerClient.peerId,
-            subjectId: subjectIds,
-            countDown: 0
-          }, null, null, null, true)
-          let messageIds = []
-          if (messages && messages.length > 0) {
-            for (let message of messages) {
-              messageIds.push(message.messageId)
-            }
-            let messagesJson = JSON.stringify(messages)
-            console.log(messagesJson)
-            json = json + '[messagesJson:]' + messagesJson + '[:messagesJson]'
-          }
-          if (messageIds.length > 0) {
-            let mergeMessages = await chatComponent.loadMergeMessage({
-              ownerPeerId: myself.myselfPeerClient.peerId,
-              topMergeMessageId: messageIds
-            })
-            if (mergeMessages && mergeMessages.length > 0) {
-              let mergeMessagesJson = JSON.stringify(mergeMessages)
-              console.log(mergeMessagesJson)
-              json = json + '[mergeMessagesJson:]' + mergeMessagesJson + '[:mergeMessagesJson]'
-            }
-            if (!store.textOnlyFlag) {
-              let chatAttachs = await chatBlockComponent.loadLocalAttach(messageIds, null, true)
-              if (chatAttachs && chatAttachs.length > 0) {
-                let chatAttachsJson = JSON.stringify(chatAttachs)
-                console.log(chatAttachsJson)
-                json = json + '[chatAttachsJson:]' + chatAttachsJson + '[:chatAttachsJson]'
+          let chats = await chatComponent.loadChat({
+            ownerPeerId: clientPeerId,
+            subjectId: subjectIds
+          })
+          if (chats && chats.length > 0) {
+            let chatsJson = JSON.stringify(chats)
+            console.log(chatsJson)
+            json = json + '[chatsJson:]' + chatsJson + '[:chatsJson]'
+            let messages = await chatComponent.loadMessage({
+              ownerPeerId: clientPeerId,
+              subjectId: subjectIds,
+              countDown: 0
+            }, null, null, null, true)
+            if (messages && messages.length > 0) {
+              let messagesJson = JSON.stringify(messages)
+              console.log(messagesJson)
+              json = json + '[messagesJson:]' + messagesJson + '[:messagesJson]'
+              let messageIds = []
+              for (let message of messages) {
+                messageIds.push(message.messageId)
+              }
+              let mergeMessages = await chatComponent.loadMergeMessage({
+                ownerPeerId: clientPeerId,
+                topMergeMessageId: messageIds
+              })
+              if (mergeMessages && mergeMessages.length > 0) {
+                let mergeMessagesJson = JSON.stringify(mergeMessages)
+                console.log(mergeMessagesJson)
+                json = json + '[mergeMessagesJson:]' + mergeMessagesJson + '[:mergeMessagesJson]'
+              }
+              if (!store.textOnlyFlag) {
+                let chatAttachs = await chatBlockComponent.loadLocalAttach(messageIds, null, true)
+                if (chatAttachs && chatAttachs.length > 0) {
+                  let chatAttachsJson = JSON.stringify(chatAttachs)
+                  console.log(chatAttachsJson)
+                  json = json + '[chatAttachsJson:]' + chatAttachsJson + '[:chatAttachsJson]'
+                }
               }
             }
           }
@@ -209,6 +217,7 @@ export default {
         if (reader.result) {
           let json = reader.result
           // 联系人同步：跨实例云端同步功能提供前临时使用 - start
+          let changeFlag = false
           let linkmansJson = null
           if (json.indexOf('[linkmansJson:]') > -1 && json.indexOf('[:linkmansJson]') > -1) {
             linkmansJson = json.substring(json.indexOf('[linkmansJson:]') + 15, json.indexOf('[:linkmansJson]'))
@@ -229,6 +238,7 @@ export default {
                 }
               }
               if (linkmans.length > 0) {
+                changeFlag = true
                 await contactComponent.insert(ContactDataType.LINKMAN, linkmans, null)
               }
             }
@@ -253,6 +263,7 @@ export default {
                 }
               }
               if (groups.length > 0) {
+                changeFlag = true
                 await contactComponent.insert(ContactDataType.GROUP, groups, null)
                 let groupMembersJson = null
                 if (json.indexOf('[groupMembersJson:]') > -1 && json.indexOf('[:groupMembersJson]') > -1) {
@@ -311,6 +322,7 @@ export default {
                 }
               }
               if (linkmanTags.length > 0) {
+                changeFlag = true
                 await contactComponent.insert(ContactDataType.LINKMAN_TAG, linkmanTags, null)
                 let linkmanTagLinkmansJson = null
                 if (json.indexOf('[linkmanTagLinkmansJson:]') > -1 && json.indexOf('[:linkmanTagLinkmansJson]') > -1) {
@@ -352,7 +364,34 @@ export default {
               }
             }
           }
+          if (changeFlag) {
+            await store.refreshContactsData()
+          }
           // 联系人同步：跨实例云端同步功能提供前临时使用 - end
+          let chatsJson = null
+          if (json.indexOf('[chatsJson:]') > -1 && json.indexOf('[:chatsJson]') > -1) {
+            chatsJson = json.substring(json.indexOf('[chatsJson:]') + 12, json.indexOf('[:chatsJson]'))
+            console.log(chatsJson)
+            let chats = JSON.parse(chatsJson)
+            if (chats && chats.length > 0) {
+              for (let i = chats.length - 1; i >= 0; i--) {
+                if (chats[i].ownerPeerId === myself.myselfPeerClient.peerId) {
+                  let localChats = await chatComponent.loadMessage({
+                    ownerPeerId: myself.myselfPeerClient.peerId,
+                    subjectId: chats[i].subjectId
+                  })
+                  if (localChats && localChats.length > 0) {
+                    chats.splice(i, 1)
+                  }
+                } else {
+                  chats.splice(i, 1)
+                }
+              }
+              if (chats.length > 0) {
+                await chatComponent.insert(ChatDataType.CHAT, chats, null)
+              }
+            }
+          }
           let messagesJson = null
           if (json.indexOf('[messagesJson:]') > -1 && json.indexOf('[:messagesJson]') > -1) {
             messagesJson = json.substring(json.indexOf('[messagesJson:]') + 15, json.indexOf('[:messagesJson]'))
@@ -444,6 +483,7 @@ export default {
                     }
                   }
                 }
+                
               }
             }
           }

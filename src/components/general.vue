@@ -57,12 +57,12 @@
             q-item-section(side)
               q-toggle(v-model="fullTextSearchSwitch" @input="changeFullTextSearchSwitch")
           q-separator.c-separator(style="height:8px;margin-left:0px;margin-right:0px")
-          //q-item(clickable v-ripple @click="subKind= 'backupMigration'")
+          q-item(clickable v-ripple @click="subKind= 'backupMigration'")
             q-item-section
               q-item-label {{$t('Chat Records Backup and Migration')}}
             q-item-section(avatar)
               q-icon(name="keyboard_arrow_right" color="c-grey-5")
-          //q-separator.c-separator(style="margin-left:16px;width:calc(100% - 16px)")
+          q-separator.c-separator(style="margin-left:16px;width:calc(100% - 16px)")
           q-item(clickable v-ripple @click="subKind= 'storage'")
             q-item-section
               q-item-label {{$t('Storage')}}

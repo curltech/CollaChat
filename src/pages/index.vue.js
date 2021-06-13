@@ -1039,7 +1039,6 @@ export default {
       message.messageId = UUID.string(null, null)
       message.messageType = P2pChatMessageType.CHAT_LINKMAN
       message.fileSize = StringUtil.getSize(fileData)
-        debugger
       await store.saveFileInMessage(chat, message, fileData, type, name, message.messageId)
       await store.sendChatMessage(chat, message)
     },
@@ -2597,6 +2596,96 @@ export default {
           }
         }
       }
+    },
+    async refreshContactsData() {
+      let _that = this
+      let store = _that.$store
+      let clientPeerId = myself.myselfPeerClient.peerId
+      store.state.linkmanTagNames = []
+      store.state.linkmanTagNameMap = {}
+      store.state.linkmanTagIdMap = {}
+      store.state.linkmans = []
+      store.state.linkmanMap = {}
+      store.state.groupChats = []
+      store.state.groupChatMap = {}
+      let linkmanTags = await contactComponent.loadLinkmanTag({
+        ownerPeerId: clientPeerId,
+        createDate: { $gt: null }
+      }, [{ createDate: 'asc' }])
+      if (linkmanTags && linkmanTags.length > 0) {
+        for (let linkmanTag of linkmanTags) {
+          store.state.linkmanTagNames.push(linkmanTag.name)
+          store.state.linkmanTagNameMap[linkmanTag.name] = linkmanTag._id
+          store.state.linkmanTagIdMap[linkmanTag._id] = linkmanTag.name
+        }
+      }
+      let linkmanDBItems = await contactComponent.loadLinkman({
+        ownerPeerId: clientPeerId
+      })
+      if (linkmanDBItems && linkmanDBItems.length > 0) {
+        linkmanDBItems.sort(function (a, b) {
+          let aPy = a.pyGivenName ? a.pyGivenName : a.pyName
+          let bPy = b.pyGivenName ? b.pyGivenName : b.pyName
+          if (aPy < bPy) {
+            return -1
+          } else if (aPy == bPy) {
+            return 0
+          } else {
+            return 1
+          }
+        })
+        store.state.linkmans = linkmanDBItems
+        for (let linkmanDBItem of linkmanDBItems) {
+          store.state.linkmanMap[linkmanDBItem.peerId] = linkmanDBItem
+          linkmanDBItem.groupChats = [] // 初始化属性
+          let tagNames = []
+          let tag = ''
+          let linkmanTagLinkmans = await contactComponent.loadLinkmanTagLinkman({
+            ownerPeerId: clientPeerId,
+            linkmanPeerId: linkmanDBItem.peerId,
+            createDate: { $gt: null }
+          }, [{ createDate: 'asc' }])
+          if (linkmanTagLinkmans && linkmanTagLinkmans.length > 0) {
+            for (let linkmanTagLinkman of linkmanTagLinkmans) {
+              let name = store.state.linkmanTagIdMap[linkmanTagLinkman.tagId]
+              tagNames.push(name)
+              tag = (tag ? tag + ", " + name : name)
+            }
+          }
+          linkmanDBItem.tagNames = tagNames
+          linkmanDBItem.tag = tag
+          linkmanDBItem.pyTag = pinyinUtil.getPinyin(tag)
+        }
+      }
+      let groupDBItems = await contactComponent.loadGroup({
+        ownerPeerId: clientPeerId,
+        createDate: { $gt: null }
+      }, [{ createDate: 'asc' }])
+      if (groupDBItems && groupDBItems.length > 0) {
+        store.state.groupChats = groupDBItems
+        for (let groupDBItem of groupDBItems) {
+          let groupMemberDBItems = await contactComponent.loadGroupMember(
+            {
+              ownerPeerId: clientPeerId,
+              groupId: groupDBItem.groupId,
+              createDate: { $gt: null }
+            }, [{ createDate: 'asc' }]
+          )
+          if (groupMemberDBItems && groupMemberDBItems.length > 0) {
+            for (let groupMemberDBItem of groupMemberDBItems) {
+              if (groupMemberDBItem.memberType === MemberType.OWNER) {
+                groupDBItem.groupOwnerPeerId = groupMemberDBItem.memberPeerId
+              }
+              let linkman = store.state.linkmanMap[groupMemberDBItem.memberPeerId]
+              if (linkman) {
+                linkman.groupChats.push(groupDBItem)
+              }
+            }
+            groupDBItem.groupMembers = groupMemberDBItems
+          }
+          store.state.groupChatMap[groupDBItem.groupId] = groupDBItem
+        }
+      }
     }
   },
   async created() {
@@ -2743,58 +2832,9 @@ export default {
       store.collectionWorkerEnabler = false
     }
     store.useNativeAndroid = false // 是否使用Android原生拍照、拍摄、相册等功能
-    let clientPeerId = myself.myselfPeerClient.peerId
-    let linkmanTags = await contactComponent.loadLinkmanTag({
-      ownerPeerId: clientPeerId,
-      createDate: { $gt: null }
-    }, [{ createDate: 'asc' }])
-    if (linkmanTags && linkmanTags.length > 0) {
-      for (let linkmanTag of linkmanTags) {
-        store.state.linkmanTagNames.push(linkmanTag.name)
-        store.state.linkmanTagNameMap[linkmanTag.name] = linkmanTag._id
-        store.state.linkmanTagIdMap[linkmanTag._id] = linkmanTag.name
-      }
-    }
-    let linkmanDBItems = await contactComponent.loadLinkman({
-      ownerPeerId: clientPeerId
-    })
-    if (linkmanDBItems && linkmanDBItems.length > 0) {
-      linkmanDBItems.sort(function (a, b) {
-        let aPy = a.pyGivenName ? a.pyGivenName : a.pyName
-        let bPy = b.pyGivenName ? b.pyGivenName : b.pyName
-        if (aPy < bPy) {
-          return -1
-        } else if (aPy == bPy) {
-          return 0
-        } else {
-          return 1
-        }
-      })
-      store.state.linkmans = linkmanDBItems
-      for (let linkmanDBItem of linkmanDBItems) {
-        store.state.linkmanMap[linkmanDBItem.peerId] = linkmanDBItem
-        linkmanDBItem.groupChats = [] // 初始化属性
-        let tagNames = []
-        let tag = ''
-        let linkmanTagLinkmans = await contactComponent.loadLinkmanTagLinkman({
-          ownerPeerId: clientPeerId,
-          linkmanPeerId: linkmanDBItem.peerId,
-          createDate: { $gt: null }
-        }, [{ createDate: 'asc' }])
-        if (linkmanTagLinkmans && linkmanTagLinkmans.length > 0) {
-          for (let linkmanTagLinkman of linkmanTagLinkmans) {
-            let name = store.state.linkmanTagIdMap[linkmanTagLinkman.tagId]
-            tagNames.push(name)
-            tag = (tag ? tag + ", " + name : name)
-          }
-        }
-        linkmanDBItem.tagNames = tagNames
-        linkmanDBItem.tag = tag
-        linkmanDBItem.pyTag = pinyinUtil.getPinyin(tag)
-      }
-    }
+
     let linkmanRequestDBItems = await contactComponent.loadLinkmanRequest({
-      ownerPeerId: clientPeerId,
+      ownerPeerId: myself.myselfPeerClient.peerId,
       requestType: RequestType.ADD_LINKMAN_INDIVIDUAL,
       createDate: { $gt: null }
     }, [{ createDate: 'desc' }])
@@ -2810,35 +2850,7 @@ export default {
         }
       }
     }
-    let groupDBItems = await contactComponent.loadGroup({
-      ownerPeerId: clientPeerId,
-      createDate: { $gt: null }
-    }, [{ createDate: 'asc' }])
-    if (groupDBItems && groupDBItems.length > 0) {
-      store.state.groupChats = groupDBItems
-      for (let groupDBItem of groupDBItems) {
-        let groupMemberDBItems = await contactComponent.loadGroupMember(
-          {
-            ownerPeerId: clientPeerId,
-            groupId: groupDBItem.groupId,
-            createDate: { $gt: null }
-          }, [{ createDate: 'asc' }]
-        )
-        if (groupMemberDBItems && groupMemberDBItems.length > 0) {
-          for (let groupMemberDBItem of groupMemberDBItems) {
-            if (groupMemberDBItem.memberType === MemberType.OWNER) {
-              groupDBItem.groupOwnerPeerId = groupMemberDBItem.memberPeerId
-            }
-            let linkman = store.state.linkmanMap[groupMemberDBItem.memberPeerId]
-            if (linkman) {
-              linkman.groupChats.push(groupDBItem)
-            }
-          }
-          groupDBItem.groupMembers = groupMemberDBItems
-        }
-        store.state.groupChatMap[groupDBItem.groupId] = groupDBItem
-      }
-    }
+    await _that.refreshContactsData()
 
     store.changeTab = function (tab) {
       _that.tab = tab
@@ -2919,6 +2931,7 @@ export default {
     store.connect = _that.connect
     store.getChatContent = _that.getChatContent
     store.p2pSend = _that.p2pSend
+    store.refreshContactsData = _that.refreshContactsData
     _that.tab = 'chat'
     _that.kind = 'message'
     _that.chatKind = 'message'

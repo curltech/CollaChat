@@ -115,7 +115,7 @@ export default {
           } else {
             return 1;
           }
-        });
+        })
         let tag = ''
         let linkmanTagLinkmans = []
         for (let findLinkmanDataTagName of store.state.findLinkmanData.tagNames) {
