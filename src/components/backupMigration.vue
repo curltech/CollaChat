@@ -8,17 +8,23 @@
         q-list
           q-item(clickable v-ripple @click="initMigrate")
             q-item-section
-              q-item-label {{$t('Migrate')}}
+              q-item-label {{$t('Migrate (to another Mobile)')}}
             q-item-section(avatar)
               q-icon(name="keyboard_arrow_right")
           q-separator.c-separator(style="height:8px;margin-left:0px;margin-right:0px")
-          q-item(clickable v-ripple @click="initBackup")
+          q-item(v-if="$store.ifMobile()" clickable v-ripple @click="subKind = 'tip'")
+            q-item-section
+              q-item-label {{$t('Backup and Restore')}}
+            q-item-section(avatar)
+              q-icon(name="keyboard_arrow_right")
+          //q-separator.c-separator(style="margin-left:16px;width:calc(100% - 16px)")
+          q-item(v-if="!$store.ifMobile()" clickable v-ripple @click="initBackup")
             q-item-section
               q-item-label {{$t('Backup (Mobile to PC)')}}
             q-item-section(avatar)
               q-icon(name="keyboard_arrow_right")
-          q-separator.c-separator(style="margin-left:16px;width:calc(100% - 16px)")
-          q-item(clickable v-ripple @click="initRestore")
+          q-separator.c-separator(v-if="!$store.ifMobile()" style="margin-left:16px;width:calc(100% - 16px)")
+          q-item(v-if="!$store.ifMobile()" clickable v-ripple @click="initRestore")
             q-item-section
               q-item-label {{$t('Restore (PC to Mobile)')}}
             q-item-section(avatar)
@@ -37,6 +43,8 @@
               q-icon(name="keyboard_arrow_right")
       q-tab-panel(name="selectChatRecord" style="padding:0px 0px")
         selectChatRecord.drawcontent
+      q-tab-panel(name="tip" style="padding:0px 0px")
+        tip.drawcontent
     q-uploader(style="display:none" ref="upload" @added="files => upload(files)" accept=".db")
 </template>
 <script src="./backupMigration.vue.js" />

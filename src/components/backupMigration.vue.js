@@ -1,6 +1,7 @@
 import { chatComponent, chatBlockComponent, ChatDataType } from '@/libs/biz/colla-chat'
 import { ContactDataType, contactComponent } from '@/libs/biz/colla-contact'
 import SelectChatRecord from '@/components/selectChatRecord'
+import Tip from '@/components/tip'
 import { myself } from 'libcolla'
 import { date } from 'quasar'
 
@@ -10,6 +11,7 @@ export default {
   name: "BackupMigration",
   components: {
     selectChatRecord: SelectChatRecord,
+    tip: Tip
   },
   data() {
     return {
@@ -17,6 +19,14 @@ export default {
     }
   },
   computed: {
+    heightStyle() {
+      return {
+        height: `${this.$q.screen.height}px`
+      }
+    },
+    ifMobileSize() {
+      return (!window.device && this.$q.screen.width < 481)
+    },
     heightStyle() {
       return {
         height: `${this.$q.screen.height}px`
@@ -483,7 +493,6 @@ export default {
                     }
                   }
                 }
-                
               }
             }
           }
@@ -511,16 +520,6 @@ export default {
     migrate: function () {
       let _that = this
       let store = _that.$store
-    }
-  },
-  computed: {
-    ifMobileSize() {
-      return (!window.device && this.$q.screen.width < 481)
-    },
-    heightStyle() {
-      return {
-        height: `${this.$q.screen.height}px`
-      }
     }
   },
   created() {
