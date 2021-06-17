@@ -2,6 +2,7 @@ import { date } from 'quasar'
 import { myself } from 'libcolla'
 import GroupAvatar from '@/components/groupAvatar'
 import { ActiveStatus } from '@/libs/biz/colla-contact'
+import { SubjectType } from '@/libs/biz/colla-chat'
 
 export default {
   name: "GroupChatList",
@@ -51,6 +52,13 @@ export default {
         }
       }
       return MemberGroupChatArray
+    },
+    ChatName() {
+      let _that = this
+      let store = _that.$store
+      return function (groupChat) {
+        return store.getChatName(SubjectType.GROUP_CHAT, groupChat.groupId)
+      }
     }
   },
   mounted() {
