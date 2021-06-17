@@ -9,7 +9,9 @@ self.onmessage = async function (event) {
     let _client = axios.create()
     if (_client) {
       let serviceData = await _client.get("https://curltech.io/conf/" + configName + ".conf?time=" + new Date().getTime())
-      response = serviceData.data
+      if (serviceData) {
+        response = serviceData.data
+      }
     }
   } catch (e) {
     console.error(e)

@@ -40,7 +40,9 @@ export default {
       let httpClient = new HttpClient()
 			if (httpClient) {
         let serviceData = await httpClient.get("https://curltech.io/md/" + "tos-" + language + ".md?time=" + new Date().getTime())
-        this.source = serviceData.data
+        if (serviceData) {
+          this.source = serviceData.data
+        }
 			}
     } catch (e) {
       console.error(e)

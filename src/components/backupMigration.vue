@@ -6,12 +6,12 @@
           q-btn(flat round dense icon="keyboard_arrow_left" @click="$store.changeGeneralSubKind('default')")
           q-toolbar-title(align="center" style="padding-right:54px") {{$t('Chat Records Backup and Migration')}}
         q-list
-          q-item(clickable v-ripple @click="initMigrate")
+          q-item(v-if="$store.ifMobile()" clickable v-ripple @click="initMigrate")
             q-item-section
               q-item-label {{$t('Migrate (to another Mobile)')}}
             q-item-section(avatar)
               q-icon(name="keyboard_arrow_right")
-          q-separator.c-separator(style="height:8px;margin-left:0px;margin-right:0px")
+          q-separator.c-separator(v-if="$store.ifMobile()" style="height:8px;margin-left:0px;margin-right:0px")
           q-item(v-if="$store.ifMobile()" clickable v-ripple @click="subKind = 'tip'")
             q-item-section
               q-item-label {{$t('Backup and Restore')}}
