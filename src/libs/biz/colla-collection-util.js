@@ -138,7 +138,7 @@ import { collectionComponent, CollectionType} from '@/libs/biz/colla-collection'
                 let dirEntry = await fileComponent.getRootDirEntry('tmp')
                 let dirPath = dirEntry.toInternalURL()
                 let fileName = current['_id'] + 'firstAudio' + '.' + src.substring(11, src.indexOf(';', 11))
-                let localURL = dirEntry.toInternalURL() + fileName
+                let localURL = dirPath + fileName
                 let fileEntry = await fileComponent.createNewFileEntry(fileName, dirPath)
                 let blob = BlobUtil.base64ToBlob(src)
                 await fileComponent.writeFile(fileEntry, blob, false).then(async function () {

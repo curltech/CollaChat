@@ -9,7 +9,7 @@ div
     q-tab-panel(:style="heightStyle", name="default", style="padding:0px 0px")
       q-toolbar
         q-btn(flat, round, dense, icon="keyboard_arrow_left", @click="back")
-        q-toolbar-title(align="center", style="padding-right:54px") {{ $t('Conference') }}
+        q-toolbar-title(align="center", style="padding-left:54px") {{ $t('Conference') }}
         q-btn.btnIcon(flat, round, dense, icon="alarm_add", @click="add")
         q-btn.btnIcon(
           flat,
@@ -25,13 +25,12 @@ div
           icon="history",
           @click="subKind = 'history'"
         )
-      q-form.q-gutter-sm.q-pa-sm
+      q-form(class="q-pa-sm")
         q-input.c-field(
           v-model="conference.peerId",
           :label="$t('Your peerId')",
           clearable,
           filled,
-          dense,
           borderless,
           lazy-rules,
           :rules="[(val) => (val && val.length > 0) || 'Cannot be null']"
@@ -41,7 +40,6 @@ div
           :label="$t('Your conferenceId')",
           clearable,
           filled,
-          dense,
           lazy-rules,
           :rules="[(val) => (val && val.length > 0) || 'Cannot be null']"
         )
@@ -49,7 +47,6 @@ div
           v-model="conference.password",
           clearable,
           filled,
-          dense,
           :label="$t('Your password')"
         )
         q-toggle(v-model="conference.linkman", label="If only linkman")
@@ -66,7 +63,6 @@ div
           v-model="conference.startDate",
           clearable,
           filled,
-          dense,
           :label="$t('Your startDate')"
         )
           template(v-slot:prepend) 
@@ -101,11 +97,11 @@ div
                       color="primary",
                       v-close-popup
                     )
+        p
         q-input.c-field(
           v-model="conference.endDate",
           clearable,
           filled,
-          dense,
           :label="$t('Your endDate')"
         )
           template(v-slot:prepend) 
@@ -117,7 +113,6 @@ div
                     q-btn(
                       icon="close",
                       unelevated,
-                      dense,
                       round,
                       color="primary",
                       v-close-popup
@@ -135,16 +130,15 @@ div
                     q-btn(
                       icon="close",
                       unelevated,
-                      dense,
                       round,
                       color="primary",
                       v-close-popup
                     )
+        p
         q-input.c-field(
           type="number",
           clearable,
           filled,
-          dense,
           v-model="conference.number",
           :label="$t('Max number')",
           lazy-rules
@@ -189,13 +183,14 @@ div
         q-space
         q-btn(dense, flat, icon="close", v-close-popup)
       q-card-section
-        q-form.q-pa-sm.q-gutter-sm(ref="formJoin", @submit="join")
+        q-form(ref="formJoin",
+          @submit="join",
+          class="q-pa-sm")
           q-input.c-field(
             :label="$t('Please input peerId')",
             autofocus,
             clearable,
             filled,
-            dense,
             v-model="joinData.peerId",
             lazy-rules,
             :rules="[]"
@@ -204,7 +199,6 @@ div
             :label="$t('Please input conferenceId')",
             clearable,
             filled,
-            dense,
             v-model="joinData.conferenceId",
             lazy-rules,
             :rules="[]"
@@ -213,7 +207,6 @@ div
             :label="$t('Please input Password')",
             clearable,
             filled,
-            dense,
             v-model="joinData.password",
             lazy-rules,
             :rules="[]"

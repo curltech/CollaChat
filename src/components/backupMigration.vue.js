@@ -1,9 +1,12 @@
+import { date } from 'quasar'
+
+import { myself } from 'libcolla'
+
 import { chatComponent, chatBlockComponent, ChatDataType } from '@/libs/biz/colla-chat'
 import { ContactDataType, contactComponent } from '@/libs/biz/colla-contact'
+
 import SelectChatRecord from '@/components/selectChatRecord'
 import Tip from '@/components/tip'
-import { myself } from 'libcolla'
-import { date } from 'quasar'
 
 //let fs = require('fs')
 

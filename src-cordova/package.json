@@ -16,6 +16,7 @@
   ],
   "license": "AGPL-3.0-or-later",
   "dependencies": {
+    "cordova-httpd-curltech": "^0.9.2-1",
     "cordova-plugin-add-swift-support": "^2.0.2",
     "cordova-plugin-audio-recorder-api-curltech": "^0.0.6",
     "cordova-plugin-audioinput-curltech": "^1.0.2",
@@ -122,7 +123,8 @@
       "cordova-plugin-background-mode": {},
       "cordova-plugin-backbutton": {},
       "cordova-plugin-android-permissions": {},
-      "cordova-plugin-compat": {}
+      "cordova-plugin-compat": {},
+      "com.rjfun.cordova.httpd-curltech": {}
     },
     "platforms": [
       "ios",

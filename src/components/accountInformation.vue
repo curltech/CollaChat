@@ -109,14 +109,14 @@
           q-btn(flat round icon="keyboard_arrow_left" @click="subKind = 'default'")
           q-toolbar-title(align="center") {{ $t('Change Name') }}
           q-btn.btnIcon(flat round dense icon="check" @click="changeName")
-        q-form(ref="formChangeName" @submit="changeName")
-          q-input.c-field(filled :label="$t('UserName')" clearable v-model="name" lazy-rules :rules="[ val => val && val.length > 0 || $t('Please input Name')]")
+        q-form(ref="formChangeName" @submit="changeName" class="q-pa-sm")
+          q-input.c-field(autofocus filled :label="$t('UserName')" clearable v-model="name" lazy-rules :rules="[ val => val && val.length > 0 || $t('Please input Name')]")
       q-tab-panel(:style="heightStyle" name="mobile" style="padding:0px 0px")
         q-toolbar
           q-btn(flat round icon="keyboard_arrow_left" @click="subKind = 'default'")
           q-toolbar-title(align="center") {{ $t('Change Mobile') }}
           q-btn.btnIcon(flat round dense icon="check" @click="changeMobile")
-        q-form(ref="formChangeMobile" @submit="changeMobile")
+        q-form(ref="formChangeMobile" @submit="changeMobile" class="q-pa-sm")
           q-select.c-field(:label="$t('Country/Region')" filled flat v-model="countryRegion_" :options="options"
             clearable
             use-input
@@ -133,7 +133,7 @@
             div(class="col-4")
               q-input.c-field(:label="$t('Code')" prefix="+" filled clearable v-model="code_" lazy-rules :rules="[val => val && val.length > 0 || $t('Code')]")
             div(class="col-8 q-pl-xs")
-              q-input.c-field(:label="$t('Mobile')" filled clearable v-model="mobile_" lazy-rules :rules="[val => val && val.length > 0 || $t('Please input Mobile')]")
+              q-input.c-field(autofocus :label="$t('Mobile')" filled clearable v-model="mobile_" lazy-rules :rules="[val => val && val.length > 0 || $t('Please input Mobile')]")
     q-uploader(style="display:none" ref="upload" @added="files => upload(files)" accept=".jpg, image/*")
 </template>
 <script src="./accountInformation.vue.js" />

@@ -239,17 +239,25 @@
           q-btn(flat round dense icon="keyboard_arrow_left" @click="subKind = 'GROUP_CHATDetails'")
           q-toolbar-title(align="center") {{ $t('GroupChat Details') }}
           q-btn.btnIcon(flat round dense icon="check" color="primary" @click="modifyGroupChat")
-        q-form(ref="formModifyGroupChat" @submit="modifyGroupChat")
-          div(v-if="ifIAmGroupOwner($store.state.currentChat)" style="margin-left:12px" class="text-c-grey-10 q-my-sm") {{ $t('Group Name') }}
-          q-input.c-field(v-if="ifIAmGroupOwner($store.state.currentChat)" bg-color="c-grey-0" color="c-grey-10" hide-bottom-space clearable v-model="groupChatData.name" lazy-rules :rules="[]")
-          div(v-if="ifIAmGroupOwner($store.state.currentChat)" style="margin-left:12px" class="text-c-grey-10 q-my-sm") {{ $t('Group Description') }}
-          q-input.c-field(v-if="ifIAmGroupOwner($store.state.currentChat)" bg-color="c-grey-0" color="c-grey-10" hide-bottom-space clearable v-model="groupChatData.description" lazy-rules :rules="[]")
-          div(style="margin-left:12px" class="text-c-grey-10 q-my-sm") {{ $t('Given Name') }}
-          q-input.c-field(bg-color="c-grey-0" color="c-grey-10" hide-bottom-space clearable v-model="groupChatData.givenName" lazy-rules :rules="[]")
+        q-form(ref="formModifyGroupChat" @submit="modifyGroupChat" class="q-pa-sm")
+          //div(v-if="ifIAmGroupOwner($store.state.currentChat)" style="margin-left:12px" class="text-c-grey-10 q-my-sm") {{ $t('Group Name') }}
+          q-input.c-field(v-if="ifIAmGroupOwner($store.state.currentChat)"
+            :autofocus="ifIAmGroupOwner($store.state.currentChat)"
+            :label="$t('Group Name')" filled clearable v-model="groupChatData.name" lazy-rules :rules="[]")
+          p
+          //div(v-if="ifIAmGroupOwner($store.state.currentChat)" style="margin-left:12px" class="text-c-grey-10 q-my-sm") {{ $t('Group Description') }}
+          q-input.c-field(v-if="ifIAmGroupOwner($store.state.currentChat)" :label="$t('Group Description')" filled clearable v-model="groupChatData.description" lazy-rules :rules="[]")
+          p(v-if="ifIAmGroupOwner($store.state.currentChat)")
+          //div(style="margin-left:12px" class="text-c-grey-10 q-my-sm") {{ $t('Given Name') }}
+          q-input.c-field(:label="$t('Given Name')"
+            :autofocus="!ifIAmGroupOwner($store.state.currentChat)"
+            filled clearable v-model="groupChatData.givenName" lazy-rules :rules="[]")
+          p
           //div(style="margin-left:12px" class="text-c-grey-10 q-my-sm") {{ $t('Tags') }}
           //q-input.c-field(bg-color="c-grey-0" color="c-grey-10" hide-bottom-space clearable v-model="groupChatData.tag" lazy-rules :rules="[]")
-          div(style="margin-left:12px" class="text-c-grey-10 q-my-sm") {{ $t('My Alias') }}
-          q-input.c-field(bg-color="c-grey-0" color="c-grey-10" hide-bottom-space clearable v-model="groupChatData.myAlias" lazy-rules :rules="[]")
+          //p
+          //div(style="margin-left:12px" class="text-c-grey-10 q-my-sm") {{ $t('My Alias') }}
+          q-input.c-field(:label="$t('My Alias')" filled clearable v-model="groupChatData.myAlias" lazy-rules :rules="[]")
       q-tab-panel(name="searchChatHistory" style="padding:0px 0px")
         q-toolbar
           q-btn(v-if="$store.messageEntry === 'search'" flat round dense icon="keyboard_arrow_left" @click="resultBack()")

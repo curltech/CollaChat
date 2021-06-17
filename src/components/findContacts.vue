@@ -21,6 +21,7 @@
         ) {{ $t('Find Contacts') }}
       q-toolbar(insert)
         q-input.c-field(
+          autofocus,
           filled,
           dense,
           clearable,
@@ -140,8 +141,9 @@
           color="primary",
           @click="addLinkman"
         )
-      q-form.q-gutter-sm.q-pa-sm(ref="formAddContacts", @submit="addLinkman")
+      q-form(ref="formAddContacts", @submit="addLinkman" class="q-pa-sm")
         q-input.c-field(
+          autofocus,
           :label="$t('Invite Message')",
           filled,
           clearable,
@@ -149,6 +151,7 @@
           lazy-rules,
           :rules="[]"
         )
+        p
         q-input.c-field(
           :label="$t('Given Name')",
           filled,
@@ -157,6 +160,7 @@
           lazy-rules,
           :rules="[]"
         )
+        p
         q-select.c-field(
           :label="$t('Tags') + $t(' (please input Return after input new tags)')",
           filled,
@@ -193,11 +197,13 @@
           color="primary",
           @click="acceptLinkman"
         )
-      q-form.q-gutter-sm.q-pa-sm(
+      q-formAcceptContacts(
         ref="formAcceptContacts",
         @submit="acceptLinkman"
+        class="q-pa-sm"
       )
         q-input.c-field(
+          autofocus,
           :label="$t('Given Name')",
           filled,
           clearable,
@@ -205,6 +211,7 @@
           lazy-rules,
           :rules="[]"
         )
+        p
         q-select.c-field(
           :label="$t('Tags') + $t(' (please input Return after input new tags)')",
           filled,
@@ -223,7 +230,7 @@
   q-dialog(v-model="qrCodeDialog")
     q-card.fixed-center.q-pa-none(flat)
       q-card-section.q-pa-xs#qrCodeCard
-        q-card.q-pa-sm(flat)
+        q-card(flat class="q-pa-sm")
           q-card-section.q-pb-none
             q-avatar
               img(

@@ -29,7 +29,8 @@ export default {
         givenName: null,
         tagNames: null
       },
-      filterOptions: this.$store.state.linkmanTagNames
+      filterOptions: this.$store.state.linkmanTagNames,
+      itemName: null
     }
   },
   methods: {
@@ -46,11 +47,12 @@ export default {
         }
       })
     },
-    showModifyContacts() {
+    showModifyContacts(itemName) {
       let _that = this
       let store = _that.$store
       _that.linkmanData.givenName = store.state.currentLinkman.givenName
       _that.linkmanData.tagNames = CollaUtil.clone(store.state.currentLinkman.tagNames)
+      _that.itemName = itemName
       _that.subKind = 'modifyContacts'
     },
     async modifyLinkman() {

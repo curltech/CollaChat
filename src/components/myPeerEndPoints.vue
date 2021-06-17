@@ -7,7 +7,7 @@
           q-toolbar-title(align="center") {{$t('MyNodes') + '(' + data.length + ')'}}
           q-btn.btnIcon(flat round dense icon="add_circle_outline" @click="showAddItem")
         q-toolbar(insert class="q-px-xs")
-          q-input.c-field(debounce="100" autofocus filled dense v-model="filter" :placeholder="placeholder" input-class="text-center iconfont")
+          q-input.c-field(debounce="100" filled dense v-model="filter" :placeholder="placeholder" input-class="text-center iconfont")
             template(slot="append")
               //q-icon(v-if="!filter" name="search")
               //q-icon(v-else name="cancel" class="cursor-pointer" @click.stop="filter = null")
@@ -43,6 +43,6 @@
         q-form(ref="formAdd" @submit="add" class="q-pa-sm")
           q-select.c-field(filled :label="$t('No')" v-model="mpepData.priority" :options="options")
           p
-          q-input.c-field(filled :label="$t('Address')" clearable v-model="mpepData.address" lazy-rules :rules="[val => val && val.length > 0 || $t('Please input Address')]")
+          q-input.c-field(autofocus filled :label="$t('Address')" clearable v-model="mpepData.address" lazy-rules :rules="[val => val && val.length > 0 || $t('Please input Address')]")
 </template>
 <script src="./myPeerEndPoints.vue.js" />

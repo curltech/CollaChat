@@ -65,9 +65,9 @@
           q-btn(dense flat icon="close" v-close-popup @click="changeDeveloperOption(false)")
         q-card-section
           q-item
-            q-item-section(side)
-              q-input.c-field(:label="$t('Please input Password')" dense filled v-model="password" color="primary")
+            q-item-section
+              q-input.c-field(:label="$t('Please input Password')" autofocus filled clearable v-model="password" type="password" lazy-rules :rules="[]")
         q-card-actions(align="right")
-          q-btn(color="primary" round unelevated icon="check" v-close-popup  @click="changeDeveloperOption(true)")
+          q-btn(round unelevated color="primary" icon="check" v-close-popup @click="changeDeveloperOption(true)")
 </template>
 <script src="./advanceSetting.vue.js" />

@@ -55,7 +55,7 @@
         q-separator.c-separator(v-if="$store.state.currentLinkman && $store.state.currentLinkman.peerId !== $store.state.myselfPeerClient.peerId"
           style="margin-left:16px;width:calc(100% - 16px)"
         )
-        q-item(v-if="$store.state.currentLinkman && $store.state.currentLinkman.peerId !== $store.state.myselfPeerClient.peerId" clickable, v-ripple, @click="showModifyContacts")
+        q-item(v-if="$store.state.currentLinkman && $store.state.currentLinkman.peerId !== $store.state.myselfPeerClient.peerId" clickable, v-ripple, @click="showModifyContacts('givenName')")
           q-item-section
             q-item-label {{ $t('Given Name') }}
           q-item-section(side) {{ $store.state.currentLinkman && $store.state.currentLinkman.givenName ? $store.state.currentLinkman.givenName : '' }}
@@ -64,7 +64,7 @@
         q-separator.c-separator(v-if="$store.state.currentLinkman && $store.state.currentLinkman.peerId !== $store.state.myselfPeerClient.peerId"
           style="margin-left:16px;width:calc(100% - 16px)"
         )
-        q-item(v-if="$store.state.currentLinkman && $store.state.currentLinkman.peerId !== $store.state.myselfPeerClient.peerId" clickable, v-ripple, @click="showModifyContacts")
+        q-item(v-if="$store.state.currentLinkman && $store.state.currentLinkman.peerId !== $store.state.myselfPeerClient.peerId" clickable, v-ripple, @click="showModifyContacts('tags')")
           q-item-section
             q-item-label {{ $t('Tags') }}
           q-item-section(side) {{ $store.state.currentLinkman && $store.state.currentLinkman.tag ? $store.state.currentLinkman.tag : '' }}
@@ -233,9 +233,9 @@
           color="primary",
           @click="modifyLinkman"
         )
-      q-form.q-pa-sm(ref="formModifyContacts", @submit="modifyLinkman")
+      q-form(ref="formModifyContacts", @submit="modifyLinkman", class="q-pa-sm")
         q-input.c-field(
-          autofocus,
+          :autofocus="itemName === 'givenName'",
           :label="$t('Given Name')",
           filled,
           clearable,
@@ -245,6 +245,7 @@
         )
         p
         q-select.c-field(
+          :autofocus="itemName === 'tags'",
           filled,
           :label="$t('Tags') + $t(' (please input Return after input new tags)')",
           clearable,
@@ -277,7 +278,7 @@
           color="primary",
           @click="addLinkman"
         )
-      q-form.q-pa-sm(ref="formFindSendInvitation", @submit="addLinkman")
+      q-form(ref="formFindSendInvitation", @submit="addLinkman", class="q-pa-sm")
         q-input.c-field(
           autofocus,
           :label="$t('Invite Message')",

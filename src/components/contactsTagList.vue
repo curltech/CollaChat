@@ -23,8 +23,8 @@
           q-btn(flat round icon="keyboard_arrow_left" @click="subKind = 'default'")
           q-toolbar-title(align="center") {{ $t('Edit Tags') }}
           q-btn(color="primary" flat round dense icon="check" :disable="!$store.state.linkmanTagData.name || $store.state.linkmanTagData.linkmans.length === 0" :class="$store.state.linkmanTagData.name && $store.state.linkmanTagData.linkmans.length > 0 ? 'primary' : 'c-grey-0'" @click="saveLinkmanTag")
-        q-form(ref="formEditContactsTag")
-          q-input.c-field(filled :label="$t('Name')" clearable v-model="$store.state.linkmanTagData.name" lazy-rules :rules="[ val => val && val.length > 0 || $t('Please input Name')]")
+        q-form(ref="formEditContactsTag" class="q-pa-sm")
+          q-input.c-field(autofocus filled :label="$t('Name')" clearable v-model="$store.state.linkmanTagData.name" lazy-rules :rules="[ val => val && val.length > 0 || $t('Please input Name')]")
         p
         q-list(dense)
           q-item(style="padding-left:12px" clickable v-ripple @click="addLinkmanTagLinkman")
