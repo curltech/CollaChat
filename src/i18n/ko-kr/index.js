@@ -651,4 +651,13 @@
   "Matte Black": "스크럽 블랙",
   "Shell + film": "케이스 + 패 치",
   "Shell + lanyard": "케이스 + 끈",
+
+   // Date
+   "Sunday": "일요일",
+   "Monday": "월요일",
+   "Tuesday": "화요일",
+   "Wednesday": "수요일",
+   "Thursday": "목요일",
+   "Friday": "금요일",
+   "Saturday": "토요일",
 }

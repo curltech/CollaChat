@@ -95,7 +95,7 @@ export default {
       let _that = this
       let store =_that.$store
       store.state.currentPhoneContact = peerContact
-      store.mediaRequest(type,'phoneContacts')
+      _that.initiateCallRequest(type,'phoneContacts')
     },
     showAddContacts() {
       let _that = this

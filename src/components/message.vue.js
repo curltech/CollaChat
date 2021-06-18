@@ -232,6 +232,7 @@ export default {
       }
     },
     detailDateFormat() {
+      let _that = this
       return function (createDate) {
         if (createDate) {
           createDate = new Date(createDate)
@@ -241,10 +242,14 @@ export default {
           if (dateString === currentDateString) {
             return date.formatDate(createDate, 'HH:mm')
           } else if ((new Date(currentDateString) - new Date(dateString)) / (1000 * 60 * 60 * 24) < 7) {
-            return date.formatDate(createDate, 'dddd HH:mm')
-          } else {
-            return date.formatDate(createDate, 'YYYY-MM-DD HH:mm')
-          }
+            console.log(_that.$i18n.t('Sunday'))
+            let weekTimeString = date.formatDate(createDate, 'dddd HH:mm')
+            let weekTimeArrary = weekTimeString.split(' ')
+            let weekString = `${_that.$i18n.t(weekTimeArrary[0])} ${weekTimeArrary[1]}`
+            return weekString
+            } else {
+              return date.formatDate(createDate, 'YYYY-MM-DD HH:mm')
+            }
         }
       }
     },
@@ -2002,50 +2007,46 @@ export default {
       let store = _that.$store
       if (peerId) {
         let myselfPeerClient = myself.myselfPeerClient
-        if (myselfPeerClient.peerId === peerId) {
-          return
+        let linkman = store.state.linkmanMap[peerId]
+        if (linkman) {
+          store.state.currentLinkman = linkman
+          store.contactsDetailsEntry =  _that.subKind// CHATDetails, GROUP_CHATDetails,default
+          _that.subKind = 'contactsDetails'
+          /*if (store.state.ifMobileStyle) {
+            statusBarComponent.style(true, '#ffffff')
+          }*/
         } else {
-          let linkman = store.state.linkmanMap[peerId]
-          if (linkman) {
-            store.state.currentLinkman = linkman
-            store.contactsDetailsEntry = _that.subKind // CHATDetails, GROUP_CHATDetails
-            _that.subKind = 'contactsDetails'
-            /*if (store.state.ifMobileStyle) {
-              statusBarComponent.style(true, '#ffffff')
-            }*/
-          } else {
-            linkman = await peerClientService.findPeerClient(null, peerId, null)
-            if (linkman && linkman.visibilitySetting && linkman.visibilitySetting.substring(2, 3) === 'N') {
-              store.state.findLinkmanResult = 1
-              store.state.findLinkmanTip = _that.$i18n.t('The contact is invisible')
-              store.findLinkman = null
-              store.state.findLinkmanData = {
-                peerId: _that.$i18n.t('Invisible Peer Id'), // set Peer Id
-                message: null,
-                givenName: null,
-                tag: null
-              }
-              store.state.findContactsSubKind = 'default'
-            } else if (linkman && !(linkman.visibilitySetting && linkman.visibilitySetting.substring(0, 1) === 'N')) {
-              store.state.findLinkmanResult = 4
-              store.state.findLinkmanTip = ''
-              store.findLinkman = linkman
-              store.state.findContactsSubKind = 'result'
-            } else {
-              store.state.findLinkmanResult = 1
-              store.state.findLinkmanTip = _that.$i18n.t('The contact does not exist')
-              store.findLinkman = null
-              store.state.findLinkmanData = {
-                peerId: peerId,
-                message: null,
-                givenName: null,
-                tag: null
-              }
-              store.state.findContactsSubKind = 'default'
+          linkman = await peerClientService.findPeerClient(null, peerId, null)
+          if (linkman && linkman.visibilitySetting && linkman.visibilitySetting.substring(2, 3) === 'N') {
+            store.state.findLinkmanResult = 1
+            store.state.findLinkmanTip = _that.$i18n.t('The contact is invisible')
+            store.findLinkman = null
+            store.state.findLinkmanData = {
+              peerId: _that.$i18n.t('Invisible Peer Id'), // set Peer Id
+              message: null,
+              givenName: null,
+              tag: null
             }
-            store.findContactsEntry = 'GROUP_CHATDetails'
-            _that.subKind = 'findContacts'
+            store.state.findContactsSubKind = 'default'
+          } else if (linkman && !(linkman.visibilitySetting && linkman.visibilitySetting.substring(0, 1) === 'N')) {
+            store.state.findLinkmanResult = 4
+            store.state.findLinkmanTip = ''
+            store.findLinkman = linkman
+            store.state.findContactsSubKind = 'result'
+          } else {
+            store.state.findLinkmanResult = 1
+            store.state.findLinkmanTip = _that.$i18n.t('The contact does not exist')
+            store.findLinkman = null
+            store.state.findLinkmanData = {
+              peerId: peerId,
+              message: null,
+              givenName: null,
+              tag: null
+            }
+            store.state.findContactsSubKind = 'default'
           }
+          store.findContactsEntry = 'GROUP_CHATDetails'
+          _that.subKind = 'findContacts'
         }
       }
     },

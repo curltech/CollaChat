@@ -213,4 +213,13 @@ export default {
   "Matte Black": "Preto fosco",
   "Shell + film": "Shell + filme",
   "Shell + lanyard": "Shell + cordão",
+
+  // Date
+  "Sunday": "domingo",
+  "Monday": "segunda-feira",
+  "Tuesday": "terça-feira",
+  "Wednesday": "quarta-feira",
+  "Thursday": "quinta-feira",
+  "Friday": "sexta-feira",
+  "Saturday": "sábado",
 }

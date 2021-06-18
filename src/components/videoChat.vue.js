@@ -264,7 +264,7 @@ export default {
     },
     async sendCallMessage(){
       let message = {
-        content: store.state.currentChat.subjectType === SubjectType.CHAT ? store.state.currentChat.subjectId : store.state.currentCallChat.callMessage.content,
+        content: store.state.currentCallChat.subjectType === SubjectType.CHAT ? store.state.currentCallChat.subjectId : store.state.currentCallChat.callMessage.content,
         messageType: P2pChatMessageType.CALL_REQUEST
       }
       if (store.state.currentCallChat.callType  === 'video') {
@@ -272,7 +272,7 @@ export default {
       } else {
         message.contentType = ChatContentType.AUDIO_INVITATION
       }
-      await store.sendChatMessage(store.state.currentChat, message)
+      await store.sendChatMessage(store.state.currentCallChat, message)
       store.state.currentCallChat.callMessage = message
     },
     async receiveCallRequest(message) {

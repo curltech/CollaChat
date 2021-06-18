@@ -2435,7 +2435,7 @@ export default {
           await chatComponent.update(ChatDataType.RECEIVE, receives[0], null)
         }
       }
-      if (typeof message === "object" && message.messageType !== P2pChatMessageType.SYNC_LINKMAN_INFO) {
+      if (typeof message === "object" && message.messageType !== P2pChatMessageType.SYNC_LINKMAN_INFO && message.messageType !== P2pChatMessageType.CALL_REQUEST) {
         let signalSession = await _that.getSignalSession(peerId)
         if (!signalSession) {
           console.error('signalSession does not exist')

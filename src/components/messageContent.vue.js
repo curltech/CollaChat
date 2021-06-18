@@ -14,7 +14,7 @@ export default {
     notePreview: NotePreview,
     mobileAudio: MobileAudio,
   },
-  props: ['message', 'entry'],
+  props: ['message', 'entry',"showContacts"],
   data() {
     return {
       SubjectType: SubjectType,
@@ -131,6 +131,11 @@ export default {
       store.state.noteMessageSrc = await store.getMessageFile(message)
       store.state.noteMessageDialog = true
     },
+    avatarClick(mouseEvent,message){
+      if(mouseEvent.path[0].getAttribute("class").indexOf('q-message-avatar') > -1){
+        this.showContacts(message.senderPeerId)
+      }
+    }
   },
   mounted() {
     let _that = this

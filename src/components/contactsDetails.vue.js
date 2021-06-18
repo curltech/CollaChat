@@ -608,7 +608,7 @@ export default {
         store.toggleDrawer(false)
       } else if (store.contactsDetailsEntry === 'findContacts') {
         store.state.findContactsSubKind = 'default'
-      } else if (store.contactsDetailsEntry === 'CHATDetails' || store.contactsDetailsEntry === 'GROUP_CHATDetails') {
+      } else if (store.contactsDetailsEntry === 'CHATDetails' || store.contactsDetailsEntry === 'GROUP_CHATDetails' || store.contactsDetailsEntry === 'default') {
         store.changeMessageSubKind(store.contactsDetailsEntry)
       } else if (store.contactsDetailsEntry === 'message') {
         store.changeKind('message')
