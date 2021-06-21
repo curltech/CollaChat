@@ -72,7 +72,7 @@ export default {
         let myselfPeer = myself.myselfPeer
         myselfPeer.visibilitySetting = visibilitySetting
         myselfPeer.updateDate = currentDate
-        myselfPeer.lastUpdateTime = lastUpdateTime
+        myselfPeer.lastUpdateTime = currentDate
         myselfPeer = await myselfPeerService.update(myselfPeer)
         myself.myselfPeer = myselfPeer
 
