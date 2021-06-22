@@ -224,6 +224,7 @@ export default {
   "5 min": "5 分",
   "1 min": "1 分",
   "30 sec": "30 秒",
+  "10 sec": "10 秒",
   "No more messages": "没有更多消息了",
   "I'm ": "我是",
   "send": "发送",

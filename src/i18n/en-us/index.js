@@ -216,7 +216,7 @@ export default {
   "10 min": "10 min",
   "5 min": "5 min",
   "1 min": "1 min",
-  "30 sec": "30 sec",
+  "10 sec": "10 sec",
   "No more messages":"No more messages",
   "I'm ":"I'm ",
   "send":"send",

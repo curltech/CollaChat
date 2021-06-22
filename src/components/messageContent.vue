@@ -6,7 +6,6 @@
       div(v-if="message.contentType === ChatContentType.AUDIO_HISTORY || message.contentType === ChatContentType.VIDEO_HISTORY")
         q-icon(:name="message.contentType === ChatContentType.VIDEO_HISTORY?'videocam':'call'")
         span  {{message.content}}
-      q-badge.countdown-badge(color="secondary" text-color="c-grey-10" v-if="message.countDown") {{message.countDown}}
       img(v-if="message.contentType === ChatContentType.IMAGE" :src="message.thumbnail" @click = '$store.getMessageFileAndOpen(message)')
       mobileAudio(v-if="message.contentType === ChatContentType.VOICE" :src="message.thumbnail")
       q-btn(v-if = "message.contentType === ChatContentType.FILE" :loading="message.percent?true:false" :percentage="message.percent ? message.percent :0" dark-percentage unelevated color="secondary" text-color="grey-1" @click="$store.getMessageFileAndOpen(message)" icon="cloud_download" style="width: 100%")
@@ -37,6 +36,9 @@
       q-card.personal-card(v-if="message.contentType === ChatContentType.NOTE" @click="openNoteMessage(message)")
         notePreview(v-bind:item = "message" entry = "message")
       q-spinner-dots(size="2rem" v-if = "(message.contentType === ChatContentType.IMAGE || message.contentType === ChatContentType.VIDEO || message.contentType === ChatContentType.FILE || message.contentType === ChatContentType.NOTE) && message.loading")
+      q-badge.countdown-badge( style="bottom:-4px;top:unset" v-if="message.countDown") {{message.countDown}}
       q-badge(floating v-if = "(message.contentType === ChatContentType.IMAGE || message.contentType === ChatContentType.VIDEO || message.contentType === ChatContentType.FILE || message.contentType === ChatContentType.NOTE)") {{message.fileSize}}
+      q-badge(floating style="bottom:-4px;top:unset" v-if="message.destroyTime && message.senderPeerId === $store.state.myselfPeerClient.peerId")
+          q-icon(name="alarm")
 </template>
 <script src="./messageContent.vue.js"/>
