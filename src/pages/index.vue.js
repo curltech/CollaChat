@@ -661,15 +661,15 @@ export default {
       if (store.state.chatMap[subjectId] == store.state.currentChat) {
         message.readTime = new Date()
         if (message.destroyTime) {
-          let callbackMessage = {
-            messageId: message.messageId,
-            subjectId: message.senderPeerId,
-            senderPeerId: myself.myselfPeerClient.peerId,
-            messageType: P2pChatMessageType.CHAT_READ_CALLBACK,
-            preSubjectType: message.subjectType,
-            readTime: message.readTime
-          }
-          await store.p2pSend(callbackMessage,message.senderPeerId)
+          // let callbackMessage = {
+          //   messageId: message.messageId,
+          //   subjectId: message.senderPeerId,
+          //   senderPeerId: myself.myselfPeerClient.peerId,
+          //   messageType: P2pChatMessageType.CHAT_READ_CALLBACK,
+          //   preSubjectType: message.subjectType,
+          //   readTime: message.readTime
+          // }
+          // await store.p2pSend(callbackMessage,message.senderPeerId)
           message.countDown = message.destroyTime / 1000
           let countDownInterval = setInterval(async function () {
             if (!message.countDown) {
@@ -709,7 +709,7 @@ export default {
       })
       await chatComponent.insert(ChatDataType.MESSAGE, message, messages)
       // AutoDownload
-      if (message.subjectType == SubjectType.CHAT && store.state.linkmanMap[message.subjectId].downloadSwitch && (message.contentType === ChatContentType.FILE || message.contentType === ChatContentType.IMAGE)) {
+      if (message.subjectType == SubjectType.CHAT && myself.myselfPeerClient.downloadSwitch && (message.contentType === ChatContentType.FILE || message.contentType === ChatContentType.IMAGE)) {
         await store.getMessageFile(message)
       }
     },

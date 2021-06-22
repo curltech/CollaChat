@@ -73,6 +73,7 @@ export default {
         { label: this.$i18n.t('5 min'), value: 300000 },
         { label: this.$i18n.t('1 min'), value: 60000 },
         { label: this.$i18n.t('30 sec'), value: 30000 },
+        { label: this.$i18n.t('10 sec'), value: 10000 },
         { label: this.$i18n.t('Off'), value: 0 }
       ],
       //richTextEditor
@@ -243,7 +244,6 @@ export default {
           if (dateString === currentDateString) {
             return date.formatDate(createDate, 'HH:mm')
           } else if ((new Date(currentDateString) - new Date(dateString)) / (1000 * 60 * 60 * 24) < 7) {
-            console.log(_that.$i18n.t('Sunday'))
             let weekTimeString = date.formatDate(createDate, 'dddd HH:mm')
             let weekTimeArrary = weekTimeString.split(' ')
             let weekString = `${_that.$i18n.t(weekTimeArrary[0])} ${weekTimeArrary[1]}`
