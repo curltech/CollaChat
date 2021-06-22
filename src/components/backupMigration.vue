@@ -24,7 +24,8 @@
             q-item-section(avatar)
               q-icon(name="keyboard_arrow_right")
           q-separator.c-separator(v-if="!$store.ifMobile()" style="margin-left:16px;width:calc(100% - 16px)")
-          q-item(v-if="!$store.ifMobile()" clickable v-ripple @click="initRestore")
+          //q-item(v-if="!$store.ifMobile()" clickable v-ripple @click="initRestore")
+          q-item(v-if="!$store.ifMobile()" clickable v-ripple @click="subKind = 'list'")
             q-item-section
               q-item-label {{$t('Restore (PC to Mobile)')}}
             q-item-section(avatar)
@@ -45,6 +46,8 @@
         selectChatRecord.drawcontent
       q-tab-panel(name="tip" style="padding:0px 0px")
         tip.drawcontent
+      q-tab-panel(name="list" style="padding:0px 0px")
+        list.drawcontent
     q-uploader(style="display:none" ref="upload" @added="files => upload(files)" accept=".db")
 </template>
 <script src="./backupMigration.vue.js" />

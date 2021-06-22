@@ -4,6 +4,7 @@ import Vue from 'vue'
 import { EntityState } from 'libcolla'
 import { CollaUtil, TypeUtil, BlobUtil, UUID } from 'libcolla'
 import { myself, dataBlockService, peerClientService } from 'libcolla'
+import { BlockType } from 'libcolla'
 
 import pinyinUtil from '@/libs/base/colla-pinyin'
 import { audioCaptureComponent, mediaCaptureComponent, mediaComponent, cameraComponent, alloyFingerComponent, mediaPickerComponent, mediaRecorderComponent, mediaStreamComponent, audioInputComponent } from '@/libs/base/colla-media'
@@ -1053,72 +1054,113 @@ export default {
     async collectMessage(message, index) {
       let _that = this
       let store = _that.$store
-      let chat = store.state.chatMap[message.subjectId]
-      let inserted = {
-        blockId: UUID.string(null, null),
-        state: EntityState.New,
-        ownerPeerId: myself.myselfPeerClient.peerId,
-        srcChannelType: chat.subjectType,
-        srcChannelId: chat.subjectId,
-        srcChannelName: store.getChatName(chat.subjectType, chat.subjectId),
-        srcEntityType: SrcEntityType.LINKMAN,
-        srcEntityId: message.senderPeerId,
-        srcEntityName: _that.getSrcEntityName(message.senderPeerId),
-        attachs: [],
-        contentTitle: message.title ? message.title : '',
-        contentBody: '',
-        firstFileInfo: '',
-        firstAudioDuration: '',
-        contentIVAmount: 0,
-        contentAAmount: 0,
-        attachIVAmount: 0,
-        attachAAmount: 0,
-        attachOAmount: 0,
-        attachAmount: 0
-      }
-      let content = null
-      if (message.contentType === ChatContentType.TEXT || message.contentType === ChatContentType.CHAT || message.contentType === ChatContentType.NOTE) {
-        inserted.collectionType = CollectionType.TEXT
-        if (message.contentType === ChatContentType.TEXT) {
+      try {
+        let chat = store.state.chatMap[message.subjectId]
+        let inserted = {
+          blockId: UUID.string(null, null),
+          state: EntityState.New,
+          ownerPeerId: myself.myselfPeerClient.peerId,
+          srcChannelType: chat.subjectType,
+          srcChannelId: chat.subjectId,
+          srcChannelName: store.getChatName(chat.subjectType, chat.subjectId),
+          srcEntityType: SrcEntityType.LINKMAN,
+          srcEntityId: message.senderPeerId,
+          srcEntityName: _that.getSrcEntityName(message.senderPeerId),
+          attachs: [],
+          contentTitle: message.title ? message.title : '',
+          contentBody: '',
+          firstFileInfo: '',
+          firstAudioDuration: '',
+          contentIVAmount: 0,
+          contentAAmount: 0,
+          attachIVAmount: 0,
+          attachAAmount: 0,
+          attachOAmount: 0,
+          attachAmount: 0
+        }
+        let dom = document.getElementById('mobileAudio:' + message.subjectId + '_' + message.messageId)
+        if (dom) {
+          inserted.firstAudioDuration = dom.innerHTML
+        }
+        let content = null
+        if (message.contentType === ChatContentType.TEXT || message.contentType === ChatContentType.CHAT || message.contentType === ChatContentType.NOTE) {
           inserted.collectionType = CollectionType.TEXT
-        } else if (message.contentType === ChatContentType.NOTE) {
-          inserted.collectionType = CollectionType.NOTE
-        }
-        else if (message.contentType === ChatContentType.CHAT) {
-          inserted.collectionType = CollectionType.CHAT
-        }
-        content = message.content
-      } else {
-        if (message.contentType === ChatContentType.IMAGE) {
-          inserted.collectionType = CollectionType.IMAGE
-        } else if (message.contentType === ChatContentType.VIDEO) {
-          inserted.collectionType = CollectionType.VIDEO
-        } else if (message.contentType === ChatContentType.VOICE) {
-          inserted.collectionType = CollectionType.VOICE
-        } else if (message.contentType === ChatContentType.FILE) {
-          inserted.collectionType = CollectionType.FILE
-        }
-        let attaches = await chatBlockComponent.loadLocalAttach(message.messageId)
-        if (attaches && attaches.length > 0) {
-          let file = attaches[0].content
-          if (file) {
-            content = file
+          if (message.contentType === ChatContentType.TEXT) {
+            inserted.collectionType = CollectionType.TEXT
+          } else if (message.contentType === ChatContentType.NOTE) {
+            inserted.collectionType = CollectionType.NOTE
+          }
+          else if (message.contentType === ChatContentType.CHAT) {
+            inserted.collectionType = CollectionType.CHAT
+          }
+          content = message.content
+        } else {
+          if (message.contentType === ChatContentType.IMAGE) {
+            inserted.collectionType = CollectionType.IMAGE
+          } else if (message.contentType === ChatContentType.VIDEO) {
+            inserted.collectionType = CollectionType.VIDEO
+          } else if (message.contentType === ChatContentType.VOICE) {
+            inserted.collectionType = CollectionType.VOICE
+          } else if (message.contentType === ChatContentType.FILE) {
+            inserted.collectionType = CollectionType.FILE
+          }
+          if (message.contentType === ChatContentType.VOICE) {
+            content = message.thumbnail
+          } else {
+            let attaches = await chatBlockComponent.loadLocalAttach(message.messageId)
+            if (attaches && attaches.length > 0) {
+              let file = attaches[0].content
+              if (file) {
+                content = file
+              }
+            }
           }
         }
+        console.log('collectMessage-content:' + content)
+        let files = []
+        if (content) {
+          files.push(content)
+        }
+        inserted.content = await collectionUtil.getInsertHtml(files)
+        await collectionUtil.save('collection', inserted)
+        // 云端cloud保存
+        if (store.collectionWorkerEnabler) {
+          /*let dbLogs = await collectionUtil.saveBlock(inserted, false, BlockType.Collection)
+          let options = {}
+          options.privateKey = myself.privateKey
+          openpgp.clonePackets(options)
+          let worker = _that.initCollectionUploadWorker()
+          worker.postMessage(['one', dbLogs, myself.myselfPeerClient, options.privateKey])*/
+        } else {
+          let dbLogs = await collectionUtil.saveBlock(inserted, true, BlockType.Collection)
+          // 刷新syncFailed标志
+          let newDbLogMap = CollaUtil.clone(store.state.dbLogMap)
+          if (dbLogs && dbLogs.length > 0) {
+            for (let dbLog of dbLogs) {
+              let dl = newDbLogMap[dbLog.blockId]
+              if (!dl) {
+                newDbLogMap[dbLog.blockId] = true
+                console.log('add dbLog, blockId:' + dbLog.blockId)
+              }
+            }
+          }
+          store.state.dbLogMap = newDbLogMap
+        }
+        _that.$q.notify({
+          message: _that.$i18n.t("Save Collection successfully"),
+          timeout: 3000,
+          type: "info",
+          color: "info",
+        })
+      } catch (error) {
+        console.error(error)
+        _that.$q.notify({
+          message: _that.$i18n.t("Save failed"),
+          timeout: 3000,
+          type: "warning",
+          color: "warning"
+        })
       }
-      console.log('collectMessage-content:' + content)
-      let files = []
-      if (content) {
-        files.push(content)
-      }
-      inserted.content = await collectionUtil.getInsertHtml(files)
-      await collectionUtil.save('collection', inserted)
-      _that.$q.notify({
-        message: _that.$i18n.t("Save Collection successfully"),
-        timeout: 3000,
-        type: "info",
-        color: "info",
-      })
     },
     getSrcEntityName(senderPeerId) {
       let _that = this

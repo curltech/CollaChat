@@ -2,13 +2,19 @@
   .x-audio-wrap(:class="{inline:!block}" ref="wrap" @click="play")
     .x-sector(:class="{play:animate}")
       .x-dot
-    .x-time {{duration&&showDuration?duration:text}}
+    .x-time(:id="srcId") {{duration&&showDuration?duration:text}}
 </template>
 <script>
+  import { CollaUtil } from 'libcolla'
+
   export default {
     name: 'mobileAudio',
     props: {
       src: {
+        type: String,
+        default: ''
+      },
+      srcId: {
         type: String,
         default: ''
       },
@@ -43,7 +49,7 @@
           await new Promise(r => setTimeout(r, 500));
           _that.audio.currentTime = 10000000*Math.random();
         }
-        _that.duration = _that.format(_that.audio.duration)
+        _that.duration = CollaUtil.formatSeconds(_that.audio.duration) //_that.format(_that.audio.duration)
         
       })
       this.audio.src = this.src
@@ -75,7 +81,7 @@
           this.audio.pause()
         }
       },
-      format(s) {
+      /*format(s) {
         var t = '';
         if (s > -1) {
           var min = Math.floor(s / 60) % 60;
@@ -92,7 +98,7 @@
         }
         t = t.replace('.', '\"')
         return t;
-      },
+      },*/
     }
   }
 </script>

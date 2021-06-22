@@ -133,7 +133,7 @@ import { collectionComponent, CollectionType} from '@/libs/biz/colla-collection'
             }
           } else if (src.substring(0, 10) === 'data:audio') {
             type = 'audio'
-            if (currentFirstAudioDuration == 0) {
+            if (!current['firstAudioDuration'] && currentFirstAudioDuration == 0) {
               if (window.device && (window.device.platform === 'Android' || window.device.platform === 'iOS')) {
                 let dirEntry = await fileComponent.getRootDirEntry('tmp')
                 let dirPath = dirEntry.toInternalURL()
@@ -217,10 +217,14 @@ import { collectionComponent, CollectionType} from '@/libs/biz/colla-collection'
     }
     current['contentBody'] = contentBody.replace(/\&nbsp\;/g, '')
     current['firstFileInfo'] = currentFirstFileInfo
-    current['firstAudioDuration'] = CollaUtil.formatSeconds(currentFirstAudioDuration)
+    if (current['firstAudioDuration']) {
+      current['contentAAmount'] = 1
+    } else {
+      current['firstAudioDuration'] = CollaUtil.formatSeconds(currentFirstAudioDuration)
+      current['contentAAmount'] = contentAAmount
+    }
     console.log('***********************firstAudioDuration:' + current['firstAudioDuration'] + '***********************')
     current['contentIVAmount'] = contentIVAmount
-    current['contentAAmount'] = contentAAmount
     // 临时用以兼容旧数据，否则导致预览封面不显示图片视频、音频、其它文件数量-start
     if (!current['attachIVAmount']) {
       current['attachIVAmount'] = 0

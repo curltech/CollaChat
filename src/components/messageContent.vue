@@ -8,7 +8,7 @@
         span  {{message.content}}
       q-badge.countdown-badge(color="secondary" text-color="c-grey-10" v-if="message.countDown") {{message.countDown}}
       img(v-if="message.contentType === ChatContentType.IMAGE" :src="message.thumbnail" @click = '$store.getMessageFileAndOpen(message)')
-      mobileAudio(v-if="message.contentType === ChatContentType.VOICE" :src="message.thumbnail")
+      mobileAudio(v-if="message.contentType === ChatContentType.VOICE" :src="message.thumbnail" :srcId="'mobileAudio:' + message.subjectId + '_' + message.messageId")
       q-btn(v-if = "message.contentType === ChatContentType.FILE" :loading="message.percent?true:false" :percentage="message.percent ? message.percent :0" dark-percentage unelevated color="secondary" text-color="grey-1" @click="$store.getMessageFileAndOpen(message)" icon="cloud_download" style="width: 100%")
         span {{message.content}}
       q-btn(v-if = "message.contentType === ChatContentType.AUDIO" flat round icon="play_arrow" :label="message.content?message.content:''" @click = '$store.getMessageFileAndOpen(message)')
