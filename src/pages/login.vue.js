@@ -621,10 +621,12 @@ export default {
               break
             }
           } else {
-            store.latestVersion = store.currentVersion
             break
           }
           no++
+        }
+        if (!store.latestVersion) {
+          store.latestVersion = store.currentVersion
         }
         console.log('currentVersion:' + store.currentVersion + ',latestVersion:' + store.latestVersion + ',mandatory:' + store.mandatory)
         if (store.latestVersion !== store.currentVersion) {
