@@ -1194,6 +1194,7 @@ export default {
       _that.textVal = messageText
       _that.$refs.editor.focus()
     },
+      //已不在接收已读回执
     async handleReadCallback(mes) {
       let _that = this
       let store = _that.$store

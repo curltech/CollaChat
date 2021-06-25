@@ -204,6 +204,7 @@ export default {
   "This file has expired": "文件已过期",
   "Can not play this video": "无法播放此视频",
   "Unconnected": "未连接",
+  "Open Timing Message":"打开定时消息",
 
   // Developer
   "Developer": "开发者",

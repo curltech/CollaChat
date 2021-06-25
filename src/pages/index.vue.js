@@ -661,6 +661,7 @@ export default {
       if (store.state.chatMap[subjectId] == store.state.currentChat) {
         message.readTime = new Date()
         if (message.destroyTime) {
+            message.opened = false
           // let callbackMessage = {
           //   messageId: message.messageId,
           //   subjectId: message.senderPeerId,
@@ -670,21 +671,23 @@ export default {
           //   readTime: message.readTime
           // }
           // await store.p2pSend(callbackMessage,message.senderPeerId)
-          message.countDown = message.destroyTime / 1000
-          let countDownInterval = setInterval(async function () {
-            if (!message.countDown) {
-              clearInterval(countDownInterval)
-              let currentChatMessages = store.state.chatMap[subjectId].messages
-              for (let i = currentChatMessages.length - 1; i >= 0; i--) {
-                if (message == currentChatMessages[i]) {
-                  await chatComponent.remove(ChatDataType.MESSAGE, message, messages)
-                }
-              }
-              return
-            }
-            message.countDown--
-            console.log(message.countDown)
-          }, 1000)
+
+
+          // message.countDown = message.destroyTime / 1000
+          // let countDownInterval = setInterval(async function () {
+          //   if (!message.countDown) {
+          //     clearInterval(countDownInterval)
+          //     let currentChatMessages = store.state.chatMap[subjectId].messages
+          //     for (let i = currentChatMessages.length - 1; i >= 0; i--) {
+          //       if (message == currentChatMessages[i]) {
+          //         await chatComponent.remove(ChatDataType.MESSAGE, message, messages)
+          //       }
+          //     }
+          //     return
+          //   }
+          //   message.countDown--
+          //   console.log(message.countDown)
+          // }, 1000)
         }
       } else {
         store.state.chatMap[subjectId].unReadCount = store.state.chatMap[subjectId].unReadCount != undefined ? store.state.chatMap[subjectId].unReadCount + 1 : 0

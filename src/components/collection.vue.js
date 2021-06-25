@@ -16,7 +16,7 @@ import { mediaCaptureComponent, mediaComponent, alloyFingerComponent, mediaPicke
 import { collectionComponent, SrcChannelType, SrcEntityType, CollectionDataType, CollectionType } from '@/libs/biz/colla-collection'
 import { collectionUtil, blockLogComponent } from '@/libs/biz/colla-collection-util'
 import SelectChat from '@/components/selectChat'
-import MergeMessageDialog from '@/components/mergeMessageDialog'
+import MessageContent from '@/components/messageContent'
 import CaptureMedia from '@/components/captureMedia'
 import NotePreview from '@/components/notePreview'
 import MobileAudio from '@/components/mobileAudio'
@@ -31,9 +31,9 @@ export default {
     pdf,
     selectChat: SelectChat,
     captureMedia: CaptureMedia,
-    mergeMessageDialog: MergeMessageDialog,
     notePreview:NotePreview,
-    mobileAudio: MobileAudio
+    mobileAudio: MobileAudio,
+    messageContent: MessageContent
   },
   data() {
     return {
@@ -607,7 +607,7 @@ export default {
       }
       store.state.currentCollection = item
       if (store.collectionEntry !== 'message') {
-        if (item.collectionType !== CollectionType.CHAT){
+        // if (item.collectionType !== CollectionType.CHAT){
           _that.myCollections.c_meta.current = item
           _that.myCollections.c_meta.currentIndex = index
           let content = item.content
@@ -621,13 +621,12 @@ export default {
           } else {
             _that.subKind = 'view'
           }
-        } else {
-          let message = {
-            mergeMessages : JSON.parse(item.plainContent)
-          }
-          store.state.currentMergeMessage = message
-          store.state.mergeMessageDialog = true
-        }
+        // } else {
+        //   let message = {
+        //     mergeMessages : JSON.parse(item.plainContent)
+        //   }
+        //   store.state.currentMergeMessage = message
+        // }
       } else {
         store.collectionPicked(item)
       }
