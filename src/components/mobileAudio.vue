@@ -2,7 +2,7 @@
   .x-audio-wrap(:class="{inline:!block}" ref="wrap" @click="play")
     .x-sector(:class="{play:animate}")
       .x-dot
-    .x-time(:id="srcId") {{duration&&showDuration?duration:text}}
+    .x-time {{(duration && showDuration) ? duration : text}}
 </template>
 <script>
   import { CollaUtil } from 'libcolla'
@@ -11,10 +11,6 @@
     name: 'mobileAudio',
     props: {
       src: {
-        type: String,
-        default: ''
-      },
-      srcId: {
         type: String,
         default: ''
       },
@@ -55,7 +51,7 @@
       this.audio.src = this.src
       this.audio.load()
       this.audio.onplay = () => {
-        this.animat = true
+        this.animate = true
         this.timer = setInterval(() => {
           this.animate = false
           setTimeout(() => {

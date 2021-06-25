@@ -1078,10 +1078,6 @@ export default {
           attachOAmount: 0,
           attachAmount: 0
         }
-        let dom = document.getElementById('mobileAudio:' + message.subjectId + '_' + message.messageId)
-        if (dom) {
-          inserted.firstAudioDuration = dom.innerHTML
-        }
         let content = null
         if (message.contentType === ChatContentType.TEXT || message.contentType === ChatContentType.CHAT || message.contentType === ChatContentType.NOTE) {
           inserted.collectionType = CollectionType.TEXT
@@ -1102,10 +1098,13 @@ export default {
           } else if (message.contentType === ChatContentType.VOICE) {
             inserted.collectionType = CollectionType.VOICE
           } else if (message.contentType === ChatContentType.FILE) {
+            inserted.attachOAmount = 1
+            inserted.firstFileInfo = `(${message.fileSize}) ${message.content}`
             inserted.collectionType = CollectionType.FILE
           }
           if (message.contentType === ChatContentType.VOICE) {
-            content = message.thumbnail
+            inserted.attachAAmount = 1
+            inserted.content = message.thumbnail
           } else {
             let attaches = await chatBlockComponent.loadLocalAttach(message.messageId)
             if (attaches && attaches.length > 0) {
@@ -1116,12 +1115,14 @@ export default {
             }
           }
         }
-        console.log('collectMessage-content:' + content)
+        if(message.contentType !== ChatContentType.VOICE){
+          console.log('collectMessage-content:' + content)
         let files = []
         if (content) {
           files.push(content)
         }
-        inserted.content = await collectionUtil.getInsertHtml(files)
+        inserted.content = message.contentType !== ChatContentType.FILE ? await collectionUtil.getInsertHtml(files) : content
+        }
         await collectionUtil.save('collection', inserted)
         // 云端cloud保存
         if (store.collectionWorkerEnabler) {

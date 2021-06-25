@@ -19,6 +19,7 @@ import SelectChat from '@/components/selectChat'
 import MergeMessageDialog from '@/components/mergeMessageDialog'
 import CaptureMedia from '@/components/captureMedia'
 import NotePreview from '@/components/notePreview'
+import MobileAudio from '@/components/mobileAudio'
 //import CollectionUploadWorker from '@/worker/collectionUpload.worker.js'
 //import CollectionDownloadWorker from '@/worker/collectionDownload.worker.js'
 
@@ -31,7 +32,8 @@ export default {
     selectChat: SelectChat,
     captureMedia: CaptureMedia,
     mergeMessageDialog: MergeMessageDialog,
-    notePreview:NotePreview
+    notePreview:NotePreview,
+    mobileAudio: MobileAudio
   },
   data() {
     return {
@@ -449,6 +451,54 @@ export default {
           _that.$q.loading.hide()
         }
       }
+    },
+    async fileCollectionDownload(){
+      let collection = this.myCollections.c_meta.current
+      let filename = collection.firstFileInfo.slice(collection.firstFileInfo.indexOf(' ') + 1)
+        if (store.ios === true || store.android === true) {
+          let storageLocation = ''
+          if (window.device) {
+            if (window.device.platform === 'Android') {
+              storageLocation = 'file:///storage/emulated/0/'
+            } else if (window.device.platform === 'iOS') {
+              storageLocation = cordova.file.documentsDirectory //cordova.file.applicationStorageDirectory, dataDirectory
+            }
+          }
+          console.log('storageLocation:' + storageLocation)
+          let dirEntry = await fileComponent.getDirEntry(storageLocation)
+          await fileComponent.createDirectory(dirEntry, 'Colla')
+          let dirPath = storageLocation + 'Colla/'
+          let fileEntry = await fileComponent.createNewFileEntry(filename, dirPath)
+          fileComponent.writeFile(fileEntry, BlobUtil.base64ToBlob(collection.content), false).then(function () {
+            _that.$q.notify({
+              message: "save success",
+              timeout: 3000,
+              type: "info",
+              color: "info",
+            })
+          }).catch(function (err) {
+            console.error(JSON.stringify(err))
+            _that.$q.notify({
+              message: "save failure",
+              timeout: 3000,
+              type: "warning",
+              color: "warning",
+            })
+          })
+        } else {
+          let hyperlink = document.createElement("a"),
+          mouseEvent = new MouseEvent('click', {
+            view: window,
+            bubbles: true,
+            cancelable: true
+          });
+          hyperlink.href = collection.content;
+          hyperlink.target = '_blank';
+          hyperlink.download = filename;
+          hyperlink.dispatchEvent(mouseEvent);
+          (window.URL || window.webkitURL).revokeObjectURL(hyperlink.href);
+        }
+      
     },
     async refresh() {
       this.myCollections.splice(0)
@@ -1083,44 +1133,42 @@ export default {
     viewCommand() {
       let _that = this
       let store = _that.$store
-      _that.$q.bottomSheet({
-        actions: [
-          {
-            label: _that.$i18n.t('Forward'),
-            icon: 'forward',
-            id: 'forward'
-          },
-          {},
-          /*{
-            label: _that.$i18n.t('Open in Other App'),
-            icon: 'apps',
-            id: 'openInOtherApp'
-          },
-          {},*/
-          {
+      let collection = _that.myCollections.c_meta.current
+      let actions = [
+        {
+          label: _that.$i18n.t('Edit Tags'),
+          icon: 'label',
+          id: 'editTags'
+        },
+        {},
+        {
+          label: _that.$i18n.t('Delete'),
+          icon: 'delete',
+          id: 'delete'
+        },
+        {},
+        {
+          label: _that.$i18n.t('Cancel'),
+          icon: 'cancel',
+          id: 'cancel'
+        }
+      ]
+      if(collection.collectionType !== CollectionType.VOICE){
+        actions.unshift({
+          label: _that.$i18n.t('Forward'),
+          icon: 'forward',
+          id: 'forward'
+        })
+        if(collection.collectionType !== CollectionType.FILE ){
+          actions.unshift({
             label: _that.$i18n.t('Save as Note'),
             icon: 'notes',
             id: 'saveAsNote'
-          },
-          {},
-          {
-            label: _that.$i18n.t('Edit Tags'),
-            icon: 'label',
-            id: 'editTags'
-          },
-          {},
-          {
-            label: _that.$i18n.t('Delete'),
-            icon: 'delete',
-            id: 'delete'
-          },
-          {},
-          {
-            label: _that.$i18n.t('Cancel'),
-            icon: 'cancel',
-            id: 'cancel'
-          }
-        ]
+          })
+        }
+      }
+      _that.$q.bottomSheet({
+        actions: actions
       }).onOk(async action => {
         // console.log('Action chosen:', action.id)
         if (action.id === 'forward') {

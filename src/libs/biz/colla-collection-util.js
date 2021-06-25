@@ -246,24 +246,26 @@ import { collectionComponent, CollectionType} from '@/libs/biz/colla-collection'
     }
   }
   // 保存
-  async save(type, entities, parent) {
+  async save(type, entity, parent) {
     if (!type || type === 'attach' || type === 'collection') {
       // 考虑到新增场景，需先保存collection，再保存attach
-      console.log('collection before preview length:' + JSON.stringify(entities).length)
+      console.log('collection before preview length:' + JSON.stringify(entity).length)
       let start = new Date().getTime()
-      await this.setCollectionPreview(entities)
+      if(entity['collectionType'] !== CollectionType.FILE && entity['collectionType'] !== CollectionType.VOICE){
+        await this.setCollectionPreview(entity) 
+      }
       let end = new Date().getTime()
       console.log('collection preview time:' + (end - start))
-      console.log('collection after preview length:' + JSON.stringify(entities).length)
-      entities.versionFlag = 'local'
+      console.log('collection after preview length:' + JSON.stringify(entity).length)
+      entity.versionFlag = 'local'
       if (myself.myselfPeerClient.localDataCryptoSwitch !== true) {
-        entities.plainContent = entities.content.replace(/<[^>]+>/g, '').replace(/^\s*/g, '').replace(/\&nbsp\;/g, '')
-        entities.pyPlainContent = pinyinUtil.getPinyin(entities.plainContent)
+        entity.plainContent = entity.content.replace(/<[^>]+>/g, '').replace(/^\s*/g, '').replace(/\&nbsp\;/g, '')
+        entity.pyPlainContent = pinyinUtil.getPinyin(entity.plainContent)
       }
-      console.log('collection after pyPlainContent length:' + JSON.stringify(entities).length)
-      await collectionComponent.saveCollection(entities, null) // 新增时手工从头部插入，故不传parent参数，否则底层API会从尾部插入
+      console.log('collection after pyPlainContent length:' + JSON.stringify(entity).length)
+      await collectionComponent.saveCollection(entity, null) // 新增时手工从头部插入，故不传parent参数，否则底层API会从尾部插入
       if (!type || type === 'attach') {
-        await collectionComponent.saveAttach(entities) // 需要确保所有的附件都已经加载到attachs中
+        await collectionComponent.saveAttach(entity) // 需要确保所有的附件都已经加载到attachs中
       }
       if (parent) {
         parent.sort(function (a, b) {
