@@ -327,7 +327,7 @@ export default {
       let condition = {}
       condition['ownerPeerId'] = clientPeerId
       condition['priority'] = { $gt: priority }
-      let ret = await peerEndpointService.load(condition, null, null, null, null)
+      let ret = await peerEndpointService.find(condition, null, null, null, null)
       if (ret) {
         for (let myPeerEndPoint of ret) {
           myPeerEndPoint.priority = myPeerEndPoint.priority - 1
