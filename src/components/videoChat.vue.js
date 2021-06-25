@@ -280,9 +280,6 @@ export default {
       let store = _that.$store
       let subjectId = message.senderPeerId
       if (message.subjectType === SubjectType.CHAT) {
-        if (store.state.linkmanMap[subjectId].activeStatus !== ActiveStatus.UP) {
-          return;
-        }
         if (store.state.currentCallChat && store.state.currentCallChat.subjectId && store.state.videoDialog) {
           await _that.sendCallCloseMessage(subjectId,ChatContentType.MEDIA_BUSY,'')
           return;
@@ -362,12 +359,17 @@ export default {
           currentVideoDom.srcObject = localStream
         } else { }
         _that.addStreamCount++
-        let webrtcPeers = await webrtcPeerPool.get(peerId)
+        let webrtcPeers = webrtcPeerPool.getConnected(peerId)
         if (webrtcPeers && webrtcPeers.length > 0) {
           for (let webrtcPeer of webrtcPeers) {
             _that.localCloneStream[peerId] = localStream.clone()
             webrtcPeer.addStream(_that.localCloneStream[peerId])
           }
+        }else{
+            let option = {}
+            _that.localCloneStream[peerId] = localStream.clone()
+            option.stream = _that.localCloneStream[peerId]
+            webrtcPeerPool.create(peerId, option)
         }
       })
     },
@@ -555,12 +557,6 @@ export default {
         })
       }
       _that.addStreamCount++;
-    },
-    //发起方接收到stream,仅单聊
-    originatorReceiveStream(){},
-    //应答方接收到stream,仅单聊
-    answererReceiveStream(){
-
     },
     async pendingCall(peerId){
       let _that = this
