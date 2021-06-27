@@ -30,8 +30,14 @@
         q-item-section(avatar)
           q-icon(name="keyboard_arrow_right")
       //q-separator.c-separator
-    div(class="bg-c-grey-0 text-c-grey-10 q-pl-md q-py-xs") {{ $t('Chat Record') }}
+    div(v-if="$store.selectChatRecordEntry && $store.selectChatRecordEntry.indexOf('backupMigration') === -1" class="bg-c-grey-0 text-c-grey-10 q-pl-md q-py-xs") {{ $t('Chat Record') }}
     q-list(v-if="$store.selectChatRecordEntry !== 'selectChat'")
+      q-item(v-if="$store.selectChatRecordEntry && $store.selectChatRecordEntry.indexOf('backupMigration') === 0" dense)
+        q-item-section(side)
+          q-item-label(flat dense class="bg-c-grey-0 text-c-grey-10") {{ $t('Chat Record') }}
+        q-space
+        q-item-section(side)
+          q-checkbox(dense v-model="inclContactsInfoFlag" color="primary" :label="$t('incl. Contacts Info')")
       q-item(dense)
         q-item-section(side)
           q-btn(flat dense color="primary" :label="selectAllFlag ? $t('Unselect All') : $t('Select All')" @click="selectAll" no-caps)

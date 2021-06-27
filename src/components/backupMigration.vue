@@ -12,18 +12,18 @@
             q-item-section(avatar)
               q-icon(name="keyboard_arrow_right")
           q-separator.c-separator(v-if="$store.ifMobile()" style="height:8px;margin-left:0px;margin-right:0px")
-          q-item(v-if="$store.ifMobile()" clickable v-ripple @click="subKind = 'tip'")
+          //q-item(v-if="$store.ifMobile()" clickable v-ripple @click="subKind = 'tip'")
             q-item-section
               q-item-label {{$t('Backup and Restore')}}
             q-item-section(avatar)
               q-icon(name="keyboard_arrow_right")
           //q-separator.c-separator(style="margin-left:16px;width:calc(100% - 16px)")
-          q-item(v-if="!$store.ifMobile()" clickable v-ripple @click="initBackup")
+          q-item(v-if="$store.ifMobile()" clickable v-ripple @click="initBackup")
             q-item-section
               q-item-label {{$t('Backup (Mobile to PC)')}}
             q-item-section(avatar)
               q-icon(name="keyboard_arrow_right")
-          q-separator.c-separator(v-if="!$store.ifMobile()" style="margin-left:16px;width:calc(100% - 16px)")
+          //q-separator.c-separator(v-if="$store.ifMobile()" style="margin-left:16px;width:calc(100% - 16px)")
           //q-item(v-if="!$store.ifMobile()" clickable v-ripple @click="initRestore")
           q-item(v-if="!$store.ifMobile()" clickable v-ripple @click="subKind = 'list'")
             q-item-section

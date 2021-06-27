@@ -16,7 +16,8 @@ export default {
       selectChatRecordfilter: null,
       placeholder: '\ue672' + ' ' + this.$i18n.t('Search'),
       textOnlyFlag: false,
-      selectAllFlag: false
+      selectAllFlag: false,
+      inclContactsInfoFlag: true
     }
   },
   computed: {
@@ -126,10 +127,13 @@ export default {
         }
       } else if (store.selectChatRecordEntry.indexOf('backupMigration') === 0) {
         store.textOnlyFlag = _that.textOnlyFlag
+        store.inclContactsInfoFlag = _that.inclContactsInfoFlag
         if (store.selectChatRecordEntry === 'backupMigrationLocalBackup') {
           await store.localBackup()
         } else if (store.selectChatRecordEntry === 'backupMigrationMigrate') {
           await store.migrate()
+        } else if (store.selectChatRecordEntry === 'backupMigrationBackup') {
+          await store.backup()
         }
       }
     },

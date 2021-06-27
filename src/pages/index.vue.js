@@ -1595,6 +1595,10 @@ export default {
         }
       } else if (type === ChatMessageType.LOGOUT) {
         await store.logout(data)
+      } else if (type === ChatMessageType.BACKUP) {
+        console.log('BACKUP')
+      } else if (type === ChatMessageType.RESTORE) {
+        console.log('RESTORE')
       }
     },
     async p2pChatReceiver(peerId, message) {
