@@ -1,6 +1,9 @@
 <template lang="pug">
   div
-    q-chat-message(@click ='avatarClick($event,message)' :class = "entry === 'message'?'':'list-message'" :name = "getName(message)" :avatar = "getAvatar(message)" :stamp= "getStamp(message)"  :sent="isSent(message)" text-color="grey-10" bg-color="primary")
+    q-chat-message(@click ='avatarClick($event,message)' v-if='message.destroyTime && !message.opened &&  message.senderPeerId !== $store.state.myselfPeerClient.peerId' :name = "getName(message)" :avatar = "getAvatar(message)" :stamp= "getStamp(message)"  :sent="isSent(message)" text-color="grey-10" bg-color="primary")
+        q-btn(dark-percentage unelevated color="secondary" text-color="grey-1" @click="openDestroyMessage(message)")
+            span {{$t('Open Timing Message')}}
+    q-chat-message(v-else @click ='avatarClick($event,message)' :class = "entry === 'message'?'':'list-message'" :name = "getName(message)" :avatar = "getAvatar(message)" :stamp= "getStamp(message)"  :sent="isSent(message)" text-color="grey-10" bg-color="primary")
       q-btn.btnIcon.q-mr-sm.resend-btn(v-if = " entry === 'message' && isResend(message)" flat round dense icon="sync" @click="attemptConnect(message)")
       span.message-text(v-if="message.contentType === ChatContentType.TEXT" v-html="message.content")
       div(v-if="message.contentType === ChatContentType.AUDIO_HISTORY || message.contentType === ChatContentType.VIDEO_HISTORY")

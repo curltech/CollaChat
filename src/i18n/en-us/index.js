@@ -200,6 +200,7 @@ export default {
   "Includes: ": "Includes: ",
   "Can not play this video": "Can not play this video",
   "Unconnected": "Unconnected",
+  "Open Timing Message":"Open timing message",
 
   // Call
   "Call": "Call",

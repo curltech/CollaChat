@@ -2,7 +2,7 @@ import { date } from 'quasar'
 
 import { webrtcPeerPool } from 'libcolla'
 
-import { chatComponent, ChatContentType, P2pChatMessageType, SubjectType } from '@/libs/biz/colla-chat'
+import {  ChatDataType, chatComponent, ChatContentType, P2pChatMessageType, SubjectType } from '@/libs/biz/colla-chat'
 import { ActiveStatus } from '@/libs/biz/colla-contact'
 
 import NotePreview from '@/components/notePreview'
@@ -132,10 +132,29 @@ export default {
       store.state.noteMessageDialog = true
     },
     avatarClick(mouseEvent,message){
-      if(mouseEvent.path[0].getAttribute("class") && mouseEvent.path[0].getAttribute("class").indexOf('q-message-avatar') > -1){
+      if(this.entry === 'message' && mouseEvent.path[0].getAttribute("class") && mouseEvent.path[0].getAttribute("class").indexOf('q-message-avatar') > -1){
         this.showContacts(message.senderPeerId)
       }
-    }
+    },
+    async openDestroyMessage(message){
+          let _that = this
+          let store = _that.$store
+          message.opened = true
+          message.countDown = message.destroyTime / 1000
+          let countDownInterval = setInterval(async function () {
+              if (!message.countDown) {
+                  clearInterval(countDownInterval)
+                  let currentChatMessages = store.state.chatMap[message.senderPeerId].messages
+                  for (let i = currentChatMessages.length - 1; i >= 0; i--) {
+                      if (message == currentChatMessages[i]) {
+                          await chatComponent.remove(ChatDataType.MESSAGE, message, store.state.currentChat.messages)
+                      }
+                  }
+                  return
+              }
+              message.countDown--
+          }, 1000)
+      }
   },
   mounted() {
     let _that = this
