@@ -296,6 +296,8 @@
 
   // Genel
   "Chat Records Backup and Migration": "채 팅 기록 백업 및 이전",
+  "incl. Contacts Info": "연락처 정보 포함",
+  "Please confirm on your computer to start the backup": "백업을 시작하려면 컴퓨터에서 확인하세요",
   "Storage": "저장 공간",
   "Local Data Crypto": "로 컬 데이터 암호 화",
   "Full Text Search": "전체 텍스트 검색",

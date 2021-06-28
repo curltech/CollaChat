@@ -49,5 +49,15 @@
       q-tab-panel(name="list" style="padding:0px 0px")
         list.drawcontent
     q-uploader(style="display:none" ref="upload" @added="files => upload(files)" accept=".db")
+    q-dialog(v-model="backupDialog" persistent)
+      q-card(style="width: 250px")
+        q-bar(class="bg-primary text-c-grey-0")
+          q-item-label {{$t('Backup (Mobile to PC)')}}
+          //q-space
+          //q-btn(dense flat icon="close" v-close-popup)
+        q-card-section(class="q-pa-lg")
+          q-item-label {{$t('Please confirm on your computer to start the backup')}}
+        q-card-actions(align="center")
+          q-btn.btnIcon(unelevated color="primary" :label="$t('Cancel')" v-close-popup @click="cancelBackup")
 </template>
 <script src="./backupMigration.vue.js" />

@@ -301,6 +301,8 @@ export default {
 
   // General
   "Chat Records Backup and Migration": "聊天记录备份与迁移",
+  "incl. Contacts Info": "含联系人信息",
+  "Please confirm on your computer to start the backup": "请在电脑上确认，以开始备份",
   "Storage": "存储空间",
   "Local Data Crypto": "本地数据加密",
   "Full Text Search": "全文检索",

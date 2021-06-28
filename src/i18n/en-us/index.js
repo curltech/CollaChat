@@ -290,6 +290,8 @@ export default {
 
   // General
   "Chat Records Backup and Migration": "Chat Records Backup and Migration",
+  "incl. Contacts Info": "incl. Contacts Info",
+  "Please confirm on your computer to start the backup": "Please confirm on your computer to start the backup",
   "Storage": "Storage",
   "Local Data Crypto": "Local Data Crypto",
   "Full Text Search": "Full Text Search",

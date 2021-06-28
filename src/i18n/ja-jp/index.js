@@ -296,6 +296,8 @@
 
   // General
   "Chat Records Backup and Migration": "チャット記録のバックアップと移転",
+  "incl. Contacts Info": "連絡先情報を含める",
+  "Please confirm on your computer to start the backup": "コンピュータで確認してバックアップを開始してください",
   "Storage": "格納空間",
   "Local Data Crypto": "ローカルデータ暗号化",
   "Full Text Search": "全文検索",

@@ -296,6 +296,8 @@
 
   // General
   "Chat Records Backup and Migration": "聊天記錄備份與遷移",
+  "incl. Contacts Info": "含聯繫人信息",
+  "Please confirm on your computer to start the backup": "請在電腦上確認，以開始備份",
   "Storage": "存儲空間",
   "Local Data Crypto": "本地數據加密",
   "Full Text Search": "全文檢索",
