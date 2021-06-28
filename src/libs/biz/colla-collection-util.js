@@ -137,7 +137,7 @@ import { collectionComponent, CollectionType} from '@/libs/biz/colla-collection'
               if (window.device && (window.device.platform === 'Android' || window.device.platform === 'iOS')) {
                 let dirEntry = await fileComponent.getRootDirEntry('tmp')
                 let dirPath = dirEntry.toInternalURL()
-                let fileName = current['_id'] + 'firstAudio' + '.' + src.substring(11, src.indexOf(';', 11))
+                let fileName = (current['_id'] ? current['_id'] : new Date().getTime()) + 'firstAudio' + '.' + src.substring(11, src.indexOf(';', 11))
                 let localURL = dirPath + fileName
                 let fileEntry = await fileComponent.createNewFileEntry(fileName, dirPath)
                 let blob = BlobUtil.base64ToBlob(src)
