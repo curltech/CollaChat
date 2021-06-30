@@ -221,7 +221,7 @@ q-layout
         //q-space
         //q-btn(dense flat icon="close" v-close-popup)
       q-card-section(class="q-pa-lg")
-        q-item-label {{$t('Please confirm to accept the backup from your mobile')}}
+        q-item-label {{$t('Please confirm to receive the backup from your mobile')}}
       q-card-actions(align="center")
         q-btn.btnIcon(unelevated color="primary" :label="$t('Confirm')" v-close-popup @click="acceptBackup")
         q-btn.btnIcon(unelevated color="primary" :label="$t('Cancel')" v-close-popup @click="closeBackup")
@@ -246,7 +246,7 @@ q-layout
         //q-space
         //q-btn(dense flat icon="close" v-close-popup)
       q-card-section(class="q-pa-lg")
-        q-item-label {{$t('Please confirm to accept the migration from another mobile')}}
+        q-item-label {{$t('Please confirm to receive the migration from another mobile')}}
       q-card-actions(align="center")
         q-btn.btnIcon(unelevated color="primary" :label="$t('Confirm')" v-close-popup @click="acceptMigrate")
         q-btn.btnIcon(unelevated color="primary" :label="$t('Cancel')" v-close-popup @click="closeMigrate")

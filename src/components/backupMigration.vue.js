@@ -2,6 +2,7 @@ import { date } from 'quasar'
 
 import { myself } from 'libcolla'
 import { ChatMessageType, chatAction } from 'libcolla'
+import { logService } from 'libcolla'
 
 import { chatComponent, chatBlockComponent } from '@/libs/biz/colla-chat'
 import { contactComponent } from '@/libs/biz/colla-contact'
@@ -209,8 +210,8 @@ export default {
         } else {
           console.log('server is down')
         }
-      }, function(error) {
-        console.error('failed to start server:' + error)
+      }, async function(error) {
+        await logService.log(error, 'startServerError', 'error')
       })
     },
     exportJson: async function() {
