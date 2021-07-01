@@ -74,8 +74,8 @@
    // 聊天
    'CHAT_SYS': 'CHAT_SYS', // 系统预定义聊天消息，如群聊动态通知
    'CHAT_LINKMAN': 'CHAT_LINKMAN', // 联系人发送聊天消息
-   'CHAT_RECEIVE_CALLBACK': 'CHAT_RECEIVE_CALLBACK', // 接收回复
-   'CHAT_READ_CALLBACK': 'CHAT_READ_CALLBACK', // 已阅回复
+   'CHAT_RECEIVE_RECEIPT': 'CHAT_RECEIVE_RECEIPT', // 接收回复
+   'CHAT_READ_RECEIPT': 'CHAT_READ_RECEIPT', // 已阅回复
    'CALL_CLOSE': 'CALL_CLOSE',
    'CALL_REQUEST': 'CALL_REQUEST' // 通话请求
  }
@@ -160,7 +160,7 @@
    constructor() {
      this.localFileDataMap = {}
      pounchDb.create('chat', ['ownerPeerId', 'subjectId', 'createDate', 'updateTime'], indexFields[ChatDataType.CHAT])
-     pounchDb.create('message', ['ownerPeerId', 'subjectId', 'createDate','receiveTime','actualReceiveTime','blockId'], indexFields[ChatDataType.MESSAGE])
+     pounchDb.create('message', ['ownerPeerId', 'subjectId', 'createDate','receiveTime','actualReceiveTime','blockId','messageType'], indexFields[ChatDataType.MESSAGE])
      pounchDb.create('receive', ['ownerPeerId', 'subjectId', 'createDate', 'subjectType', 'receiverPeerId','blockId'], indexFields[ChatDataType.RECEIVE])
      pounchDb.create('chatAttach', ['ownerPeerId', 'subjectId', 'createDate', 'messageId'], indexFields[ChatDataType.ATTACH])
      pounchDb.create('mergeMessage', ['ownerPeerId', 'mergeMessageId', 'createDate'], indexFields[ChatDataType.MERGEMESSAGE])

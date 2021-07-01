@@ -196,9 +196,9 @@ export default {
       if (type == "video") {
         let ideal;
         if(store.state.ifMobileStyle){
-          ideal = 1.33
+          ideal = 2
         }else{
-          ideal = 0.7486
+          ideal = 0.5625
         }
         options = { video: {
             aspectRatio: { ideal: ideal },
@@ -337,7 +337,7 @@ export default {
         if(store.state.ifMobileStyle){
           ideal = 1.33
         }else{
-          ideal = 0.7486
+          ideal = 0.5625
         }
         // if(_that.$q.platform.is.ios){
         //   options = { video: true, audio: true }
@@ -408,7 +408,7 @@ export default {
         if(store.state.ifMobileStyle){
           ideal = 1.33
         }else{
-          ideal = 0.7486
+          ideal = 0.5625
         }
         options = { video: {
             aspectRatio: { ideal: ideal },

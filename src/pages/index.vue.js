@@ -552,54 +552,78 @@ export default {
     async sendUnsentMessage(linkmanPeerId) {
       let _that = this
       let store = _that.$store
-      //linkman
-      let unSentIndividualMessages = await chatComponent.loadMessage({
-        ownerPeerId: myself.myselfPeerClient.peerId,
-        senderPeerId : myself.myselfPeerClient.peerId,
-        subjectId: linkmanPeerId,
-        subjectType: SubjectType.CHAT,
-        actualReceiveTime: { $eq: null }
+
+      //receipt
+        let receiptTypes = [
+            P2pChatMessageType.ADD_GROUPCHAT_MEMBER_RECEIPT,
+            P2pChatMessageType.CHAT_RECEIVE_RECEIPT,
+            P2pChatMessageType.MODIFY_GROUPCHAT_OWNER_RECEIPT,
+            P2pChatMessageType.MODIFY_GROUPCHAT_RECEIPT,
+            P2pChatMessageType.REMOVE_GROUPCHAT_MEMBER_RECEIPT,
+            P2pChatMessageType.ADD_GROUPCHAT_RECEIPT
+        ]
+      let receiptMessages = await chatComponent.loadMessage({
+          ownerPeerId: myself.myselfPeerClient.peerId,
+          subjectId: linkmanPeerId,
+          messageType: { $in: receiptTypes }
       })
-      if (unSentIndividualMessages && unSentIndividualMessages.length > 0) {
-        for (let unSentIndividualMessage of unSentIndividualMessages) {
-          await store.p2pSend(unSentIndividualMessage,linkmanPeerId)
-        }
-      }
-      //group
-      let unSentReceives = await chatComponent.loadReceive({
-        ownerPeerId: myself.myselfPeerClient.peerId,
-        receiverPeerId: linkmanPeerId,
-        receiveTime: { $eq: null }
-      })
-      if (unSentReceives && unSentReceives.length > 0) {
-        for (let unSentReceive of unSentReceives) {
-          if (unSentReceive.subjectType === SubjectType.LINKMAN_REQUEST) {
-            let linkmanRequest = await contactComponent.get(ContactDataType.LINKMAN_REQUEST, unSentReceive.messageId)
-            if (linkmanRequest.data) {
-              try {
-                linkmanRequest.data = JSON.parse(linkmanRequest.data)
-              } catch (e) {
-                console.log('JSON parse error, string:' + linkmanRequest.data + '; error:' + e)
-              }
-            }
-            let message = {
-              messageType: unSentReceive.messageType,
-              content: linkmanRequest
-            }
-            await store.p2pSend(message,linkmanPeerId)
-          } else {
-            let unSentGroupMessages = await chatComponent.loadMessage({
-              ownerPeerId: myself.myselfPeerClient.peerId,
-              messageId: unSentReceive.messageId
-            })
-            if (unSentGroupMessages && unSentGroupMessages.length > 0) {
-              for (let unSentGroupMessage of unSentGroupMessages) {
-                await store.p2pSend(unSentGroupMessage,linkmanPeerId)
-              }
-            }
+      if (receiptMessages && receiptMessages.length > 0) {
+          for (let receiptMessage of receiptMessages) {
+              await store.p2pSend(receiptMessage,linkmanPeerId)
+              await chatComponent.remove(ChatDataType.MESSAGE, receiptMessage)
           }
-        }
       }
+      setTimeout(async function(){//等待1s的回执
+          //linkman
+          let unSentIndividualMessages = await chatComponent.loadMessage({
+              ownerPeerId: myself.myselfPeerClient.peerId,
+              senderPeerId : myself.myselfPeerClient.peerId,
+              subjectId: linkmanPeerId,
+              subjectType: SubjectType.CHAT,
+              actualReceiveTime: { $eq: null }
+          })
+          if (unSentIndividualMessages && unSentIndividualMessages.length > 0) {
+              for (let unSentIndividualMessage of unSentIndividualMessages) {
+                  await store.p2pSend(unSentIndividualMessage,linkmanPeerId)
+              }
+          }
+          //group
+          let unSentReceives = await chatComponent.loadReceive({
+              ownerPeerId: myself.myselfPeerClient.peerId,
+              receiverPeerId: linkmanPeerId,
+              receiveTime: { $eq: null }
+          })
+          if (unSentReceives && unSentReceives.length > 0) {
+              for (let unSentReceive of unSentReceives) {
+                  if (unSentReceive.subjectType === SubjectType.LINKMAN_REQUEST) {
+                      let linkmanRequest = await contactComponent.get(ContactDataType.LINKMAN_REQUEST, unSentReceive.messageId)
+                      if (linkmanRequest.data) {
+                          try {
+                              linkmanRequest.data = JSON.parse(linkmanRequest.data)
+                          } catch (e) {
+                              console.log('JSON parse error, string:' + linkmanRequest.data + '; error:' + e)
+                          }
+                      }
+                      let message = {
+                          messageType: unSentReceive.messageType,
+                          content: linkmanRequest
+                      }
+                      await store.p2pSend(message,linkmanPeerId)
+                  } else {
+                      let unSentGroupMessages = await chatComponent.loadMessage({
+                          ownerPeerId: myself.myselfPeerClient.peerId,
+                          messageId: unSentReceive.messageId
+                      })
+                      if (unSentGroupMessages && unSentGroupMessages.length > 0) {
+                          for (let unSentGroupMessage of unSentGroupMessages) {
+                              await store.p2pSend(unSentGroupMessage,linkmanPeerId)
+                          }
+                      }
+                  }
+              }
+          }
+      },1000)
+
     },
     async insertReceivedMessage(message) {
       let _that = this
@@ -612,17 +636,25 @@ export default {
       let _that = this
       let store = _that.$store
       let currentDate = new Date().getTime()
-      let webrtcPeers  = webrtcPeerPool.getConnected(message.senderPeerId)
-      if(webrtcPeers && webrtcPeers.length > 0 && !message.actualReceiveTime){
+      if(!message.actualReceiveTime){
           let _message = {
-            messageType: P2pChatMessageType.CHAT_RECEIVE_CALLBACK,
-            preSubjectType: message.subjectType,
-            preSubjectId: message.subjectId,
-            senderPeerId: myself.myselfPeerClient.peerId,
-            messageId: message.messageId,
-            receiveTime: currentDate
+              messageType: P2pChatMessageType.CHAT_RECEIVE_RECEIPT,
+              preSubjectType: message.subjectType,
+              preSubjectId: message.subjectId,
+              subjectType: message.subjectType,
+              subjectId: message.senderPeerId,//不管群聊还是单聊，都为linkman的peerId
+              ownerPeerId: myself.myselfPeerClient.peerId,
+              senderPeerId: myself.myselfPeerClient.peerId,
+              messageId: message.messageId,
+              receiveTime: currentDate,
+              actualReceiveTime:currentDate
           }
-          await store.p2pSend( _message ,message.senderPeerId)
+          let webrtcPeers  = webrtcPeerPool.getConnected(message.senderPeerId)
+          if(webrtcPeers && webrtcPeers.length > 0){
+              await store.p2pSend( _message ,message.senderPeerId)
+          }else{
+              await chatComponent.insert(ChatDataType.MESSAGE, _message)
+          }
       }
       let receivedMessages = await chatComponent.loadMessage({
         ownerPeerId: myself.myselfPeerClient.peerId,
@@ -674,7 +706,7 @@ export default {
           //   messageId: message.messageId,
           //   subjectId: message.senderPeerId,
           //   senderPeerId: myself.myselfPeerClient.peerId,
-          //   messageType: P2pChatMessageType.CHAT_READ_CALLBACK,
+          //   messageType: P2pChatMessageType.CHAT_READ_RECEIPT,
           //   preSubjectType: message.subjectType,
           //   readTime: message.readTime
           // }
@@ -832,9 +864,9 @@ export default {
         }else{
           chat.destroyTime = 0
         }
-        if(_that.ifOnlySocketConnected(subjectId)){
-            message.actualReceiveTime = message.createDate
-        }
+        // if(_that.ifOnlySocketConnected(subjectId)){
+        //     message.actualReceiveTime = message.createDate
+        // }
         await store.p2pSend(message,subjectId)
       } else if (subjectType === SubjectType.GROUP_CHAT) {
         let groupMembers
@@ -1657,8 +1689,8 @@ export default {
       }
       let messageType = message.messageType
       let content = message.content
-      if(messageType === P2pChatMessageType.CHAT_RECEIVE_CALLBACK) {
-        console.log('receive CHAT_RECEIVE_CALLBACK')
+      if(messageType === P2pChatMessageType.CHAT_RECEIVE_RECEIPT) {
+        console.log('receive CHAT_RECEIVE_RECEIPT')
         console.log(message)
         if(message.preSubjectType === SubjectType.CHAT) {
           let currentMes
@@ -1833,9 +1865,11 @@ export default {
         linkmanRequest.receiveTime = currentTime
         let message = {
           messageType: P2pChatMessageType.ADD_GROUPCHAT_RECEIPT,
+          ownerPeerId: myselfPeerClient.peerId,
+          subjectId:content.senderPeerId,
           content: linkmanRequest
         }
-        await store.p2pSend(message, content.senderPeerId)
+        await _that.sendOrSaveReceipt(message)
       }
       else if (messageType === P2pChatMessageType.MODIFY_GROUPCHAT && content) {
         let _id = content._id
@@ -1911,9 +1945,11 @@ export default {
         linkmanRequest.receiveTime = currentTime
         let message = {
           messageType: P2pChatMessageType.MODIFY_GROUPCHAT_RECEIPT,
+          ownerPeerId: myselfPeerClient.peerId,
+          subjectId:content.senderPeerId,
           content: linkmanRequest
         }
-        await store.p2pSend(message, content.senderPeerId)
+        await _that.sendOrSaveReceipt(message)
       }
       else if (messageType === P2pChatMessageType.ADD_GROUPCHAT_MEMBER && content) {
         // 重复消息不处理、但仍发送Receive收条
@@ -2017,9 +2053,11 @@ export default {
         linkmanRequest.receiveTime = currentTime
         let message = {
           messageType: P2pChatMessageType.ADD_GROUPCHAT_RECEIPT,
+          ownerPeerId: myselfPeerClient.peerId,
+          subjectId:content.senderPeerId,
           content: linkmanRequest
         }
-        await store.p2pSend(message, content.senderPeerId)
+        await _that.sendOrSaveReceipt(message)
       }
       else if (messageType === P2pChatMessageType.REMOVE_GROUPCHAT_MEMBER && content) {
         let _id = content._id
@@ -2154,9 +2192,11 @@ export default {
         linkmanRequest.receiveTime = currentTime
         let message = {
           messageType: P2pChatMessageType.REMOVE_GROUPCHAT_MEMBER_RECEIPT,
+          ownerPeerId: myselfPeerClient.peerId,
+          subjectId:content.senderPeerId,
           content: linkmanRequest
         }
-        await store.p2pSend(message, content.senderPeerId)
+        await _that.sendOrSaveReceipt(message)
       }
       else if (messageType === P2pChatMessageType.MODIFY_GROUPCHAT_OWNER && content) {
         let _id = content._id
@@ -2216,9 +2256,11 @@ export default {
         linkmanRequest.receiveTime = currentTime
         let message = {
           messageType: P2pChatMessageType.MODIFY_GROUPCHAT_OWNER_RECEIPT,
+          ownerPeerId: myselfPeerClient.peerId,
+          subjectId:content.senderPeerId,
           content: linkmanRequest
         }
-        await store.p2pSend(message, content.senderPeerId)
+        await _that.sendOrSaveReceipt(message)
       }
       else if ((messageType === P2pChatMessageType.ADD_GROUPCHAT_RECEIPT
         || messageType === P2pChatMessageType.MODIFY_GROUPCHAT_RECEIPT
@@ -2240,7 +2282,7 @@ export default {
           await chatComponent.update(ChatDataType.RECEIVE, receives, null)
         }
       }
-      else if (messageType === P2pChatMessageType.CHAT_READ_CALLBACK) {
+      else if (messageType === P2pChatMessageType.CHAT_READ_RECEIPT) {
         await store.handleReadCallback(message)
       }
       else if (messageType === P2pChatMessageType.CALL_REQUEST) {
@@ -2252,6 +2294,15 @@ export default {
       else if(messageType === P2pChatMessageType.CHAT_LINKMAN){
         await store.insertReceivedMessage(message)
       }
+    },
+    async sendOrSaveReceipt(message){
+        let _that = this
+        let webrtcPeers  = webrtcPeerPool.getConnected(message.subjectId)
+        if(webrtcPeers && webrtcPeers.length > 0){
+            await store.p2pSend( message ,message.subjectId)
+        }else{
+            await chatComponent.insert(ChatDataType.MESSAGE, message)
+        }
     },
     async webrtcConnect(evt){
       let _that = this
