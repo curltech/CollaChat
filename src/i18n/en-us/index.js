@@ -295,6 +295,7 @@ export default {
   "Please confirm to receive the backup from your mobile": "Please confirm to receive the backup from your mobile",
   "Please scan the QR code using another mobile to start the migration": "Please scan the QR code using another mobile to start the migration",
   "Please confirm to receive the migration from another mobile": "Please confirm to receive the migration from another mobile",
+  "Please confirm to restore using the backup from your PC": "Please confirm to restore using the backup from your PC",
   "Storage": "Storage",
   "Local Data Crypto": "Local Data Crypto",
   "Full Text Search": "Full Text Search",

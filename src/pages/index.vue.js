@@ -16,6 +16,7 @@ import pinyinUtil from '@/libs/base/colla-pinyin'
 import * as CollaConstant from '@/libs/base/colla-constant'
 import { statusBarComponent, deviceComponent, localNotificationComponent } from '@/libs/base/colla-cordova'
 import { cameraComponent, systemAudioComponent, mediaComponent } from '@/libs/base/colla-media'
+import { fileComponent } from '@/libs/base/colla-cordova'
 import { CollectionType } from '@/libs/biz/colla-collection'
 import { ChatDataType, ChatContentType, P2pChatMessageType, SubjectType, chatComponent, chatBlockComponent} from '@/libs/biz/colla-chat'
 import { ContactDataType, RequestType, RequestStatus, LinkmanStatus, ActiveStatus, contactComponent, MemberType } from '@/libs/biz/colla-contact'
@@ -79,13 +80,15 @@ export default {
       pendingSetupSocket: false,
       logoutFlag: false,
       heartbeatTimer: null,
+      initMigrateDialog: false,
+      migrateDialog: false,
+      migrateQRContent: null,
       initBackupDialog: false,
       backupDialog: false,
       backupUrl: null,
       backupFilename: null,
-      initMigrateDialog: false,
-      migrateDialog: false,
-      migrateQRContent: null
+      restoreDialog: false,
+      restoreFilename: null
     }
   },
   computed: {
@@ -623,7 +626,6 @@ export default {
               }
           }
       },1000)
-
     },
     async insertReceivedMessage(message) {
       let _that = this
@@ -864,9 +866,9 @@ export default {
         }else{
           chat.destroyTime = 0
         }
-        // if(_that.ifOnlySocketConnected(subjectId)){
-        //     message.actualReceiveTime = message.createDate
-        // }
+        //if(_that.ifOnlySocketConnected(subjectId)){
+        //    message.actualReceiveTime = message.createDate
+        //}
         await store.p2pSend(message,subjectId)
       } else if (subjectType === SubjectType.GROUP_CHAT) {
         let groupMembers
@@ -1292,6 +1294,7 @@ export default {
               alert("[Scan.scan.error] " + JSON.stringify(e))
             } else {
               //alert("[Scan.scan.contents] " + contents)
+              console.log('scan contents:' + contents)
               systemAudioComponent.scanAudioPlay()
               if (contents) {
                 if (contents.indexOf('Migration::') > -1) {
@@ -1649,8 +1652,11 @@ export default {
         }
       } else if (type === ChatMessageType.LOGOUT) {
         await store.logout(data)
+      }  else if (type === ChatMessageType.MIGRATE) {
+        console.log('MIGRATE')
+        _that.initMigrateDialog = false
       } else if (type === ChatMessageType.BACKUP) {
-        console.log('BACKUP')
+        console.log('BACKUP, url:' + data.url + ', filename:' + data.filename)
         if (data.url && data.filename) {
           _that.backupUrl = data.url
           _that.backupFilename = data.filename
@@ -1659,8 +1665,35 @@ export default {
           _that.initBackupDialog = false
         }
       } else if (type === ChatMessageType.RESTORE) {
-        console.log('RESTORE')
-        _that.initMigrateDialog = false
+        console.log('RESTORE, url:' + data.url + ', filename:' + data.filename)
+        if (data.url && !data.filename) {
+          try {
+            let _client = axios.create()
+            if (_client && store.restoreFile) {
+              let formdata = new FormData()
+              formdata.append('file', store.restoreFile)
+              //formdata.append('name', store.restoreFile.name)
+              let result = await _client.post(data.url, formdata, {
+                headers: {"Content-Type" : "multipart/form-data"}
+              })
+              console.log('post result:' + JSON.stringify(result))
+              let clientPeerId = myself.myselfPeerClient.peerId
+              let newPayload = {}
+              newPayload.type = ChatMessageType.RESTORE
+              newPayload.srcClientId = myself.myselfPeerClient.clientId
+              newPayload.srcPeerId = clientPeerId
+              newPayload.filename = store.restoreFile.name
+              await chatAction.chat(null, newPayload, clientPeerId)
+            }
+          } catch (e) {
+            await logService.log(e.stack, 'restorePostError', 'error')
+          }
+        } else if (!data.url && data.filename) {
+          _that.restoreFilename = data.filename
+          _that.restoreDialog = true
+        } else if (!data.url && !data.filename) {
+          _that.startServer('restore', null)
+        }
       }
     },
     async p2pChatReceiver(peerId, message) {
@@ -2296,13 +2329,13 @@ export default {
       }
     },
     async sendOrSaveReceipt(message){
-        let _that = this
-        let webrtcPeers  = webrtcPeerPool.getConnected(message.subjectId)
-        if(webrtcPeers && webrtcPeers.length > 0){
-            await store.p2pSend( message ,message.subjectId)
-        }else{
-            await chatComponent.insert(ChatDataType.MESSAGE, message)
-        }
+      let _that = this
+      let webrtcPeers  = webrtcPeerPool.getConnected(message.subjectId)
+      if(webrtcPeers && webrtcPeers.length > 0){
+          await store.p2pSend( message ,message.subjectId)
+      }else{
+          await chatComponent.insert(ChatDataType.MESSAGE, message)
+      }
     },
     async webrtcConnect(evt){
       let _that = this
@@ -2682,147 +2715,6 @@ export default {
         }
       }
     },
-    async refreshContactsData() {
-      let _that = this
-      let store = _that.$store
-      let clientPeerId = myself.myselfPeerClient.peerId
-      store.state.linkmanTagNames = []
-      store.state.linkmanTagNameMap = {}
-      store.state.linkmanTagIdMap = {}
-      store.state.linkmans = []
-      store.state.linkmanMap = {}
-      store.state.groupChats = []
-      store.state.groupChatMap = {}
-      let linkmanTags = await contactComponent.loadLinkmanTag({
-        ownerPeerId: clientPeerId,
-        createDate: { $gt: null }
-      }, [{ createDate: 'asc' }])
-      if (linkmanTags && linkmanTags.length > 0) {
-        for (let linkmanTag of linkmanTags) {
-          store.state.linkmanTagNames.push(linkmanTag.name)
-          store.state.linkmanTagNameMap[linkmanTag.name] = linkmanTag._id
-          store.state.linkmanTagIdMap[linkmanTag._id] = linkmanTag.name
-        }
-      }
-      let linkmanDBItems = await contactComponent.loadLinkman({
-        ownerPeerId: clientPeerId
-      })
-      if (linkmanDBItems && linkmanDBItems.length > 0) {
-        linkmanDBItems.sort(function (a, b) {
-          let aPy = a.pyGivenName ? a.pyGivenName : a.pyName
-          let bPy = b.pyGivenName ? b.pyGivenName : b.pyName
-          if (aPy < bPy) {
-            return -1
-          } else if (aPy == bPy) {
-            return 0
-          } else {
-            return 1
-          }
-        })
-        store.state.linkmans = linkmanDBItems
-        for (let linkmanDBItem of linkmanDBItems) {
-          store.state.linkmanMap[linkmanDBItem.peerId] = linkmanDBItem
-          linkmanDBItem.groupChats = [] // 初始化属性
-          let tagNames = []
-          let tag = ''
-          let linkmanTagLinkmans = await contactComponent.loadLinkmanTagLinkman({
-            ownerPeerId: clientPeerId,
-            linkmanPeerId: linkmanDBItem.peerId,
-            createDate: { $gt: null }
-          }, [{ createDate: 'asc' }])
-          if (linkmanTagLinkmans && linkmanTagLinkmans.length > 0) {
-            for (let linkmanTagLinkman of linkmanTagLinkmans) {
-              let name = store.state.linkmanTagIdMap[linkmanTagLinkman.tagId]
-              tagNames.push(name)
-              tag = (tag ? tag + ", " + name : name)
-            }
-          }
-          linkmanDBItem.tagNames = tagNames
-          linkmanDBItem.tag = tag
-          linkmanDBItem.pyTag = pinyinUtil.getPinyin(tag)
-        }
-      }
-      let groupDBItems = await contactComponent.loadGroup({
-        ownerPeerId: clientPeerId,
-        createDate: { $gt: null }
-      }, [{ createDate: 'asc' }])
-      if (groupDBItems && groupDBItems.length > 0) {
-        store.state.groupChats = groupDBItems
-        for (let groupDBItem of groupDBItems) {
-          let groupMemberDBItems = await contactComponent.loadGroupMember(
-            {
-              ownerPeerId: clientPeerId,
-              groupId: groupDBItem.groupId,
-              createDate: { $gt: null }
-            }, [{ createDate: 'asc' }]
-          )
-          if (groupMemberDBItems && groupMemberDBItems.length > 0) {
-            for (let groupMemberDBItem of groupMemberDBItems) {
-              if (groupMemberDBItem.memberType === MemberType.OWNER) {
-                groupDBItem.groupOwnerPeerId = groupMemberDBItem.memberPeerId
-              }
-              let linkman = store.state.linkmanMap[groupMemberDBItem.memberPeerId]
-              if (linkman) {
-                linkman.groupChats.push(groupDBItem)
-              }
-            }
-            groupDBItem.groupMembers = groupMemberDBItems
-          }
-          store.state.groupChatMap[groupDBItem.groupId] = groupDBItem
-        }
-      }
-    },
-    showInitBackupDialog: function() {
-      let _that = this
-      _that.initBackupDialog = true
-    },
-    cancelInitBackup: function() {
-      let _that = this
-      _that.initBackupDialog = false
-    },
-    acceptBackup: async function() {
-      let _that = this
-      let url = _that.backupUrl + '/' + _that.backupFilename
-      let json
-      try {
-        let _client = axios.create()
-        if (_client) {
-          let serviceData = await _client.get(url)
-          if (serviceData) {
-            json = serviceData.data
-          }
-        }
-      } catch (e) {
-        console.error(e)
-      }
-      if (json) {
-        if (_that.backupFilename) {
-          let filenameArr = _that.backupFilename.split('-')
-          if (filenameArr.length === 3) {
-            let arr = filenameArr[2].split('.')
-            let filename = filenameArr[0] + '-' + filenameArr[1] + '(' + date.formatDate(new Date(parseInt(arr[0])), 'YYYY-MM-DD_HH:mm:ss') + ').db'
-            let element = document.createElement('a')
-            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(json))
-            element.setAttribute('download', filename)
-            element.style.display = 'none'
-            document.body.appendChild(element)
-            element.click()
-            document.body.removeChild(element)
-          }
-        }
-      }
-      await _that.closeBackup()
-    },
-    closeBackup: async function() {
-      let _that = this
-      let clientPeerId = myself.myselfPeerClient.peerId
-      let newPayload = {}
-      newPayload.type = ChatMessageType.BACKUP
-      newPayload.srcClientId = myself.myselfPeerClient.clientId
-      newPayload.srcPeerId = clientPeerId
-      await chatAction.chat(null, newPayload, clientPeerId)
-      _that.backupDialog = false
-    },
     showInitMigrateDialog: async function(url, filename) {
       let _that = this
       _that.initMigrateDialog = true
@@ -2855,7 +2747,7 @@ export default {
               }
             }
           } catch (e) {
-            console.error(e)
+            await logService.log(e.stack, 'acceptMigrateError', 'error')
           }
           if (json) {
             await store.restoreChatRecord(json)
@@ -2873,6 +2765,81 @@ export default {
       newPayload.srcPeerId = clientPeerId
       await chatAction.chat(null, newPayload, clientPeerId)
       _that.migrateDialog = false
+    },
+    showInitBackupDialog: function() {
+      let _that = this
+      _that.initBackupDialog = true
+    },
+    cancelInitBackup: function() {
+      let _that = this
+      _that.initBackupDialog = false
+    },
+    acceptBackup: async function() {
+      let _that = this
+      let url = _that.backupUrl + '/' + _that.backupFilename
+      let json
+      try {
+        let _client = axios.create()
+        if (_client) {
+          let serviceData = await _client.get(url)
+          if (serviceData) {
+            json = serviceData.data
+          }
+        }
+      } catch (e) {
+        await logService.log(e.stack, 'acceptBackupError', 'error')
+      }
+      if (json) {
+        if (_that.backupFilename) {
+          /*let filenameArr = _that.backupFilename.split('-')
+          if (filenameArr.length === 3) {
+            let arr = filenameArr[2].split('.')
+            let filename = filenameArr[0] + '-' + filenameArr[1] + '(' + date.formatDate(new Date(parseInt(arr[0])), 'YYYY-MM-DD_HH:mm:ss') + ').db'*/
+            let filename = _that.backupFilename
+            let element = document.createElement('a')
+            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(json))
+            element.setAttribute('download', filename)
+            element.style.display = 'none'
+            document.body.appendChild(element)
+            element.click()
+            document.body.removeChild(element)
+          /*}*/
+        }
+      }
+      await _that.closeBackup()
+    },
+    closeBackup: async function() {
+      let _that = this
+      let clientPeerId = myself.myselfPeerClient.peerId
+      let newPayload = {}
+      newPayload.type = ChatMessageType.BACKUP
+      newPayload.srcClientId = myself.myselfPeerClient.clientId
+      newPayload.srcPeerId = clientPeerId
+      await chatAction.chat(null, newPayload, clientPeerId)
+      _that.backupDialog = false
+    },
+    acceptRestore: async function() {
+      let _that = this
+      let store = _that.$store
+      let dirEntry = await fileComponent.getRootDirEntry('/')
+      let dirPath = dirEntry.toInternalURL()
+      let url = dirPath + '/' + _that.restoreFilename
+      let fileEntry = await fileComponent.getFileEntry(url)
+      let json = await fileComponent.readFile(fileEntry, { format: 'txt' })
+      if (json) {
+        await store.restoreChatRecord(json)
+        _that.closeRestore()
+        _that.$q.notify({
+          message: _that.$i18n.t("Restore successfully"),
+          timeout: 3000,
+          type: "info",
+          color: "info",
+        })
+      }
+    },
+    closeRestore: function() {
+      let _that = this
+      _that.restoreDialog = false
     },
     restoreChatRecord: async function(json) {
       let _that = this
@@ -3152,6 +3119,158 @@ export default {
         }
       }
       _that.$q.loading.hide()
+    },
+    async refreshContactsData() {
+      let _that = this
+      let store = _that.$store
+      let clientPeerId = myself.myselfPeerClient.peerId
+      store.state.linkmanTagNames = []
+      store.state.linkmanTagNameMap = {}
+      store.state.linkmanTagIdMap = {}
+      store.state.linkmans = []
+      store.state.linkmanMap = {}
+      store.state.groupChats = []
+      store.state.groupChatMap = {}
+      let linkmanTags = await contactComponent.loadLinkmanTag({
+        ownerPeerId: clientPeerId,
+        createDate: { $gt: null }
+      }, [{ createDate: 'asc' }])
+      if (linkmanTags && linkmanTags.length > 0) {
+        for (let linkmanTag of linkmanTags) {
+          store.state.linkmanTagNames.push(linkmanTag.name)
+          store.state.linkmanTagNameMap[linkmanTag.name] = linkmanTag._id
+          store.state.linkmanTagIdMap[linkmanTag._id] = linkmanTag.name
+        }
+      }
+      let linkmanDBItems = await contactComponent.loadLinkman({
+        ownerPeerId: clientPeerId
+      })
+      if (linkmanDBItems && linkmanDBItems.length > 0) {
+        linkmanDBItems.sort(function (a, b) {
+          let aPy = a.pyGivenName ? a.pyGivenName : a.pyName
+          let bPy = b.pyGivenName ? b.pyGivenName : b.pyName
+          if (aPy < bPy) {
+            return -1
+          } else if (aPy == bPy) {
+            return 0
+          } else {
+            return 1
+          }
+        })
+        store.state.linkmans = linkmanDBItems
+        for (let linkmanDBItem of linkmanDBItems) {
+          store.state.linkmanMap[linkmanDBItem.peerId] = linkmanDBItem
+          linkmanDBItem.groupChats = [] // 初始化属性
+          let tagNames = []
+          let tag = ''
+          let linkmanTagLinkmans = await contactComponent.loadLinkmanTagLinkman({
+            ownerPeerId: clientPeerId,
+            linkmanPeerId: linkmanDBItem.peerId,
+            createDate: { $gt: null }
+          }, [{ createDate: 'asc' }])
+          if (linkmanTagLinkmans && linkmanTagLinkmans.length > 0) {
+            for (let linkmanTagLinkman of linkmanTagLinkmans) {
+              let name = store.state.linkmanTagIdMap[linkmanTagLinkman.tagId]
+              tagNames.push(name)
+              tag = (tag ? tag + ", " + name : name)
+            }
+          }
+          linkmanDBItem.tagNames = tagNames
+          linkmanDBItem.tag = tag
+          linkmanDBItem.pyTag = pinyinUtil.getPinyin(tag)
+        }
+      }
+      let groupDBItems = await contactComponent.loadGroup({
+        ownerPeerId: clientPeerId,
+        createDate: { $gt: null }
+      }, [{ createDate: 'asc' }])
+      if (groupDBItems && groupDBItems.length > 0) {
+        store.state.groupChats = groupDBItems
+        for (let groupDBItem of groupDBItems) {
+          let groupMemberDBItems = await contactComponent.loadGroupMember(
+            {
+              ownerPeerId: clientPeerId,
+              groupId: groupDBItem.groupId,
+              createDate: { $gt: null }
+            }, [{ createDate: 'asc' }]
+          )
+          if (groupMemberDBItems && groupMemberDBItems.length > 0) {
+            for (let groupMemberDBItem of groupMemberDBItems) {
+              if (groupMemberDBItem.memberType === MemberType.OWNER) {
+                groupDBItem.groupOwnerPeerId = groupMemberDBItem.memberPeerId
+              }
+              let linkman = store.state.linkmanMap[groupMemberDBItem.memberPeerId]
+              if (linkman) {
+                linkman.groupChats.push(groupDBItem)
+              }
+            }
+            groupDBItem.groupMembers = groupMemberDBItems
+          }
+          store.state.groupChatMap[groupDBItem.groupId] = groupDBItem
+        }
+      }
+    },
+    startServer: function(type, filename) {
+      let _that = this
+      let httpd = ( cordova && cordova.plugins && cordova.plugins.CorHttpd ) ? cordova.plugins.CorHttpd : null
+      if (httpd) {
+        httpd.getURL(function(url) {
+          if (url.length > 0) {
+            console.log('server is up:' + url)
+            httpd.stopServer(function() {
+              console.log('server is stopped.')
+              _that.start(httpd, type, filename)
+            }, function(error) {
+              console.error('failed to stop server:' + error)
+            })
+          } else {
+            _that.start(httpd, type, filename)
+          }
+        })
+      } else {
+        alert('CorHttpd plugin not available/ready.')
+      }
+    },
+    start: function(httpd, type, filename) {
+      let _that = this
+      let store = _that.$store
+      httpd.startServer({
+        'www_root' : '/data/user/0/io.curltech.colla/files/files/',
+        'port' : 8090
+      }, async function(url) {
+        if (url.length > 0) {
+          console.log('server is started:' + url)
+          httpd.getLocalPath(function(path) {
+            console.log('localpath:' + path)
+          })
+          if (type === 'migrate') {
+            await store.showInitMigrateDialog(url, filename)
+          } else if (type === 'backup') {
+            let clientPeerId = myself.myselfPeerClient.peerId
+            let newPayload = {}
+            newPayload.type = ChatMessageType.BACKUP
+            newPayload.srcClientId = myself.myselfPeerClient.clientId
+            newPayload.srcPeerId = clientPeerId
+            newPayload.url = url
+            newPayload.filename = filename
+            await chatAction.chat(null, newPayload, clientPeerId)
+            store.changeBackupMigrationSubKind('default')
+            store.showInitBackupDialog()
+          } else if (type === 'restore') {
+            let clientPeerId = myself.myselfPeerClient.peerId
+            let newPayload = {}
+            newPayload.type = ChatMessageType.RESTORE
+            newPayload.srcClientId = myself.myselfPeerClient.clientId
+            newPayload.srcPeerId = clientPeerId
+            newPayload.url = url
+            await chatAction.chat(null, newPayload, clientPeerId)
+          }
+        } else {
+          console.log('server is down')
+        }
+      }, async function(error) {
+        await logService.log(error, 'startServerError', 'error')
+      })
     }
   },
   async created() {
@@ -3401,6 +3520,7 @@ export default {
     store.showInitBackupDialog = _that.showInitBackupDialog
     store.showInitMigrateDialog = _that.showInitMigrateDialog
     store.restoreChatRecord = _that.restoreChatRecord
+    store.startServer = _that.startServer
     _that.tab = 'chat'
     _that.kind = 'message'
     _that.chatKind = 'message'

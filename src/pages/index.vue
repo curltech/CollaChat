@@ -204,27 +204,6 @@ q-layout
     v-if="$store.state.miniVideoDialog"
   )
     q-btn(fab, icon="settings_phone", color="red", @click="changeMiniVideoDialog")
-  q-dialog(v-model="initBackupDialog" persistent)
-    q-card(style="width: 250px")
-      q-bar(class="bg-primary text-c-grey-0")
-        q-item-label {{$t('Backup (Mobile to PC)')}}
-        //q-space
-        //q-btn(dense flat icon="close" v-close-popup)
-      q-card-section(class="q-pa-lg")
-        q-item-label {{$t('Please confirm on your computer to start the backup')}}
-      q-card-actions(align="center")
-        q-btn.btnIcon(unelevated color="primary" :label="$t('Cancel')" v-close-popup @click="cancelInitBackup")
-  q-dialog(v-model="backupDialog" persistent)
-    q-card(style="width: 250px")
-      q-bar(class="bg-primary text-c-grey-0")
-        q-item-label {{$t('Backup (Mobile to PC)')}}
-        //q-space
-        //q-btn(dense flat icon="close" v-close-popup)
-      q-card-section(class="q-pa-lg")
-        q-item-label {{$t('Please confirm to receive the backup from your mobile')}}
-      q-card-actions(align="center")
-        q-btn.btnIcon(unelevated color="primary" :label="$t('Confirm')" v-close-popup @click="acceptBackup")
-        q-btn.btnIcon(unelevated color="primary" :label="$t('Cancel')" v-close-popup @click="closeBackup")
   q-dialog(v-model="initMigrateDialog" persistent maximized)
     q-card(flat class="fixed-center q-pa-none")
       q-bar(class="bg-primary text-c-grey-0")
@@ -250,6 +229,38 @@ q-layout
       q-card-actions(align="center")
         q-btn.btnIcon(unelevated color="primary" :label="$t('Confirm')" v-close-popup @click="acceptMigrate")
         q-btn.btnIcon(unelevated color="primary" :label="$t('Cancel')" v-close-popup @click="closeMigrate")
+  q-dialog(v-model="initBackupDialog" persistent)
+    q-card(style="width: 250px")
+      q-bar(class="bg-primary text-c-grey-0")
+        q-item-label {{$t('Backup (Mobile to PC)')}}
+        //q-space
+        //q-btn(dense flat icon="close" v-close-popup)
+      q-card-section(class="q-pa-lg")
+        q-item-label {{$t('Please confirm on your computer to start the backup')}}
+      q-card-actions(align="center")
+        q-btn.btnIcon(unelevated color="primary" :label="$t('Cancel')" v-close-popup @click="cancelInitBackup")
+  q-dialog(v-model="backupDialog" persistent)
+    q-card(style="width: 250px")
+      q-bar(class="bg-primary text-c-grey-0")
+        q-item-label {{$t('Backup (Mobile to PC)')}}
+        //q-space
+        //q-btn(dense flat icon="close" v-close-popup)
+      q-card-section(class="q-pa-lg")
+        q-item-label {{$t('Please confirm to receive the backup from your mobile')}}
+      q-card-actions(align="center")
+        q-btn.btnIcon(unelevated color="primary" :label="$t('Confirm')" v-close-popup @click="acceptBackup")
+        q-btn.btnIcon(unelevated color="primary" :label="$t('Cancel')" v-close-popup @click="closeBackup")
+  q-dialog(v-model="restoreDialog" persistent)
+    q-card(style="width: 250px")
+      q-bar(class="bg-primary text-c-grey-0")
+        q-item-label {{$t('Restore (PC to Mobile)')}}
+        //q-space
+        //q-btn(dense flat icon="close" v-close-popup)
+      q-card-section(class="q-pa-lg")
+        q-item-label {{$t('Please confirm to restore using the backup from your PC')}}
+      q-card-actions(align="center")
+        q-btn.btnIcon(unelevated color="primary" :label="$t('Confirm')" v-close-popup @click="acceptRestore")
+        q-btn.btnIcon(unelevated color="primary" :label="$t('Cancel')" v-close-popup @click="closeRestore")
 </template>
 <script src="./index.vue.js" />
 <style lang="stylus" src="../css/index.styl"/>

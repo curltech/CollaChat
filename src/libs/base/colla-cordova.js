@@ -152,10 +152,11 @@ class FileComponent {
             fileEntry.file(function (file) {
                 let reader = new FileReader()
                 reader.onloadend = function (e) {
-                    console.log('Successful file read: ' + this.result.byteLength)
                     if (options.format === 'txt') {
+                        console.log('Successful file read: ' + this.result.length)
                         resolve(this.result)
                     } else {
+                        console.log('Successful file read: ' + this.result.byteLength)
                         let arr = new Uint8Array(this.result)
                         if (options.format === 'blob' && options.type) {
                             let blob = new Blob([arr], { type: options.type })

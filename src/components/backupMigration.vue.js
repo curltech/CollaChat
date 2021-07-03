@@ -2,7 +2,6 @@ import { date } from 'quasar'
 
 import { myself } from 'libcolla'
 import { ChatMessageType, chatAction } from 'libcolla'
-import { logService } from 'libcolla'
 
 import { chatComponent, chatBlockComponent } from '@/libs/biz/colla-chat'
 import { contactComponent } from '@/libs/biz/colla-contact'
@@ -55,7 +54,7 @@ export default {
       let store = _that.$store
       let json = await _that.exportJson()
       if (json) {
-        let filename = 'collaBackup-' + myself.myselfPeerClient.clientId + '(' + date.formatDate(new Date(), 'YYYY-MM-DD_HH:mm:ss') + ').db'
+        let filename = 'collaBackup-' + myself.myselfPeerClient.clientId + '-' + new Date().getTime() + '.db' //'(' + date.formatDate(new Date(), 'YYYY-MM-DD_HH:mm:ss') + ').db'
         let element = document.createElement('a')
         element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(json))
         element.setAttribute('download', filename)
@@ -69,9 +68,9 @@ export default {
     localRestore: function () {
       let _that = this
       let store = _that.$store
-      _that.$refs.upload.pickFiles()
+      _that.$refs.localRestoreUpload.pickFiles()
     },
-    upload: function(files) {
+    localRestoreUpload: function(files) {
       let _that = this
       let store = _that.$store
       let file = files[0]
@@ -89,7 +88,7 @@ export default {
         })
       }
       reader.readAsText(file)
-      _that.$refs.upload.reset()
+      _that.$refs.localRestoreUpload.reset()
     },
     initMigrate: function() {
       let _that = this
@@ -115,7 +114,7 @@ export default {
           type: "text/plain",
         })
         await fileComponent.writeFile(fileEntry, blob, false)
-        _that.startServer('migrate', filename)
+        store.startServer('migrate', filename)
       }
     },
     initBackup: function() {
@@ -142,7 +141,7 @@ export default {
           type: "text/plain",
         })
         await fileComponent.writeFile(fileEntry, blob, false)
-        _that.startServer('backup', filename)
+        store.startServer('backup', filename)
       }
     },
     closeBackup: function() {
@@ -153,66 +152,25 @@ export default {
     initRestore: function() {
       let _that = this
       let store = _that.$store
-      let inAppBrowser = window.open('https://192.168.0.101:8090/', '_blank', 'location=no')
+      _that.$refs.restoreUpload.pickFiles()
+    },
+    restoreUpload: async function(files) {
+      let _that = this
+      let store = _that.$store
+      store.restoreFile = files[0]
+      _that.$refs.restoreUpload.reset()
+      let clientPeerId = myself.myselfPeerClient.peerId
+      let newPayload = {}
+      newPayload.type = ChatMessageType.RESTORE
+      newPayload.srcClientId = myself.myselfPeerClient.clientId
+      newPayload.srcPeerId = clientPeerId
+      await chatAction.chat(null, newPayload, clientPeerId)
+      //store.showInitRestoreDialog()
     },
     restore: function () {
       let _that = this
       let store = _that.$store
       _that.$refs.upload.pickFiles()
-    },
-    startServer: function(type, filename) {
-      let _that = this
-      let httpd = ( cordova && cordova.plugins && cordova.plugins.CorHttpd ) ? cordova.plugins.CorHttpd : null
-      if (httpd) {
-        httpd.getURL(function(url) {
-          if (url.length > 0) {
-            console.log('server is up:' + url)
-            httpd.stopServer(function() {
-              console.log('server is stopped.')
-              _that.start(httpd, type, filename)
-            }, function(error) {
-              console.error('failed to stop server:' + error)
-            })
-          } else {
-            _that.start(httpd, type, filename)
-          }
-        })
-      } else {
-        alert('CorHttpd plugin not available/ready.')
-      }
-    },
-    start: function(httpd, type, filename) {
-      let _that = this
-      let store = _that.$store
-      httpd.startServer({
-        'www_root' : '/data/user/0/io.curltech.colla/files/files/',
-        'port' : 8090
-      }, async function(url) {
-        if (url.length > 0) {
-          console.log('server is started:' + url)
-          httpd.getLocalPath(function(path) {
-            console.log('localpath:' + path)
-          })
-          if (type === 'backup') {
-            let clientPeerId = myself.myselfPeerClient.peerId
-            let newPayload = {}
-            newPayload.type = ChatMessageType.BACKUP
-            newPayload.srcClientId = myself.myselfPeerClient.clientId
-            newPayload.srcPeerId = clientPeerId
-            newPayload.url = url
-            newPayload.filename = filename
-            await chatAction.chat(null, newPayload, clientPeerId)
-            _that.subKind = 'default'
-            store.showInitBackupDialog()
-          } else if (type === 'migrate') {
-            await store.showInitMigrateDialog(url, filename)
-          }
-        } else {
-          console.log('server is down')
-        }
-      }, async function(error) {
-        await logService.log(error, 'startServerError', 'error')
-      })
     },
     exportJson: async function() {
       let _that = this

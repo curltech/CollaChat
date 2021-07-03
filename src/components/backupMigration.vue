@@ -24,8 +24,8 @@
             q-item-section(avatar)
               q-icon(name="keyboard_arrow_right")
           //q-separator.c-separator(v-if="$store.ifMobile()" style="margin-left:16px;width:calc(100% - 16px)")
-          //q-item(v-if="!$store.ifMobile()" clickable v-ripple @click="initRestore")
-          q-item(v-if="!$store.ifMobile()" clickable v-ripple @click="subKind = 'list'")
+          //q-item(v-if="!$store.ifMobile()" clickable v-ripple @click="subKind = 'list'")
+          q-item(v-if="!$store.ifMobile()" clickable v-ripple @click="initRestore")
             q-item-section
               q-item-label {{$t('Restore (PC to Mobile)')}}
             q-item-section(avatar)
@@ -48,6 +48,7 @@
         tip.drawcontent
       q-tab-panel(name="list" style="padding:0px 0px")
         list.drawcontent
-    q-uploader(style="display:none" ref="upload" @added="files => upload(files)" accept=".db")
+    q-uploader(style="display:none" ref="localRestoreUpload" @added="files => localRestoreUpload(files)" accept=".db")
+    q-uploader(style="display:none" ref="restoreUpload" @added="files => restoreUpload(files)" accept=".db")
 </template>
 <script src="./backupMigration.vue.js" />

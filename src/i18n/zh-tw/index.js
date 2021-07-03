@@ -301,6 +301,7 @@
   "Please confirm to receive the backup from your mobile": "請確認以接收來自手機的備份",
   "Please scan the QR code using another mobile to start the migration": "請使用另一個手機掃描二維碼以開始遷移",
   "Please confirm to receive the migration from another mobile": "請確認以接收來自另一個手機的遷移",
+  "Please confirm to restore using the backup from your PC": "請確認以使用來自電腦的備份進行恢復",
   "Storage": "存儲空間",
   "Local Data Crypto": "本地數據加密",
   "Full Text Search": "全文檢索",

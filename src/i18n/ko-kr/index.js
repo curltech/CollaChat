@@ -301,6 +301,7 @@
   "Please confirm to receive the backup from your mobile": "모바일에서 백업을 받으려면 확인하십시오",
   "Please scan the QR code using another mobile to start the migration": "이전을 시작하려면 다른 모바일을 사용하여 QR 코드를 스캔하세요",
   "Please confirm to receive the migration from another mobile": "다른 모바일에서 이전을 수신하려면 확인하세요",
+  "Please confirm to restore using the backup from your PC": "컴퓨터에서 백업을 사용하여 복원하려면 확인하십시오",
   "Storage": "저장 공간",
   "Local Data Crypto": "로 컬 데이터 암호 화",
   "Full Text Search": "전체 텍스트 검색",
