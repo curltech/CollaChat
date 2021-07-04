@@ -3231,11 +3231,20 @@ export default {
         alert('CorHttpd plugin not available/ready.')
       }
     },
-    start: function(httpd, type, filename) {
+    start: async function(httpd, type, filename) {
       let _that = this
       let store = _that.$store
+      let dirEntry = await fileComponent.getRootDirEntry('/')
+      let dirPath = dirEntry.toInternalURL()
+      let fileEntry = await fileComponent.getFileEntry(dirPath + '/')
+      let path = fileEntry.toURL()
+      let pos = path.indexOf('file://')
+      if (pos > -1) {
+        path = path.substring(pos + 7)
+      }
+      console.log('path:' + path)
       httpd.startServer({
-        'www_root' : '/data/user/0/io.curltech.colla/files/files/',
+        'www_root' : path,
         'port' : 8090
       }, async function(url) {
         if (url.length > 0) {

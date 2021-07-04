@@ -870,7 +870,7 @@ export default {
     }
     store.connectAddressOptions = _that.connectAddressOptions
     store.getAddressLabel = _that.getAddressLabel
-    config.appParams.clientType = window.device ? deviceComponent.getDeviceProperty('model') : 'PC'
+    config.appParams.clientType = window.device ? deviceComponent.getDeviceProperty('manufacturer') + '(' + deviceComponent.getDeviceProperty('model') + ')' : 'PC'
     config.appParams.clientDevice = store.ifMobile() ? ClientDevice.MOBILE : ClientDevice.DESKTOP
     config.appParams.language = _that.language
     store.upgradeVersion = _that.upgradeVersion
