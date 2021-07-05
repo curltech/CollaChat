@@ -555,7 +555,6 @@ export default {
     async sendUnsentMessage(linkmanPeerId) {
       let _that = this
       let store = _that.$store
-
       //receipt
         let receiptTypes = [
             P2pChatMessageType.ADD_GROUPCHAT_MEMBER_RECEIPT,
@@ -568,7 +567,7 @@ export default {
       let receiptMessages = await chatComponent.loadMessage({
           ownerPeerId: myself.myselfPeerClient.peerId,
           subjectId: linkmanPeerId,
-          messageType: { $in: receiptTypes }
+          messageType: {$in : receiptTypes}
       })
       if (receiptMessages && receiptMessages.length > 0) {
           for (let receiptMessage of receiptMessages) {
@@ -626,6 +625,7 @@ export default {
               }
           }
       },1000)
+
     },
     async insertReceivedMessage(message) {
       let _that = this
@@ -647,7 +647,7 @@ export default {
               subjectId: message.senderPeerId,//不管群聊还是单聊，都为linkman的peerId
               ownerPeerId: myself.myselfPeerClient.peerId,
               senderPeerId: myself.myselfPeerClient.peerId,
-              messageId: message.messageId,
+              preMessageId: message.messageId,
               receiveTime: currentDate,
               actualReceiveTime:currentDate
           }
@@ -828,6 +828,8 @@ export default {
         chat.messages = []
         store.state.chats.unshift(chat)
         store.state.chatMap[subjectId] = chat
+
+
       }
       return chat
     },
@@ -889,7 +891,8 @@ export default {
               messageId: message.messageId,
               createDate: message.createDate,
               receiverPeerId: groupMember.memberPeerId ? groupMember.memberPeerId : groupMember,
-              receiveTime: _that.ifOnlySocketConnected(subjectId) ? message.createDate : null
+              receiveTime: null
+              //receiveTime: _that.ifOnlySocketConnected(subjectId) ? message.createDate : null
             }
             if(message.messageType !== P2pChatMessageType.CALL_CLOSE){
               await chatComponent.insert(ChatDataType.RECEIVE, receive, null)
@@ -1697,6 +1700,7 @@ export default {
       }
     },
     async p2pChatReceiver(peerId, message) {
+
       let _that = this
       let store = _that.$store
       let myselfPeerClient = myself.myselfPeerClient
@@ -1731,7 +1735,7 @@ export default {
           if (chatMessages && chatMessages.length > 0) {
               for (let i = chatMessages.length; i--; i > -1) {
                   let _currentMes = chatMessages[i]
-                  if (_currentMes.messageId === message.messageId) {
+                  if (_currentMes.messageId === message.preMessageId) {
                       currentMes = _currentMes
                   }
               }
@@ -1740,7 +1744,7 @@ export default {
               let messages = await chatComponent.loadMessage(
                   {
                       ownerPeerId: myselfPeerClient.peerId,
-                      messageId: message.messageId,
+                      messageId: message.preMessageId,
                   })
             if(messages && messages.length > 0) {
               currentMes = messages[0]
@@ -1753,7 +1757,7 @@ export default {
           let receives = await chatComponent.loadReceive(
             {
               ownerPeerId: myselfPeerClient.peerId,
-              messageId: message.messageId,
+              messageId: message.preMessageId,
               receiverPeerId: message.senderPeerId
             })
           if (receives && receives.length > 0) {
@@ -1764,7 +1768,7 @@ export default {
         //update chat.messages
         let chat = store.state.chatMap[message.preSubjectId]
         for (let _message of chat.messages) {
-          if (_message.messageId === message.messageId) {
+          if (_message.messageId === message.preMessageId) {
             _message.actualReceiveTime = message.receiveTime
           }
         }
@@ -1883,13 +1887,12 @@ export default {
           groupChat.groupMembers = groupMembers
           store.state.groupChats.unshift(groupChat)
           store.state.groupChatMap[groupChat.groupId] = groupChat
-
-          let chat = await store.getChat(groupChat.groupId)
           let chatMessage = {
             messageType: P2pChatMessageType.CHAT_SYS,
             contentType: ChatContentType.EVENT,
             content: inviterName + _that.$i18n.t(" has invited ") + _that.$i18n.t("you") + (groupMemberNames ? _that.$i18n.t(" and ") + groupMemberNames : '') + (includeNonContacts ? _that.$i18n.t(" and ") + _that.$i18n.t("other NonContacts") : '') + _that.$i18n.t(" to join group chat")
           }
+          let chat = await store.getChat(groupChat.groupId)
           await store.addCHATSYSMessage(chat, chatMessage)
         }
         // 发送Receive收条
@@ -2333,7 +2336,7 @@ export default {
       let webrtcPeers  = webrtcPeerPool.getConnected(message.subjectId)
       if(webrtcPeers && webrtcPeers.length > 0){
           await store.p2pSend( message ,message.subjectId)
-      }else{
+      }else if(message._id != undefined){
           await chatComponent.insert(ChatDataType.MESSAGE, message)
       }
     },
@@ -2612,38 +2615,40 @@ export default {
             let promise = dataBlockService.findTxPayload(null, download['blockId'])
             ps.push(promise)
           }
-          let responses = await Promise.allSettled(ps)
+          let responses = await Promise.all(ps)
           if (responses && responses.length > 0) {
-            let callbackPs = []
-            let _peerIds = new Map()
-            for (let i = 0; i < responses.length; ++i) {
-              if (responses[i].status === 'fulfilled') {
-                let dataBlocks = responses[i].value
-                if (dataBlocks && dataBlocks.length > 0) {
-                  let dataBlock = dataBlocks[0]
-                  if (dataBlock) {
-                    let _callbackP = new Promise(async function(resolve, reject) {
-                      console.log(dataBlock)
-                      await _that.p2pChatReceiver(dataBlock.peerId, dataBlock.payload)
-                      await collectionUtil.deleteBlock(dataBlock, true, BlockType.P2pChat)
-                      if (!_peerIds.get(dataBlock.peerId)) {
-                        _peerIds.set(dataBlock.peerId,dataBlock.peerId)
-                      }
-                      resolve()
-                    })
-                    callbackPs.push(_callbackP)
-                  }
-                }
+              let dataBlocks = []
+              for (let i = 0; i < responses.length; ++i) {
+                dataBlocks.push(responses[i][0])
               }
-            }
-            Promise.all(callbackPs).then(async function() {
+              dataBlocks = CollaUtil.sortByKey(dataBlocks,'createDate','asc')
+              let callbackPs = []
+              let _peerIds = new Map()
+              for (let i = 0; i < dataBlocks.length; ++i) {
+                    let dataBlock = dataBlocks[i]
+                      if (dataBlock) {
+                        //let _callbackP = new Promise(async function(resolve, reject) {
+                          console.log(dataBlock)
+                          await _that.p2pChatReceiver(dataBlock.peerId, dataBlock.payload)
+                          await collectionUtil.deleteBlock(dataBlock, true, BlockType.P2pChat)
+                          if (!_peerIds.get(dataBlock.peerId)) {
+                            _peerIds.set(dataBlock.peerId,dataBlock.peerId)
+                          }
+                          console.log('------one  block resolve')
+                          //resolve()
+                       // })
+                       // callbackPs.push(_callbackP)
+                    }
+              }
+           // Promise.all(callbackPs).then(async function() {
+              console.log('-------Promise.all then')
               for (let _peerId of _peerIds.keys()) {
                 let signalSession = await _that.getSignalSession(_peerId)
                 if (signalSession) {
                   await signalSession.close()
                 }
               }
-            })
+            //})
           }
         }
       }
