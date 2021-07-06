@@ -323,6 +323,10 @@
   "Select All": "全選",
   "Unselect All": "清空",
   "Text Only": "僅文字消息",
+  " (": "（",
+  ") ": "）",
+  "Your another Colla account instance logined": "你的另一個Colla身份實例已登錄",
+  "Time: ": "時間：",
 
   // Settings
   "Visibility Setting": "可見性設置",

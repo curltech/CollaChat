@@ -1378,7 +1378,7 @@ export default {
       if (data) {
         Dialog.create({
           title: this.$i18n.t('Alert'),
-          message: this.$i18n.t('Your instance ') + data.srcClientId + this.$i18n.t(' login on device ') + data.srcClientType + this.$i18n.t(' at ') + date.formatDate(data.createDate, 'YYYY-MM-DD_HH:mm:ss') + this.$i18n.t('.'),
+          message: this.$i18n.t('Your another Colla account instance logined') + this.$i18n.t(' (') + this.$i18n.t('Id: ') + data.srcClientId + this.$i18n.t(', ') + this.$i18n.t('Device: ') + data.srcClientType + this.$i18n.t(', ') + this.$i18n.t('Time: ') + date.formatDate(data.createDate, 'YYYY-MM-DD HH:mm:ss') + this.$i18n.t(') '),
           cancel: false,
           ok: {"label":this.$i18n.t('Ok'),"color":"primary","unelevated":true,"no-caps":true},
           persistent: true

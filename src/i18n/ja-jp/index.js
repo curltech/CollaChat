@@ -323,6 +323,10 @@
   "Select All": "すべて選択",
   "Unselect All": "空の",
   "Text Only": "テキストメッセージのみ",
+  " (": "（",
+  ") ": "）",
+  "Your another Colla account instance logined": "別のCollaアカウントインスタンスがログインしました",
+  "Time: ": "時間：",
 
   // Settings
   "Visibility Setting": "視認性設定",

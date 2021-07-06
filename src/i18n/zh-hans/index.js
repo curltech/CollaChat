@@ -328,6 +328,10 @@ export default {
   "Select All": "全选",
   "Unselect All": "清空",
   "Text Only": "仅文字消息",
+  " (": "（",
+  ") ": "）",
+  "Your another Colla account instance logined": "你的另一个Colla身份实例已登录",
+  "Time: ": "时间：",
 
   // Settings
   "Visibility Setting": "可见性设置",

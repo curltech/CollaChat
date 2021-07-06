@@ -317,6 +317,10 @@ export default {
   "Select All": "Select All",
   "Unselect All": "Unselect All",
   "Text Only": "Text Only",
+  " (": " (",
+  ") ": ") ",
+  "Your another Colla account instance logined": "Your another Colla account instance logined",
+  "Time: ": "Time: ",
 
   // Settings
   "Visibility Setting": "Visibility Setting",

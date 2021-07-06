@@ -323,6 +323,10 @@
   "Select All": "모두 선택",
   "Unselect All": "빈",
   "Text Only": "문자 메시지 만",
+  " (": "（",
+  ") ": "）",
+  "Your another Colla account instance logined": "로그인 한 다른 Colla 계정 인스턴스",
+  "Time: ": "시각：",
 
   // Settings
   "Visibility Setting": "보이 기 쉬 운 설정",
