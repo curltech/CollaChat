@@ -1,7 +1,7 @@
 {
   "name": "io.curltech.colla",
   "displayName": "Colla",
-  "version": "0.2.42",
+  "version": "0.2.43",
   "description": "CollaChat",
   "leadMaintainer": "hujs888 <hujs@colla.cc>",
   "contributors": [
@@ -16,7 +16,7 @@
   ],
   "license": "AGPL-3.0-or-later",
   "dependencies": {
-    "cordova-httpd-curltech": "^0.9.2-14",
+    "cordova-httpd-curltech": "^0.9.2-16",
     "cordova-plugin-add-swift-support": "^2.0.2",
     "cordova-plugin-audio-recorder-api-curltech": "^0.0.6",
     "cordova-plugin-audioinput-curltech": "^1.0.2",
