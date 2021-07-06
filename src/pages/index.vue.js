@@ -1102,7 +1102,8 @@ export default {
       receiveMessage.messageId = message.content._id
       receiveMessage.createDate = message.content.createDate
       receiveMessage.receiverPeerId = groupChatLinkman.peerId
-      receiveMessage.receiveTime = message.content.createDate
+      receiveMessage.receiveTime = null
+      //receiveMessage.receiveTime = message.content.createDate
       await chatComponent.insert(ChatDataType.RECEIVE, receiveMessage, null)
       // 给active的联系人发送消息
       let rtcMessage = {
