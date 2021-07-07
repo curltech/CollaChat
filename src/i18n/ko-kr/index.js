@@ -484,6 +484,8 @@
   "User under": "아래 사용자",
 
   // Others
+  "Migrate successfully": "성공적으로 마이그레이션",
+  "Backup successfully": "성공적으로 백업",
   "Copy successfully": "성공적으로 복사",
   "Copy failed": "복사 실패",
   "Change avatar successfully": "아바타를 성공적으로 수정했습니다",

@@ -88,7 +88,8 @@ export default {
       backupUrl: null,
       backupFilename: null,
       restoreDialog: false,
-      restoreFilename: null
+      restoreFilename: null,
+      logoutData: null
     }
   },
   computed: {
@@ -982,18 +983,17 @@ export default {
       if (item.collectionType === CollectionType.FILE || item.collectionType === CollectionType.VIDEO || item.collectionType === CollectionType.AUDIO || item.collectionType === CollectionType.IMAGE) {
         let _content = item.content
         let name
-        if(item.collectionType !== CollectionType.FILE ){
+        if (item.collectionType !== CollectionType.FILE ) {
           let pat = /\bsrc\b\s*=\s*[\'\"]?([^\'\"]*)[\'\"]?/i
           let res = _content.match(pat)
-          if(res && res.length > 1){
-              _content = res[1]
+          if (res && res.length > 1) {
+            _content = res[1]
           }
-        }else{
-            let firstFileInfo = item.firstFileInfo
-            name = firstFileInfo.slice(firstFileInfo.indexOf(' ')+1,firstFileInfo.length)
+        } else {
+          let firstFileInfo = item.firstFileInfo
+          name = firstFileInfo.slice(firstFileInfo.indexOf(' ') + 1, firstFileInfo.length)
         }
         let fileData = _content
-
         let type = item.collectionType
         await store.saveFileAndSendMessage(chat, fileData, type, name)
       } else {
@@ -1381,22 +1381,32 @@ export default {
         clearInterval(_that.heartbeatTimer)
         delete _that.heartbeatTimer
       }*/
+      if (data) {
+        _that.logoutData = data
+      }
+      if (!_that.initMigrateDialog) {
+        _that.gotoLogin()
+      }
+    },
+    gotoLogin() {
+      let _that = this
       // 跳转页面
       _that.$router.push('/')
       if (store.state.ifMobileStyle) {
         statusBarComponent.style(false, '#33000000')
         document.querySelector("body").classList.remove('bgc')
       }
-      if (data) {
+      if (_that.logoutData) {
         Dialog.create({
-          title: this.$i18n.t('Alert'),
-          message: this.$i18n.t('Your another Colla account instance logined') + this.$i18n.t(' (') + this.$i18n.t('Id: ') + data.srcClientId + this.$i18n.t(', ') + this.$i18n.t('Device: ') + data.srcClientType + this.$i18n.t(', ') + this.$i18n.t('Time: ') + date.formatDate(data.createDate, 'YYYY-MM-DD HH:mm:ss') + this.$i18n.t(') '),
+          title: _that.$i18n.t('Alert'),
+          message: _that.$i18n.t('Your another Colla account instance logined') + _that.$i18n.t(' (') + _that.$i18n.t('Id: ') + _that.logoutData.srcClientId + _that.$i18n.t(', ') + _that.$i18n.t('Device: ') + _that.logoutData.srcClientType + _that.$i18n.t(', ') + _that.$i18n.t('Time: ') + date.formatDate(_that.logoutData.createDate, 'YYYY-MM-DD HH:mm:ss') + _that.$i18n.t(') '),
           cancel: false,
-          ok: {"label":this.$i18n.t('Ok'),"color":"primary","unelevated":true,"no-caps":true},
+          ok: {"label":_that.$i18n.t('Ok'),"color":"primary","unelevated":true,"no-caps":true},
           persistent: true
         }).onOk(() => {
         }).onCancel(() => {
         })
+        _that.logoutData = null
       }
     },
     async gotoChat(subjectId) {
@@ -1668,9 +1678,18 @@ export default {
         }
       } else if (type === ChatMessageType.LOGOUT) {
         await store.logout(data)
-      }  else if (type === ChatMessageType.MIGRATE) {
+      }  else if (type === ChatMessageType.MIGRATE) { // unreachable
         console.log('MIGRATE')
         _that.initMigrateDialog = false
+        Dialog.create({
+          title: _that.$i18n.t('Alert'),
+          message: _that.$i18n.t('Migrate successfully'),
+          cancel: false,
+          ok: {"label":_that.$i18n.t('Ok'),"color":"primary","unelevated":true,"no-caps":true},
+          persistent: true
+        }).onOk(() => {
+        }).onCancel(() => {
+        })
       } else if (type === ChatMessageType.BACKUP) {
         console.log('BACKUP, url:' + data.url + ', filename:' + data.filename)
         if (data.url && data.filename) {
@@ -1679,6 +1698,15 @@ export default {
           _that.backupDialog = true
         } else {
           _that.initBackupDialog = false
+          Dialog.create({
+            title: _that.$i18n.t('Alert'),
+            message: _that.$i18n.t('Backup successfully'),
+            cancel: false,
+            ok: {"label":_that.$i18n.t('Ok'),"color":"primary","unelevated":true,"no-caps":true},
+            persistent: true
+          }).onOk(() => {
+          }).onCancel(() => {
+          })
         }
       } else if (type === ChatMessageType.RESTORE) {
         console.log('RESTORE, url:' + data.url + ', filename:' + data.filename)
@@ -1713,7 +1741,6 @@ export default {
       }
     },
     async p2pChatReceiver(peerId, message) {
-
       let _that = this
       let store = _that.$store
       let myselfPeerClient = myself.myselfPeerClient
@@ -2745,6 +2772,9 @@ export default {
     cancelInitMigrate: function() {
       let _that = this
       _that.initMigrateDialog = false
+      if (_that.logoutFlag) {
+        _that.gotoLogin()
+      }
     },
     acceptMigrate: async function() {
       let _that = this

@@ -165,7 +165,6 @@ export default {
       newPayload.srcClientId = myself.myselfPeerClient.clientId
       newPayload.srcPeerId = clientPeerId
       await chatAction.chat(null, newPayload, clientPeerId)
-      //store.showInitRestoreDialog()
     },
     restore: function () {
       let _that = this

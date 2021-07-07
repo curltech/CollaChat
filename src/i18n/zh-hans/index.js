@@ -489,6 +489,8 @@ export default {
   "User under": "下的用户",
 
   // Others
+  "Migrate successfully": "迁移成功",
+  "Backup successfully": "备份成功",
   "Copy successfully": "复制成功",
   "Copy failed": "复制失败",
   "Change avatar successfully": "修改头像成功",

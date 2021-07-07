@@ -484,6 +484,8 @@
   "User under": "下のユーザ",
 
   // Others
+  "Migrate successfully": "正常に移行する",
+  "Backup successfully": "正常にバックアップ",
   "Copy successfully": "正常にコピー",
   "Copy failed": "コピーに失敗しました",
   "Change avatar successfully": "アバターの変更に成功しました",

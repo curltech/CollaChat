@@ -484,6 +484,8 @@
   "User under": "下的用戶",
 
   // Others
+  "Migrate successfully": "遷移成功",
+  "Backup successfully": "備份成功",
   "Copy successfully": "複製成功",
   "Copy failed": "複製失敗",
   "Change avatar successfully": "修改頭像成功",

@@ -477,6 +477,8 @@ export default {
   "User under": "User under",
 
   // Others
+  "Migrate successfully": "Migrate successfully",
+  "Backup successfully": "Backup successfully",
   "Copy successfully": "Copy successfully",
   "Copy failed": "Copy failed",
   "Change avatar successfully": "Change avatar successfully",
