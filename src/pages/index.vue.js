@@ -981,15 +981,19 @@ export default {
       let store = _that.$store
       if (item.collectionType === CollectionType.FILE || item.collectionType === CollectionType.VIDEO || item.collectionType === CollectionType.AUDIO || item.collectionType === CollectionType.IMAGE) {
         let _content = item.content
+        let name
         if(item.collectionType !== CollectionType.FILE ){
           let pat = /\bsrc\b\s*=\s*[\'\"]?([^\'\"]*)[\'\"]?/i
           let res = _content.match(pat)
           if(res && res.length > 1){
               _content = res[1]
           }
+        }else{
+            let firstFileInfo = item.firstFileInfo
+            name = firstFileInfo.slice(firstFileInfo.indexOf(' ')+1,firstFileInfo.length)
         }
         let fileData = _content
-        let name = item.contentTitle
+
         let type = item.collectionType
         await store.saveFileAndSendMessage(chat, fileData, type, name)
       } else {
