@@ -10,6 +10,7 @@ import { PeerEndpoint, peerEndpointService } from 'libcolla'
 import { libp2pClientPool, config, peerClientService, p2pPeer, myself, myselfPeerService, ChatMessageType, pingAction, chatAction, p2pChatAction, consensusAction, logService } from 'libcolla'
 import { BlockType, MsgType, PayloadType, dataBlockService, DataBlockService, queryValueAction } from 'libcolla'
 import { EntityState } from 'libcolla'
+import { SecurityPayload } from 'libcolla'
 
 import {permissionHelper} from '@/libs/base/colla-mobile'
 import pinyinUtil from '@/libs/base/colla-pinyin'
@@ -2889,10 +2890,28 @@ export default {
       let _that = this
       _that.restoreDialog = false
     },
-    restoreChatRecord: async function(json) {
+    restoreChatRecord: async function(txt) {
       let _that = this
       let store = _that.$store
       _that.$q.loading.show()
+      // decrypt
+      let json = ''
+      if (txt.indexOf('[payloadKey:]') > -1 && txt.indexOf('[:payloadKey]') > -1) {
+        let payloadKey = txt.substring(txt.indexOf('[payloadKey:]') + 13, txt.indexOf('[:payloadKey]'))
+        console.log(payloadKey)
+        txt = txt.substring(txt.indexOf('[:payloadKey]') + 13)
+        if (payloadKey) {
+          let securityParams = {}
+          securityParams.NeedCompress = false
+          securityParams.NeedEncrypt = true
+          securityParams.PayloadKey = payloadKey
+          let payload = await SecurityPayload.decrypt(txt, securityParams)
+          if (payload) {
+            json = payload
+          }
+        }
+      }
+      // restore
       // 联系人同步：跨实例云端同步功能提供前临时使用 - start
       let changeFlag = false
       let linkmansJson = null

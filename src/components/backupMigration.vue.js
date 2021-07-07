@@ -2,6 +2,7 @@ import { date } from 'quasar'
 
 import { myself } from 'libcolla'
 import { ChatMessageType, chatAction } from 'libcolla'
+import { SecurityPayload } from 'libcolla'
 
 import { chatComponent, chatBlockComponent } from '@/libs/biz/colla-chat'
 import { contactComponent } from '@/libs/biz/colla-contact'
@@ -269,7 +270,16 @@ export default {
           }
         }
       }
-      return json
+      if (json) {
+        let securityParams = {}
+				securityParams.NeedCompress = false
+				securityParams.NeedEncrypt = true
+				let result = await SecurityPayload.encrypt(json, securityParams)
+        if (result) {
+          return '[payloadKey:]' + result.PayloadKey + '[:payloadKey]' + result.TransportPayload
+        }
+      }
+      return null
     }
   },
   created() {
