@@ -1,6 +1,16 @@
 // Configuration for your app
 // https://quasar.dev/quasar-cli/quasar-conf-js
 // Configuration for your app
+/*const https = require('https')
+const fs = require('fs')
+https.globalAgent.options = {
+  //cacert: fs.readFileSync('/path/to/ca.pem'),
+  ca: fs.readFileSync('src/ca-ec.csr'),
+  //pfx: fs.readFileSync('/path/to/server.pfx'),
+  //key: fs.readFileSync('/path/to/server.key'),
+  //cert: fs.readFileSync('/path/to/server.crt')
+  cert: fs.readFileSync('src/ca-ec.crt')
+}*/
 const path = require('path')
 const ProvidePlugin = require('webpack/lib/ProvidePlugin')
 function resolve(dir) {

@@ -10,14 +10,12 @@ import { fileComponent } from '@/libs/base/colla-cordova'
 
 import SelectChatRecord from '@/components/selectChatRecord'
 import Tip from '@/components/tip'
-import List from '@/components/list'
 
 export default {
   name: "BackupMigration",
   components: {
     selectChatRecord: SelectChatRecord,
-    tip: Tip,
-    list: List
+    tip: Tip
   },
   data() {
     return {
@@ -144,11 +142,6 @@ export default {
         await fileComponent.writeFile(fileEntry, blob, false)
         store.startServer('backup', filename)
       }
-    },
-    closeBackup: function() {
-      let _that = this
-      let store = _that.$store
-      _that.backupDialog = false
     },
     initRestore: function() {
       let _that = this

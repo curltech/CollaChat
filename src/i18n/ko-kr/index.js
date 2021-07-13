@@ -302,6 +302,8 @@
   "Please scan the QR code using another mobile to start the migration": "이전을 시작하려면 다른 모바일을 사용하여 QR 코드를 스캔하세요",
   "Please confirm to receive the migration from another mobile": "다른 모바일에서 이전을 수신하려면 확인하세요",
   "Please confirm to restore using the backup from your PC": "컴퓨터에서 백업을 사용하여 복원하려면 확인하십시오",
+  "TIP: ": "팁：",
+  "This function uses self-signed ssl certificate, when you first time use it, a Not secure error page will be prompted, please click Advanced button and Proceed to ... link.": "이 기능은 자체 서명 된 SSL 인증서를 사용합니다，처음 사용할 때 안전하지 않다는 오류 페이지가 나타납니다，고급 버튼을 클릭하고...링크로 계속 진행하세요。",
   "Storage": "저장 공간",
   "Local Data Crypto": "로 컬 데이터 암호 화",
   "Full Text Search": "전체 텍스트 검색",

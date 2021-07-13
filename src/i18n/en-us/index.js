@@ -296,6 +296,8 @@ export default {
   "Please scan the QR code using another mobile to start the migration": "Please scan the QR code using another mobile to start the migration",
   "Please confirm to receive the migration from another mobile": "Please confirm to receive the migration from another mobile",
   "Please confirm to restore using the backup from your PC": "Please confirm to restore using the backup from your PC",
+  "TIP: ": "TIP: ",
+  "This function uses self-signed ssl certificate, when you first time use it, a Not secure error page will be prompted, please click Advanced button and Proceed to ... link.": "This function uses self-signed ssl certificate, when you first time use it, a Not secure error page will be prompted, please click Advanced button and Proceed to ... link.",
   "Storage": "Storage",
   "Local Data Crypto": "Local Data Crypto",
   "Full Text Search": "Full Text Search",

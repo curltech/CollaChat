@@ -307,6 +307,8 @@ export default {
   "Please scan the QR code using another mobile to start the migration": "请使用另一个手机扫描二维码以开始迁移",
   "Please confirm to receive the migration from another mobile": "请确认以接收来自另一个手机的迁移",
   "Please confirm to restore using the backup from your PC": "请确认以使用来自电脑的备份进行恢复",
+  "TIP: ": "提示：",
+  "This function uses self-signed ssl certificate, when you first time use it, a Not secure error page will be prompted, please click Advanced button and Proceed to ... link.": "此功能使用了自签名ssl证书，第一次使用时会弹出报错页面提示不安全，请点击高级按钮和继续前往...链接。",
   "Storage": "存储空间",
   "Local Data Crypto": "本地数据加密",
   "Full Text Search": "全文检索",

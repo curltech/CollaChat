@@ -15,7 +15,7 @@ import { SecurityPayload } from 'libcolla'
 import {permissionHelper} from '@/libs/base/colla-mobile'
 import pinyinUtil from '@/libs/base/colla-pinyin'
 import * as CollaConstant from '@/libs/base/colla-constant'
-import { statusBarComponent, deviceComponent, localNotificationComponent } from '@/libs/base/colla-cordova'
+import { statusBarComponent, deviceComponent, localNotificationComponent, inAppBrowserComponent } from '@/libs/base/colla-cordova'
 import { cameraComponent, systemAudioComponent, mediaComponent } from '@/libs/base/colla-media'
 import { fileComponent } from '@/libs/base/colla-cordova'
 import { CollectionType } from '@/libs/biz/colla-collection'
@@ -1699,15 +1699,17 @@ export default {
           _that.backupDialog = true
         } else {
           _that.initBackupDialog = false
-          Dialog.create({
-            title: _that.$i18n.t('Alert'),
-            message: _that.$i18n.t('Backup successfully'),
-            cancel: false,
-            ok: {"label":_that.$i18n.t('Ok'),"color":"primary","unelevated":true,"no-caps":true},
-            persistent: true
-          }).onOk(() => {
-          }).onCancel(() => {
-          })
+          if (data.operation !== 'Cancel') {
+            Dialog.create({
+              title: _that.$i18n.t('Alert'),
+              message: _that.$i18n.t('Backup successfully'),
+              cancel: false,
+              ok: {"label":_that.$i18n.t('Ok'),"color":"primary","unelevated":true,"no-caps":true},
+              persistent: true
+            }).onOk(() => {
+            }).onCancel(() => {
+            })
+          }
         }
       } else if (type === ChatMessageType.RESTORE) {
         console.log('RESTORE, url:' + data.url + ', filename:' + data.filename)
@@ -1732,6 +1734,25 @@ export default {
             }
           } catch (e) {
             await logService.log(e.stack, 'restorePostError', 'error')
+            Dialog.create({
+              title: _that.$i18n.t('Alert'),
+              message: _that.$i18n.t('This function uses self-signed ssl certificate, when you first time use it, a Not secure error page will be prompted, please click Advanced button and Proceed to ... link.'),
+              cancel: false,
+              ok: {"label":_that.$i18n.t('Ok'),"color":"primary","unelevated":true,"no-caps":true},
+              persistent: true
+            }).onOk(() => {
+              let url = data.url + '?language=' + _that.$i18n.locale
+              if (store.ios === true) {
+                let inAppBrowser = inAppBrowserComponent.open(url, '_system', 'location=no')
+              } else if (store.android === true) {
+                let inAppBrowser = inAppBrowserComponent.open(url, '_system', 'location=no')
+              } else if (store.safari === true) {
+                window.open(url, '_blank')
+              } else {
+                window.open(url, '_blank')
+              }
+            }).onCancel(() => {
+            })
           }
         } else if (!data.url && data.filename) {
           _that.restoreFilename = data.filename
@@ -2837,6 +2858,16 @@ export default {
         }
       } catch (e) {
         await logService.log(e.stack, 'acceptBackupError', 'error')
+        url = _that.backupUrl + '?language=' + _that.$i18n.locale
+        if (store.ios === true) {
+          let inAppBrowser = inAppBrowserComponent.open(url, '_system', 'location=no')
+        } else if (store.android === true) {
+          let inAppBrowser = inAppBrowserComponent.open(url, '_system', 'location=no')
+        } else if (store.safari === true) {
+          window.open(url, '_blank')
+        } else {
+          window.open(url, '_blank')
+        }
       }
       if (json) {
         if (_that.backupFilename) {
@@ -2854,16 +2885,17 @@ export default {
             document.body.removeChild(element)
           /*}*/
         }
+        await _that.closeBackup('Accept')
       }
-      await _that.closeBackup()
     },
-    closeBackup: async function() {
+    closeBackup: async function(operation) {
       let _that = this
       let clientPeerId = myself.myselfPeerClient.peerId
       let newPayload = {}
       newPayload.type = ChatMessageType.BACKUP
       newPayload.srcClientId = myself.myselfPeerClient.clientId
       newPayload.srcPeerId = clientPeerId
+      newPayload.operation = operation
       await chatAction.chat(null, newPayload, clientPeerId)
       _that.backupDialog = false
     },

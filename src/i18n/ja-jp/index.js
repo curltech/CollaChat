@@ -302,6 +302,8 @@
   "Please scan the QR code using another mobile to start the migration": "別の携帯電話を使用してQRコードをスキャンし、移行を開始してください",
   "Please confirm to receive the migration from another mobile": "別の携帯電話からの移行を受け取ることを確認してください",
   "Please confirm to restore using the backup from your PC": "コンピューターからのバックアップを使用して復元することを確認してください",
+  "TIP: ": "ヒント：",
+  "This function uses self-signed ssl certificate, when you first time use it, a Not secure error page will be prompted, please click Advanced button and Proceed to ... link.": "この関数は自己署名SSL証明書を使用します，初めて使用する場合は，安全でないことを示すエラーページがポップアップ表示されます，[高度な]ボタンをクリックして、[訪問を続ける...]リンクをクリックしてください。",
   "Storage": "格納空間",
   "Local Data Crypto": "ローカルデータ暗号化",
   "Full Text Search": "全文検索",
