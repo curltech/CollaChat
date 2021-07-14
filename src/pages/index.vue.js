@@ -2818,6 +2818,25 @@ export default {
             }
           } catch (e) {
             await logService.log(e.stack, 'acceptMigrateError', 'error')
+            Dialog.create({
+              title: _that.$i18n.t('Alert'),
+              message: _that.$i18n.t('This function uses self-signed ssl certificate, when you first time use it, a Not secure error page will be prompted, please click Advanced button and Proceed to ... link.'),
+              cancel: false,
+              ok: {"label":_that.$i18n.t('Ok'),"color":"primary","unelevated":true,"no-caps":true},
+              persistent: true
+            }).onOk(() => {
+              url = migrateUrl + '?language=' + _that.$i18n.locale
+              if (store.ios === true) {
+                let inAppBrowser = inAppBrowserComponent.open(url, '_system', 'location=no')
+              } else if (store.android === true) {
+                let inAppBrowser = inAppBrowserComponent.open(url, '_system', 'location=no')
+              } else if (store.safari === true) {
+                window.open(url, '_blank')
+              } else {
+                window.open(url, '_blank')
+              }
+            }).onCancel(() => {
+            })
           }
           if (json) {
             await store.restoreChatRecord(json)
