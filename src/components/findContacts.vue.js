@@ -103,6 +103,10 @@ export default {
         newLinkman.locked = false
         newLinkman.notAlert = false
         newLinkman.top = false
+        newLinkman.retrieveLimit = true
+        newLinkman.retrieveAlert = true
+        newLinkman.myselfRetrieveLimit = true
+        newLinkman.myselfRetrieveAlert = true
         await contactComponent.insert(ContactDataType.LINKMAN, newLinkman, store.state.linkmans)
         newLinkman.groupChats = []
         store.state.linkmans.sort(function (a, b) {
@@ -267,6 +271,10 @@ export default {
       newLinkman.locked = false
       newLinkman.notAlert = false
       newLinkman.top = false
+      newLinkman.retrieveLimit = true
+      newLinkman.retrieveAlert = true
+      newLinkman.myselfRetrieveLimit = true
+      newLinkman.myselfRetrieveAlert = true
       await contactComponent.insert(ContactDataType.LINKMAN, newLinkman, store.state.linkmans)
       newLinkman.groupChats = []
       store.state.linkmans.sort(function (a, b) {

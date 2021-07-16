@@ -119,6 +119,5 @@
         selectChat.drawcontent
       q-tab-panel(name="captureMedia" style="padding:0px 0px")
         captureMedia.drawcontent
-    mergeMessageDialog
 </template>
 <script src="./collection.vue.js" />

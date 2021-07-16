@@ -19,7 +19,7 @@ import { statusBarComponent, deviceComponent, localNotificationComponent, inAppB
 import { cameraComponent, systemAudioComponent, mediaComponent } from '@/libs/base/colla-media'
 import { fileComponent } from '@/libs/base/colla-cordova'
 import { CollectionType } from '@/libs/biz/colla-collection'
-import { ChatDataType, ChatContentType, P2pChatMessageType, SubjectType, chatComponent, chatBlockComponent} from '@/libs/biz/colla-chat'
+import { ChatDataType, ChatContentType, ChatMessageStatus, P2pChatMessageType, SubjectType, chatComponent, chatBlockComponent} from '@/libs/biz/colla-chat'
 import { ContactDataType, RequestType, RequestStatus, LinkmanStatus, ActiveStatus, contactComponent, MemberType } from '@/libs/biz/colla-contact'
 import { collectionUtil, blockLogComponent } from '@/libs/biz/colla-collection-util'
 import Chat from '@/components/chat'
@@ -636,29 +636,30 @@ export default {
         await _that.insertReceivedChatMessage(message)
       }
     },
+    async sendChatReceipt(message){
+        let _that = this
+        let store = _that.$store
+        let currentDate = new Date().getTime()
+        let _message = {
+            messageType: P2pChatMessageType.CHAT_RECEIVE_RECEIPT,
+            preSubjectType: message.subjectType,
+            preSubjectId: message.subjectId,
+            subjectType: message.subjectType,
+            subjectId: message.senderPeerId,//不管群聊还是单聊，都为linkman的peerId
+            ownerPeerId: myself.myselfPeerClient.peerId,
+            senderPeerId: myself.myselfPeerClient.peerId,
+            preMessageId: message.messageId,
+            receiveTime: currentDate,
+            actualReceiveTime:currentDate
+        }
+        await _that.sendOrSaveReceipt(_message)
+    },
     async insertReceivedChatMessage(message) {
       let _that = this
       let store = _that.$store
       let currentDate = new Date().getTime()
       if(!message.actualReceiveTime){
-          let _message = {
-              messageType: P2pChatMessageType.CHAT_RECEIVE_RECEIPT,
-              preSubjectType: message.subjectType,
-              preSubjectId: message.subjectId,
-              subjectType: message.subjectType,
-              subjectId: message.senderPeerId,//不管群聊还是单聊，都为linkman的peerId
-              ownerPeerId: myself.myselfPeerClient.peerId,
-              senderPeerId: myself.myselfPeerClient.peerId,
-              preMessageId: message.messageId,
-              receiveTime: currentDate,
-              actualReceiveTime:currentDate
-          }
-          let webrtcPeers  = webrtcPeerPool.getConnected(message.senderPeerId)
-          if(webrtcPeers && webrtcPeers.length > 0){
-              await store.p2pSend( _message ,message.senderPeerId)
-          }else{
-              await chatComponent.insert(ChatDataType.MESSAGE, _message)
-          }
+         await _that.sendChatReceipt(message)
       }
       let receivedMessages = await chatComponent.loadMessage({
         ownerPeerId: myself.myselfPeerClient.peerId,
@@ -857,6 +858,7 @@ export default {
       message.messageId = message.messageId ? message.messageId : UUID.string(null, null)
       message.senderPeerId = myselfPeerId
       message.createDate = new Date().getTime()
+      message.status = ChatMessageStatus.NORMAL
       message.countDown = 0
       message.receiveTime = message.createDate
       if(subjectId !== myselfPeerId && (message.messageType !== P2pChatMessageType.CALL_REQUEST)){
@@ -905,19 +907,19 @@ export default {
       if (message.messageType === P2pChatMessageType.CALL_CLOSE || message.contentType === ChatContentType.CALL_JOIN_REQUEST || (message.subjectType === SubjectType.CHAT && message.messageType === P2pChatMessageType.CALL_REQUEST)) {
         return
       }
-      await store.handleChatTime(message, chat)
-      await chatComponent.insert(ChatDataType.MESSAGE, message, chat.messages)
       if (message.messageType === P2pChatMessageType.CHAT_LINKMAN) {
-        chat.content = store.getChatContent(message.contentType, message.content)
+          await store.handleChatTime(message, chat)
+          chat.content = store.getChatContent(message.contentType, message.content)
+          chat.updateTime = message.createDate
+          await chatComponent.update(ChatDataType.CHAT, chat)
+          _that.$nextTick(() => {
+              let container = _that.$el.querySelector('#talk')
+              if (container) {
+                  container.scrollTop = container.scrollHeight
+              }
+          })
       }
-      chat.updateTime = message.createDate
-      await chatComponent.update(ChatDataType.CHAT, chat)
-      _that.$nextTick(() => {
-        let container = _that.$el.querySelector('#talk')
-        if (container) {
-          container.scrollTop = container.scrollHeight
-        }
-      })
+      await chatComponent.insert(ChatDataType.MESSAGE, message, chat.messages)
     },
     async handleChatTime(current, chat) {
       let _that = this
@@ -1871,6 +1873,8 @@ export default {
                 linkman.signalPublicKey = content.signalPublicKey
                 //linkman.localDataCryptoSwitch = content.localDataCryptoSwitch
                 //linkman.fullTextSearchSwitch = content.fullTextSearchSwitch
+                linkman.retrieveLimit = content.retrieveLimit
+                linkman.retrieveAlert = content.retrieveAlert
                 linkman.udpSwitch = content.udpSwitch
               }
               await contactComponent.update(ContactDataType.LINKMAN, linkmen, null)
@@ -1907,6 +1911,8 @@ export default {
           groupChat.locked = false
           groupChat.notAlert = false
           groupChat.top = false
+          groupChat.retrieveLimit = true
+          groupChat.retrieveAlert = true
 
           await contactComponent.insert(ContactDataType.GROUP, groupChat, null)
 
@@ -2081,6 +2087,8 @@ export default {
             groupChat.locked = false
             groupChat.notAlert = false
             groupChat.top = false
+            groupChat.retrieveLimit = true
+            groupChat.retrieveAlert = true
             await contactComponent.insert(ContactDataType.LINKMAN, groupChat, null)
           }
 
@@ -2389,9 +2397,50 @@ export default {
       else if (messageType === P2pChatMessageType.CALL_CLOSE) {
         await _that.receiveCallClose(message)
       }
+      else if (messageType === P2pChatMessageType.RETRIEVE) {
+          await _that.receiveRetrieveMessage(message)
+      }
       else if(messageType === P2pChatMessageType.CHAT_LINKMAN){
         await store.insertReceivedMessage(message)
       }
+    },
+    async receiveRetrieveMessage(message){
+      debugger
+      let _that = this
+      let store = _that.$store
+      let preMessageId = message.preMessageId
+      let myselfPeerClient = myself.myselfPeerClient
+      let currentMes
+      let chatMessages = store.state.chatMap[message.senderPeerId].messages
+      if (chatMessages && chatMessages.length > 0) {
+          for (let i = chatMessages.length; i--; i > -1) {
+              let _currentMes = chatMessages[i]
+              if (_currentMes.messageId === preMessageId) {
+                  currentMes = _currentMes
+              }
+          }
+      }
+      if(!currentMes){
+          let messages = await chatComponent.loadMessage(
+              {
+                  ownerPeerId: myselfPeerClient.peerId,
+                  messageId: preMessageId,
+              })
+          if(messages && messages.length > 0) {
+              currentMes = messages[0]
+          }
+      }
+      currentMes.status = ChatMessageStatus.RETRIEVE
+      await chatComponent.update(ChatDataType.MESSAGE, currentMes, null)
+
+      //update chat.messages
+      let chat = store.state.chatMap[message.preSubjectId]
+      for (let _message of chat.messages) {
+          if (_message.messageId === preMessageId) {
+              _message.status =  ChatMessageStatus.RETRIEVE
+          }
+      }
+
     },
     async sendOrSaveReceipt(message){
       let _that = this
@@ -2523,6 +2572,8 @@ export default {
         myselfBasicInfo.publicKey = myselfPeerClient.publicKey
         myselfBasicInfo.signalPublicKey = myselfPeerClient.signalPublicKey
         myselfBasicInfo.udpSwitch = myselfPeerClient.udpSwitch
+        myselfBasicInfo.retrieveLimit = linkman.myselfRetrieveLimit
+        myselfBasicInfo.retrieveAlert = linkman.myselfRetrieveAlert
         let message = {
           messageType: P2pChatMessageType.SYNC_LINKMAN_INFO,
           content: myselfBasicInfo

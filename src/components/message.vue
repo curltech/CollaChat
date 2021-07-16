@@ -14,12 +14,14 @@
               div.chat-message(:class="messageMultiSelectMode?'message_multiselect_checkboxwrap':''")
                 q-checkbox.message_multiselect_checkbox(dense v-model="messageMultiSelectedVal" v-if='message.messageType === P2pChatMessageType.CHAT_LINKMAN && messageMultiSelectMode' :val="message")
                 messageContent(v-if='message.messageType === P2pChatMessageType.CHAT_LINKMAN || message.messageType === P2pChatMessageType.CALL_REQUEST' v-bind:message = "message" entry = "message" v-bind:showContacts='showContacts')
-                q-menu(touch-position context-menu v-if='message.messageType === P2pChatMessageType.CHAT_LINKMAN')
+                q-menu(touch-position context-menu v-if='message.messageType === P2pChatMessageType.CHAT_LINKMAN && message.status === ChatMessageStatus.NORMAL')
                   q-list(dense style="min-width: 100px")
                     q-item(v-if='message.contentType === ChatContentType.TEXT && !message.countDown' clickable  @click="copyMessage(message,index)" v-close-popup)
                       q-item-section {{$t('Copy')}}
                     q-item(clickable  @click="deleteMessage(message,index)" v-close-popup)
                       q-item-section {{$t('Delete')}}
+                    q-item(clickable v-if="!isRetrieveLimit(message)" @click="retrieveMessage(message,index)" v-close-popup)
+                      q-item-section {{$t('Retrieve')}}
                     q-item(clickable v-if='!message.countDown' @click="forwardMessage([message])" v-close-popup)
                       q-item-section {{$t('Forward')}}
                     q-item(clickable v-if='!message.countDown' @click="collectMessage(message, index)" v-close-popup)
@@ -119,6 +121,16 @@
               q-item-label {{$t('Sticky Top')}}
             q-item-section(side)
               q-toggle(v-if="$store.state.currentChat && $store.state.linkmanMap[$store.state.currentChat.subjectId]" v-model="$store.state.linkmanMap[$store.state.currentChat.subjectId].top" @input="changeTopSwitch")
+          q-item
+            q-item-section
+              q-item-label {{$t('Retrieve Limit')}}
+            q-item-section(side)
+              q-toggle(v-if="$store.state.currentChat && $store.state.linkmanMap[$store.state.currentChat.subjectId]" v-model="$store.state.linkmanMap[$store.state.currentChat.subjectId].myselfRetrieveLimit" @input="changeRetrieveLimit")
+          q-item
+            q-item-section
+              q-item-label {{$t('Retrieve Alert')}}
+            q-item-section(side)
+              q-toggle(v-if="$store.state.currentChat && $store.state.linkmanMap[$store.state.currentChat.subjectId]" v-model="$store.state.linkmanMap[$store.state.currentChat.subjectId].myselfRetrieveAlert" @input="changeRetrieveAlert")
           q-separator.c-separator(style="height:8px;margin-left:0px;margin-right:0px")
           q-item
             q-item-section(align="center")
@@ -218,6 +230,16 @@
               q-item-label {{$t('Sticky Top')}}
             q-item-section(side)
               q-toggle(v-if="$store.state.currentChat && $store.state.groupChatMap[$store.state.currentChat.subjectId]" v-model="$store.state.groupChatMap[$store.state.currentChat.subjectId].top" @input="changeTopSwitch")
+          q-item
+            q-item-section
+              q-item-label {{$t('Retrieve Limit')}}
+            q-item-section(side)
+              q-toggle(v-if="$store.state.currentChat && $store.state.groupChatMap[$store.state.currentChat.subjectId]" v-model="$store.state.groupChatMap[$store.state.currentChat.subjectId].myselfRetrieveLimit" @input="changeRetrieveLimit")
+          q-item
+            q-item-section
+              q-item-label {{$t('Retrieve Alert')}}
+            q-item-section(side)
+              q-toggle(v-if="$store.state.currentChat && $store.state.groupChatMap[$store.state.currentChat.subjectId]" v-model="$store.state.groupChatMap[$store.state.currentChat.subjectId].myselfRetrieveAlert" @input="changeRetrieveAlert")
           q-separator.c-separator.message-sep-2
           q-item
             q-item-section(align="center")

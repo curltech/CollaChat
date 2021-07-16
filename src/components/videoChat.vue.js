@@ -585,7 +585,22 @@ export default {
       if(!callChat)return
       systemAudioComponent.mediaInvitationAudioStop()
       systemAudioComponent.mediaCloseAudioPlay()
-
+      if(callChat.subjectType === SubjectType.CHAT) {
+          let message = {}
+          message.messageType = P2pChatMessageType.CHAT_LINKMAN
+          if (callChat.callMessage.contentType === ChatContentType.VIDEO_INVITATION) {
+              message.contentType = ChatContentType.VIDEO_HISTORY
+          } else {
+              message.contentType = ChatContentType.AUDIO_HISTORY
+          }
+          if(_that.$refs.mediaTimer && _that.$refs.mediaTimer.innerHTML){
+              message.content = _that.$refs.mediaTimer.innerHTML
+          }else{
+              message.content = _that.$i18n.t('Unconnected')
+          }
+          message.actualReceiveTime = new Date().getTime()
+          await store.addCHATSYSMessage(callChat, message)
+      }
       if (isReceived !== true && _that.activeStatus(callChat)) {
         let members = []
         if (callChat.subjectType === SubjectType.GROUP_CHAT) {
@@ -600,22 +615,6 @@ export default {
             (callChat.streamMap && callChat.streamMap[callChat.ownerPeerId]) ? ChatContentType.MEDIA_CLOSE : ChatContentType.MEDIA_REJECT ,
             callChat.subjectType === SubjectType.GROUP_CHAT ? members : '')
         }
-      }
-      if(callChat.subjectType === SubjectType.CHAT) {
-        let message = {}
-        message.messageType = P2pChatMessageType.CHAT_LINKMAN
-        if (callChat.callMessage.contentType === ChatContentType.VIDEO_INVITATION) {
-          message.contentType = ChatContentType.VIDEO_HISTORY
-        } else {
-          message.contentType = ChatContentType.AUDIO_HISTORY
-        }
-        if(_that.$refs.mediaTimer && _that.$refs.mediaTimer.innerHTML){
-          message.content = _that.$refs.mediaTimer.innerHTML
-        }else{
-          message.content = _that.$i18n.t('Unconnected')
-        }
-        message.actualReceiveTime = new Date().getTime()
-        await store.addCHATSYSMessage(callChat, message)
       }
       await _that.removeStream()
       //close miniButton which is in index.vue
