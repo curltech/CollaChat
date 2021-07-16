@@ -77,9 +77,14 @@
    'CHAT_RECEIVE_RECEIPT': 'CHAT_RECEIVE_RECEIPT', // 接收回复
    'CHAT_READ_RECEIPT': 'CHAT_READ_RECEIPT', // 已阅回复
    'CALL_CLOSE': 'CALL_CLOSE',
-   'CALL_REQUEST': 'CALL_REQUEST' // 通话请求
+   'CALL_REQUEST': 'CALL_REQUEST', // 通话请求
+    'RETRIEVE':'RETRIEVE'
  }
- 
+export let ChatMessageStatus = {
+    'NORMAL': 'NORMAL',
+    'RETRIEVE': 'RETRIEVE',
+    'DELETE': 'DELETE',
+}
  export let SubjectType = {
    'CHAT': 'CHAT',
    'LINKMAN_REQUEST': 'LINKMAN_REQUEST',

@@ -2,7 +2,7 @@ import { date } from 'quasar'
 
 import { webrtcPeerPool } from 'libcolla'
 
-import {  ChatDataType, chatComponent, ChatContentType, P2pChatMessageType, SubjectType } from '@/libs/biz/colla-chat'
+import {  ChatDataType, chatComponent, ChatMessageStatus, ChatContentType, P2pChatMessageType, SubjectType } from '@/libs/biz/colla-chat'
 import { ActiveStatus } from '@/libs/biz/colla-contact'
 
 import NotePreview from '@/components/notePreview'
@@ -20,6 +20,7 @@ export default {
       SubjectType: SubjectType,
       ActiveStatus: ActiveStatus,
       P2pChatMessageType: P2pChatMessageType,
+      ChatMessageStatus:ChatMessageStatus,
       ChatContentType: ChatContentType,
       date: date,
     }
@@ -73,6 +74,24 @@ export default {
       }
 
       return name
+    },
+    isShowRetrieved(message){
+      let _that = this
+      let store = _that.$store
+      let retrieveSetting
+      if(message.subjectType === SubjectType.CHAT){
+        let linkman = store.state.linkmanMap[message.subjectId]
+        if(message.senderPeerId == this.$store.state.myselfPeerClient.peerId){
+            retrieveSetting = linkman.myselfRetrieveAlert
+        }else{
+            retrieveSetting = linkman.retrieveAlert
+        }
+      }else if(message.subjectType === SubjectType.GROUP_CHAT){
+        let group = store.state.groupChatMap[message.subjectId]
+        retrieveSetting = group.retrieveAlert
+      }
+      let result = message.status === ChatMessageStatus.RETRIEVE && retrieveSetting
+      return result
     },
     isResend(message) {
       let state = this.$store.state

@@ -201,6 +201,9 @@ export default {
   "Can not play this video": "Can not play this video",
   "Unconnected": "Unconnected",
   "Open Timing Message":"Open timing message",
+  "Retrieve":"Retrieve",
+  "Retrieve Limit":"Retrieve Limit",
+  "Retrieve Alert":"Retrieve Alert",
 
   // Call
   "Call": "Call",

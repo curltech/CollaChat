@@ -1,7 +1,7 @@
 import { date, Platform } from 'quasar'
 import { VEmojiPicker, emojisDefault, categoriesDefault } from 'v-emoji-picker'
 import Vue from 'vue'
-import { EntityState } from 'libcolla'
+import {EntityState, webrtcPeerPool} from 'libcolla'
 import { CollaUtil, TypeUtil, BlobUtil, UUID } from 'libcolla'
 import { myself, dataBlockService, peerClientService } from 'libcolla'
 import { BlockType } from 'libcolla'
@@ -9,7 +9,7 @@ import { BlockType } from 'libcolla'
 import pinyinUtil from '@/libs/base/colla-pinyin'
 import { audioCaptureComponent, mediaCaptureComponent, mediaComponent, cameraComponent, alloyFingerComponent, mediaPickerComponent, mediaRecorderComponent, mediaStreamComponent, audioInputComponent } from '@/libs/base/colla-media'
 import { statusBarComponent, fileComponent, photoLibraryComponent } from '@/libs/base/colla-cordova'
-import { chatComponent, ChatContentType, ChatDataType, P2pChatMessageType, SubjectType, chatBlockComponent } from '@/libs/biz/colla-chat'
+import { chatComponent, ChatContentType, ChatMessageStatus, ChatDataType, P2pChatMessageType, SubjectType, chatBlockComponent } from '@/libs/biz/colla-chat'
 import { ActiveStatus, contactComponent, ContactDataType, MemberType, RequestStatus, RequestType } from '@/libs/biz/colla-contact'
 import { SrcEntityType, CollectionType } from '@/libs/biz/colla-collection'
 import { collectionUtil } from '@/libs/biz/colla-collection-util'
@@ -48,6 +48,7 @@ export default {
       subKind: this.$store.messageEntry === 'search' ? 'searchChatHistory' : 'default',
       SubjectType: SubjectType,
       ActiveStatus: ActiveStatus,
+      ChatMessageStatus: ChatMessageStatus,
       MemberType: MemberType,
       messageMultiSelectedVal: [],
       messageMultiSelectMode: false,
@@ -208,6 +209,28 @@ export default {
           }
         }
         return chatTitle
+      }
+    },
+    isRetrieveLimit(){
+      let _that = this
+      let store = _that.$store
+
+      return function (message) {
+        if(message.senderPeerId !== store.state.myselfPeerClient.peerId){
+            return true
+        }
+        let result = false
+        let retrieveLimit
+        if(message.subjectType === SubjectType.CHAT){
+            let linkman = store.state.linkmanMap[message.subjectId]
+            retrieveLimit = linkman.retrieveLimit
+        }else if(message.subjectType === SubjectType.GROUP_CHAT){
+            let group = store.state.groupChatMap[message.subjectId]
+            retrieveLimit = group.retrieveLimit
+        }
+        if(retrieveLimit){
+          return (new Date().getTime()- message.createDate) > 2 * 60 * 1000
+        }
       }
     },
     ifSelfChat(){
@@ -869,6 +892,20 @@ export default {
       _that.textVal = ''
       _that.sending = false
       editor.focus();
+    },
+    async retrieveMessage(message,index){
+      let _that = this
+      let store = _that.$store
+      let currentChat = store.state.currentChat
+      message.status = ChatMessageStatus.RETRIEVE
+      await chatComponent.update(ChatDataType.MESSAGE, message, null)
+      let _message = {
+          messageType: P2pChatMessageType.RETRIEVE,
+          preSubjectType: message.subjectType,
+          preSubjectId: message.subjectId,
+          preMessageId: message.messageId,
+      }
+      await store.sendChatMessage(currentChat, _message)
     },
     async deleteMessage(message, index) {
       let _that = this
@@ -2044,6 +2081,48 @@ export default {
           await contactComponent.update(ContactDataType.GROUP, groupChatRecord)
         }
       }
+    },
+    changeRetrieveLimit: async function (value) {
+          let _that = this
+          let store = _that.$store
+          let subjectType = store.state.currentChat.subjectType
+          let subjectId = store.state.currentChat.subjectId
+          if (subjectType === SubjectType.CHAT) {
+              let linkman = store.state.linkmanMap[subjectId]
+              let linkmanRecord = await contactComponent.get(ContactDataType.LINKMAN, linkman._id)
+              if (linkmanRecord) {
+                  linkmanRecord.myselfRetrieveLimit = value
+                  await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
+              }
+          } else if (subjectType === SubjectType.GROUP_CHAT) {
+              let groupChat = store.state.groupChatMap[subjectId]
+              let groupChatRecord = await contactComponent.get(ContactDataType.GROUP, groupChat._id)
+              if (groupChatRecord) {
+                  groupChatRecord.retrieveLimit = value
+                  await contactComponent.update(ContactDataType.GROUP, groupChatRecord)
+              }
+          }
+    },
+    changeRetrieveAlert: async function (value) {
+          let _that = this
+          let store = _that.$store
+          let subjectType = store.state.currentChat.subjectType
+          let subjectId = store.state.currentChat.subjectId
+          if (subjectType === SubjectType.CHAT) {
+              let linkman = store.state.linkmanMap[subjectId]
+              let linkmanRecord = await contactComponent.get(ContactDataType.LINKMAN, linkman._id)
+              if (linkmanRecord) {
+                  linkmanRecord.myselfRetrieveAlert = value
+                  await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
+              }
+          } else if (subjectType === SubjectType.GROUP_CHAT) {
+              let groupChat = store.state.groupChatMap[subjectId]
+              let groupChatRecord = await contactComponent.get(ContactDataType.GROUP, groupChat._id)
+              if (groupChatRecord) {
+                  groupChatRecord.retrieveAlert = value
+                  await contactComponent.update(ContactDataType.GROUP, groupChatRecord)
+              }
+          }
     },
     async showContacts(peerId) {
       let _that = this

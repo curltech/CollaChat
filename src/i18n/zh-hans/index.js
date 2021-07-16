@@ -205,6 +205,9 @@ export default {
   "Can not play this video": "无法播放此视频",
   "Unconnected": "未连接",
   "Open Timing Message":"打开定时消息",
+  "Retrieve":"撤回",
+  "Retrieve Limit":"限时撤回",
+  "Retrieve Alert":"撤回提醒",
 
   // Developer
   "Developer": "开发者",
