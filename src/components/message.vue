@@ -20,8 +20,8 @@
                       q-item-section {{$t('Copy')}}
                     q-item(clickable  @click="deleteMessage(message,index)" v-close-popup)
                       q-item-section {{$t('Delete')}}
-                    q-item(clickable v-if="!isRetrieveLimit(message)" @click="retrieveMessage(message,index)" v-close-popup)
-                      q-item-section {{$t('Retrieve')}}
+                    q-item(clickable v-if="!isRecallTimeLimit(message)" @click="recallMessage(message,index)" v-close-popup)
+                      q-item-section {{$t('Recall')}}
                     q-item(clickable v-if='!message.countDown' @click="forwardMessage([message])" v-close-popup)
                       q-item-section {{$t('Forward')}}
                     q-item(clickable v-if='!message.countDown' @click="collectMessage(message, index)" v-close-popup)
@@ -123,14 +123,14 @@
               q-toggle(v-if="$store.state.currentChat && $store.state.linkmanMap[$store.state.currentChat.subjectId]" v-model="$store.state.linkmanMap[$store.state.currentChat.subjectId].top" @input="changeTopSwitch")
           q-item
             q-item-section
-              q-item-label {{$t('Retrieve Limit')}}
+              q-item-label {{$t('Recall Time Limit')}}
             q-item-section(side)
-              q-toggle(v-if="$store.state.currentChat && $store.state.linkmanMap[$store.state.currentChat.subjectId]" v-model="$store.state.linkmanMap[$store.state.currentChat.subjectId].myselfRetrieveLimit" @input="changeRetrieveLimit")
+              q-toggle(v-if="$store.state.currentChat && $store.state.linkmanMap[$store.state.currentChat.subjectId]" v-model="$store.state.linkmanMap[$store.state.currentChat.subjectId].myselfRecallTimeLimit" @input="changeRecallTimeLimit")
           q-item
             q-item-section
-              q-item-label {{$t('Retrieve Alert')}}
+              q-item-label {{$t('Recall Alert')}}
             q-item-section(side)
-              q-toggle(v-if="$store.state.currentChat && $store.state.linkmanMap[$store.state.currentChat.subjectId]" v-model="$store.state.linkmanMap[$store.state.currentChat.subjectId].myselfRetrieveAlert" @input="changeRetrieveAlert")
+              q-toggle(v-if="$store.state.currentChat && $store.state.linkmanMap[$store.state.currentChat.subjectId]" v-model="$store.state.linkmanMap[$store.state.currentChat.subjectId].myselfRecallAlert" @input="changeRecallAlert")
           q-separator.c-separator(style="height:8px;margin-left:0px;margin-right:0px")
           q-item
             q-item-section(align="center")
@@ -232,14 +232,14 @@
               q-toggle(v-if="$store.state.currentChat && $store.state.groupChatMap[$store.state.currentChat.subjectId]" v-model="$store.state.groupChatMap[$store.state.currentChat.subjectId].top" @input="changeTopSwitch")
           q-item
             q-item-section
-              q-item-label {{$t('Retrieve Limit')}}
+              q-item-label {{$t('Recall Time Limit')}}
             q-item-section(side)
-              q-toggle(v-if="$store.state.currentChat && $store.state.groupChatMap[$store.state.currentChat.subjectId]" v-model="$store.state.groupChatMap[$store.state.currentChat.subjectId].myselfRetrieveLimit" @input="changeRetrieveLimit")
+              q-toggle(v-if="$store.state.currentChat && $store.state.groupChatMap[$store.state.currentChat.subjectId]" v-model="$store.state.groupChatMap[$store.state.currentChat.subjectId].myselfRecallTimeLimit" @input="changeRecallTimeLimit")
           q-item
             q-item-section
-              q-item-label {{$t('Retrieve Alert')}}
+              q-item-label {{$t('Recall Alert')}}
             q-item-section(side)
-              q-toggle(v-if="$store.state.currentChat && $store.state.groupChatMap[$store.state.currentChat.subjectId]" v-model="$store.state.groupChatMap[$store.state.currentChat.subjectId].myselfRetrieveAlert" @input="changeRetrieveAlert")
+              q-toggle(v-if="$store.state.currentChat && $store.state.groupChatMap[$store.state.currentChat.subjectId]" v-model="$store.state.groupChatMap[$store.state.currentChat.subjectId].myselfRecallAlert" @input="changeRecallAlert")
           q-separator.c-separator.message-sep-2
           q-item
             q-item-section(align="center")
