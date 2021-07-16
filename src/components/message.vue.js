@@ -1411,11 +1411,10 @@ export default {
       }
       delete store.state.chatMap[currentChatPeerId]
       store.state.currentChat = null
-      if(store.state.ifMobileStyle){
+      if (store.state.ifMobileStyle) {
         store.toggleDrawer(false)
-      }else{
-        _that.subKind = "default"
       }
+      _that.subKind = "default"
     },
     confirmRemoveGroupChat() {
       let _that = this
