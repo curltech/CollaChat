@@ -2853,7 +2853,7 @@ export default {
           let json
           try {
             const httpsAgent = new https.Agent({
-              rejectUnauthorized = false
+              rejectUnauthorized: false
             })
             let _client = axios.create({ httpsAgent })
             if (_client) {
