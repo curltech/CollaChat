@@ -211,7 +211,7 @@ export default {
         return chatTitle
       }
     },
-    isRetrieveLimit(){
+    isRecallTimeLimit(){
       let _that = this
       let store = _that.$store
 
@@ -220,15 +220,15 @@ export default {
             return true
         }
         let result = false
-        let retrieveLimit
+        let recallTimeLimit
         if(message.subjectType === SubjectType.CHAT){
             let linkman = store.state.linkmanMap[message.subjectId]
-            retrieveLimit = linkman.retrieveLimit
+            recallTimeLimit = linkman.recallTimeLimit
         }else if(message.subjectType === SubjectType.GROUP_CHAT){
             let group = store.state.groupChatMap[message.subjectId]
-            retrieveLimit = group.retrieveLimit
+            recallTimeLimit = group.recallTimeLimit
         }
-        if(retrieveLimit){
+        if(recallTimeLimit){
           return (new Date().getTime()- message.createDate) > 2 * 60 * 1000
         }
       }
@@ -451,7 +451,7 @@ export default {
           ownerPeerId: myself.myselfPeerClient.peerId,
           subjectId: store.state.currentChat.subjectId,
           //messageType: P2pChatMessageType.CHAT_LINKMAN,
-        }, [{ receiveTime: 'desc' }], store.state.currentChat.messages.length > 0 ? store.state.currentChat.messages[0].receiveTime : null, 10
+        }, [{ _id: 'desc' }], store.state.currentChat.messages.length > 0 ? store.state.currentChat.messages[0].receiveTime : null, 10
       )
       CollaUtil.sortByKey(messages, 'receiveTime', 'asc');
       if (messages && messages.length > 0) {
@@ -893,14 +893,14 @@ export default {
       _that.sending = false
       editor.focus();
     },
-    async retrieveMessage(message,index){
+    async recallMessage(message,index){
       let _that = this
       let store = _that.$store
       let currentChat = store.state.currentChat
-      message.status = ChatMessageStatus.RETRIEVE
+      message.status = ChatMessageStatus.RECALL
       await chatComponent.update(ChatDataType.MESSAGE, message, null)
       let _message = {
-          messageType: P2pChatMessageType.RETRIEVE,
+          messageType: P2pChatMessageType.RECALL,
           preSubjectType: message.subjectType,
           preSubjectId: message.subjectId,
           preMessageId: message.messageId,
@@ -2082,7 +2082,7 @@ export default {
         }
       }
     },
-    changeRetrieveLimit: async function (value) {
+    changeRecallTimeLimit: async function (value) {
           let _that = this
           let store = _that.$store
           let subjectType = store.state.currentChat.subjectType
@@ -2091,19 +2091,19 @@ export default {
               let linkman = store.state.linkmanMap[subjectId]
               let linkmanRecord = await contactComponent.get(ContactDataType.LINKMAN, linkman._id)
               if (linkmanRecord) {
-                  linkmanRecord.myselfRetrieveLimit = value
+                  linkmanRecord.myselfRecallTimeLimit = value
                   await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
               }
           } else if (subjectType === SubjectType.GROUP_CHAT) {
               let groupChat = store.state.groupChatMap[subjectId]
               let groupChatRecord = await contactComponent.get(ContactDataType.GROUP, groupChat._id)
               if (groupChatRecord) {
-                  groupChatRecord.retrieveLimit = value
+                  groupChatRecord.recallTimeLimit = value
                   await contactComponent.update(ContactDataType.GROUP, groupChatRecord)
               }
           }
     },
-    changeRetrieveAlert: async function (value) {
+    changeRecallAlert: async function (value) {
           let _that = this
           let store = _that.$store
           let subjectType = store.state.currentChat.subjectType
@@ -2112,14 +2112,14 @@ export default {
               let linkman = store.state.linkmanMap[subjectId]
               let linkmanRecord = await contactComponent.get(ContactDataType.LINKMAN, linkman._id)
               if (linkmanRecord) {
-                  linkmanRecord.myselfRetrieveAlert = value
+                  linkmanRecord.myselfRecallAlert = value
                   await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
               }
           } else if (subjectType === SubjectType.GROUP_CHAT) {
               let groupChat = store.state.groupChatMap[subjectId]
               let groupChatRecord = await contactComponent.get(ContactDataType.GROUP, groupChat._id)
               if (groupChatRecord) {
-                  groupChatRecord.retrieveAlert = value
+                  groupChatRecord.recallAlert = value
                   await contactComponent.update(ContactDataType.GROUP, groupChatRecord)
               }
           }

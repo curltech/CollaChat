@@ -75,22 +75,22 @@ export default {
 
       return name
     },
-    isShowRetrieved(message){
+    isShowRecalld(message){
       let _that = this
       let store = _that.$store
-      let retrieveSetting
+      let recallSetting
       if(message.subjectType === SubjectType.CHAT){
         let linkman = store.state.linkmanMap[message.subjectId]
         if(message.senderPeerId == this.$store.state.myselfPeerClient.peerId){
-            retrieveSetting = linkman.myselfRetrieveAlert
+            recallSetting = linkman.myselfRecallAlert
         }else{
-            retrieveSetting = linkman.retrieveAlert
+            recallSetting = linkman.recallAlert
         }
       }else if(message.subjectType === SubjectType.GROUP_CHAT){
         let group = store.state.groupChatMap[message.subjectId]
-        retrieveSetting = group.retrieveAlert
+        recallSetting = group.recallAlert
       }
-      let result = message.status === ChatMessageStatus.RETRIEVE && retrieveSetting
+      let result = message.status === ChatMessageStatus.RECALL && recallSetting
       return result
     },
     isResend(message) {

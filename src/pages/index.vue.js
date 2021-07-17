@@ -826,7 +826,9 @@ export default {
         chat.unReadCount = 0
         chat.destroyTime = 0
         chat.mediaProperty = null
-        chat.content = ""
+        if(!chat.content){
+            chat.content = ""
+        }
         chat.noMoreMessageTag = false
         chat.subjectType = store.state.linkmanMap[subjectId] ? SubjectType.CHAT : SubjectType.GROUP_CHAT
         chat.messages = []
@@ -1863,8 +1865,8 @@ export default {
                 linkman.signalPublicKey = content.signalPublicKey
                 //linkman.localDataCryptoSwitch = content.localDataCryptoSwitch
                 //linkman.fullTextSearchSwitch = content.fullTextSearchSwitch
-                linkman.retrieveLimit = content.retrieveLimit
-                linkman.retrieveAlert = content.retrieveAlert
+                linkman.recallTimeLimit = content.recallTimeLimit
+                linkman.recallAlert = content.recallAlert
                 linkman.udpSwitch = content.udpSwitch
               }
               await contactComponent.update(ContactDataType.LINKMAN, linkmen, null)
@@ -1901,8 +1903,8 @@ export default {
           groupChat.locked = false
           groupChat.notAlert = false
           groupChat.top = false
-          groupChat.retrieveLimit = true
-          groupChat.retrieveAlert = true
+          groupChat.recallTimeLimit = true
+          groupChat.recallAlert = true
 
           await contactComponent.insert(ContactDataType.GROUP, groupChat, null)
 
@@ -2077,8 +2079,8 @@ export default {
             groupChat.locked = false
             groupChat.notAlert = false
             groupChat.top = false
-            groupChat.retrieveLimit = true
-            groupChat.retrieveAlert = true
+            groupChat.recallTimeLimit = true
+            groupChat.recallAlert = true
             await contactComponent.insert(ContactDataType.LINKMAN, groupChat, null)
           }
 
@@ -2387,26 +2389,35 @@ export default {
       else if (messageType === P2pChatMessageType.CALL_CLOSE) {
         await _that.receiveCallClose(message)
       }
-      else if (messageType === P2pChatMessageType.RETRIEVE) {
-          await _that.receiveRetrieveMessage(message)
+      else if (messageType === P2pChatMessageType.RECALL) {
+          await _that.receiveRecallMessage(message)
       }
       else if(messageType === P2pChatMessageType.CHAT_LINKMAN){
         await store.insertReceivedMessage(message)
       }
     },
-    async receiveRetrieveMessage(message){
-      debugger
+    async receiveRecallMessage(message){
       let _that = this
       let store = _that.$store
       let preMessageId = message.preMessageId
       let myselfPeerClient = myself.myselfPeerClient
       let currentMes
-      let chatMessages = store.state.chatMap[message.senderPeerId].messages
-      if (chatMessages && chatMessages.length > 0) {
-          for (let i = chatMessages.length; i--; i > -1) {
-              let _currentMes = chatMessages[i]
-              if (_currentMes.messageId === preMessageId) {
-                  currentMes = _currentMes
+      let subjectId
+      if(message.preSubjectType === SubjectType.GROUP_CHAT){
+          subjectId = message.preSubjectId
+      }else{
+          subjectId = message.senderPeerId
+      }
+      let chat = store.state.chatMap[subjectId]
+      if(chat){
+          let chatMessages = chat.messages
+          if (chatMessages && chatMessages.length > 0) {
+              for (let i = chatMessages.length; i--; i > -1) {
+                  let _currentMes = chatMessages[i]
+                  if (_currentMes.messageId === preMessageId) {
+                      currentMes = _currentMes
+                      currentMes.status = ChatMessageStatus.RECALL
+                  }
               }
           }
       }
@@ -2420,17 +2431,8 @@ export default {
               currentMes = messages[0]
           }
       }
-      currentMes.status = ChatMessageStatus.RETRIEVE
+      currentMes.status = ChatMessageStatus.RECALL
       await chatComponent.update(ChatDataType.MESSAGE, currentMes, null)
-
-      //update chat.messages
-      let chat = store.state.chatMap[message.preSubjectId]
-      for (let _message of chat.messages) {
-          if (_message.messageId === preMessageId) {
-              _message.status =  ChatMessageStatus.RETRIEVE
-          }
-      }
-
     },
     async sendOrSaveReceipt(message){
       let _that = this
@@ -2562,8 +2564,8 @@ export default {
         myselfBasicInfo.publicKey = myselfPeerClient.publicKey
         myselfBasicInfo.signalPublicKey = myselfPeerClient.signalPublicKey
         myselfBasicInfo.udpSwitch = myselfPeerClient.udpSwitch
-        myselfBasicInfo.retrieveLimit = linkman.myselfRetrieveLimit
-        myselfBasicInfo.retrieveAlert = linkman.myselfRetrieveAlert
+        myselfBasicInfo.recallTimeLimit = linkman.myselfRecallTimeLimit
+        myselfBasicInfo.recallAlert = linkman.myselfRecallAlert
         let message = {
           messageType: P2pChatMessageType.SYNC_LINKMAN_INFO,
           content: myselfBasicInfo
@@ -3167,6 +3169,7 @@ export default {
       }
       // 联系人同步：跨实例云端同步功能提供前临时使用 - end
       let chatsJson = null
+      let needInsertMessageChats = []
       if (json.indexOf('[chatsJson:]') > -1 && json.indexOf('[:chatsJson]') > -1) {
         chatsJson = json.substring(json.indexOf('[chatsJson:]') + 12, json.indexOf('[:chatsJson]'))
         console.log(chatsJson)
@@ -3188,7 +3191,8 @@ export default {
           if (chats.length > 0) {
             await chatComponent.insert(ChatDataType.CHAT, chats, null)
             for (let i = chats.length - 1; i >= 0; i--) {
-              await store.getChat(chats[i].subjectId)
+              let _chat = await store.getChat(chats[i].subjectId)
+                needInsertMessageChats.push(_chat)
             }
           }
         }
@@ -3286,6 +3290,23 @@ export default {
             }
           }
         }
+      }
+      if(needInsertMessageChats.length > 0){
+          for(let needInsertMessageChat of needInsertMessageChats){
+              needInsertMessageChat.messages = []
+              let _messages = await chatComponent.loadMessage(
+                  {
+                      ownerPeerId: myself.myselfPeerClient.peerId,
+                      subjectId: needInsertMessageChat.subjectId,
+                  }, [{ _id: 'desc' }], null, 10
+              )
+              if (_messages && _messages.length > 0) {
+                  CollaUtil.sortByKey(_messages, 'receiveTime', 'asc');
+                  needInsertMessageChat.messages = _messages
+              } else {
+                  needInsertMessageChat.noMoreMessageTag = true
+              }
+          }
       }
       _that.$q.loading.hide()
     },

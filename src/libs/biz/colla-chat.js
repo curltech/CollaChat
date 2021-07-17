@@ -78,11 +78,11 @@
    'CHAT_READ_RECEIPT': 'CHAT_READ_RECEIPT', // 已阅回复
    'CALL_CLOSE': 'CALL_CLOSE',
    'CALL_REQUEST': 'CALL_REQUEST', // 通话请求
-    'RETRIEVE':'RETRIEVE'
+    'RECALL':'RECALL'
  }
 export let ChatMessageStatus = {
     'NORMAL': 'NORMAL',
-    'RETRIEVE': 'RETRIEVE',
+    'RECALL': 'RECALL',
     'DELETE': 'DELETE',
 }
  export let SubjectType = {
