@@ -2,6 +2,7 @@ import { date, Dialog } from 'quasar'
 import jsQR from 'jsqr'
 import jimp from 'jimp'
 import axios from 'axios'
+import https from 'https'
 
 import { CollaUtil, StringUtil,UUID } from 'libcolla'
 import { webrtcPeerPool } from 'libcolla'
@@ -1684,15 +1685,6 @@ export default {
       }  else if (type === ChatMessageType.MIGRATE) { // unreachable
         console.log('MIGRATE')
         _that.initMigrateDialog = false
-        Dialog.create({
-          title: _that.$i18n.t('Alert'),
-          message: _that.$i18n.t('Migrate successfully'),
-          cancel: false,
-          ok: {"label":_that.$i18n.t('Ok'),"color":"primary","unelevated":true,"no-caps":true},
-          persistent: true
-        }).onOk(() => {
-        }).onCancel(() => {
-        })
       } else if (type === ChatMessageType.BACKUP) {
         console.log('BACKUP, url:' + data.url + ', filename:' + data.filename)
         if (data.url && data.filename) {
@@ -1702,15 +1694,13 @@ export default {
         } else {
           _that.initBackupDialog = false
           if (data.operation !== 'Cancel') {
-            Dialog.create({
-              title: _that.$i18n.t('Alert'),
-              message: _that.$i18n.t('Backup successfully'),
-              cancel: false,
-              ok: {"label":_that.$i18n.t('Ok'),"color":"primary","unelevated":true,"no-caps":true},
-              persistent: true
-            }).onOk(() => {
-            }).onCancel(() => {
-            })
+            _that.closeRestore()
+          _that.$q.notify({
+            message: _that.$i18n.t("Backup successfully"),
+            timeout: 3000,
+            type: "info",
+            color: "info",
+          })
           }
         }
       } else if (type === ChatMessageType.RESTORE) {
@@ -2860,7 +2850,10 @@ export default {
           let url = migrateUrl + '/' + migrateFilename
           let json
           try {
-            let _client = axios.create()
+            const httpsAgent = new https.Agent({
+              rejectUnauthorized = false
+            })
+            let _client = axios.create({ httpsAgent })
             if (_client) {
               let serviceData = await _client.get(url)
               if (serviceData) {
@@ -2892,6 +2885,13 @@ export default {
           if (json) {
             await store.restoreChatRecord(json)
             await _that.closeMigrate()
+            _that.closeRestore()
+            _that.$q.notify({
+              message: _that.$i18n.t("Migrate successfully"),
+              timeout: 3000,
+              type: "info",
+              color: "info",
+            })
           }
         }
       }
