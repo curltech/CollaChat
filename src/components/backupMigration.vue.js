@@ -9,13 +9,11 @@ import { contactComponent } from '@/libs/biz/colla-contact'
 import { fileComponent } from '@/libs/base/colla-cordova'
 
 import SelectChatRecord from '@/components/selectChatRecord'
-import Tip from '@/components/tip'
 
 export default {
   name: "BackupMigration",
   components: {
-    selectChatRecord: SelectChatRecord,
-    tip: Tip
+    selectChatRecord: SelectChatRecord
   },
   data() {
     return {

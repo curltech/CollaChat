@@ -118,6 +118,7 @@
   "Group Name": "단체 톡 이름",
   "Group Description": "단체 토 크 설명",
   "Group Owner": "군 주",
+  "Group File": "그룹 파일",
   "My Alias": "내 가 본 그룹 에 있 는 닉네임",
   "MemberAlias: ": "그룹 닉네임：",
   "Name: ": "이름：",

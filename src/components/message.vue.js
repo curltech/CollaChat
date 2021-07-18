@@ -372,6 +372,12 @@ export default {
         }
       }
     }*/
+    GroupFileFilteredList() {
+      let _that = this
+      let store = _that.$store
+      let groupFileFilteredArray = []
+      return groupFileFilteredArray
+    }
   },
   methods: {
     talkHeight(){
@@ -807,7 +813,7 @@ export default {
             type: "warning",
             color: "warning",
           })
-          _that.$refs.imgUpload.reset()
+          _that.$refs.messageUpload.reset()
           return
         }
         type = ChatContentType.IMAGE
@@ -822,7 +828,7 @@ export default {
       name = file.name
       fileSize = file.size
       await store.saveFileAndSendMessage(store.state.currentChat, fileData, type, name)
-      _that.$refs.imgUpload.reset()
+      _that.$refs.messageUpload.reset()
     },
     uploadMobileMessageImage: async function () {
       let _that = this
@@ -2668,6 +2674,48 @@ export default {
           }
         })
       }
+    },
+    async uploadGroupFile(file) {
+      let _that = this
+      let store = _that.$store
+      let peerId = store.state.currentChat.subjectId
+      let fileType
+      if (file.name) {
+        let index = file.name.lastIndexOf(".");
+        fileType = file.name.substr(index + 1);
+      }
+      let fileData = await BlobUtil.fileObjectToBase64(file)
+      let type, name, fileSize;
+      if (mediaComponent.isAssetTypeAnImage(fileType)) {
+        if (file.size > 2097152) { //2M
+          _that.$q.notify({
+            message: _that.$i18n.t("Restricted to images, size less than 2M"),
+            timeout: 3000,
+            type: "warning",
+            color: "warning",
+          })
+          _that.$refs.groupFileUpload.reset()
+          return
+        }
+        type = ChatContentType.IMAGE
+      } else if (mediaComponent.isAssetTypeAVideo(fileType)) {
+        type = ChatContentType.VIDEO
+      } else if (mediaComponent.isAssetTypeAnAudio(fileType)) {
+        type = ChatContentType.AUDIO
+      } else {
+        type = ChatContentType.FILE
+      }
+      name = file.name
+      fileSize = file.size
+      await store.saveFileAndSendMessage(store.state.currentChat, fileData, type, name)
+      _that.$refs.groupFileUpload.reset()
+    },
+    searchFocus(e) {
+      let _that = this
+    },
+    groupFileSelected(groupFile, _index) {
+      let _that = this
+      let store = _that.$store
     }
   },
   async mounted() {

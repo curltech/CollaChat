@@ -118,6 +118,7 @@ export default {
   "Group Name": "Group Name",
   "Group Description": "Group Description",
   "Group Owner": "Group Owner",
+  "Group File": "Group File",
   "My Alias": "My Alias",
   "MemberAlias: ": "MemberAlias: ",
   "Name: ": "Name: ",

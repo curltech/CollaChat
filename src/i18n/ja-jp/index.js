@@ -118,6 +118,7 @@
   "Group Name": "群雑名",
   "Group Description": "群雑談説明",
   "Group Owner": "群主",
+  "Group File": "グループファイル",
   "My Alias": "私はこのグループのニックネームです",
   "MemberAlias: ": "グループニックネーム：",
   "Name: ": "名称：",

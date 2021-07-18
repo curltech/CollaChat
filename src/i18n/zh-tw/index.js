@@ -118,6 +118,7 @@
   "Group Name": "群聊名稱",
   "Group Description": "群聊描述",
   "Group Owner": "群主",
+  "Group File": "群文件",
   "My Alias": "我在本群的昵稱",
   "MemberAlias: ": "群昵稱：",
   "Name: ": "名稱：",

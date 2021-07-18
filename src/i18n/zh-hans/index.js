@@ -121,6 +121,7 @@ export default {
   "Group Name": "群聊名称",
   "Group Description": "群聊描述",
   "Group Owner": "群主",
+  "Group File": "群文件",
   "My Alias": "我在本群的昵称",
   "MemberAlias: ": "群昵称：",
   "Name: ": "名称：",

@@ -47,8 +47,7 @@
               q-btn.q-mr-sm.btnIcon(round flat icon="camera" @click="capture('video')")
               q-btn.q-mr-sm.btnIcon(round flat icon="bookmarks" @click="openCollection")
               q-btn.q-mr-sm.btnIcon(round flat icon="account_box" @click="selectLinkmanCard")
-              q-btn.q-mr-sm.btnIcon(round flat icon="folder" @click="$refs.imgUpload.pickFiles()")
-              q-uploader(style="display:none" max-file-size="20971520" ref="imgUpload" @added="files => uploadMessageFile(files[0])" label="Custom header" multiple)
+              q-btn.q-mr-sm.btnIcon(round flat icon="folder" @click="$refs.messageUpload.pickFiles()")
             q-toolbar.message-operate-wrap(v-if='messageMultiSelectMode' :class = 'Platform.is.mobile?"message-operate-wrap-mobile":"message-operate-wrap-pc"')
               q-btn-group.full-width(flat spread stretch)
                 q-btn.btnIcon.btnMessage(flat stack no-caps :label="$t('Forward')" icon="forward" @click="multiForwardMessage('single')")
@@ -78,8 +77,7 @@
                       q-btn.btnIcon.btnMessage(flat stack no-caps :label="$t('Contact Card')" icon="account_box" @click="selectLinkmanCard")
                   q-carousel-slide(name="slide2" class="q-pa-md")
                     q-btn-group(flat stretch)
-                      q-btn.btnIcon.btnMessage(flat stack no-caps :label="$t('File')" icon="folder" @click="$refs.imgUpload.pickFiles()")
-                        q-uploader(style="display:none"  max-file-size="20971520"  ref="imgUpload" @added="files => uploadMessageFile(files[0])" label="Custom header" multiple)
+                      q-btn.btnIcon.btnMessage(flat stack no-caps :label="$t('File')" icon="folder" @click="$refs.messageUpload.pickFiles()")
               .col-12.text-center
                 .audio-touch#audio-touch(@touchstart="audioTouchStart" @touchmove="audioTouchMove" @touchend="audioTouchEnd")
                   q-icon(size="16px" name="mic" style="vertical-align: text-top;")
@@ -207,6 +205,12 @@
             q-item-section(avatar)
               q-icon(name="keyboard_arrow_right" color="c-grey-10")
           q-separator.c-separator.message-sep-2
+          q-item(clickable v-ripple @click="subKind='groupFile'")
+            q-item-section
+              q-item-label {{$t('Group File')}}
+            q-item-section(avatar)
+              q-icon(name="keyboard_arrow_right" color="c-grey-10")
+          q-separator.c-separator.message-sep-2
           q-item(clickable v-ripple @click="showSearchChatHistory")
             q-item-section
               q-item-label {{$t('Search Chat History')}}
@@ -312,6 +316,24 @@
               q-item-label( lines="1") {{ message.senderPeerId === message.ownerPeerId?$store.state.myselfPeerClient.name:$store.state.linkmanMap[message.senderPeerId].name }}
               q-item-label(caption v-html="message.highlighting")
             q-item-section(side top) {{detailDateFormat(message.createDate)}}
+      q-tab-panel(name="groupFile" style="padding:0px 0px")
+        q-toolbar.header-toolbar
+          q-btn(flat round dense icon="keyboard_arrow_left" @click="subKind='default'")
+          q-toolbar-title(align="center") {{ $t('Group File') + '(' + GroupFileFilteredList.length + ')' }}
+          q-btn.btnIcon(flat round dense icon="add_circle_outline" @click="$refs.groupFileUpload.pickFiles()")
+        div.scroll.header-mar-top(id="scroll-target-default" :class="ifMobileSize || $store.state.ifMobileStyle ? 'scrollHeightMobileStyle-editor' : 'scrollHeightStyle'")
+          q-toolbar(insert class="q-px-xs")
+            q-input.c-field(debounce="100" filled dense v-model="searchText" :placeholder="placeholder" input-class="text-center iconfont" @focus="searchFocus")
+              template(slot="append")
+                q-icon(v-if="searchText" name="cancel" class="cursor-pointer" @click.stop="searchText = null")
+          q-list
+            q-item(v-for="(groupFile, index) in GroupFileFilteredList" :key="groupFile.messageId" clickable v-ripple @click="groupFileSelected(groupFile, index)")
+              q-item-section(avatar)
+                q-avatar
+                  img(:src="message.senderPeerId === message.ownerPeerId ? ($store.state.myselfPeerClient.avatar ? $store.state.myselfPeerClient.avatar : $store.defaultActiveAvatar) : ($store.state.linkmanMap[message.senderPeerId].avatar ? $store.state.linkmanMap[message.senderPeerId].avatar : $store.defaultActiveAvatar)")
+              q-item-section
+                q-item-label( lines="1") {{ groupFile.senderPeerId === groupFile.ownerPeerId?$store.state.myselfPeerClient.name:$store.state.linkmanMap[groupFile.senderPeerId].name }}
+              q-item-section(side top) {{ detailDateFormat(groupFile.createDate) }}
       // group chat ///////////////////////////////////////////////////////////////////////////////////
       q-tab-panel(name="selectGroupChatMember" style="padding:0px 0px")
         q-toolbar
@@ -382,8 +404,9 @@
                   img(:src="$store.state.linkmanMap[groupMember.memberPeerId] && $store.state.linkmanMap[groupMember.memberPeerId].avatar ? $store.state.linkmanMap[groupMember.memberPeerId].avatar : $store.defaultActiveAvatar")
               q-item-section(@click="selectedFocusGroupMember(groupMember)")
                 q-item-label {{$store.state.linkmanMap[groupMember.memberPeerId].givenName?$store.state.linkmanMap[groupMember.memberPeerId].givenName:$store.state.linkmanMap[groupMember.memberPeerId].name }}
+    q-uploader(style="display:none" max-file-size="20971520" ref="messageUpload" @added="files => uploadMessageFile(files[0])" label="Custom header" multiple)
+    q-uploader(style="display:none" max-file-size="20971520" ref="groupFileUpload" @added="files => uploadGroupFile(files[0])" label="Custom header" multiple)
     mergeMessageDialog
     noteMessageDialog
 </template>
 <script src="./message.vue.js" />
-
