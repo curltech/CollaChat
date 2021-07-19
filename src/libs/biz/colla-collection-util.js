@@ -7,6 +7,7 @@ import pinyinUtil from '@/libs/base/colla-pinyin'
 import { mediaComponent, audioMediaComponent } from '@/libs/base/colla-media'
 import { fileComponent } from '@/libs/base/colla-cordova'
 import { collectionComponent, CollectionType} from '@/libs/biz/colla-collection'
+import { P2pChatMessageType } from '@/libs/biz/colla-chat'
 
 /**
  * message和collection复用功能
@@ -338,13 +339,16 @@ import { collectionComponent, CollectionType} from '@/libs/biz/colla-collection'
     } else {
       peers = _peers
     }
-    peers.push(myself.myselfPeerClient)
+    if (bizObj.messageType !== P2pChatMessageType.GROUP_FILE) {
+      peers.push(myself.myselfPeerClient)
+    }
     let blockId = bizObj.blockId
+    let businessNumber = bizObj._id ? bizObj._id : bizObj.businessNumber // Collection-_id, ChatAttach/GroupFile-businessNumber
     if (!expireDate) {
       expireDate = 0
     }
     let payload = { payload: CollaUtil.clone(bizObj), metadata: bizObj.tag, expireDate: expireDate }
-    let dataBlock = DataBlockService.create(blockId, bizObj._id, blockType, bizObj.updateDate, payload, peers)
+    let dataBlock = DataBlockService.create(blockId, businessNumber, blockType, bizObj.updateDate, payload, peers)
     console.log('collection dataBlock length:' + JSON.stringify(dataBlock).length)
     let start = new Date().getTime()
     await dataBlockService.encrypt(dataBlock)

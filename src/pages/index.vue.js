@@ -1048,22 +1048,25 @@ export default {
     async saveFileInMessage(chat, message, fileData, type, name, originalMessageId) {
       let _that = this
       let store = _that.$store
-      let peerId = chat.subjectId
       let _peers = []
-      if(chat.subjectType === SubjectType.CHAT){
-        _peers.push(store.state.linkmanMap[peerId])
-      }else if(chat.subjectType === SubjectType.GROUP_CHAT){
-        let groupMembers = store.state.groupChatMap[peerId].groupMembers
-        for (let groupMember of groupMembers) {
-          let linkman = store.state.linkmanMap[groupMember.memberPeerId]
-          if(linkman && groupMember.memberPeerId !== myself.myselfPeerClient.peerId){
-            _peers.push(linkman)
+      if (message.messageType === P2pChatMessageType.CHAT_LINKMAN) {
+        if (chat.subjectType === SubjectType.CHAT) {
+          _peers.push(store.state.linkmanMap[chat.subjectId])
+        } else if (chat.subjectType === SubjectType.GROUP_CHAT) {
+          let groupMembers = store.state.groupChatMap[peerId].groupMembers
+          for (let groupMember of groupMembers) {
+            let linkman = store.state.linkmanMap[groupMember.memberPeerId]
+            if(linkman && groupMember.memberPeerId !== myself.myselfPeerClient.peerId){
+              _peers.push(linkman)
+            }
           }
         }
       }
       chatComponent.localFileDataMap[message.messageId] = fileData
       let current = {
-        _id: message.messageId,
+        businessNumber: (message.messageType === P2pChatMessageType.GROUP_FILE ? chat.subjectId : message.messageId),
+        messageType: message.messageType,
+        subjectId: chat.subjectId,
         blockId: UUID.string(null, null),
         attachs: [{
           content: fileData,
@@ -1071,11 +1074,11 @@ export default {
           ownerPeerId: myself.myselfPeerClient.peerId,
           originalMessageId: originalMessageId
         }],
-        tag: "",
+        tag: name,
         updateDate: new Date().getTime()
       }
       this.$q.loading.show()
-      let saveResult = await chatBlockComponent.save(current,_peers)
+      let saveResult = await chatBlockComponent.save(current, _peers)
       this.$q.loading.hide()
       if (!saveResult) {
         _that.$q.notify({

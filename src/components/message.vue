@@ -205,7 +205,7 @@
             q-item-section(avatar)
               q-icon(name="keyboard_arrow_right" color="c-grey-10")
           q-separator.c-separator.message-sep-2
-          q-item(clickable v-ripple @click="subKind='groupFile'")
+          q-item(clickable v-ripple @click="enterGroupFile")
             q-item-section
               q-item-label {{$t('Group File')}}
             q-item-section(avatar)

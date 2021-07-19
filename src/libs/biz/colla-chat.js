@@ -78,7 +78,8 @@
    'CHAT_READ_RECEIPT': 'CHAT_READ_RECEIPT', // 已阅回复
    'CALL_CLOSE': 'CALL_CLOSE',
    'CALL_REQUEST': 'CALL_REQUEST', // 通话请求
-    'RECALL':'RECALL'
+   'RECALL':'RECALL',
+   'GROUP_FILE': 'GROUP_FILE'
  }
 export let ChatMessageStatus = {
     'NORMAL': 'NORMAL',
@@ -658,8 +659,13 @@ export let ChatMessageStatus = {
    }
    async save(current, _peers) {
      let _that = this
+     let blockType = BlockType.ChatAttach
      let expireDate = new Date().getTime() + 3600*24
-     let blockResult = await collectionUtil.saveBlock(current, true, BlockType.ChatAttach, _peers, expireDate)
+     if (current.messageType === P2pChatMessageType.GROUP_FILE) {
+       blockType = BlockType.GroupFile
+       expireDate = 0
+     }
+     let blockResult = await collectionUtil.saveBlock(current, true, blockType, _peers, expireDate)
      let result = true;
      if (blockResult) {
        current.state = EntityState.New

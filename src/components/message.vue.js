@@ -1,9 +1,9 @@
 import { date, Platform } from 'quasar'
-import { VEmojiPicker, emojisDefault, categoriesDefault } from 'v-emoji-picker'
+import { VEmojiPicker } from 'v-emoji-picker'
 import Vue from 'vue'
-import {EntityState, webrtcPeerPool} from 'libcolla'
-import { CollaUtil, TypeUtil, BlobUtil, UUID } from 'libcolla'
-import { myself, dataBlockService, peerClientService } from 'libcolla'
+import { EntityState } from 'libcolla'
+import { CollaUtil, TypeUtil, BlobUtil, UUID, StringUtil } from 'libcolla'
+import { myself, dataBlockService, peerClientService, queryValueAction } from 'libcolla'
 import { BlockType } from 'libcolla'
 
 import pinyinUtil from '@/libs/base/colla-pinyin'
@@ -788,12 +788,12 @@ export default {
       }
     },
     fullscreenBack() {
-          let _that = this
-          let bottomSheet = document.getElementsByClassName('q-bottom-sheet')
-          if (!bottomSheet || !bottomSheet[0] || bottomSheet[0].style.display === 'none') { // 排除longTap触发的singleTapCallback
-              store.state.imageMessageViewDialog = false
-          }
-      },
+      let _that = this
+      let bottomSheet = document.getElementsByClassName('q-bottom-sheet')
+      if (!bottomSheet || !bottomSheet[0] || bottomSheet[0].style.display === 'none') { // 排除longTap触发的singleTapCallback
+          store.state.imageMessageViewDialog = false
+      }
+    },
     uploadMessageFile: async function (file) {
       let _that = this
       let store = _that.$store
@@ -806,7 +806,7 @@ export default {
       let fileData = await BlobUtil.fileObjectToBase64(file)
       let type, name, fileSize;
       if (mediaComponent.isAssetTypeAnImage(fileType)) {
-        if(file.size > 2097152){//2M
+        if (file.size > 2097152) { // 2M
           _that.$q.notify({
             message: _that.$i18n.t("Restricted to images, size less than 2M"),
             timeout: 3000,
@@ -821,8 +821,7 @@ export default {
         type = ChatContentType.VIDEO
       } else if (mediaComponent.isAssetTypeAnAudio(fileType)) {
         type = ChatContentType.AUDIO
-      }
-      else {
+      } else {
         type = ChatContentType.FILE
       }
       name = file.name
@@ -2675,6 +2674,33 @@ export default {
         })
       }
     },
+    async enterGroupFile() {
+      let _that = this
+      let store = _that.$store
+      _that.subKind='groupFile'
+      _that.$q.loading.show()
+      await _that.getGroupFileList()
+      _that.$q.loading.hide()
+    },
+    async getGroupFileList() {
+      let _that = this
+      let store = _that.$store
+      let currentChat = store.state.currentChat
+      // 查询cloud全量DataBlock索引信息
+      let conditionBean = {}
+      conditionBean['businessNumber'] = currentChat.subjectId
+      conditionBean['getAllBlockIndex'] = true
+      conditionBean['blockType'] = BlockType.GroupFile
+      let groupFileList = await queryValueAction.queryValue(null, conditionBean)
+      console.log('groupFileList:' + JSON.stringify(groupFileList))
+    },
+    groupFileSelected(groupFile, _index) {
+      let _that = this
+      let store = _that.$store
+    },
+    searchFocus(e) {
+      let _that = this
+    },
     async uploadGroupFile(file) {
       let _that = this
       let store = _that.$store
@@ -2687,7 +2713,7 @@ export default {
       let fileData = await BlobUtil.fileObjectToBase64(file)
       let type, name, fileSize;
       if (mediaComponent.isAssetTypeAnImage(fileType)) {
-        if (file.size > 2097152) { //2M
+        if (file.size > 2097152) { // 2M
           _that.$q.notify({
             message: _that.$i18n.t("Restricted to images, size less than 2M"),
             timeout: 3000,
@@ -2707,15 +2733,13 @@ export default {
       }
       name = file.name
       fileSize = file.size
-      await store.saveFileAndSendMessage(store.state.currentChat, fileData, type, name)
+      let chat = store.state.currentChat
+      let message = {}
+      message.messageId = UUID.string(null, null)
+      message.messageType = P2pChatMessageType.GROUP_FILE
+      message.fileSize = StringUtil.getSize(fileData)
+      await store.saveFileInMessage(chat, message, fileData, type, name, message.messageId)
       _that.$refs.groupFileUpload.reset()
-    },
-    searchFocus(e) {
-      let _that = this
-    },
-    groupFileSelected(groupFile, _index) {
-      let _that = this
-      let store = _that.$store
     }
   },
   async mounted() {
