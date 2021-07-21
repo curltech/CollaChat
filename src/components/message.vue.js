@@ -387,6 +387,7 @@ export default {
           groupFileFilteredArray = groupFileList.filter((groupFile) => {
             if (groupFile) {
               return groupFile.metadata.toLowerCase().includes(groupFileFilter.toLowerCase())
+              || pinyinUtil.getPinyin(groupFile.metadata).toLowerCase().includes(groupFileFilter.toLowerCase())
             }
           })
         } else {
