@@ -223,9 +223,11 @@ export default {
         let recallTimeLimit
         if(message.subjectType === SubjectType.CHAT){
             let linkman = store.state.linkmanMap[message.subjectId]
+            if(!linkman) return true
             recallTimeLimit = linkman.recallTimeLimit
         }else if(message.subjectType === SubjectType.GROUP_CHAT){
             let group = store.state.groupChatMap[message.subjectId]
+            if(!group) return true
             recallTimeLimit = group.recallTimeLimit
         }
         if(recallTimeLimit){
@@ -1291,7 +1293,6 @@ export default {
       let store = _that.$store
       let myselfPeerClient = myself.myselfPeerClient
       let groupChat = store.state.groupChatMap[store.state.currentChat.subjectId]
-      let currentTime = new Date()
 
       // 修改群组信息
       let nameChanged = false
@@ -1327,6 +1328,8 @@ export default {
         groupChatRecord.tag = groupChat.tag
         groupChatRecord.pyTag = groupChat.pyTag
         groupChatRecord.myAlias = groupChat.myAlias
+        groupChatRecord.recallTimeLimit = groupChat.recallTimeLimit
+        groupChatRecord.recallAlert = groupChat.recallAlert
         await contactComponent.update(ContactDataType.GROUP, groupChatRecord)
       }
 
@@ -1355,37 +1358,7 @@ export default {
 
       // 新增Sent请求
       if (nameChanged || descriptionChanged || myAliasChanged) {
-        let linkmanRequest = {}
-        linkmanRequest.requestType = RequestType.MODIFY_GROUPCHAT
-        linkmanRequest.ownerPeerId = myselfPeerClient.peerId
-        linkmanRequest.senderPeerId = myselfPeerClient.peerId
-        //linkmanRequest.data = JSON.stringify(groupMembers) // 数据库为JSON格式
-        linkmanRequest.groupId = groupChat.groupId
-        //linkmanRequest.groupCreateDate = groupChat.createDate
-        linkmanRequest.groupName = groupChat.name
-        linkmanRequest.groupDescription = groupChat.description
-        linkmanRequest.myAlias = groupChat.myAlias
-        linkmanRequest.createDate = currentTime
-        linkmanRequest.status = RequestStatus.SENT
-        console.log(linkmanRequest)
-        await contactComponent.insert(ContactDataType.LINKMAN_REQUEST, linkmanRequest, null)
-
-        // 保存/发送Sent请求
-        let message = {
-          subjectType: SubjectType.LINKMAN_REQUEST,
-          messageType: P2pChatMessageType.MODIFY_GROUPCHAT,
-          content: linkmanRequest
-        }
-        let groupChatLinkmans = []
-        for (let groupMember of groupMembers) {
-          let linkman = store.state.linkmanMap[groupMember.memberPeerId]
-          if (linkman) { // 自己和非联系人除外
-            groupChatLinkmans.push(store.state.linkmanMap[groupMember.memberPeerId])
-          }
-        }
-        for (let groupChatLinkman of groupChatLinkmans) {
-          await store.saveAndSendMessage(message, groupChatLinkman)
-        }
+        await _that.sendGroupInfo()
       }
 
       if (nameChanged || descriptionChanged) {
@@ -1399,6 +1372,46 @@ export default {
       }
 
       _that.subKind = "default"
+    },
+    async sendGroupInfo(){
+        let _that = this
+        let store = _that.$store
+        let currentTime = new Date()
+        let myselfPeerClient = myself.myselfPeerClient
+        let groupChat = store.state.groupChatMap[store.state.currentChat.subjectId]
+        let linkmanRequest = {}
+        linkmanRequest.requestType = RequestType.MODIFY_GROUPCHAT
+        linkmanRequest.ownerPeerId = myselfPeerClient.peerId
+        linkmanRequest.senderPeerId = myselfPeerClient.peerId
+        //linkmanRequest.data = JSON.stringify(groupMembers) // 数据库为JSON格式
+        linkmanRequest.groupId = groupChat.groupId
+        //linkmanRequest.groupCreateDate = groupChat.createDate
+        linkmanRequest.groupName = groupChat.name
+        linkmanRequest.groupDescription = groupChat.description
+        linkmanRequest.myAlias = groupChat.myAlias
+        linkmanRequest.recallTimeLimit = groupChat.recallTimeLimit
+        linkmanRequest.recallAlert = groupChat.recallAlert
+        linkmanRequest.createDate = currentTime
+        linkmanRequest.status = RequestStatus.SENT
+        console.log(linkmanRequest)
+        await contactComponent.insert(ContactDataType.LINKMAN_REQUEST, linkmanRequest, null)
+
+        // 保存/发送Sent请求
+        let message = {
+            subjectType: SubjectType.LINKMAN_REQUEST,
+            messageType: P2pChatMessageType.MODIFY_GROUPCHAT,
+            content: linkmanRequest
+        }
+        let groupChatLinkmans = []
+        for (let groupMember of groupChat.groupMembers) {
+            let linkman = store.state.linkmanMap[groupMember.memberPeerId]
+            if (linkman && linkman.peerId !== myselfPeerClient.peerId) { // 自己和非联系人除外
+                groupChatLinkmans.push(store.state.linkmanMap[groupMember.memberPeerId])
+            }
+        }
+        for (let groupChatLinkman of groupChatLinkmans) {
+            await store.saveAndSendMessage(message, groupChatLinkman)
+        }
     },
     confirmRemoveChat() {
       let _that = this
@@ -2096,17 +2109,22 @@ export default {
               let linkman = store.state.linkmanMap[subjectId]
               let linkmanRecord = await contactComponent.get(ContactDataType.LINKMAN, linkman._id)
               if (linkmanRecord) {
+                  linkman.myselfRecallTimeLimit = value
                   linkmanRecord.myselfRecallTimeLimit = value
                   await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
+                  await store.sendLinkmanInfo(subjectId,`modify`)
               }
           } else if (subjectType === SubjectType.GROUP_CHAT) {
               let groupChat = store.state.groupChatMap[subjectId]
               let groupChatRecord = await contactComponent.get(ContactDataType.GROUP, groupChat._id)
               if (groupChatRecord) {
+                  groupChat.recallTimeLimit = value
                   groupChatRecord.recallTimeLimit = value
                   await contactComponent.update(ContactDataType.GROUP, groupChatRecord)
+                  _that.sendGroupInfo()
               }
           }
+          _that.$forceUpdate()
     },
     changeRecallAlert: async function (value) {
           let _that = this
@@ -2117,15 +2135,19 @@ export default {
               let linkman = store.state.linkmanMap[subjectId]
               let linkmanRecord = await contactComponent.get(ContactDataType.LINKMAN, linkman._id)
               if (linkmanRecord) {
+                  linkman.myselfRecallAlert = value
                   linkmanRecord.myselfRecallAlert = value
                   await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
+                  await store.sendLinkmanInfo(subjectId,`modify`)
               }
           } else if (subjectType === SubjectType.GROUP_CHAT) {
               let groupChat = store.state.groupChatMap[subjectId]
               let groupChatRecord = await contactComponent.get(ContactDataType.GROUP, groupChat._id)
               if (groupChatRecord) {
+                  groupChat.recallAlert = value
                   groupChatRecord.recallAlert = value
                   await contactComponent.update(ContactDataType.GROUP, groupChatRecord)
+                  _that.sendGroupInfo()
               }
           }
     },

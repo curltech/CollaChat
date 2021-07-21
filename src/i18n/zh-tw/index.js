@@ -202,6 +202,11 @@
   "This file has expired": "文件已過期",
   "Can not play this video": "無法播放此視頻",
   "Unconnected": "未連接",
+  "Open Timing Message":"打開定時消息",
+  "Recall":"召回",
+  "Recall Time Limit":"召回時間限制",
+  "Recall Alert":"召回警報",
+  "This message has been recalled":"此消息已被撤回",
 
   // Developer
   "Developer": "開發者",

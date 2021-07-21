@@ -202,6 +202,11 @@
   "This file has expired": "파일 이 만 료 되 었 습 니 다",
   "Can not play this video": "이 영상 을 재생 할 수 없습니다",
   "Unconnected": "연결되지 않음",
+  "Open Timing Message":"오픈 타이밍 메시지",
+  "Recall":"소환",
+  "Recall Time Limit":"리콜 시간 제한",
+  "Recall Alert":"리콜 경고",
+  "This message has been recalled":"이 메시지는 회수되었습니다.",
 
   // Developer
   "Developer": "개발 자",

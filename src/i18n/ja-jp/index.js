@@ -202,6 +202,11 @@
   "This file has expired": "ファイルが期限切れです",
   "Can not play this video": "この動画を再生できませんでした",
   "Unconnected": "未接続",
+  "Open Timing Message":"オープンタイミングメッセージ",
+  "Recall":"召還",
+  "Recall Time Limit":"制限時間を思い出してください",
+  "Recall Alert":"リコールアラート",
+  "This message has been recalled":"このメッセージはリコールされました",
 
   //Developer
   "Developer": "開発者",
