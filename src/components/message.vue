@@ -318,22 +318,25 @@
             q-item-section(side top) {{detailDateFormat(message.createDate)}}
       q-tab-panel(name="groupFile" style="padding:0px 0px")
         q-toolbar.header-toolbar
-          q-btn(flat round dense icon="keyboard_arrow_left" @click="subKind='default'")
-          q-toolbar-title(align="center") {{ $t('Group File') + '(' + GroupFileFilteredList.length + ')' }}
-          q-btn.btnIcon(flat round dense icon="add_circle_outline" @click="$refs.groupFileUpload.pickFiles()")
+          q-btn(flat round dense icon="keyboard_arrow_left" @click="subKind='GROUP_CHATDetails'")
+          q-toolbar-title(align="center" :style="ifIAmGroupOwner($store.state.currentChat) ? '' : 'padding-right:54px'") {{ $t('Group File') + '(' + GroupFileFilteredList.length + ')' }}
+          q-btn.btnIcon(v-if="ifIAmGroupOwner($store.state.currentChat)" flat round dense icon="add_circle_outline" @click="$refs.groupFileUpload.pickFiles()")
         div.scroll.header-mar-top(id="scroll-target-default" :class="ifMobileSize || $store.state.ifMobileStyle ? 'scrollHeightMobileStyle-editor' : 'scrollHeightStyle'")
           q-toolbar(insert class="q-px-xs")
-            q-input.c-field(debounce="100" filled dense v-model="searchText" :placeholder="placeholder" input-class="text-center iconfont" @focus="searchFocus")
+            q-input.c-field(debounce="100" filled dense v-model="groupFileFilter" :placeholder="placeholder" input-class="text-center iconfont")
               template(slot="append")
-                q-icon(v-if="searchText" name="cancel" class="cursor-pointer" @click.stop="searchText = null")
+                q-icon(v-if="groupFileFilter" name="cancel" class="cursor-pointer" @click.stop="groupFileFilter = null")
           q-list
-            q-item(v-for="(groupFile, index) in GroupFileFilteredList" :key="groupFile.messageId" clickable v-ripple @click="groupFileSelected(groupFile, index)")
-              q-item-section(avatar)
-                q-avatar
-                  img(:src="message.senderPeerId === message.ownerPeerId ? ($store.state.myselfPeerClient.avatar ? $store.state.myselfPeerClient.avatar : $store.defaultActiveAvatar) : ($store.state.linkmanMap[message.senderPeerId].avatar ? $store.state.linkmanMap[message.senderPeerId].avatar : $store.defaultActiveAvatar)")
-              q-item-section
-                q-item-label( lines="1") {{ groupFile.senderPeerId === groupFile.ownerPeerId?$store.state.myselfPeerClient.name:$store.state.linkmanMap[groupFile.senderPeerId].name }}
-              q-item-section(side top) {{ detailDateFormat(groupFile.createDate) }}
+            div(v-for="(groupFile, index) in GroupFileFilteredList" :key="groupFile.blockId")
+              q-item(clickable v-ripple @click="groupFileSelected(groupFile, index)" :active-class="ifMobileSize || $store.state.ifMobileStyle ? 'bg-c-grey-1' : 'bg-c-grey-2'" class="text-c-grey-10")
+                q-item-section(avatar)
+                  q-icon.menuIcon(name="folder" color="primary")
+                q-item-section
+                  q-item-label(lines="1") {{ groupFile.metadata }}
+                q-item-section(side)
+                  q-item-label(lines="1") {{ detailDateFormat(groupFile.createTimestamp) }}
+                q-item-section(v-if="ifIAmGroupOwner($store.state.currentChat)" side)
+                  q-btn.btnIcon(dense round flat icon="remove_circle_outline" @click="confirmRemoveGroupFile(groupFile)")
       // group chat ///////////////////////////////////////////////////////////////////////////////////
       q-tab-panel(name="selectGroupChatMember" style="padding:0px 0px")
         q-toolbar

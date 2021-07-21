@@ -660,10 +660,10 @@ export let ChatMessageStatus = {
    async save(current, _peers) {
      let _that = this
      let blockType = BlockType.ChatAttach
-     let expireDate = new Date().getTime() + 3600*24
+     let expireDate = new Date().getTime() + 3600*24*10 // 10 days
      if (current.messageType === P2pChatMessageType.GROUP_FILE) {
        blockType = BlockType.GroupFile
-       expireDate = 0
+       expireDate = new Date().getTime() + 3600*24*365*100 // 100 years
      }
      let blockResult = await collectionUtil.saveBlock(current, true, blockType, _peers, expireDate)
      let result = true;

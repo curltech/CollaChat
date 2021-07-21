@@ -8,8 +8,8 @@
           q-btn.btnIcon(style="padding-right:4px" color="primary" flat round dense icon="add_circle_outline" @click="showAddContactsTag")
         q-list
           div(v-for="(linkmanTag, index) in linkmanTags" :key="linkmanTag._id")
-            q-item(clickable v-ripple)
-              q-item-section(@click="showModifyContactsTag(linkmanTag)")
+            q-item(clickable v-ripple @click="showModifyContactsTag(linkmanTag)")
+              q-item-section
                 q-item-label {{ linkmanTag.name + '(' + linkmanTag.linkmanTagLinkmans.length + ')' }}
                 q-item-label(caption lines="1") {{ linkmanTag.linkmansName }}
               //q-item-section(avatar)

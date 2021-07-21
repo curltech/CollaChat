@@ -345,7 +345,7 @@ import { P2pChatMessageType } from '@/libs/biz/colla-chat'
     let blockId = bizObj.blockId
     let businessNumber = bizObj._id ? bizObj._id : bizObj.businessNumber // Collection-_id, ChatAttach/GroupFile-businessNumber
     if (!expireDate) {
-      expireDate = 0
+      expireDate = new Date().getTime() + 3600*24*365*100 // 100 years
     }
     let payload = { payload: CollaUtil.clone(bizObj), metadata: bizObj.tag, expireDate: expireDate }
     let dataBlock = DataBlockService.create(blockId, businessNumber, blockType, bizObj.updateDate, payload, peers)

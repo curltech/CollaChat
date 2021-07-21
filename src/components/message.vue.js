@@ -153,7 +153,9 @@ export default {
         myAlias: null
       },
       placeholder: '\ue672' + ' ' + this.$i18n.t('Search'),
-      placeholder2: '\ue672' + ' ' + (myself.myselfPeerClient.localDataCryptoSwitch === true ? this.$i18n.t('Local Data Crypto mode only search by Tag') : this.$i18n.t('Search'))
+      placeholder2: '\ue672' + ' ' + (myself.myselfPeerClient.localDataCryptoSwitch === true ? this.$i18n.t('Local Data Crypto mode only search by Tag') : this.$i18n.t('Search')),
+      groupFileList: [],
+      groupFileFilter: null
     }
   },
   computed: {
@@ -376,6 +378,20 @@ export default {
       let _that = this
       let store = _that.$store
       let groupFileFilteredArray = []
+      let groupFileList = _that.groupFileList
+      if (groupFileList && groupFileList.length > 0) {
+        let groupFileFilter = _that.groupFileFilter
+        if (groupFileFilter) {
+          groupFileFilteredArray = groupFileList.filter((groupFile) => {
+            if (groupFile) {
+              return groupFile.metadata.toLowerCase().includes(groupFileFilter.toLowerCase())
+            }
+          })
+        } else {
+          groupFileFilteredArray = groupFileList
+        }
+        CollaUtil.sortByKey(groupFileFilteredArray, 'createTimestamp', 'desc')
+      }
       return groupFileFilteredArray
     }
   },
@@ -2691,19 +2707,13 @@ export default {
       conditionBean['businessNumber'] = currentChat.subjectId
       conditionBean['getAllBlockIndex'] = true
       conditionBean['blockType'] = BlockType.GroupFile
-      let groupFileList = await queryValueAction.queryValue(null, conditionBean)
-      console.log('groupFileList:' + JSON.stringify(groupFileList))
-    },
-    groupFileSelected(groupFile, _index) {
-      let _that = this
-      let store = _that.$store
-    },
-    searchFocus(e) {
-      let _that = this
+      _that.groupFileList = await queryValueAction.queryValue(null, conditionBean)
+      console.log('groupFileList:' + JSON.stringify(_that.groupFileList))
     },
     async uploadGroupFile(file) {
       let _that = this
       let store = _that.$store
+      _that.$q.loading.show()
       let peerId = store.state.currentChat.subjectId
       let fileType
       if (file.name) {
@@ -2740,6 +2750,51 @@ export default {
       message.fileSize = StringUtil.getSize(fileData)
       await store.saveFileInMessage(chat, message, fileData, type, name, message.messageId)
       _that.$refs.groupFileUpload.reset()
+      await _that.getGroupFileList()
+      _that.$q.loading.hide()
+    },
+    confirmRemoveGroupFile(groupFile) {
+      let _that = this
+      _that.$q.bottomSheet({
+        message: _that.$i18n.t('Confirm the deletion?'),
+        actions: [
+          {},
+          {
+            label: _that.$i18n.t('Confirm'),
+            icon: 'check_circle',
+            color: 'primary',
+            id: 'confirm'
+          },
+          {},
+          {
+            label: _that.$i18n.t('Cancel'),
+            icon: 'cancel',
+            color: 'primary',
+            id: 'cancel'
+          }
+        ]
+      }).onOk(async action => {
+        // console.log('Action chosen:', action.id)
+        if (action.id === 'confirm') {
+          await _that.removeGroupFile(groupFile)
+        }
+      }).onCancel(() => {
+        // console.log('Dismissed')
+      }).onDismiss(() => {
+        // console.log('I am triggered on both OK and Cancel')
+      })
+    },
+    async removeGroupFile(groupFile) {
+      let _that = this
+      _that.$q.loading.show()
+      await collectionUtil.deleteBlock(groupFile, true, BlockType.GroupFile)
+      await _that.getGroupFileList()
+      _that.$q.loading.hide()
+    },
+    groupFileSelected(groupFile, _index) {
+      let _that = this
+      let store = _that.$store
+      // TODO
     }
   },
   async mounted() {

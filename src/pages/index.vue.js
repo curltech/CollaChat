@@ -1767,7 +1767,7 @@ export default {
       if(!message.messageType){
         let signalSession = await _that.getSignalSession(peerId)
         if(!signalSession){
-          console.log('signalSession dont exist')
+          console.log('signalSession does not exist')
           return
         }
         let messageString
@@ -2676,7 +2676,8 @@ export default {
       }
       message = JSON.stringify(message)
       let createTimestamp = new Date().getTime()
-      let payload = { payload: message, metadata: null, expireDate: 0 }
+      let expireDate = new Date().getTime() + 3600*24*10 // 10 days
+      let payload = { payload: message, metadata: null, expireDate: expireDate }
       let dataBlock = DataBlockService.create(blockId, peerId, BlockType.P2pChat, createTimestamp, payload, [])
       await dataBlockService.encrypt(dataBlock)
       let dataBlocks = await DataBlockService.slice(dataBlock)
@@ -2740,9 +2741,9 @@ export default {
                           await _that.p2pChatReceiver(dataBlock.peerId, dataBlock.payload)
                           await collectionUtil.deleteBlock(dataBlock, true, BlockType.P2pChat)
                           if (!_peerIds.get(dataBlock.peerId)) {
-                            _peerIds.set(dataBlock.peerId,dataBlock.peerId)
+                            _peerIds.set(dataBlock.peerId, dataBlock.peerId)
                           }
-                          console.log('------one  block resolve')
+                          console.log('------one block resolve')
                           //resolve()
                        // })
                        // callbackPs.push(_callbackP)
