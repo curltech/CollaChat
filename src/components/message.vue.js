@@ -2770,7 +2770,10 @@ export default {
       message.messageId = UUID.string(null, null)
       message.messageType = P2pChatMessageType.GROUP_FILE
       message.fileSize = StringUtil.getSize(fileData)
+      // 云端保存
       await store.saveFileInMessage(chat, message, fileData, type, name, message.messageId)
+      // 群主新增群文件后保存本地不发送
+      //await store.sendChatMessage(chat, message)
       _that.$refs.groupFileUpload.reset()
       await _that.getGroupFileList()
       _that.$q.loading.hide()
@@ -2816,7 +2819,7 @@ export default {
     groupFileSelected(groupFile, _index) {
       let _that = this
       let store = _that.$store
-      // TODO
+      // 本地有的话本地加载，没有的话从云端下载
     }
   },
   async mounted() {
