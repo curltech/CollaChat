@@ -1808,6 +1808,9 @@ export default {
             if(messages && messages.length > 0) {
               currentMes = messages[0]
             }
+          }else{
+              currentMes.actualReceiveTime = message.receiveTime
+              currentMes = await chatComponent.get(ChatDataType.MESSAGE, currentMes._id)
           }
           currentMes.actualReceiveTime = message.receiveTime
           await chatComponent.update(ChatDataType.MESSAGE, currentMes, null)
@@ -2491,6 +2494,9 @@ export default {
           if(messages && messages.length > 0) {
               currentMes = messages[0]
           }
+      }else{
+          currentMes.status = ChatMessageStatus.RECALL
+          currentMes = await chatComponent.get(ChatDataType.MESSAGE, currentMes._id)
       }
       if(!currentMes)return
       currentMes.status = ChatMessageStatus.RECALL
