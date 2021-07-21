@@ -205,7 +205,7 @@ export default {
   "Recall":"Recall",
   "Recall Time Limit":"Recall Time Limit",
   "Recall Alert":"Recall Alert",
-
+  "This message has been recalled":"This message has been recalled",
   // Call
   "Call": "Call",
   "join audio": "join audio",

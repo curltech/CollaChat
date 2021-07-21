@@ -209,6 +209,7 @@ export default {
   "Recall":"撤回",
   "Recall Time Limit":"限时撤回",
   "Recall Alert":"撤回提醒",
+  "This message has been recalled":"此消息已撤回",
 
   // Developer
   "Developer": "开发者",

@@ -73,6 +73,11 @@ export default {
   "videoInvitation": "Invitación de vídeo",
   "card": "Tarjeta",
   "note": "Notas",
+  "Open Timing Message":"Mensagem de tempo de abertura",
+  "Recall":"Lembrar",
+  "Recall Time Limit":"Limite de tempo de rechamada",
+  "Recall Alert":"Alerta de Rechamada",
+  "This message has been recalled":"Esta mensagem foi recuperada",
   // Outros
   Other: "Outro",
   System: "Sistema",

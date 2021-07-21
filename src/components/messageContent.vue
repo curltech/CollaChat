@@ -1,7 +1,7 @@
 <template lang="pug">
   div
     q-chat-message(@click ='avatarClick($event,message)' v-if='isShowRecalld(message)' :name = "getName(message)" :avatar = "getAvatar(message)" :stamp= "getStamp(message)"  :sent="isSent(message)" text-color="grey-10" bg-color="primary")
-      span {{$t('This message has been recalld')}}
+      span {{$t('This message has been recalled')}}
     q-chat-message(@click ='avatarClick($event,message)' v-else-if='message.destroyTime && !message.opened &&  message.senderPeerId !== $store.state.myselfPeerClient.peerId' :name = "getName(message)" :avatar = "getAvatar(message)" :stamp= "getStamp(message)"  :sent="isSent(message)" text-color="grey-10" bg-color="primary")
         q-btn(dark-percentage unelevated color="secondary" text-color="grey-1" @click="openDestroyMessage(message)")
             span {{$t('Open Timing Message')}}

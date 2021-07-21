@@ -197,7 +197,7 @@
           color="primary",
           @click="acceptLinkman"
         )
-      q-formAcceptContacts(
+      q-form(
         ref="formAcceptContacts",
         @submit="acceptLinkman"
         class="q-pa-sm"
