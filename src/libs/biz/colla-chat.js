@@ -166,7 +166,7 @@ export let ChatMessageStatus = {
    constructor() {
      this.localFileDataMap = {}
      pounchDb.create('chat', ['ownerPeerId', 'subjectId', 'createDate', 'updateTime'], indexFields[ChatDataType.CHAT])
-     pounchDb.create('message', ['ownerPeerId', 'subjectId', 'createDate','receiveTime','actualReceiveTime','blockId','messageType'], indexFields[ChatDataType.MESSAGE])
+     pounchDb.create('message', ['ownerPeerId', 'subjectId', 'createDate','receiveTime','actualReceiveTime','blockId','messageType','attachBlockId'], indexFields[ChatDataType.MESSAGE])
      pounchDb.create('receive', ['ownerPeerId', 'subjectId', 'createDate', 'subjectType', 'receiverPeerId','blockId'], indexFields[ChatDataType.RECEIVE])
      pounchDb.create('chatAttach', ['ownerPeerId', 'subjectId', 'createDate', 'messageId'], indexFields[ChatDataType.ATTACH])
      pounchDb.create('mergeMessage', ['ownerPeerId', 'mergeMessageId', 'createDate'], indexFields[ChatDataType.MERGEMESSAGE])
@@ -303,6 +303,11 @@ export let ChatMessageStatus = {
        let q = {}
        q['senderPeerId'] = originCondition.senderPeerId
        qs.push(q)
+     }
+     if (originCondition.attachBlockId) {
+         let q = {}
+         q['attachBlockId'] = originCondition.attachBlockId
+         qs.push(q)
      }
      if (originCondition.searchText) {
        let tags = originCondition.searchText.split(' ')
@@ -665,7 +670,13 @@ export let ChatMessageStatus = {
        blockType = BlockType.GroupFile
        expireDate = new Date().getTime() + 3600*24*365*100 // 100 years
      }
-     let blockResult = await collectionUtil.saveBlock(current, true, blockType, _peers, expireDate)
+     let firstAttach = current.attachs[0]
+     let blockResult
+       if(current.messageType === P2pChatMessageType.GROUP_FILE && firstAttach.senderPeerId !== myself.myselfPeerClient.peerId){
+           blockResult = true
+       }else{
+           blockResult = await collectionUtil.saveBlock(current, true, blockType, _peers, expireDate)
+       }
      let result = true;
      if (blockResult) {
        current.state = EntityState.New

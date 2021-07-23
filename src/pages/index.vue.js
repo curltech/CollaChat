@@ -1053,7 +1053,7 @@ export default {
         if (chat.subjectType === SubjectType.CHAT) {
           _peers.push(store.state.linkmanMap[chat.subjectId])
         } else if (chat.subjectType === SubjectType.GROUP_CHAT) {
-          let groupMembers = store.state.groupChatMap[peerId].groupMembers
+          let groupMembers = store.state.groupChatMap[chat.subjectId].groupMembers
           for (let groupMember of groupMembers) {
             let linkman = store.state.linkmanMap[groupMember.memberPeerId]
             if(linkman && groupMember.memberPeerId !== myself.myselfPeerClient.peerId){
@@ -1062,16 +1062,19 @@ export default {
           }
         }
       }
-      chatComponent.localFileDataMap[message.messageId] = fileData
+      let attachBlockId = UUID.string(null, null)
+      chatComponent.localFileDataMap[attachBlockId] = fileData
       let current = {
         businessNumber: (message.messageType === P2pChatMessageType.GROUP_FILE ? chat.subjectId : message.messageId),
         messageType: message.messageType,
         subjectId: chat.subjectId,
-        blockId: UUID.string(null, null),
+        blockId: attachBlockId,
         attachs: [{
           content: fileData,
+          contentType: type,
           messageId: message.messageId,
           ownerPeerId: myself.myselfPeerClient.peerId,
+          senderPeerId: myself.myselfPeerClient.peerId,
           originalMessageId: originalMessageId
         }],
         tag: name,
