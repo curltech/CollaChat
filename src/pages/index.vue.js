@@ -1073,6 +1073,7 @@ export default {
           content: fileData,
           contentType: type,
           messageId: message.messageId,
+          attachBlockId: attachBlockId,
           ownerPeerId: myself.myselfPeerClient.peerId,
           senderPeerId: myself.myselfPeerClient.peerId,
           originalMessageId: originalMessageId
@@ -3357,7 +3358,7 @@ export default {
                     }
                     if (newFlag) {
                       // 保守的做法，一般messageId为new，不会存在其下的记录
-                      let localChatAttachs = await chatBlockComponent.loadLocalAttach(chatAttachs[i].messageId, null, true)
+                      let localChatAttachs = await chatBlockComponent.loadLocalAttach(chatAttachs[i].attachBlockId, null, true)
                       if (localChatAttachs && localChatAttachs.length > 0) {
                         chatAttachs.splice(i, 1)
                       }

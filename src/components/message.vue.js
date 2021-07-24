@@ -692,6 +692,7 @@ export default {
                     } else if (attach.contentType === ChatContentType.VIDEO) {
                         message.thumbnail = await mediaComponent.createVideoThumbnailByBase64(fileData)
                     }
+                    await chatComponent.insert(ChatDataType.MESSAGE, message, null)
                 }
 
                 attach.ownerPeerId = myself.myselfPeerClient.peerId
@@ -1182,7 +1183,7 @@ export default {
             inserted.attachAAmount = 1
             inserted.content = message.thumbnail
           } else {
-            let attaches = await chatBlockComponent.loadLocalAttach(message.messageId)
+            let attaches = await chatBlockComponent.loadLocalAttach(message.attachBlockId)
             if (attaches && attaches.length > 0) {
               let file = attaches[0].content
               if (file) {
@@ -2761,7 +2762,7 @@ export default {
           for(let _groupFileMessage of _messages){
             if(!cloudGroupFileMap[_groupFileMessage.attachBlockId]){
                 await chatComponent.remove(ChatDataType.MESSAGE, _groupFileMessage)
-                let localGroupAttachs = await chatBlockComponent.loadLocalAttach(_groupFileMessage.messageId)
+                let localGroupAttachs = await chatBlockComponent.loadLocalAttach(_groupFileMessage.attachBlockId)
                 for(let localGroupAttach of localGroupAttachs){
                     localGroupAttach.state = EntityState.Deleted
                 }

@@ -719,7 +719,7 @@ export let ChatMessageStatus = {
        await pounchDb.execute('chatAttach', attachs, [], null)
      }
    }
-   async loadLocalAttach(messageId, from) {
+   async loadLocalAttach(attachBlockId, from) {
      let condition = {}
      let qs = []
      if (from) {
@@ -730,12 +730,12 @@ export let ChatMessageStatus = {
      let q1 = {}
      q1['ownerPeerId'] = myself.myselfPeerClient.peerId
      qs.push(q1)
-     if (messageId) {
+     if (attachBlockId) {
        let q2 = {}
-       if (Array.isArray(messageId)) {
-         q2['messageId'] = { $in: messageId }
+       if (Array.isArray(attachBlockId)) {
+         q2['attachBlockId'] = { $in: attachBlockId }
        } else {
-         q2['messageId'] = messageId
+         q2['attachBlockId'] = attachBlockId
        }
        qs.push(q2)
      }
