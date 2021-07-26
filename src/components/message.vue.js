@@ -2746,15 +2746,20 @@ export default {
       conditionBean['businessNumber'] = currentChat.subjectId
       conditionBean['getAllBlockIndex'] = true
       conditionBean['blockType'] = BlockType.GroupFile
-      _that.groupFileList = await queryValueAction.queryValue(null, conditionBean)
+      _that.groupFileList = []
+      if(store.state.networkStatus === 'CONNECTED'){
+        _that.groupFileList = await queryValueAction.queryValue(null, conditionBean)
+      }
       let _messages = await chatComponent.loadMessage(
           {
               ownerPeerId: myself.myselfPeerClient.peerId,
               messageType: P2pChatMessageType.GROUP_FILE,
               subjectId : currentChat.subjectId
           })
+          debugger
       if(_messages && _messages.length > 0) {
-        //只做比较删除，下载到本地后才会新增
+        if(store.state.networkStatus === 'CONNECTED'){
+          //只做比较删除，下载到本地后才会新增
           let cloudGroupFileMap = {}
           for(let cloudGroupFile of _that.groupFileList){
               cloudGroupFileMap[cloudGroupFile.blockId] = cloudGroupFile.blockId
@@ -2769,6 +2774,16 @@ export default {
                 await chatBlockComponent.saveLocalAttach({attachs : localGroupAttachs})
             }
           }
+        }else{
+          for(let _groupFileMessage of _messages){
+            _that.groupFileList.push({
+              blockId : _groupFileMessage.attachBlockId,
+              createTimestamp : _groupFileMessage.createDate,
+              metadata : _groupFileMessage.content,
+              businessNumber : _groupFileMessage.subjectId
+            })
+          }
+        }
       }
       console.log('groupFileList:' + JSON.stringify(_that.groupFileList))
     },
