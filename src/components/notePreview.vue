@@ -1,5 +1,7 @@
 <template lang="pug">
   q-item
+    q-item-section(v-if="entry !== 'message' && $store.collectionEntry === 'message'" side)
+      q-checkbox(dense v-model="item.selected" color="primary" @input="selectItem(item)")
     q-item-section(v-if="ifMobileSize || $store.state.ifMobileStyle")
       q-card(flat class="q-pa-md")
         q-card-section(class="q-pa-none")

@@ -94,6 +94,22 @@ export default {
       }
       return name
     },
+    selectItem(item) {
+      let _that = this
+      let store = _that.$store
+      if (item.selected) {
+        store.state.selectedCollectionItems.push(item)
+      } else {
+        let index = 0
+        for (let selectedCollectionItem of store.state.selectedCollectionItems) {
+          if (selectedCollectionItem.blockId === item.blockId) {
+            store.state.selectedCollectionItems.splice(index, 1)
+            return
+          }
+          index++
+        }
+      }
+    }
   },
   mounted() {
     let _that = this

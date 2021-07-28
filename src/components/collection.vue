@@ -6,6 +6,7 @@
           q-btn(v-if="ifMobileSize || $store.state.ifMobileStyle || $store.collectionEntry === 'message'" flat round dense icon="keyboard_arrow_left" @click="back()")
           q-toolbar-title(align="center" :style="ifMobileSize || $store.state.ifMobileStyle ? ($store.collectionEntry === 'message' ? 'padding-right:54px' : '') : ($store.collectionEntry === 'message' ? 'padding-right:54px' : 'padding-left:54px')") {{ cloudSyncing ? $t('Updating...') : $t('Collection') + '-' + $t(collectionTypes[collectionTypeIndex].value) + '(' + myCollections.length + ')' }}
           q-btn.btnIcon(v-if="$store.collectionEntry !== 'message' && (collectionTypeIndex === 0 || collectionTypeIndex === 1)" flat round dense icon="add_circle_outline" @click="insert")
+          q-btn(v-if="$store.collectionEntry === 'message'" flat icon="check" :disable="$store.state.selectedCollectionItems.length < 1" :label="($store.state.selectedCollectionItems.length > 0 ? '(' + $store.state.selectedCollectionItems.length + ')' : '')" :class="$store.state.selectedCollectionItems.length > 0 ? 'text-primary' : 'c-grey-0'" @click="doneSelectCollectionItem")
         div.scroll.header-mar-top(id="scroll-target-default" :class="ifMobileSize || $store.state.ifMobileStyle ? 'scrollHeightMobileStyle-editor' : 'scrollHeightStyle'")
           q-pull-to-refresh(@refresh="cloudSync" color="primary" bg-color="c-grey-0" icon="sync")
             q-infinite-scroll(@load="load" debounce="100" :offset="150" scroll-target="#scroll-target-default")
@@ -16,7 +17,7 @@
               ly-tab.cursor-pointer(v-model="collectionTypeIndex" :items="collectionTypes" :options="collectionTypeOptions" @change="changeCollectionType")
               q-list
                 div(v-for="(item, index) in myCollections" :key="index")
-                  div( clickable v-ripple @click="collectionSelected(item, index)")
+                  div(clickable v-ripple @click="collectionSelected(item, index)")
                     notePreview(v-bind:item = "item" entry = "collection")
                   q-separator.c-separator
                 q-item(v-if="collectionDone===true")
@@ -65,7 +66,7 @@
         q-toolbar.header-toolbar
           q-btn(flat round icon="keyboard_arrow_left" @click="subKind='default'")
           q-space
-          q-btn.btnIcon(flat round icon="more_horiz" @click="viewCommand()")
+          q-btn.btnIcon(v-if="$store.collectionEntry !== 'message'" flat round icon="more_horiz" @click="viewCommand()")
         div.scroll.header-mar-top.bg-c-white(id="scroll-target-view" :class="ifMobileSize || $store.state.ifMobileStyle ? 'scrollHeightMobileStyle-editor' : 'scrollHeightStyle'")
           iframe(v-if="myCollections.c_meta.current && myCollections.c_meta.current.content && myCollections.c_meta.current.content.substr(0,4)==='http'" id="iframeContent"
             :src="myCollections.c_meta.current.content" frameborder="no" border="0" marginwidth="0" marginheight="0" allowtransparency="yes" scrolling="yes")

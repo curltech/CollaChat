@@ -562,6 +562,7 @@ export default {
         if (data) {
           console.log('data length:' + data.length)
           for (let d of data) {
+            d.selected = false
             this.myCollections.push(d)
             console.log(d)
           }
@@ -606,15 +607,15 @@ export default {
         return
       }
       store.state.currentCollection = item
+      _that.myCollections.c_meta.current = item
+      _that.myCollections.c_meta.currentIndex = index
+      let content = item.content
+      if (!content) {
+        item.content = ''
+      }
+      let collectionType = item.collectionType
       if (store.collectionEntry !== 'message') {
-        // if (item.collectionType !== CollectionType.CHAT){
-          _that.myCollections.c_meta.current = item
-          _that.myCollections.c_meta.currentIndex = index
-          let content = item.content
-          if (!content) {
-            item.content = ''
-          }
-          let collectionType = item.collectionType
+        // if (item.collectionType !== CollectionType.CHAT) {
           if (collectionType === CollectionType.NOTE) {
             _that.backupContent = _that.myCollections.c_meta.current.blockId + ':' + _that.myCollections.c_meta.current.content
             _that.subKind = 'edit'
@@ -628,7 +629,14 @@ export default {
         //   store.state.currentMergeMessage = message
         // }
       } else {
-        store.collectionPicked(item)
+        _that.subKind = 'view'
+      }
+    },
+    doneSelectCollectionItem() {
+      let _that = this
+      let store = _that.$store
+      if (store.state.selectedCollectionItems && store.state.selectedCollectionItems.length > 0) {
+        store.collectionPicked(store.state.selectedCollectionItems)
       }
     },
     // 新增

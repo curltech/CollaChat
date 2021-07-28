@@ -393,7 +393,9 @@ export default {
         } else {
           groupFileFilteredArray = groupFileList
         }
-        CollaUtil.sortByKey(groupFileFilteredArray, 'createTimestamp', 'desc')
+        if(groupFileFilteredArray.length > 0) {
+            CollaUtil.sortByKey(groupFileFilteredArray, 'createTimestamp', 'desc')
+        }
       }
       return groupFileFilteredArray
     }
@@ -663,11 +665,10 @@ export default {
     async getMessageFile(message) {
       let _that = this
       let store = _that.$store
-      let messageId = message.messageId
-      let fileData = chatComponent.localFileDataMap[messageId]
+      let fileData = chatComponent.localFileDataMap[message.attachBlockId]
       if (!fileData) {
         let localAttachs
-        localAttachs = await chatBlockComponent.loadLocalAttach(message.messageId)
+        localAttachs = await chatBlockComponent.loadLocalAttach(message.attachBlockId)
         if (localAttachs && localAttachs.length > 0) {
           fileData = localAttachs[0].content
         } else {
@@ -678,9 +679,24 @@ export default {
             if (block[0].attachs && block[0].attachs.length > 0) {
               let attach = block[0].attachs[0]
               if (attach) {
+                  fileData = attach.content
+                if(!message.messageId){//群共享接收方创建message
+                    message.ownerPeerId = myself.myselfPeerClient.peerId
+                    message.messageId = UUID.string(null, null)
+                    message.messageType = P2pChatMessageType.GROUP_FILE
+                    message.fileSize = StringUtil.getSize(fileData)
+                    message.contentType = attach.contentType
+                    message.connectPeerId = null
+                    if (attach.contentType === ChatContentType.IMAGE) {
+                        message.thumbnail = await mediaComponent.compressImage(fileData)
+                    } else if (attach.contentType === ChatContentType.VIDEO) {
+                        message.thumbnail = await mediaComponent.createVideoThumbnailByBase64(fileData)
+                    }
+                    await chatComponent.insert(ChatDataType.MESSAGE, message, null)
+                }
+
                 attach.ownerPeerId = myself.myselfPeerClient.peerId
                 await chatBlockComponent.saveLocalAttach({attachs : [attach]})
-                fileData = attach.content
                 if (message.contentType === ChatContentType.VIDEO) {
                   fileData = mediaComponent.fixVideoUrl(fileData)
                 }
@@ -692,7 +708,7 @@ export default {
           }
          message.loading = false
         }
-        chatComponent.localFileDataMap[message.messageId] = fileData
+        chatComponent.localFileDataMap[message.attachBlockId] = fileData
       }
       if (!fileData) {
         _that.$q.notify({
@@ -1167,7 +1183,7 @@ export default {
             inserted.attachAAmount = 1
             inserted.content = message.thumbnail
           } else {
-            let attaches = await chatBlockComponent.loadLocalAttach(message.messageId)
+            let attaches = await chatBlockComponent.loadLocalAttach(message.attachBlockId)
             if (attaches && attaches.length > 0) {
               let file = attaches[0].content
               if (file) {
@@ -2493,7 +2509,6 @@ export default {
         canvas,
         "jpeg"
       )
-
     },
     async saveLocalVideo() {
       let _that = this
@@ -2506,18 +2521,20 @@ export default {
         type: "info",
         color: "info",
       })
-
     },
     openCollection() {
       let _that = this
       let store = _that.$store
       store.collectionEntry = 'message'
+      store.state.selectedCollectionItems = []
       store.changeKind('collection')
     },
-    async collectionPicked(item) {
+    async collectionPicked(items) {
       let _that = this
       let store = _that.$store
-      await store.collectionForwardToChat(item,store.state.currentChat)
+      for (let item of items) {
+        await store.collectionForwardToChat(item, store.state.currentChat)
+      }
     },
     isSent(message) {
       return message.senderPeerId === this.$store.state.myselfPeerClient.peerId ? true : false
@@ -2730,7 +2747,45 @@ export default {
       conditionBean['businessNumber'] = currentChat.subjectId
       conditionBean['getAllBlockIndex'] = true
       conditionBean['blockType'] = BlockType.GroupFile
-      _that.groupFileList = await queryValueAction.queryValue(null, conditionBean)
+      _that.groupFileList = []
+      if(store.state.networkStatus === 'CONNECTED'){
+        _that.groupFileList = await queryValueAction.queryValue(null, conditionBean)
+      }
+      let _messages = await chatComponent.loadMessage(
+          {
+              ownerPeerId: myself.myselfPeerClient.peerId,
+              messageType: P2pChatMessageType.GROUP_FILE,
+              subjectId : currentChat.subjectId
+          })
+          debugger
+      if(_messages && _messages.length > 0) {
+        if(store.state.networkStatus === 'CONNECTED'){
+          //只做比较删除，下载到本地后才会新增
+          let cloudGroupFileMap = {}
+          for(let cloudGroupFile of _that.groupFileList){
+              cloudGroupFileMap[cloudGroupFile.blockId] = cloudGroupFile.blockId
+          }
+          for(let _groupFileMessage of _messages){
+            if(!cloudGroupFileMap[_groupFileMessage.attachBlockId]){
+                await chatComponent.remove(ChatDataType.MESSAGE, _groupFileMessage)
+                let localGroupAttachs = await chatBlockComponent.loadLocalAttach(_groupFileMessage.attachBlockId)
+                for(let localGroupAttach of localGroupAttachs){
+                    localGroupAttach.state = EntityState.Deleted
+                }
+                await chatBlockComponent.saveLocalAttach({attachs : localGroupAttachs})
+            }
+          }
+        }else{
+          for(let _groupFileMessage of _messages){
+            _that.groupFileList.push({
+              blockId : _groupFileMessage.attachBlockId,
+              createTimestamp : _groupFileMessage.createDate,
+              metadata : _groupFileMessage.content,
+              businessNumber : _groupFileMessage.subjectId
+            })
+          }
+        }
+      }
       console.log('groupFileList:' + JSON.stringify(_that.groupFileList))
     },
     async uploadGroupFile(file) {
@@ -2768,13 +2823,16 @@ export default {
       fileSize = file.size
       let chat = store.state.currentChat
       let message = {}
+      message.ownerPeerId = myself.myselfPeerClient.peerId
       message.messageId = UUID.string(null, null)
       message.messageType = P2pChatMessageType.GROUP_FILE
+      message.subjectId = peerId
       message.fileSize = StringUtil.getSize(fileData)
+      message.contentType = type
       // 云端保存
       await store.saveFileInMessage(chat, message, fileData, type, name, message.messageId)
       // 群主新增群文件后保存本地不发送
-      //await store.sendChatMessage(chat, message)
+      await chatComponent.insert(ChatDataType.MESSAGE, message)
       _that.$refs.groupFileUpload.reset()
       await _that.getGroupFileList()
       _that.$q.loading.hide()
@@ -2817,10 +2875,27 @@ export default {
       await _that.getGroupFileList()
       _that.$q.loading.hide()
     },
-    groupFileSelected(groupFile, _index) {
+    async groupFileSelected(groupFile, _index) {
       let _that = this
       let store = _that.$store
-      // 本地有的话本地加载，没有的话从云端下载
+      let message
+      let _messages = await chatComponent.loadMessage(
+        {
+            ownerPeerId: myself.myselfPeerClient.peerId,
+            attachBlockId : groupFile.blockId
+        })
+      if(_messages && _messages.length > 0) {
+          message = _messages[0]
+      }
+      if(!message){
+          message = {
+              attachBlockId : groupFile.blockId,
+              content : groupFile.metadata,
+              createDate : groupFile.createTimestamp,
+              subjectId : groupFile.businessNumber
+          }
+      }
+      _that.getMessageFileAndOpen(message)
     }
   },
   async mounted() {
