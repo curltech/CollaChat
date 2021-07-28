@@ -328,11 +328,11 @@
                 q-icon(v-if="groupFileFilter" name="cancel" class="cursor-pointer" @click.stop="groupFileFilter = null")
           q-list
             div(v-for="(groupFile, index) in GroupFileFilteredList" :key="groupFile.blockId")
-              q-item(clickable v-ripple @click="groupFileSelected(groupFile, index)" :active-class="ifMobileSize || $store.state.ifMobileStyle ? 'bg-c-grey-1' : 'bg-c-grey-2'" class="text-c-grey-10")
+              q-item(:active-class="ifMobileSize || $store.state.ifMobileStyle ? 'bg-c-grey-1' : 'bg-c-grey-2'" class="text-c-grey-10")
                 q-item-section(avatar)
                   q-icon.menuIcon(name="folder" color="primary")
                 q-item-section
-                  q-item-label(lines="1") {{ groupFile.metadata }}
+                  q-item-label(lines="1" clickable v-ripple @click="groupFileSelected(groupFile, index)" ) {{ groupFile.metadata }}
                 q-item-section(side)
                   q-item-label(lines="1") {{ detailDateFormat(groupFile.createTimestamp) }}
                 q-item-section(v-if="ifIAmGroupOwner($store.state.currentChat)" side)
