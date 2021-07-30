@@ -1131,6 +1131,11 @@ export default {
     async collectMessage(message, index) {
       let _that = this
       let store = _that.$store
+      if(message.contentType === ChatContentType.CARD){
+          _that.messageMultiSelectedVal = [message]
+          await _that.multiCollectionMessage()
+          return
+      }
       try {
         let chat = store.state.chatMap[message.subjectId]
         let inserted = {
