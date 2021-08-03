@@ -1032,7 +1032,8 @@ export default {
           message.messageType = P2pChatMessageType.CHAT_LINKMAN
           await store.saveFileInMessage(chat, message, item.content, item.collectionType, item.title, message.messageId)
         } else {
-          message.content = item.content
+          debugger
+          message.content = item.plainContent
         }
         message.messageType = P2pChatMessageType.CHAT_LINKMAN
         message.contentType = item.collectionType
@@ -1772,6 +1773,7 @@ export default {
         let signalSession = await _that.getSignalSession(peerId)
         if(!signalSession){
           console.log('signalSession does not exist')
+          await logService.log({}, 'signalSessionDoesNotExistError', 'error')
           return
         }
         let messageString
@@ -2709,67 +2711,72 @@ export default {
       }
     },
     async p2pSend(message, peerId) {
-      let _that = this
-      let blockId = UUID.string(null,null)
-      let store = _that.$store
-      if(store.state.networkStatus !== 'CONNECTED'){
-        _that.$q.notify({
-          message: _that.$i18n.t('CONNECTING'),
-          timeout: 3000,
-          type: "info",
-          color: "info",
-        })
-        return
-      }
-      if(message.subjectType === SubjectType.CHAT){
-        let currentMes
-        let messages = await chatComponent.loadMessage(
-          {
-            ownerPeerId: message.ownerPeerId,
-            messageId: message.messageId
+      try{
+        let _that = this
+        let blockId = UUID.string(null,null)
+        let store = _that.$store
+        if(store.state.networkStatus !== 'CONNECTED'){
+          _that.$q.notify({
+            message: _that.$i18n.t('CONNECTING'),
+            timeout: 3000,
+            type: "info",
+            color: "info",
           })
-          if(messages && messages.length > 0) {
-            currentMes = messages[0]
-            currentMes.blockId = blockId
-            await chatComponent.update(ChatDataType.MESSAGE, currentMes, null)
-          }  
-      } else if(message.subjectType === SubjectType.GROUP_CHAT) {
-        let receives = await chatComponent.loadReceive(
-          {
-            ownerPeerId: message.ownerPeerId,
-            messageId: message.messageId,
-            receiverPeerId: peerId
-          })
-        if (receives && receives.length > 0) {
-          let receive = receives[0]
-          receive.blockId = blockId
-          await chatComponent.update(ChatDataType.RECEIVE, receives[0], null)
-        }
-      }
-      if (typeof message === "object" && message.messageType !== P2pChatMessageType.SYNC_LINKMAN_INFO && message.messageType !== P2pChatMessageType.CALL_REQUEST) {
-        let signalSession = await _that.getSignalSession(peerId)
-        if (!signalSession) {
-          console.error('signalSession does not exist')
           return
         }
-        message = await signalSession.encrypt(JSON.stringify(message))
-      } else if (message.messageType === P2pChatMessageType.SYNC_LINKMAN_INFO) {
+        if(message.subjectType === SubjectType.CHAT){
+          let currentMes
+          let messages = await chatComponent.loadMessage(
+            {
+              ownerPeerId: message.ownerPeerId,
+              messageId: message.messageId
+            })
+            if(messages && messages.length > 0) {
+              currentMes = messages[0]
+              currentMes.blockId = blockId
+              await chatComponent.update(ChatDataType.MESSAGE, currentMes, null)
+            }
+        } else if(message.subjectType === SubjectType.GROUP_CHAT) {
+          let receives = await chatComponent.loadReceive(
+            {
+              ownerPeerId: message.ownerPeerId,
+              messageId: message.messageId,
+              receiverPeerId: peerId
+            })
+          if (receives && receives.length > 0) {
+            let receive = receives[0]
+            receive.blockId = blockId
+            await chatComponent.update(ChatDataType.RECEIVE, receives[0], null)
+          }
+        }
+        if (typeof message === "object" && message.messageType !== P2pChatMessageType.SYNC_LINKMAN_INFO && message.messageType !== P2pChatMessageType.CALL_REQUEST) {
+          let signalSession = await _that.getSignalSession(peerId)
+          if (!signalSession) {
+            await logService.log({}, 'signalSessionDoesNotExistError', 'error')
+            console.error('signalSession does not exist')
+            return
+          }
+          message = await signalSession.encrypt(JSON.stringify(message))
+        } else if (message.messageType === P2pChatMessageType.SYNC_LINKMAN_INFO) {
 
+        }
+        message = JSON.stringify(message)
+        let createTimestamp = new Date().getTime()
+        let expireDate = new Date().getTime() + 3600*24*10 // 10 days
+        let payload = { payload: message, metadata: null, expireDate: expireDate }
+        let dataBlock = DataBlockService.create(blockId, peerId, BlockType.P2pChat, createTimestamp, payload, [])
+        await dataBlockService.encrypt(dataBlock)
+        let dataBlocks = await DataBlockService.slice(dataBlock)
+        if (dataBlocks.length !== 1) {
+          console.error('P2pChat DataBlock sliceSize is greater than 1')
+          return
+        }
+        dataBlock = dataBlocks[0]
+        dataBlock.payload = message // for webrtc send
+        await p2pChatAction.chat(null, dataBlock, peerId)
+      }catch(e){
+          await logService.log(e.stack, 'p2pSendError', 'error')
       }
-      message = JSON.stringify(message)
-      let createTimestamp = new Date().getTime()
-      let expireDate = new Date().getTime() + 3600*24*10 // 10 days
-      let payload = { payload: message, metadata: null, expireDate: expireDate }
-      let dataBlock = DataBlockService.create(blockId, peerId, BlockType.P2pChat, createTimestamp, payload, [])
-      await dataBlockService.encrypt(dataBlock)
-      let dataBlocks = await DataBlockService.slice(dataBlock)
-      if (dataBlocks.length !== 1) {
-        console.error('P2pChat DataBlock sliceSize is greater than 1')
-        return
-      }
-      dataBlock = dataBlocks[0]
-      dataBlock.payload = message // for webrtc send
-      await p2pChatAction.chat(null, dataBlock, peerId)
     },
     async getSignalSession(peerId){
       let linkman = store.state.linkmanMap[peerId]
