@@ -218,9 +218,7 @@ import { P2pChatMessageType } from '@/libs/biz/colla-chat'
     }
     current['contentBody'] = contentBody.replace(/\&nbsp\;/g, '')
     current['firstFileInfo'] = currentFirstFileInfo
-    if (current['firstAudioDuration']) {
-      current['contentAAmount'] = 1
-    } else {
+    if (!current['firstAudioDuration']) {
       current['firstAudioDuration'] = CollaUtil.formatSeconds(currentFirstAudioDuration)
       current['contentAAmount'] = contentAAmount
     }
