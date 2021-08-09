@@ -253,8 +253,6 @@ export class CollectionComponent {
 		let qs = []
 		if (from) {
 			qs.push({ createDate: { $lt: from } })
-		} else {
-			qs.push({ createDate: { $lt: null } })
 		}
 		let collectionId = currentCollection._id
 		if (collectionId) {
@@ -262,12 +260,15 @@ export class CollectionComponent {
 		} else {
 			qs.push({ collectionId: '' })
 		}
-		qs.push({ createDate: { $gt: null } })
+		// put content into attach
+		//qs.push({ createDate: { $gt: null } })
 		if (qs.length > 0) {
 			condition['$and'] = qs
 		}
 		console.log('will load more attachs, collectionId:' + collectionId + 'from:' + from)
-		let page = await pounchDb.findPage('myAttach', condition, [{ createDate: 'desc' }], null, null, limit)
+		// put content into attach
+		//let page = await pounchDb.findPage('myAttach', condition, [{ createDate: 'desc' }], null, null, limit)
+		let page = await pounchDb.findPage('myAttach', condition, null, null, null, limit)
 		let data = page.result
 		if (data && data.length > 0) {
 			let payloadKey = currentCollection.payloadKey
@@ -300,10 +301,10 @@ export class CollectionComponent {
 		if (!current) {
 			return
 		}
-		let payloadKey = current.payloadKey
 		let state = current.state
 		let content = current.content
 		let thumbnail = current.thumbnail
+		let payloadKey = current.payloadKey
 		let now = new Date().getTime()
 		if (EntityState.New === state) {
 			if (!current.createDate) {
@@ -317,7 +318,11 @@ export class CollectionComponent {
 				current.updateDate = now
 			}
 		}
-		let ignore = ['attachs']
+		// put content into attach
+		if (EntityState.Deleted === state) {
+			await this.saveAttach(current)
+		}
+		/*let ignore = ['attachs']
 		if (myself.myselfPeerClient.localDataCryptoSwitch === true) {
 			if (EntityState.Deleted !== state) {
 				current.securityContext = myself.myselfPeer.securityContext
@@ -352,11 +357,16 @@ export class CollectionComponent {
 				console.log('collection after encrypt length:' + JSON.stringify(current).length)
 			}
 			ignore = ['plainContent', 'pyPlainContent', 'content', 'thumbnail', 'attachs']
-		}
+		}*/
+		let ignore = ['attachs', 'content']
 		let start = new Date().getTime()
 		await pounchDb.run('myCollection', current, ignore, parent)
 		let end = new Date().getTime()
         console.log('collection save run time:' + (end - start))
+		if (EntityState.Deleted !== state) {
+			current.attachs = [{content: content}]
+			await this.saveAttach(current)
+		}
 		delete current['content_']
 		delete current['thumbnail_']
 	}
@@ -374,21 +384,26 @@ export class CollectionComponent {
 			securityParams.NeedEncrypt = true
 			for (let key in current.attachs) {
 				let attach = current.attachs[key]
-				if (EntityState.Deleted === current.state) {
+				// put content into attach
+				/*if (EntityState.Deleted === current.state) {
 					attach.state = EntityState.Deleted
 					continue
 				} else {
 					attach.collectionId = current._id
-				}
-				if (myself.myselfPeerClient.localDataCryptoSwitch === true) {
-					if (attach.content) {
-						let result = await SecurityPayload.encrypt(attach.content, securityParams)
-						if (result) {
-							attach.securityContext = current.SecurityContext
-							attach.payloadKey = result.PayloadKey
-							attach.needCompress = result.NeedCompress
-							attach.content_ = result.TransportPayload
-							attach.payloadHash = result.PayloadHash
+				}*/
+				attach.state = current.state
+				attach.collectionId = current._id
+				if (EntityState.Deleted !== current.state) {
+					if (myself.myselfPeerClient.localDataCryptoSwitch === true) {
+						if (attach.content) {
+							let result = await SecurityPayload.encrypt(attach.content, securityParams)
+							if (result) {
+								attach.securityContext = current.SecurityContext
+								attach.payloadKey = result.PayloadKey
+								attach.needCompress = result.NeedCompress
+								attach.content_ = result.TransportPayload
+								attach.payloadHash = result.PayloadHash
+							}
 						}
 					}
 				}
@@ -397,7 +412,10 @@ export class CollectionComponent {
 			if (myself.myselfPeerClient.localDataCryptoSwitch === true) {
 				ignore = ['content']
 			}
+			let start = new Date().getTime()
 			await pounchDb.execute('myAttach', current.attachs, ignore, current.attachs)
+			let end = new Date().getTime()
+        	console.log('collection attachs save run time:' + (end - start))
 			for (let attach of current.attachs) {
 				delete attach['content_']
 			}
@@ -419,7 +437,8 @@ export class CollectionComponent {
 				}
 			}
 			await this.saveCollection(current, parent)
-			await this.saveAttach(current)
+			// put content into attach
+			//await this.saveAttach(current)
 		}
 	}
 	async deleteAttach(attach, parent) {

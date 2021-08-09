@@ -600,19 +600,26 @@ export default {
         this.collectionLoading = false
       }
     },
-    collectionSelected(item, index) {
+    async collectionSelected(item, index) {
       let _that = this
       let store = _that.$store
       if (!item) {
         return
       }
+      // put content into attach
+      if (!item.content) {
+        let attachs = await collectionComponent.loadAttach(item, null, null)
+        if (attachs && attachs.length > 0) {
+          item.attachs = attachs
+          item.content = attachs[0].content
+        }
+        if (!item.content) {
+          item.content = ''
+        }
+      }
       store.state.currentCollection = item
       _that.myCollections.c_meta.current = item
       _that.myCollections.c_meta.currentIndex = index
-      let content = item.content
-      if (!content) {
-        item.content = ''
-      }
       let collectionType = item.collectionType
       if (store.collectionEntry !== 'message') {
         // if (item.collectionType !== CollectionType.CHAT) {
