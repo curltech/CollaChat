@@ -401,15 +401,17 @@ export default {
             let defaultName = ''
             let hasNonContacts = false
             let groupChatMembers = store.state.groupChatMap[groupId].groupMembers
-            for (let groupChatMember of groupChatMembers) {
-              let linkman = store.state.linkmanMap[groupChatMember.memberPeerId]
-              if (linkman) {
-                defaultName = (defaultName ? defaultName + _that.$i18n.t(", ") : '') + (linkman.givenName ? linkman.givenName : linkman.name)
-              } else {
-                hasNonContacts = true
+            if (groupChatMembers && groupChatMembers.length > 0) {
+              for (let groupChatMember of groupChatMembers) {
+                let linkman = store.state.linkmanMap[groupChatMember.memberPeerId]
+                if (linkman) {
+                  defaultName = (defaultName ? defaultName + _that.$i18n.t(", ") : '') + (linkman.givenName ? linkman.givenName : linkman.name)
+                } else {
+                  hasNonContacts = true
+                }
               }
             }
-            chatName = (hasNonContacts ? defaultName + _that.$i18n.t(", ") + _that.$i18n.t("NonContacts") : defaultName)
+            chatName = (hasNonContacts ? defaultName + _that.$i18n.t(", ") + _that.$i18n.t("other NonContacts") : defaultName)
           }
         }
       }

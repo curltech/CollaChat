@@ -888,7 +888,7 @@ export default {
         }
         for (let groupMember of groupMembers) {
           let linkman = store.state.linkmanMap[groupMember.memberPeerId ? groupMember.memberPeerId : groupMember]
-          if (linkman && linkman.peerId !== linkman.ownerPeerId) { // 自己和非联系人除外
+          if (!linkman || linkman.peerId !== linkman.ownerPeerId) { // 自己除外
             await store.p2pSend(message,groupMember.memberPeerId ? groupMember.memberPeerId : groupMember)
             let receive = {
               ownerPeerId: message.ownerPeerId,
@@ -1978,6 +1978,10 @@ export default {
             }
             if (!linkman && gm.memberPeerId !== myselfPeerClient.peerId) {
               includeNonContacts = true
+              let peerClients = await peerClientService.getCachedPeerClient(gm.memberPeerId)
+              if (!peerClients || peerClients.length === 0) {
+                console.error('getCachedPeerClient is empty, memberPeerId:' + gm.memberPeerId)
+              }
             }
           }
 
@@ -2177,6 +2181,10 @@ export default {
               }
               if (!linkman && gm.memberPeerId !== myselfPeerClient.peerId) {
                 includeNonContacts = true
+                let peerClients = await peerClientService.getCachedPeerClient(gm.memberPeerId)
+                if (!peerClients || peerClients.length === 0) {
+                  console.error('getCachedPeerClient is empty, memberPeerId:' + gm.memberPeerId)
+                }
               }
               if (linkman && gm.memberPeerId !== myselfPeerClient.peerId) {
                 linkman.groupChats.unshift(groupChat)
@@ -2753,10 +2761,9 @@ export default {
           let signalSession = await _that.getSignalSession(peerId)
           if (!signalSession) {
             await logService.log({}, 'signalSessionDoesNotExistError', 'error')
-            console.error('signalSession does not exist')
-            return
+          } else {
+            message = await signalSession.encrypt(JSON.stringify(message))
           }
-          message = await signalSession.encrypt(JSON.stringify(message))
         } else if (message.messageType === P2pChatMessageType.SYNC_LINKMAN_INFO) {
 
         }
@@ -2778,15 +2785,15 @@ export default {
           await logService.log(e.stack, 'p2pSendError', 'error')
       }
     },
-    async getSignalSession(peerId){
+    async getSignalSession(peerId) {
+      let signalSession
       let linkman = store.state.linkmanMap[peerId]
-      if(!signalProtocol.signalPublicKeys.get(peerId)){
-        if(!linkman.signalPublicKey){
-          return null
+      if (linkman) {
+        if (!signalProtocol.signalPublicKeys.get(peerId) && linkman.signalPublicKey) {
+          signalProtocol.signalPublicKeys.set(peerId, linkman.signalPublicKey)
         }
-        signalProtocol.signalPublicKeys.set(peerId,linkman.signalPublicKey)
+        signalSession = await signalProtocol.get(peerId, linkman.connectPeerId, linkman.connectSessionId)
       }
-      let signalSession = await signalProtocol.get(peerId,linkman.connectPeerId,linkman.connectSessionId)
       return signalSession
     },
     async cloudSyncP2pChat() {
@@ -3485,6 +3492,11 @@ export default {
               let linkman = store.state.linkmanMap[groupMemberDBItem.memberPeerId]
               if (linkman) {
                 linkman.groupChats.push(groupDBItem)
+              } else {
+                let peerClients = await peerClientService.getCachedPeerClient(groupMemberDBItem.memberPeerId)
+                if (!peerClients || peerClients.length === 0) {
+                  console.error('getCachedPeerClient is empty, memberPeerId:' + groupMemberDBItem.memberPeerId)
+                }
               }
             }
             groupDBItem.groupMembers = groupMemberDBItems

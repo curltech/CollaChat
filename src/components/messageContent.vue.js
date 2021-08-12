@@ -1,6 +1,6 @@
 import { date } from 'quasar'
 
-import { webrtcPeerPool } from 'libcolla'
+import { webrtcPeerPool, peerClientService } from 'libcolla'
 
 import {  ChatDataType, chatComponent, ChatMessageStatus, ChatContentType, P2pChatMessageType, SubjectType } from '@/libs/biz/colla-chat'
 import { ActiveStatus } from '@/libs/biz/colla-contact'
@@ -61,16 +61,36 @@ export default {
     },
     getName(message) {
       let state = this.$store.state
-      let senderPeer = state.linkmanMap[message.senderPeerId]
-      let name
-      if(senderPeer){
-        let gName = senderPeer ? senderPeer.givenName : null
-        name = senderPeer ? senderPeer.name : null
-        let name1 = gName ? gName : name
-        let name2 = message.senderPeerId === state.myselfPeerClient.peerId ? state.myselfPeerClient.name : name1
-        name = (message.subjectType === SubjectType.CHAT && this.entry === 'message') ? '' : name2
-      }else{
-        name = this.$i18n.t("NonContacts")
+      let name = ''
+      if (message.subjectType !== SubjectType.CHAT || this.entry !== 'message') {
+        if (message.senderPeerId === state.myselfPeerClient.peerId) {
+          name = state.myselfPeerClient.name
+        } else {
+          let senderPeer = state.linkmanMap[message.senderPeerId]
+          if (senderPeer) {
+            name = senderPeer.givenName ? senderPeer.givenName : senderPeer.name
+          } else {
+            //name = this.$i18n.t("NonContacts")
+            if (message.subjectType === SubjectType.GROUP_CHAT) {
+              let group = state.groupChatMap[message.subjectId]
+              let groupChatMembers = group.groupMembers
+              if (groupChatMembers && groupChatMembers.length > 0) {
+                for (let groupChatMember of groupChatMembers) {
+                  if (groupChatMember.peerId === message.senderPeerId && groupChatMember.memberAlias) {
+                    name = groupChatMember.memberAlias
+                    break
+                  }
+                }
+              }
+              if (!name) {
+                let peerClient = peerClientService.getBestPeerClientFromCache(memberPeerId)
+                if (peerClient && peerClient.name) {
+                  name = peerClient.name
+                }
+              }
+            }
+          }
+        }
       }
 
       return name
