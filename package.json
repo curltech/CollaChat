@@ -60,7 +60,7 @@
     "html2canvas": "^1.0.0-rc.7",
     "jimp": "^0.16.1",
     "jsqr": "^1.4.0",
-    "libcolla": "^0.0.53",
+    "libcolla": "^0.0.54",
     "ly-tab": "^2.1.2",
     "pdfjs-dist": "^2.7.570",
     "qr-code-with-logo": "^1.1.0",

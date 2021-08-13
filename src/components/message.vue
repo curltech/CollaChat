@@ -144,19 +144,19 @@
               q-avatar(size="56px")
                 img(:src="$store.state.myselfPeerClient.avatar ? $store.state.myselfPeerClient.avatar : $store.defaultActiveAvatar")
               q-icon(size="16px" name="person" color="secondary")
-            q-item-section(avatar v-for="(groupChatMember, index) in ($store.state.groupChatMap[$store.state.currentChat.subjectId] ? $store.state.groupChatMap[$store.state.currentChat.subjectId].groupMembers : [])" v-if="groupChatMember.memberType === MemberType.OWNER && groupChatMember.memberPeerId !== $store.state.myselfPeerClient.peerId" :key="groupChatMember.memberPeerId") {{ GroupChatMemberName(groupChatMember) }}
+            q-item-section(avatar v-for="(groupChatMember, index) in ($store.state.groupChatMap[$store.state.currentChat.subjectId] ? $store.state.groupChatMap[$store.state.currentChat.subjectId].groupMembers : [])" v-if="groupChatMember.memberType === MemberType.OWNER && groupChatMember.memberPeerId !== $store.state.myselfPeerClient.peerId" :key="groupChatMember.memberPeerId") {{ groupChatMemberName(groupChatMember) }}
               q-btn(dense flat round @click="showContacts(groupChatMember.memberPeerId)")
                 q-avatar(size="56px")
-                  img(:src="$store.state.linkmanMap[groupChatMember.memberPeerId] ? ($store.state.linkmanMap[groupChatMember.memberPeerId].avatar ? $store.state.linkmanMap[groupChatMember.memberPeerId].avatar : $store.defaultActiveAvatar) : $store.defaultDisabledAvatar")
+                  img(:src="groupChatMemeberAvatar(groupChatMember)")
               q-icon(size="16px" name="person" :color="groupChatMember.memberPeerId === $store.state.myselfPeerClient.peerId || ($store.state.linkmanMap[groupChatMember.memberPeerId] && $store.state.linkmanMap[groupChatMember.memberPeerId].activeStatus === ActiveStatus.UP) ? 'secondary' : 'grey-1'")
             q-item-section(avatar v-for="(groupChatMember, index) in ($store.state.groupChatMap[$store.state.currentChat.subjectId] ? $store.state.groupChatMap[$store.state.currentChat.subjectId].groupMembers : [])" v-if="groupChatMember.memberType !== MemberType.OWNER && groupChatMember.memberPeerId === $store.state.myselfPeerClient.peerId" :key="groupChatMember.memberPeerId") {{$store.state.myselfPeerClient.name}}
               q-avatar(size="56px")
                 img(:src="$store.state.myselfPeerClient.avatar ? $store.state.myselfPeerClient.avatar : $store.defaultActiveAvatar")
               q-icon(size="16px" name="person" color="secondary")
-            q-item-section(avatar v-for="(groupChatMember, index) in ($store.state.groupChatMap[$store.state.currentChat.subjectId] ? $store.state.groupChatMap[$store.state.currentChat.subjectId].groupMembers : [])" v-if="groupChatMember.memberType !== MemberType.OWNER && groupChatMember.memberPeerId !== $store.state.myselfPeerClient.peerId" :key="groupChatMember.memberPeerId") {{ GroupChatMemberName(groupChatMember) }}
+            q-item-section(avatar v-for="(groupChatMember, index) in ($store.state.groupChatMap[$store.state.currentChat.subjectId] ? $store.state.groupChatMap[$store.state.currentChat.subjectId].groupMembers : [])" v-if="groupChatMember.memberType !== MemberType.OWNER && groupChatMember.memberPeerId !== $store.state.myselfPeerClient.peerId" :key="groupChatMember.memberPeerId") {{ groupChatMemberName(groupChatMember) }}
               q-btn(dense flat round @click="showContacts(groupChatMember.memberPeerId)")
                 q-avatar(size="56px")
-                  img(:src="$store.state.linkmanMap[groupChatMember.memberPeerId] ? ($store.state.linkmanMap[groupChatMember.memberPeerId].avatar ? $store.state.linkmanMap[groupChatMember.memberPeerId].avatar : $store.defaultActiveAvatar) : $store.defaultDisabledAvatar")
+                  img(:src="groupChatMemeberAvatar(groupChatMember)")
               q-icon(size="16px" name="person" :color="$store.state.linkmanMap[groupChatMember.memberPeerId] && $store.state.linkmanMap[groupChatMember.memberPeerId].activeStatus === ActiveStatus.UP ? 'secondary' : 'grey-1'")
             q-item-section(avatar v-if="ifIAmGroupOwner($store.state.currentChat)")
               q-btn.btnIcon(dense flat round size="28px" icon="add" @click="showAddGroupChatMember")
@@ -166,7 +166,7 @@
           q-item(clickable v-ripple @click="showOwnershipHandover")
             q-item-section
               q-item-label {{ ifIAmGroupOwner($store.state.currentChat) ? $t('Ownership Handover') : $t('Group Owner') }}
-            q-item-section(side) {{ GroupChatOwnerName() }}
+            q-item-section(side) {{ groupChatOwnerName() }}
             q-item-section(avatar v-if="ifIAmGroupOwner($store.state.currentChat)")
               q-icon(name="keyboard_arrow_right" color="c-grey-10")
           q-separator.c-separator.message-sep-1

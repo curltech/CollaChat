@@ -192,72 +192,6 @@ export default {
         return message.senderPeerId == store.state.myselfPeerClient.peerId ? (store.state.myselfPeerClient.avatar ? store.state.myselfPeerClient.avatar : store.defaultActiveAvatar) : (store.state.linkmanMap[message.senderPeerId].avatar ? store.state.linkmanMap[message.senderPeerId].avatar : store.defaultActiveAvatar);
       }
     },
-    GroupChatMemberName() {
-      let _that = this
-      let store = _that.$store
-      return function (groupChatMember) {
-        let groupChatMemberName = ''
-        let memberPeerId = groupChatMember.memberPeerId
-        let linkman = store.state.linkmanMap[memberPeerId]
-        if (linkman) {
-          if (linkman.givenName) {
-            groupChatMemberName = linkman.givenName.length > 3 ? linkman.givenName.substr(0, 3) + '...' : linkman.givenName
-          } else if (groupChatMember.memberAlias) {
-            groupChatMemberName = groupChatMember.memberAlias.length > 3 ? groupChatMember.memberAlias.substr(0, 3) + '...' : groupChatMember.memberAlias
-          } else if (linkman.name) {
-            groupChatMemberName = linkman.name.length > 3 ? linkman.name.substr(0, 3) + '...' : linkman.name
-          }
-        } else {
-          if (groupChatMember.memberAlias) {
-            groupChatMemberName = groupChatMember.memberAlias.length > 3 ? groupChatMember.memberAlias.substr(0, 3) + '...' : groupChatMember.memberAlias
-          } else {
-            let peerClient = peerClientService.getBestPeerClientFromCache(memberPeerId)
-            if (peerClient && peerClient.name) {
-              groupChatMemberName = peerClient.name
-            }
-          }
-        }
-        return groupChatMemberName
-      }
-    },
-    GroupChatOwnerName() {
-      let _that = this
-      let store = _that.$store
-      return function () {
-        let groupChatOwnerName = ''
-        let currentChat = store.state.currentChat
-        if (currentChat) {
-          let group = store.state.groupChatMap[currentChat.subjectId]
-          if (group) {
-            if (group.groupOwnerPeerId === store.state.myselfPeerClient.peerId) {
-              groupChatOwnerName = store.state.myselfPeerClient.name
-            } else {
-              let linkman = store.state.linkmanMap[group.groupOwnerPeerId]
-              if (linkman) {
-                groupChatOwnerName = linkman.name
-              } else {
-                let groupChatMembers = group.groupMembers
-                if (groupChatMembers && groupChatMembers.length > 0) {
-                  for (let groupChatMember of groupChatMembers) {
-                    if (groupChatMember.peerId === group.groupOwnerPeerId && groupChatMember.memberAlias) {
-                      groupChatOwnerName = groupChatMember.memberAlias
-                      break
-                    }
-                  }
-                }
-                if (!groupChatOwnerName) {
-                  let peerClient = peerClientService.getBestPeerClientFromCache(group.groupOwnerPeerId)
-                  if (peerClient && peerClient.name) {
-                    groupChatOwnerName = peerClient.name
-                  }
-                }
-              }
-            }
-          }
-        }
-        return groupChatOwnerName
-      }
-    },
     ChatTitle() {
       let _that = this
       let store = _that.$store
@@ -2255,7 +2189,7 @@ export default {
               }
           }
     },
-    showContacts(peerId) {
+    async showContacts(peerId) {
       let _that = this
       let store = _that.$store
       if (peerId) {
@@ -2269,7 +2203,7 @@ export default {
             statusBarComponent.style(true, '#ffffff')
           }*/
         } else {
-          linkman = peerClientService.getBestPeerClientFromCache(peerId)
+          linkman = await peerClientService.getCachedPeerClient(peerId)
           if (linkman && linkman.visibilitySetting && linkman.visibilitySetting.substring(2, 3) === 'N') {
             store.state.findLinkmanResult = 1
             store.state.findLinkmanTip = _that.$i18n.t('The contact is invisible')
@@ -2967,6 +2901,88 @@ export default {
           }
       }
       _that.getMessageFileAndOpen(message)
+    },
+    groupChatMemberName(groupChatMember) {
+      let _that = this
+      let store = _that.$store
+      let groupChatMemberName = ''
+      let memberPeerId = groupChatMember.memberPeerId
+      let linkman = store.state.linkmanMap[memberPeerId]
+      if (linkman) {
+        if (linkman.givenName) {
+          groupChatMemberName = linkman.givenName.length > 3 ? linkman.givenName.substr(0, 3) + '...' : linkman.givenName
+        } else if (groupChatMember.memberAlias) {
+          groupChatMemberName = groupChatMember.memberAlias.length > 3 ? groupChatMember.memberAlias.substr(0, 3) + '...' : groupChatMember.memberAlias
+        } else if (linkman.name) {
+          groupChatMemberName = linkman.name.length > 3 ? linkman.name.substr(0, 3) + '...' : linkman.name
+        }
+      } else {
+        if (groupChatMember.memberAlias) {
+          groupChatMemberName = groupChatMember.memberAlias.length > 3 ? groupChatMember.memberAlias.substr(0, 3) + '...' : groupChatMember.memberAlias
+        } else {
+          let peerClient = peerClientService.getPeerClientFromCache(memberPeerId)
+          if (peerClient && peerClient.name) {
+            groupChatMemberName = peerClient.name.length > 3 ? peerClient.name.substr(0, 3) + '...' : peerClient.name
+          }
+        }
+      }
+      return groupChatMemberName
+    },
+    groupChatOwnerName() {
+      let _that = this
+      let store = _that.$store
+      let groupChatOwnerName = ''
+      let currentChat = store.state.currentChat
+      if (currentChat) {
+        let group = store.state.groupChatMap[currentChat.subjectId]
+        if (group) {
+          if (group.groupOwnerPeerId === store.state.myselfPeerClient.peerId) {
+            groupChatOwnerName = store.state.myselfPeerClient.name
+          } else {
+            let linkman = store.state.linkmanMap[group.groupOwnerPeerId]
+            if (linkman) {
+              groupChatOwnerName = linkman.name
+            } else {
+              let groupChatMembers = group.groupMembers
+              if (groupChatMembers && groupChatMembers.length > 0) {
+                for (let groupChatMember of groupChatMembers) {
+                  if (groupChatMember.peerId === group.groupOwnerPeerId) {
+                    if (groupChatMember.memberAlias) {
+                      groupChatOwnerName = groupChatMember.memberAlias
+                    }
+                    break
+                  }
+                }
+              }
+              if (!groupChatOwnerName) {
+                let peerClient = peerClientService.getPeerClientFromCache(group.groupOwnerPeerId)
+                if (peerClient && peerClient.name) {
+                  groupChatOwnerName = peerClient.name
+                }
+              }
+            }
+          }
+        }
+      }
+      return groupChatOwnerName
+    },
+    groupChatMemeberAvatar(groupChatMember) {
+      let _that = this
+      let store = _that.$store
+      let groupChatMemeberAvatar = store.defaultActiveAvatar
+      let memberPeerId = groupChatMember.memberPeerId
+      let linkman = store.state.linkmanMap[memberPeerId]
+      if (linkman) {
+        if (linkman.avatar) {
+          groupChatMemeberAvatar = linkman.avatar
+        }
+      } else {
+        let peerClient = peerClientService.getPeerClientFromCache(memberPeerId)
+        if (peerClient && peerClient.avatar) {
+          groupChatMemeberAvatar = peerClient.avatar
+        }
+      }
+      return groupChatMemeberAvatar
     }
   },
   async mounted() {

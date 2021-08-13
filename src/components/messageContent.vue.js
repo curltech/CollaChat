@@ -36,10 +36,24 @@ export default {
     },
     getAvatar(message) {
       let state = this.$store.state
-      let senderPeer = state.linkmanMap[message.senderPeerId]
-      let avatar1 = state.myselfPeerClient.avatar ? state.myselfPeerClient.avatar : this.$store.defaultActiveAvatar
-      let avatar2 = (senderPeer && senderPeer.avatar) ? senderPeer.avatar : this.$store.defaultActiveAvatar
-      let avatar = message.senderPeerId === state.myselfPeerClient.peerId ? avatar1 : avatar2
+      let avatar = this.$store.defaultActiveAvatar
+      if (message.senderPeerId === state.myselfPeerClient.peerId) {
+        if (state.myselfPeerClient.avatar) {
+          avatar = state.myselfPeerClient.avatar
+        }
+      } else {
+        let senderPeer = state.linkmanMap[message.senderPeerId]
+        if (senderPeer) {
+          if (senderPeer.avatar) {
+            avatar = senderPeer.avatar
+          }
+        } else {
+          let peerClient = peerClientService.getPeerClientFromCache(message.senderPeerId)
+          if (peerClient && peerClient.avatar) {
+            avatar = peerClient.avatar
+          }
+        }
+      }
       return avatar
     },
     getStamp(message) {
@@ -76,14 +90,16 @@ export default {
               let groupChatMembers = group.groupMembers
               if (groupChatMembers && groupChatMembers.length > 0) {
                 for (let groupChatMember of groupChatMembers) {
-                  if (groupChatMember.peerId === message.senderPeerId && groupChatMember.memberAlias) {
-                    name = groupChatMember.memberAlias
+                  if (groupChatMember.peerId === message.senderPeerId) {
+                    if (groupChatMember.memberAlias) {
+                      name = groupChatMember.memberAlias
+                    }
                     break
                   }
                 }
               }
               if (!name) {
-                let peerClient = peerClientService.getBestPeerClientFromCache(memberPeerId)
+                let peerClient = peerClientService.getPeerClientFromCache(message.senderPeerId)
                 if (peerClient && peerClient.name) {
                   name = peerClient.name
                 }

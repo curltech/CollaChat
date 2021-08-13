@@ -1978,8 +1978,8 @@ export default {
             }
             if (!linkman && gm.memberPeerId !== myselfPeerClient.peerId) {
               includeNonContacts = true
-              let peerClients = await peerClientService.getCachedPeerClient(gm.memberPeerId)
-              if (!peerClients || peerClients.length === 0) {
+              let peerClient = await peerClientService.getCachedPeerClient(gm.memberPeerId)
+              if (!peerClient) {
                 console.error('getCachedPeerClient is empty, memberPeerId:' + gm.memberPeerId)
               }
             }
@@ -2181,8 +2181,8 @@ export default {
               }
               if (!linkman && gm.memberPeerId !== myselfPeerClient.peerId) {
                 includeNonContacts = true
-                let peerClients = await peerClientService.getCachedPeerClient(gm.memberPeerId)
-                if (!peerClients || peerClients.length === 0) {
+                let peerClient = await peerClientService.getCachedPeerClient(gm.memberPeerId)
+                if (!peerClient) {
                   console.error('getCachedPeerClient is empty, memberPeerId:' + gm.memberPeerId)
                 }
               }
@@ -3493,8 +3493,8 @@ export default {
               if (linkman) {
                 linkman.groupChats.push(groupDBItem)
               } else {
-                let peerClients = await peerClientService.getCachedPeerClient(groupMemberDBItem.memberPeerId)
-                if (!peerClients || peerClients.length === 0) {
+                let peerClient = await peerClientService.getCachedPeerClient(groupMemberDBItem.memberPeerId)
+                if (!peerClient) {
                   console.error('getCachedPeerClient is empty, memberPeerId:' + groupMemberDBItem.memberPeerId)
                 }
               }
