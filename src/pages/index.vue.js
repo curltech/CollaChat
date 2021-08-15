@@ -1772,7 +1772,6 @@ export default {
       if(!message.messageType){
         let signalSession = await _that.getSignalSession(peerId)
         if(!signalSession){
-          console.log('signalSession does not exist')
           await logService.log({}, 'signalSessionDoesNotExistError', 'error')
           return
         }
@@ -2788,7 +2787,8 @@ export default {
     async getSignalSession(peerId) {
       let signalSession
       let linkman = store.state.linkmanMap[peerId]
-      if (linkman) {
+      let webrtcPeers = webrtcPeerPool.getConnected(peerId)
+      if (linkman && webrtcPeers && webrtcPeers.length > 0) {
         if (!signalProtocol.signalPublicKeys.get(peerId) && linkman.signalPublicKey) {
           signalProtocol.signalPublicKeys.set(peerId, linkman.signalPublicKey)
         }
