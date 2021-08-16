@@ -197,7 +197,7 @@ export default {
       if (type == "video") {
         let ideal;
         if(store.state.ifMobileStyle){
-          ideal = 2
+          ideal = 1.33
         }else{
           ideal = 0.5625
         }
@@ -582,55 +582,57 @@ export default {
     async closeCall(isReceived) {
       let _that = this
       let store = _that.$store
-      let callChat = store.state.currentCallChat
-      if(!callChat)return
-      systemAudioComponent.mediaInvitationAudioStop()
-      systemAudioComponent.mediaCloseAudioPlay()
-      if(callChat.subjectType === SubjectType.CHAT) {
-          let message = {}
-          message.messageType = P2pChatMessageType.CHAT_LINKMAN
-          if (callChat.callMessage.contentType === ChatContentType.VIDEO_INVITATION) {
-              message.contentType = ChatContentType.VIDEO_HISTORY
-          } else {
-              message.contentType = ChatContentType.AUDIO_HISTORY
+      try{
+          let callChat = store.state.currentCallChat
+          if(!callChat)return
+          systemAudioComponent.mediaInvitationAudioStop()
+          systemAudioComponent.mediaCloseAudioPlay()
+          if(callChat.subjectType === SubjectType.CHAT) {
+              let message = {}
+              message.messageType = P2pChatMessageType.CHAT_LINKMAN
+              if (callChat.callMessage.contentType === ChatContentType.VIDEO_INVITATION) {
+                  message.contentType = ChatContentType.VIDEO_HISTORY
+              } else {
+                  message.contentType = ChatContentType.AUDIO_HISTORY
+              }
+              if(_that.$refs.mediaTimer && _that.$refs.mediaTimer.innerHTML){
+                  message.content = _that.$refs.mediaTimer.innerHTML
+              }else{
+                  message.content = _that.$i18n.t('Unconnected')
+              }
+              message.actualReceiveTime = new Date().getTime()
+              await store.addCHATSYSMessage(callChat, message)
           }
-          if(_that.$refs.mediaTimer && _that.$refs.mediaTimer.innerHTML){
-              message.content = _that.$refs.mediaTimer.innerHTML
-          }else{
-              message.content = _that.$i18n.t('Unconnected')
+          if (isReceived !== true && _that.activeStatus(callChat)) {
+              let members = []
+              if (callChat.subjectType === SubjectType.GROUP_CHAT) {
+                  for (let memberPeerId of callChat.callMessage.content) {
+                      if (memberPeerId !== callChat.ownerPeerId && callChat.streamMap[memberPeerId]) {
+                          members.push(memberPeerId)
+                      }
+                  }
+              }
+              if (callChat.subjectType === SubjectType.CHAT || (callChat.subjectType === SubjectType.GROUP_CHAT && members.length > 0)) {
+                  await _that.sendCallCloseMessage( callChat.subjectId ,
+                      (callChat.streamMap && callChat.streamMap[callChat.ownerPeerId]) ? ChatContentType.MEDIA_CLOSE : ChatContentType.MEDIA_REJECT ,
+                      callChat.subjectType === SubjectType.GROUP_CHAT ? members : '')
+              }
           }
-          message.actualReceiveTime = new Date().getTime()
-          await store.addCHATSYSMessage(callChat, message)
-      }
-      if (isReceived !== true && _that.activeStatus(callChat)) {
-        let members = []
-        if (callChat.subjectType === SubjectType.GROUP_CHAT) {
-          for (let memberPeerId of callChat.callMessage.content) {
-            if (memberPeerId !== callChat.ownerPeerId && callChat.streamMap[memberPeerId]) {
-              members.push(memberPeerId)
-            }
-          }
-        }
-        if (callChat.subjectType === SubjectType.CHAT || (callChat.subjectType === SubjectType.GROUP_CHAT && members.length > 0)) {
-          await _that.sendCallCloseMessage( callChat.subjectId ,
-            (callChat.streamMap && callChat.streamMap[callChat.ownerPeerId]) ? ChatContentType.MEDIA_CLOSE : ChatContentType.MEDIA_REJECT ,
-            callChat.subjectType === SubjectType.GROUP_CHAT ? members : '')
-        }
-      }
-      await _that.removeStream()
-      //close miniButton which is in index.vue
-      store.state.miniVideoDialog = false
-      clearInterval(_that.mediaTimer);
-      _that.mediaTimer = null
-      _that.mediaMemberList = []
-      store.state.currentCallChat.audio = null
-      store.state.currentCallChat = null
-      _that.$nextTick(() => {
-        store.state.videoDialog = false;
-        _that.chatMute = false
-        _that.chatMic = true
-      })
-    },
+          await _that.removeStream()
+          //close miniButton which is in index.vue
+          store.state.miniVideoDialog = false
+          clearInterval(_that.mediaTimer);
+          _that.mediaTimer = null
+          _that.mediaMemberList = []
+          store.state.currentCallChat.audio = null
+          store.state.currentCallChat = null
+          _that.$nextTick(() => {
+              store.state.videoDialog = false;
+              _that.chatMute = false
+              _that.chatMic = true
+          })
+      }catch(e){await _that.removeStream()}
+  },
     changeMiniVideoDialog() {
       let _that = this
       let store = _that.$store
