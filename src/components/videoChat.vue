@@ -2,22 +2,11 @@
   q-dialog.bg-c-grey-0.text-c-grey-10(v-model="$store.state.videoDialog" id='videoDialog' persistent :maximized = 'ifMobileSize || $store.state.ifMobileStyle || fullSize')
     //single video
     q-card.message-dialog-card(:class="dialogSizeClass" v-if="$store.state.currentCallChat && ($store.state.currentCallChat.subjectType === SubjectType.CHAT) && $store.state.currentCallChat.callType === 'video'")
-      q-toolbar.linkman-video-toolbar.justify-center
-        q-toolbar-title.media-timer(:class="Platform.is.ios?'':'text-white'" align="center")
-          span(ref="mediaTimer")
-        q-btn.btnIcon(v-if = "$store.state.currentCallChat.stream" unelevated round color="primary" :icon="chatMute?'volume_off':'volume_up'" @click="changeChatMute")
-        q-space(v-if = "$store.state.currentCallChat.stream")
-        q-btn.btnIcon(unelevated round color="red" icon="call_end" @click="closeCall")
-        q-space(v-if = "$store.state.currentCallChat.stream")
-        q-btn.btnIcon(v-if = "$store.state.currentCallChat.stream" unelevated round color="primary" :icon="chatMic?'mic':'mic_off'"  @click="changeChatMic")
-        q-space(v-if="canCall()===true")
-        q-btn.btnIcon(unelevated round color="primary" icon="call" @click="acceptSingleCall" v-if="canCall()===true")
-        q-btn.btnIcon(unelevated round color="primary" icon="cached" @click="zoomVideoChange" v-if="Platform.is.ios")
       q-card-section.current-video-section(v-show ="$store.state.currentCallChat.stream")
         q-item(style="display:none")
           q-item-section
             span {{addStreamCount}}
-        video(ref='currentVideo' :class="ifMobileSize || $store.state.ifMobileStyle ?'':'current-linkman-video'" autoplay = 'autoplay')
+        video(ref='currentVideo' autoplay = 'autoplay')
       q-card-section.linkman-video-section(v-if="$store.state.currentCallChat && $store.state.currentCallChat.stream && $store.state.currentCallChat.stream.length === 1 && !Platform.is.ios")
         q-item
           q-item-section(avatar)
@@ -31,6 +20,18 @@
         q-btn.btnIcon(flat round color="primary" icon="remove_circle" @click="changeMiniVideoDialog")
       q-card-section.call-pending-section(v-if = '$store.state.currentCallChat.streamMap && $store.state.currentCallChat.streamMap[$store.state.currentCallChat.subjectId] && $store.state.currentCallChat.streamMap[$store.state.currentCallChat.subjectId].pending')
           q-spinner-dots(size="2rem")
+      q-toolbar.linkman-video-toolbar.justify-center
+        q-toolbar-title.media-timer(:class="Platform.is.ios?'':'text-white'" align="center")
+            span(ref="mediaTimer")
+        q-btn.btnIcon(unelevated round color="primary" icon="cached" @click="zoomVideoChange" v-if="Platform.is.ios")
+        q-btn.btnIcon(v-if = "(!Platform.is.ios && $store.state.currentCallChat.stream) ||(Platform.is.ios && $store.state.currentCallChat.stream && iosShowMore)" unelevated round color="primary" :icon="chatMute?'volume_off':'volume_up'" @click="changeChatMute")
+        q-space(v-if = "$store.state.currentCallChat.stream")
+        q-btn.btnIcon(unelevated round color="red" icon="call_end" @click="closeCall")
+        q-space(v-if = "$store.state.currentCallChat.stream")
+        q-btn.btnIcon(v-if = "(!Platform.is.ios && $store.state.currentCallChat.stream) ||(Platform.is.ios && $store.state.currentCallChat.stream && iosShowMore)" unelevated round color="primary" :icon="chatMic?'mic':'mic_off'"  @click="changeChatMic")
+        q-space(v-if="canCall()===true")
+        q-btn.btnIcon(unelevated round color="primary" icon="call" @click="acceptSingleCall" v-if="canCall()===true")
+        q-btn.btnIcon(unelevated round color="primary" icon="more_horiz" @click="iosShowMoreChange" v-if="Platform.is.ios")
     //group video or audio
     q-card.message-dialog-card(:class="Platform.is.ios?'ios-linkman-video':'linkman-video'" v-if="$store.state.currentCallChat && $store.state.currentCallChat.subjectType === SubjectType.GROUP_CHAT")
       q-toolbar.group-video-toolbar
