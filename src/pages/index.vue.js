@@ -2791,8 +2791,8 @@ export default {
       if (linkman && webrtcPeers && webrtcPeers.length > 0) {
         if (!signalProtocol.signalPublicKeys.get(peerId) && linkman.signalPublicKey) {
           signalProtocol.signalPublicKeys.set(peerId, linkman.signalPublicKey)
+          signalSession = await signalProtocol.get(peerId, linkman.connectPeerId, linkman.connectSessionId)
         }
-        signalSession = await signalProtocol.get(peerId, linkman.connectPeerId, linkman.connectSessionId)
       }
       return signalSession
     },
