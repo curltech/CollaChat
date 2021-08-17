@@ -548,10 +548,16 @@ export default {
       let files = []
       for (let u of urls) {
         if (u) {
+          let localURL = u.localURL
           let blob = null
           if (store.ios === true || store.android === true) {
             let type = u.type
-            let fileEntry = await fileComponent.getFileEntry(u.localURL)
+            if (localURL.indexOf('.HEIC') > -1) {
+                u.quality = 99
+                u = await mediaPickerComponent.compressImage(u)
+                localURL = u.uri
+            }
+            let fileEntry = await fileComponent.getFileEntry(localURL)
             blob = await fileComponent.readFile(fileEntry, { format: 'blob', type: type })
             if (blob.type.indexOf('audio/webm') > -1) {
               _that.audioBlobMessageHandle(blob)
