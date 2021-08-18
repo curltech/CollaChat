@@ -2,12 +2,12 @@
   div.bg-c-grey-0.drawHeightStyle(v-if="$store.state.currentChat")
     q-tab-panels(v-model="subKind" animated transition-prev="slide-right" transition-next="slide-left")
       q-tab-panel(name="default" style="padding:0px 0px")
-        q-toolbar.header-toolbar(:class="$store.state.currentChat.subjectId ? '' : 'hidden'")
+        q-toolbar.header-toolbar.bg-c-grey-message(:class="$store.state.currentChat.subjectId ? '' : 'hidden'")
           q-btn(:class="ifMobileSize || $store.state.ifMobileStyle ? '' : 'hidden'" flat round dense icon="keyboard_arrow_left" @click="$store.toggleDrawer(false)")
           q-toolbar-title(align="center" :style="ifMobileSize || $store.state.ifMobileStyle ? '' : 'padding-left:54px'") {{ ChatTitle($store.state.currentChat) }}
           q-btn.btnIcon(flat round dense icon="more_horiz" @click="subKind = $store.state.currentChat.subjectType + 'Details'")
         q-separator.c-separator.header-mar-top(style="height:1px;margin-left:0px;margin-right:0px" color="c-grey-0")
-        #talk.q-pa-md.bg-c-grey-0.row.justify-center.scroll.q-chat-message(:class="!Platform.is.mobile?'talk-height-pc':(keyboardMode?'talk-height-mobile1':'talk-height-mobile2')")
+        #talk.q-pa-md.bg-c-grey-message.row.justify-center.scroll.q-chat-message(:class="!Platform.is.mobile?'talk-height-pc':(keyboardMode?'talk-height-mobile1':'talk-height-mobile2')")
           q-infinite-scroll(style="width:100%" @load="load_message" debounce="100" reverse :offset="50")
             q-chat-message(v-if="$store.state.currentChat && $store.state.currentChat.noMoreMessageTag" @touchstart="preventDefault" :label="$t('No more messages')")
             template(v-for="(message,index) in $store.state.currentChat.messages")
@@ -32,9 +32,9 @@
                       q-item-section {{$t('MultiSelect')}}
                 q-chat-message(v-if='message.messageType === P2pChatMessageType.CHAT_SYS && message.contentType === ChatContentType.EVENT' :label="detailDateFormat(message.createDate)+'</br>'+ message.content")
                 q-chat-message(v-if='message.messageType === P2pChatMessageType.CHAT_SYS && message.contentType === ChatContentType.TIME' :label="detailDateFormat(message.content)")
-        .message-editor-wrap
+        .message-editor-wrap.bg-c-grey-message
           .message-editor-area
-            q-toolbar.text-c-grey-10.row(style="height:40px;min-height:40px" v-if="!Platform.is.mobile && !messageMultiSelectMode")
+            q-toolbar.row(style="height:40px;min-height:40px" v-if="!Platform.is.mobile && !messageMultiSelectMode")
               q-btn.q-mr-sm.btnIcon(round flat icon="alarm" :disable ='!(!ifSelfChat && activeStatus($store.state.currentChat) && ($store.state.currentChat && $store.state.currentChat.subjectType === SubjectType.CHAT))' @click='destroyClock = true')
                 q-popup-edit(v-model="destroyClock" content-class="" style='width:100px')
                   q-option-group(:options="clockOptions" label="Notifications" type="radio" v-model="$store.state.currentChat.destroyTime")
