@@ -2167,6 +2167,18 @@ export default {
                   await contactComponent.update(ContactDataType.GROUP, groupChatRecord)
                   _that.sendGroupInfo()
               }
+
+              let _type = _that.$i18n.t("Recall Time Limit")
+              let _content = `${store.state.myselfPeerClient.name}${(value? _that.$i18n.t("Add") : _that.$i18n.t("Cancel")) }${_type}`
+              if(_content){
+                  let chat = await store.getChat(groupChat.groupId)
+                  let chatMessage = {
+                      messageType: P2pChatMessageType.CHAT_SYS,
+                      contentType: ChatContentType.EVENT,
+                      content: _content
+                  }
+                  await store.addCHATSYSMessage(chat, chatMessage)
+              }
           }
           _that.$forceUpdate()
     },
@@ -2192,6 +2204,18 @@ export default {
                   groupChatRecord.recallAlert = value
                   await contactComponent.update(ContactDataType.GROUP, groupChatRecord)
                   _that.sendGroupInfo()
+
+                  let _type = _that.$i18n.t("Recall Alert")
+                  let _content = `${store.state.myselfPeerClient.name}${(value? _that.$i18n.t("Add") : _that.$i18n.t("Cancel")) }${_type}`
+                  if(_content){
+                      let chat = await store.getChat(groupChat.groupId)
+                      let chatMessage = {
+                          messageType: P2pChatMessageType.CHAT_SYS,
+                          contentType: ChatContentType.EVENT,
+                          content: _content
+                      }
+                      await store.addCHATSYSMessage(chat, chatMessage)
+                  }
               }
           }
     },

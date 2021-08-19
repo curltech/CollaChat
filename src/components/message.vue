@@ -48,7 +48,7 @@
               q-btn.q-mr-sm.btnIcon(round flat icon="bookmarks" @click="openCollection")
               q-btn.q-mr-sm.btnIcon(round flat icon="account_box" @click="selectLinkmanCard")
               q-btn.q-mr-sm.btnIcon(round flat icon="folder" @click="$refs.messageUpload.pickFiles()")
-            q-toolbar.message-operate-wrap(v-if='messageMultiSelectMode' :class = 'Platform.is.mobile?"message-operate-wrap-mobile":"message-operate-wrap-pc"')
+            q-toolbar.message-operate-wrap(v-if='messageMultiSelectMode' :class = 'Platform.is.mobile?"message-operate-wrap-mobile":""')
               q-btn-group.full-width(flat spread stretch)
                 q-btn.btnIcon.btnMessage(flat stack no-caps :label="$t('Forward')" icon="forward" @click="multiForwardMessage('single')")
                 q-btn.btnIcon.btnMessage(flat stack no-caps :label="$t('MultiForward')" icon="forward" @click="multiForwardMessage('multi')")
@@ -119,16 +119,16 @@
               q-item-label {{$t('Sticky Top')}}
             q-item-section(side)
               q-toggle(v-if="$store.state.currentChat && $store.state.linkmanMap[$store.state.currentChat.subjectId]" v-model="$store.state.linkmanMap[$store.state.currentChat.subjectId].top" @input="changeTopSwitch")
-          q-item
+          q-item(v-if="$store.state.currentChat && $store.state.linkmanMap[$store.state.currentChat.subjectId]")
             q-item-section
               q-item-label {{$t('Recall Time Limit')}}
             q-item-section(side)
-              q-toggle(v-if="$store.state.currentChat && $store.state.linkmanMap[$store.state.currentChat.subjectId]" v-model="$store.state.linkmanMap[$store.state.currentChat.subjectId].myselfRecallTimeLimit" @input="changeRecallTimeLimit")
-          q-item
+              q-toggle(v-model="$store.state.linkmanMap[$store.state.currentChat.subjectId].myselfRecallTimeLimit" @input="changeRecallTimeLimit")
+          q-item(v-if="$store.state.currentChat && $store.state.linkmanMap[$store.state.currentChat.subjectId]")
             q-item-section
               q-item-label {{$t('Recall Alert')}}
             q-item-section(side)
-              q-toggle(v-if="$store.state.currentChat && $store.state.linkmanMap[$store.state.currentChat.subjectId]" v-model="$store.state.linkmanMap[$store.state.currentChat.subjectId].myselfRecallAlert" @input="changeRecallAlert")
+              q-toggle(v-model="$store.state.linkmanMap[$store.state.currentChat.subjectId].myselfRecallAlert" @input="changeRecallAlert")
           q-separator.c-separator(style="height:8px;margin-left:0px;margin-right:0px")
           q-item
             q-item-section(align="center")
@@ -234,16 +234,18 @@
               q-item-label {{$t('Sticky Top')}}
             q-item-section(side)
               q-toggle(v-if="$store.state.currentChat && $store.state.groupChatMap[$store.state.currentChat.subjectId]" v-model="$store.state.groupChatMap[$store.state.currentChat.subjectId].top" @input="changeTopSwitch")
-          q-item( v-if="ifIAmGroupOwner($store.state.currentChat)")
+          q-item
             q-item-section
               q-item-label {{$t('Recall Time Limit')}}
             q-item-section(side)
-              q-toggle(v-if="$store.state.currentChat && $store.state.groupChatMap[$store.state.currentChat.subjectId]" v-model="$store.state.groupChatMap[$store.state.currentChat.subjectId].recallTimeLimit" @input="changeRecallTimeLimit")
-          q-item(v-if="ifIAmGroupOwner($store.state.currentChat)")
+              q-toggle(v-if="$store.state.currentChat && $store.state.groupChatMap[$store.state.currentChat.subjectId] && ifIAmGroupOwner($store.state.currentChat)" v-model="$store.state.groupChatMap[$store.state.currentChat.subjectId].recallTimeLimit" @input="changeRecallTimeLimit")
+              q-toggle(v-if="$store.state.currentChat && $store.state.groupChatMap[$store.state.currentChat.subjectId] && !ifIAmGroupOwner($store.state.currentChat)" disable = true v-model="$store.state.groupChatMap[$store.state.currentChat.subjectId].recallTimeLimit")
+          q-item
             q-item-section
               q-item-label {{$t('Recall Alert')}}
             q-item-section(side)
-              q-toggle(v-if="$store.state.currentChat && $store.state.groupChatMap[$store.state.currentChat.subjectId]" v-model="$store.state.groupChatMap[$store.state.currentChat.subjectId].recallAlert" @input="changeRecallAlert")
+              q-toggle(v-if="$store.state.currentChat && $store.state.groupChatMap[$store.state.currentChat.subjectId] && ifIAmGroupOwner($store.state.currentChat)" v-model="$store.state.groupChatMap[$store.state.currentChat.subjectId].recallAlert" @input="changeRecallAlert")
+              q-toggle(v-if="$store.state.currentChat && $store.state.groupChatMap[$store.state.currentChat.subjectId] && !ifIAmGroupOwner($store.state.currentChat)" disable = true  v-model="$store.state.groupChatMap[$store.state.currentChat.subjectId].recallAlert")
           q-separator.c-separator.message-sep-2
           q-item
             q-item-section(align="center")

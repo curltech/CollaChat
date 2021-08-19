@@ -2758,12 +2758,9 @@ export default {
         }
         if (typeof message === "object" && message.messageType !== P2pChatMessageType.SYNC_LINKMAN_INFO && message.messageType !== P2pChatMessageType.CALL_REQUEST) {
           let signalSession = await _that.getSignalSession(peerId)
-          if (!signalSession) {
-            await logService.log({}, 'signalSessionDoesNotExistError', 'error')
-          } else {
+          if (signalSession)
             message = await signalSession.encrypt(JSON.stringify(message))
-          }
-        } else if (message.messageType === P2pChatMessageType.SYNC_LINKMAN_INFO) {
+          } else if (message.messageType === P2pChatMessageType.SYNC_LINKMAN_INFO) {
 
         }
         message = JSON.stringify(message)
@@ -2788,11 +2785,11 @@ export default {
       let signalSession
       let linkman = store.state.linkmanMap[peerId]
       let webrtcPeers = webrtcPeerPool.getConnected(peerId)
-      if (linkman && webrtcPeers && webrtcPeers.length > 0) {
-        if (!signalProtocol.signalPublicKeys.get(peerId) && linkman.signalPublicKey) {
+      if (linkman && linkman.signalPublicKey && webrtcPeers && webrtcPeers.length > 0) {
+        if (!signalProtocol.signalPublicKeys.get(peerId)) {
           signalProtocol.signalPublicKeys.set(peerId, linkman.signalPublicKey)
-          signalSession = await signalProtocol.get(peerId, linkman.connectPeerId, linkman.connectSessionId)
         }
+          signalSession = await signalProtocol.get(peerId, linkman.connectPeerId, linkman.connectSessionId)
       }
       return signalSession
     },
