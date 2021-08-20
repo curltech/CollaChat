@@ -401,11 +401,11 @@ export default {
     }
   },
   methods: {
-    talkHeight(){
+    talkHeight() {
       let _that = this
-      if(_that.$refs.editor){
-        let height = this.$q.height -(_that.$refs.editor.$el.offsetHeight +25+50)
-        document.getElementById('talk').style.height = height+'px'
+      if (_that.$refs.editor) {
+        let height = _that.$q.height - (_that.$refs.editor.$el.offsetHeight + 25 + 50)
+        document.getElementById('talk').style.height = height + 'px'
       }
     },
     switchEmoji() {
@@ -2167,6 +2167,18 @@ export default {
                   await contactComponent.update(ContactDataType.GROUP, groupChatRecord)
                   _that.sendGroupInfo()
               }
+
+              let _type = _that.$i18n.t("Recall Time Limit")
+              let _content = `${store.state.myselfPeerClient.name}${(value? _that.$i18n.t("Add") : _that.$i18n.t("Cancel")) }${_type}`
+              if(_content){
+                  let chat = await store.getChat(groupChat.groupId)
+                  let chatMessage = {
+                      messageType: P2pChatMessageType.CHAT_SYS,
+                      contentType: ChatContentType.EVENT,
+                      content: _content
+                  }
+                  await store.addCHATSYSMessage(chat, chatMessage)
+              }
           }
           _that.$forceUpdate()
     },
@@ -2192,6 +2204,18 @@ export default {
                   groupChatRecord.recallAlert = value
                   await contactComponent.update(ContactDataType.GROUP, groupChatRecord)
                   _that.sendGroupInfo()
+
+                  let _type = _that.$i18n.t("Recall Alert")
+                  let _content = `${store.state.myselfPeerClient.name}${(value? _that.$i18n.t("Add") : _that.$i18n.t("Cancel")) }${_type}`
+                  if(_content){
+                      let chat = await store.getChat(groupChat.groupId)
+                      let chatMessage = {
+                          messageType: P2pChatMessageType.CHAT_SYS,
+                          contentType: ChatContentType.EVENT,
+                          content: _content
+                      }
+                      await store.addCHATSYSMessage(chat, chatMessage)
+                  }
               }
           }
     },
@@ -2426,7 +2450,7 @@ export default {
       } else {
         if (((e.shiftKey && e.keyCode == 50)) && store.state.currentChat.subjectType === SubjectType.GROUP_CHAT) {
           _that.focusGroupMemberDialog = true
-        }else if(Platform.is.mobile){
+        }else if(store.state.ifMobileStyle){
           _that.talkHeight()
         }
       }
@@ -3044,16 +3068,31 @@ export default {
     //audioCaptureComponent.initialize();
   },
   watch: {
-    /*subKind(val) {
+    subKind(val) {
       let _that = this
       let store = _that.$store
       if (store.state.ifMobileStyle) {
-        if (val === 'captureMedia') {
-          statusBarComponent.style(false, '#000000')
-        } else {
-          statusBarComponent.style(true, '#eee')
+        if (store.drawer) {
+          /*if (val === 'captureMedia') {
+            statusBarComponent.style(false, '#000000')
+          } else {
+            statusBarComponent.style(true, '#eee')
+          }*/
+          if (_that.$q.dataBlockService.isActive) {
+            if (val === 'default') {
+              statusBarComponent.style(false, '#2d2d2d')
+            } else {
+              statusBarComponent.style(false, '#1d1d1d')
+            }
+          } else {
+            if (val === 'default') {
+              statusBarComponent.style(true, '#f5f5f5') // grey-2
+            } else {
+              statusBarComponent.style(true, '#ffffff')
+            }
+          }
         }
       }
-    }*/
+    }
   }
 }

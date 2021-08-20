@@ -109,6 +109,12 @@ body.body--light.bgc {
   background: #ffffff !important;
 }
 .body--light {
+  .message-editor-pc .q-field__control {
+    background: #ffffff !important;
+  }
+  .message-editor-pc .q-field__native {
+    background: #ffffff !important;
+  }
   .text-c-white {
     color: #ffffff;
   }
@@ -233,7 +239,10 @@ body.body--light.bgc {
     background: $grey-14;
   }
   .bg-c-grey-message {
-    background: $grey-3;
+    background: $grey-2;
+  }
+  .bg-c-grey-message-editor-pc {
+    background: #ffffff;
   }
 
   .text-i-grey {
@@ -330,6 +339,9 @@ body.body--light.bgc {
     color: $grey-9;
     background-color: $grey-1;
   }
+  .c-separator-message {
+    background: rgba(0, 0, 0, 0.12);
+  }
   .menuIcon {
     color: $primary;
   }
@@ -352,6 +364,12 @@ body.body--dark.bgc {
   background: #1d1d1d !important;
 }
 .body--dark {
+  .message-editor-pc .q-field__control {
+    background: #1d1d1d !important;
+  }
+  .message-editor-pc .q-field__native {
+    background: #1d1d1d !important;
+  }
   .text-c-white {
     color: #000000;
   }
@@ -476,6 +494,9 @@ body.body--dark.bgc {
     background: $grey-11;
   }
   .bg-c-grey-message {
+    background: #2d2d2d;
+  }
+  .bg-c-grey-message-editor-pc {
     background: #1d1d1d;
   }
 
@@ -572,6 +593,9 @@ body.body--dark.bgc {
   .c-separator {
     color: $grey-0;
     background-color: $grey-10;
+  }
+  .c-separator-message {
+    background: rgba(255, 255, 255, 0.28);
   }
   .menuIcon {
     color: $primary;
@@ -894,6 +918,13 @@ body.body--dark.bgc {
 .message-editor-pc{
   height: 60px;
   width: 100%;
+}
+.message-editor-pc .q-field__native{
+  padding: 4px 0px !important;
+}
+.message-editor-pc .q-field__control{
+  padding-left: 16px !important;
+  padding-right: 16px !important;
 }
 .send-btn {
   width: 14%;

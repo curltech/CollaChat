@@ -1435,6 +1435,13 @@ export default {
       /*if (store.state.ifMobileStyle) {
         statusBarComponent.style(true, '#eee')
       }*/
+      if (store.state.ifMobileStyle) {
+        if (_that.$q.dataBlockService.isActive) {
+          statusBarComponent.style(false, '#2d2d2d')
+        } else {
+          statusBarComponent.style(true, '#f5f5f5') // grey-2
+        }
+      }
     },
     async setNetworkStatus(ifOnline) {
       let _that = this
@@ -2758,9 +2765,7 @@ export default {
         }
         if (typeof message === "object" && message.messageType !== P2pChatMessageType.SYNC_LINKMAN_INFO && message.messageType !== P2pChatMessageType.CALL_REQUEST) {
           let signalSession = await _that.getSignalSession(peerId)
-          if (!signalSession) {
-            await logService.log({}, 'signalSessionDoesNotExistError', 'error')
-          } else {
+          if (signalSession) {
             message = await signalSession.encrypt(JSON.stringify(message))
           }
         } else if (message.messageType === P2pChatMessageType.SYNC_LINKMAN_INFO) {
@@ -2788,11 +2793,11 @@ export default {
       let signalSession
       let linkman = store.state.linkmanMap[peerId]
       let webrtcPeers = webrtcPeerPool.getConnected(peerId)
-      if (linkman && webrtcPeers && webrtcPeers.length > 0) {
-        if (!signalProtocol.signalPublicKeys.get(peerId) && linkman.signalPublicKey) {
+      if (linkman && linkman.signalPublicKey && webrtcPeers && webrtcPeers.length > 0) {
+        if (!signalProtocol.signalPublicKeys.get(peerId)) {
           signalProtocol.signalPublicKeys.set(peerId, linkman.signalPublicKey)
-          signalSession = await signalProtocol.get(peerId, linkman.connectPeerId, linkman.connectSessionId)
         }
+        signalSession = await signalProtocol.get(peerId, linkman.connectPeerId, linkman.connectSessionId)
       }
       return signalSession
     },
@@ -3881,9 +3886,17 @@ export default {
             statusBarComponent.style(true, '#eee')
           }*/
           if (_that.$q.dark.isActive) {
-            statusBarComponent.style(false, '#1d1d1d')
+            if (_that.kind === 'message') {
+              statusBarComponent.style(false, '#2d2d2d')
+            } else {
+              statusBarComponent.style(false, '#1d1d1d')
+            }
           } else {
-            statusBarComponent.style(true, '#ffffff')
+            if (_that.kind === 'message') {
+              statusBarComponent.style(true, '#f5f5f5') // grey-2
+            } else {
+              statusBarComponent.style(true, '#ffffff')
+            }
           }
         } else {
           if (store.state.ifScan) {

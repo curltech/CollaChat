@@ -6,8 +6,8 @@
           q-btn(:class="ifMobileSize || $store.state.ifMobileStyle ? '' : 'hidden'" flat round dense icon="keyboard_arrow_left" @click="$store.toggleDrawer(false)")
           q-toolbar-title(align="center" :style="ifMobileSize || $store.state.ifMobileStyle ? '' : 'padding-left:54px'") {{ ChatTitle($store.state.currentChat) }}
           q-btn.btnIcon(flat round dense icon="more_horiz" @click="subKind = $store.state.currentChat.subjectType + 'Details'")
-        q-separator.c-separator.header-mar-top(style="height:1px;margin-left:0px;margin-right:0px" color="c-grey-0")
-        #talk.q-pa-md.bg-c-grey-message.row.justify-center.scroll.q-chat-message(:class="!Platform.is.mobile?'talk-height-pc':(keyboardMode?'talk-height-mobile1':'talk-height-mobile2')")
+        q-separator.c-separator-message.header-mar-top(style="height:1px;margin-left:0px;margin-right:0px")
+        #talk.q-pa-md.bg-c-grey-message.row.justify-center.scroll.q-chat-message(:class="!(ifMobileSize || $store.state.ifMobileStyle)?'talk-height-pc':(keyboardMode?'talk-height-mobile1':'talk-height-mobile2')")
           q-infinite-scroll(style="width:100%" @load="load_message" debounce="100" reverse :offset="50")
             q-chat-message(v-if="$store.state.currentChat && $store.state.currentChat.noMoreMessageTag" @touchstart="preventDefault" :label="$t('No more messages')")
             template(v-for="(message,index) in $store.state.currentChat.messages")
@@ -32,34 +32,34 @@
                       q-item-section {{$t('MultiSelect')}}
                 q-chat-message(v-if='message.messageType === P2pChatMessageType.CHAT_SYS && message.contentType === ChatContentType.EVENT' :label="detailDateFormat(message.createDate)+'</br>'+ message.content")
                 q-chat-message(v-if='message.messageType === P2pChatMessageType.CHAT_SYS && message.contentType === ChatContentType.TIME' :label="detailDateFormat(message.content)")
-        .message-editor-wrap.bg-c-grey-message
+        .message-editor-wrap(:class="ifMobileSize || $store.state.ifMobileStyle ? 'bg-c-grey-message-editor' : 'bg-c-grey-message-editor-pc'")
           .message-editor-area
-            q-toolbar.row(style="height:40px;min-height:40px" v-if="!Platform.is.mobile && !messageMultiSelectMode")
+            q-toolbar.row(style="height:40px;min-height:40px" v-if="!(ifMobileSize || $store.state.ifMobileStyle) && !messageMultiSelectMode")
               q-btn.q-mr-sm.btnIcon(round flat icon="alarm" :disable ='!(!ifSelfChat && activeStatus($store.state.currentChat) && ($store.state.currentChat && $store.state.currentChat.subjectType === SubjectType.CHAT))' @click='destroyClock = true')
                 q-popup-edit(v-model="destroyClock" content-class="" style='width:100px')
                   q-option-group(:options="clockOptions" label="Notifications" type="radio" v-model="$store.state.currentChat.destroyTime")
               q-btn.q-mr-sm.btnIcon(round flat icon="insert_emoticon" @click="switchEmoji")
               div(v-if="emojiShow" @mouseleave = 'emojiPickerBlur')
                 vEmojiPicker.bg-c-grey-0.emoji-dialog#emojiPicker(@select="selectEmoji")
-              q-btn.q-mr-sm.btnIcon(round flat icon="videocam"  :disable="!(!ifSelfChat && activeStatus($store.state.currentChat))" @click="initiateCallRequest('video')")
+              q-btn.q-mr-sm.btnIcon(round flat icon="videocam" :disable="!(!ifSelfChat && activeStatus($store.state.currentChat))" @click="initiateCallRequest('video')")
               q-btn.q-mr-sm.btnIcon(round flat icon="call" :disable="!(!ifSelfChat && activeStatus($store.state.currentChat))" @click="initiateCallRequest('audio')")
               q-btn.q-mr-sm.btnIcon(round flat icon="mic" @click="capture('audio')")
               q-btn.q-mr-sm.btnIcon(round flat icon="camera" @click="capture('video')")
               q-btn.q-mr-sm.btnIcon(round flat icon="bookmarks" @click="openCollection")
               q-btn.q-mr-sm.btnIcon(round flat icon="account_box" @click="selectLinkmanCard")
               q-btn.q-mr-sm.btnIcon(round flat icon="folder" @click="$refs.messageUpload.pickFiles()")
-            q-toolbar.message-operate-wrap(v-if='messageMultiSelectMode' :class = 'Platform.is.mobile?"message-operate-wrap-mobile":"message-operate-wrap-pc"')
+            q-toolbar.message-operate-wrap(v-if='messageMultiSelectMode' :class = 'ifMobileSize || $store.state.ifMobileStyle?"message-operate-wrap-mobile":"message-operate-wrap-pc"')
               q-btn-group.full-width(flat spread stretch)
                 q-btn.btnIcon.btnMessage(flat stack no-caps :label="$t('Forward')" icon="forward" @click="multiForwardMessage('single')")
                 q-btn.btnIcon.btnMessage(flat stack no-caps :label="$t('MultiForward')" icon="forward" @click="multiForwardMessage('multi')")
                 q-btn.btnIcon.btnMessage(flat stack no-caps :label="$t('MultiCollection')" icon="bookmarks" @click="multiCollectionMessage()")
                 q-btn.btnIcon.btnMessage(flat stack no-caps :label="$t('Cancel')" icon="cancel" @click="cancelMessageMultiSelect")
-            q-toolbar.message-operate-wrap(:class = 'Platform.is.mobile?"message-operate-wrap-mobile":"message-operate-wrap-pc"' v-if="!messageMultiSelectMode")
-              q-btn.q-mr-sm.btnIcon(v-if="Platform.is.mobile" round flat icon ='add_circle_outline' @click = "more")
-              q-input.c-field.message-editor(type='textarea' autogrow ref='editor' rows='1' filled input-style='resize:none;max-height:98px;' name="editor" id="editor" v-model= 'textVal' :class = 'Platform.is.mobile?"message-editor-mobile":"message-editor-pc"'
-              @keyup="editorKeyup" @focus="editorFocus" @blur="editorBlur" @paste="editorPaste" @drop="editorDrop")
-              q-btn.btnIcon(v-if="Platform.is.mobile" round flat icon="send" @click = "preSend")
-            q-toolbar.no-padding(style='flex-wrap:wrap' v-if="Platform.is.mobile && !keyboardMode && !messageMultiSelectMode")
+            q-toolbar.message-operate-wrap(:class = 'ifMobileSize || $store.state.ifMobileStyle?"message-operate-wrap-mobile":"message-operate-wrap-pc"' v-if="!messageMultiSelectMode")
+              q-btn.q-mr-sm.btnIcon(v-if="ifMobileSize || $store.state.ifMobileStyle" round flat icon ='add_circle_outline' @click = "more")
+              q-input.c-field.message-editor(type='textarea' autogrow ref='editor' rows='1' filled input-style='resize:none;max-height:98px;' name="editor" id="editor" v-model= 'textVal' :class = 'ifMobileSize || $store.state.ifMobileStyle?"message-editor-mobile":"message-editor-pc"'
+                @keyup="editorKeyup" @focus="editorFocus" @blur="editorBlur" @paste="editorPaste" @drop="editorDrop")
+              q-btn.btnIcon(v-if="ifMobileSize || $store.state.ifMobileStyle" round flat icon="send" @click = "preSend")
+            q-toolbar.no-padding(style='flex-wrap:wrap' v-if="(ifMobileSize || $store.state.ifMobileStyle) && !keyboardMode && !messageMultiSelectMode")
               .col-12
                 q-carousel(v-model="slide" swipeable animated padding control-text-color="c-grey" style="height: 210px")
                   q-carousel-slide(name="slide1" class="q-pa-md")
@@ -119,16 +119,16 @@
               q-item-label {{$t('Sticky Top')}}
             q-item-section(side)
               q-toggle(v-if="$store.state.currentChat && $store.state.linkmanMap[$store.state.currentChat.subjectId]" v-model="$store.state.linkmanMap[$store.state.currentChat.subjectId].top" @input="changeTopSwitch")
-          q-item
+          q-item(v-if="$store.state.currentChat && $store.state.linkmanMap[$store.state.currentChat.subjectId]")
             q-item-section
               q-item-label {{$t('Recall Time Limit')}}
             q-item-section(side)
-              q-toggle(v-if="$store.state.currentChat && $store.state.linkmanMap[$store.state.currentChat.subjectId]" v-model="$store.state.linkmanMap[$store.state.currentChat.subjectId].myselfRecallTimeLimit" @input="changeRecallTimeLimit")
-          q-item
+              q-toggle(v-model="$store.state.linkmanMap[$store.state.currentChat.subjectId].myselfRecallTimeLimit" @input="changeRecallTimeLimit")
+          q-item(v-if="$store.state.currentChat && $store.state.linkmanMap[$store.state.currentChat.subjectId]")
             q-item-section
               q-item-label {{$t('Recall Alert')}}
             q-item-section(side)
-              q-toggle(v-if="$store.state.currentChat && $store.state.linkmanMap[$store.state.currentChat.subjectId]" v-model="$store.state.linkmanMap[$store.state.currentChat.subjectId].myselfRecallAlert" @input="changeRecallAlert")
+              q-toggle(v-model="$store.state.linkmanMap[$store.state.currentChat.subjectId].myselfRecallAlert" @input="changeRecallAlert")
           q-separator.c-separator(style="height:8px;margin-left:0px;margin-right:0px")
           q-item
             q-item-section(align="center")
@@ -234,16 +234,18 @@
               q-item-label {{$t('Sticky Top')}}
             q-item-section(side)
               q-toggle(v-if="$store.state.currentChat && $store.state.groupChatMap[$store.state.currentChat.subjectId]" v-model="$store.state.groupChatMap[$store.state.currentChat.subjectId].top" @input="changeTopSwitch")
-          q-item( v-if="ifIAmGroupOwner($store.state.currentChat)")
+          q-item
             q-item-section
               q-item-label {{$t('Recall Time Limit')}}
             q-item-section(side)
-              q-toggle(v-if="$store.state.currentChat && $store.state.groupChatMap[$store.state.currentChat.subjectId]" v-model="$store.state.groupChatMap[$store.state.currentChat.subjectId].recallTimeLimit" @input="changeRecallTimeLimit")
-          q-item(v-if="ifIAmGroupOwner($store.state.currentChat)")
+              q-toggle(v-if="$store.state.currentChat && $store.state.groupChatMap[$store.state.currentChat.subjectId] && ifIAmGroupOwner($store.state.currentChat)" v-model="$store.state.groupChatMap[$store.state.currentChat.subjectId].recallTimeLimit" @input="changeRecallTimeLimit")
+              q-toggle(v-if="$store.state.currentChat && $store.state.groupChatMap[$store.state.currentChat.subjectId] && !ifIAmGroupOwner($store.state.currentChat)" disable = true v-model="$store.state.groupChatMap[$store.state.currentChat.subjectId].recallTimeLimit")
+          q-item
             q-item-section
               q-item-label {{$t('Recall Alert')}}
             q-item-section(side)
-              q-toggle(v-if="$store.state.currentChat && $store.state.groupChatMap[$store.state.currentChat.subjectId]" v-model="$store.state.groupChatMap[$store.state.currentChat.subjectId].recallAlert" @input="changeRecallAlert")
+              q-toggle(v-if="$store.state.currentChat && $store.state.groupChatMap[$store.state.currentChat.subjectId] && ifIAmGroupOwner($store.state.currentChat)" v-model="$store.state.groupChatMap[$store.state.currentChat.subjectId].recallAlert" @input="changeRecallAlert")
+              q-toggle(v-if="$store.state.currentChat && $store.state.groupChatMap[$store.state.currentChat.subjectId] && !ifIAmGroupOwner($store.state.currentChat)" disable = true  v-model="$store.state.groupChatMap[$store.state.currentChat.subjectId].recallAlert")
           q-separator.c-separator.message-sep-2
           q-item
             q-item-section(align="center")
