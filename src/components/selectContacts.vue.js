@@ -163,6 +163,8 @@ export default {
       groupChat.locked = false
       groupChat.notAlert = false
       groupChat.top = false
+      groupChat.recallTimeLimit = true
+      groupChat.recallAlert = true
       await contactComponent.insert(ContactDataType.GROUP, groupChat, null)
 
       // 新增群组成员，包括自己
