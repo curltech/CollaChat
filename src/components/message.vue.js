@@ -3072,13 +3072,13 @@ export default {
       let _that = this
       let store = _that.$store
       if (store.state.ifMobileStyle) {
-        if (store.drawer) {
+        if (store.getDrawer()) {
           /*if (val === 'captureMedia') {
             statusBarComponent.style(false, '#000000')
           } else {
             statusBarComponent.style(true, '#eee')
           }*/
-          if (_that.$q.dataBlockService.isActive) {
+          if (_that.$q.dark.isActive) {
             if (val === 'default') {
               statusBarComponent.style(false, '#2d2d2d')
             } else {

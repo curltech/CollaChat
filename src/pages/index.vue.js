@@ -1436,7 +1436,7 @@ export default {
         statusBarComponent.style(true, '#eee')
       }*/
       if (store.state.ifMobileStyle) {
-        if (_that.$q.dataBlockService.isActive) {
+        if (_that.$q.dark.isActive) {
           statusBarComponent.style(false, '#2d2d2d')
         } else {
           statusBarComponent.style(true, '#f5f5f5') // grey-2
