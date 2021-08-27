@@ -1056,9 +1056,17 @@ export default {
         } else if (chat.subjectType === SubjectType.GROUP_CHAT) {
           let groupMembers = store.state.groupChatMap[chat.subjectId].groupMembers
           for (let groupMember of groupMembers) {
-            let linkman = store.state.linkmanMap[groupMember.memberPeerId]
-            if(linkman && groupMember.memberPeerId !== myself.myselfPeerClient.peerId){
-              _peers.push(linkman)
+            //let linkman = store.state.linkmanMap[groupMember.memberPeerId]
+            //if (linkman && groupMember.memberPeerId !== myself.myselfPeerClient.peerId) {
+            let memberPeerId = groupMember.memberPeerId
+            if (memberPeerId !== myself.myselfPeerClient.peerId) {
+              let memberPeerClient = await peerClientService.getCachedPeerClient(memberPeerId)
+              if (memberPeerClient) {
+                _peers.push({
+                  peerId: memberPeerId,
+                  publicKey: memberPeerClient.publicKey
+                })
+              }
             }
           }
         }
