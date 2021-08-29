@@ -47,7 +47,9 @@
               q-btn.q-mr-sm.btnIcon(round flat icon="camera" @click="capture('video')")
               q-btn.q-mr-sm.btnIcon(round flat icon="bookmarks" @click="openCollection")
               q-btn.q-mr-sm.btnIcon(round flat icon="account_box" @click="selectLinkmanCard")
-              q-btn.q-mr-sm.btnIcon(round flat icon="folder" @click="$refs.messageUpload.pickFiles()")
+              //q-btn.q-mr-sm.btnIcon(round flat icon="folder" @click="$refs.messageUpload.pickFiles()")
+              label(for="messageUpload" class="notranslate material-icons q-icon btnIcon" aria-hidden="true" style="font-size: 32px;") folder
+              input#messageUpload(type="file" class="visually-hidden" @change="uploadMessageFile()")
             q-toolbar.message-operate-wrap(v-if='messageMultiSelectMode' :class = 'ifMobileSize || $store.state.ifMobileStyle?"message-operate-wrap-mobile":"message-operate-wrap-pc"')
               q-btn-group.full-width(flat spread stretch)
                 q-btn.btnIcon.btnMessage(flat stack no-caps :label="$t('Forward')" icon="forward" @click="multiForwardMessage('single')")
@@ -76,8 +78,11 @@
                       q-btn.btnIcon.btnMessage(flat stack no-caps :label="$t('Collection')" icon="bookmarks" @click="openCollection")
                       q-btn.btnIcon.btnMessage(flat stack no-caps :label="$t('Contact Card')" icon="account_box" @click="selectLinkmanCard")
                   q-carousel-slide(name="slide2" class="q-pa-md")
-                    q-btn-group(flat stretch)
+                    //q-btn-group(flat stretch)
                       q-btn.btnIcon.btnMessage(flat stack no-caps :label="$t('File')" icon="folder" @click="$refs.messageUpload.pickFiles()")
+                    label(for="messageUpload" class="notranslate material-icons q-icon btnIcon" aria-hidden="true" style="font-size: 32px;") folder
+                    input#messageUpload(type="file" class="visually-hidden" @change="uploadMessageFile()")
+                    label(for="messageUpload" class="btnIcon" style="font-size: 12px;padding-left: 4px;") {{ $t('File') }}
               .col-12.text-center
                 .audio-touch#audio-touch(@touchstart="audioTouchStart" @touchmove="audioTouchMove" @touchend="audioTouchEnd")
                   q-icon(size="16px" name="mic" style="vertical-align: text-top;")
@@ -322,7 +327,9 @@
         q-toolbar.header-toolbar
           q-btn(flat round dense icon="keyboard_arrow_left" @click="subKind='GROUP_CHATDetails'")
           q-toolbar-title(align="center" :style="ifIAmGroupOwner($store.state.currentChat) ? '' : 'padding-right:54px'") {{ $t('Group File') + '(' + GroupFileFilteredList.length + ')' }}
-          q-btn.btnIcon(v-if="ifIAmGroupOwner($store.state.currentChat)" flat round dense icon="add_circle_outline" @click="$refs.groupFileUpload.pickFiles()")
+          //q-btn.btnIcon(v-if="ifIAmGroupOwner($store.state.currentChat)" flat round dense icon="add_circle_outline" @click="$refs.groupFileUpload.pickFiles()")
+          label(v-if="ifIAmGroupOwner($store.state.currentChat)" for="groupFileUpload" class="notranslate material-icons q-icon btnIcon" aria-hidden="true" style="font-size: 27px;") add_circle_outline
+          input#groupFileUpload(v-if="ifIAmGroupOwner($store.state.currentChat)" type="file" class="visually-hidden" @change="uploadGroupFile()")
         div.scroll.header-mar-top(id="scroll-target-default" :class="ifMobileSize || $store.state.ifMobileStyle ? 'scrollHeightMobileStyle-editor' : 'scrollHeightStyle'")
           q-toolbar(insert class="q-px-xs")
             q-input.c-field(debounce="100" filled dense v-model="groupFileFilter" :placeholder="placeholder" input-class="text-center iconfont")
@@ -332,7 +339,7 @@
             div(v-for="(groupFile, index) in GroupFileFilteredList" :key="groupFile.blockId")
               q-item(:active-class="ifMobileSize || $store.state.ifMobileStyle ? 'bg-c-grey-1' : 'bg-c-grey-2'" class="text-c-grey-10")
                 q-item-section(avatar)
-                  q-icon.menuIcon(name="folder" color="primary")
+                  q-icon.menuIcon(:name="FileIconName(groupFile.metadata)" color="primary")
                 q-item-section
                   q-item-label(lines="1" clickable v-ripple @click="groupFileSelected(groupFile, index)" ) {{ groupFile.metadata }}
                 q-item-section(side)
@@ -409,8 +416,8 @@
                   img(:src="$store.state.linkmanMap[groupMember.memberPeerId] && $store.state.linkmanMap[groupMember.memberPeerId].avatar ? $store.state.linkmanMap[groupMember.memberPeerId].avatar : $store.defaultActiveAvatar")
               q-item-section(@click="selectedFocusGroupMember(groupMember)")
                 q-item-label {{$store.state.linkmanMap[groupMember.memberPeerId].givenName?$store.state.linkmanMap[groupMember.memberPeerId].givenName:$store.state.linkmanMap[groupMember.memberPeerId].name }}
-    q-uploader(style="display:none" max-file-size="20971520" ref="messageUpload" @added="files => uploadMessageFile(files[0])" label="Custom header" multiple)
-    q-uploader(style="display:none" max-file-size="20971520" ref="groupFileUpload" @added="files => uploadGroupFile(files[0])" label="Custom header" multiple)
+    //q-uploader(style="display:none" ref="messageUpload" @added="files => uploadMessageFile(files[0])")
+    //q-uploader(style="display:none" ref="groupFileUpload" @added="files => uploadGroupFile(files[0])")
     mergeMessageDialog
     noteMessageDialog
 </template>

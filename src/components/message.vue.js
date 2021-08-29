@@ -398,6 +398,26 @@ export default {
         }
       }
       return groupFileFilteredArray
+    },
+    FileIconName() {
+      let _that = this
+      let store = _that.$store
+      return function (metadata) {
+        let iconName = 'insert_drive_file'
+        if (metadata) {
+          let arr = metadata.split('.')
+          let suffix = arr[arr.length - 1]
+          suffix = suffix.toUpperCase()
+          if (suffix === 'JPG' || suffix === 'JPEG' || suffix === 'PNG' || suffix === 'BMP') {
+            iconName = 'image'
+          } else if (suffix === 'MP4' || suffix === 'MPG' || suffix === 'MPEG' || suffix === 'WMV' || suffix === 'MOV' || suffix === 'AVI' || suffix === 'MKV' || suffix === 'FLV') {
+            iconName = 'videocam'
+          } else if (suffix === 'MP3' || suffix === 'MPG' || suffix === 'MPEG' || suffix === 'WMA' || suffix === 'WAV' || suffix === 'APE') {
+            iconName = 'audiotrack'
+          }
+        }
+        return iconName
+      }
     }
   },
   methods: {
@@ -835,40 +855,49 @@ export default {
           store.state.imageMessageViewDialog = false
       }
     },
-    uploadMessageFile: async function (file) {
+    uploadMessageFile: function () {
       let _that = this
       let store = _that.$store
-      let peerId = store.state.currentChat.subjectId
-      let fileType
-      if (file.name) {
-        let index = file.name.lastIndexOf(".");
-        fileType = file.name.substr(index + 1);
-      }
-      let fileData = await BlobUtil.fileObjectToBase64(file)
-      let type, name, fileSize;
-      if (mediaComponent.isAssetTypeAnImage(fileType)) {
-        if (file.size > 2097152) { // 2M
-          _that.$q.notify({
-            message: _that.$i18n.t("Restricted to images, size less than 2M"),
-            timeout: 3000,
-            type: "warning",
-            color: "warning",
-          })
-          _that.$refs.messageUpload.reset()
-          return
+      _that.$nextTick(async () => {
+        let messageUpload = document.getElementById('messageUpload')
+        if (messageUpload && messageUpload.files) {
+          let file = messageUpload.files[0]
+          if (!file) {
+            return
+          }
+          let peerId = store.state.currentChat.subjectId
+          let fileType
+          if (file.name) {
+            let index = file.name.lastIndexOf(".");
+            fileType = file.name.substr(index + 1);
+          }
+          let fileData = await BlobUtil.fileObjectToBase64(file)
+          let type, name, fileSize;
+          if (mediaComponent.isAssetTypeAnImage(fileType)) {
+            /*if (file.size > 2097152) { // 2M
+              _that.$q.notify({
+                message: _that.$i18n.t("Restricted to images, size less than 2M"),
+                timeout: 3000,
+                type: "warning",
+                color: "warning",
+              })
+              _that.$refs.messageUpload.reset()
+              return
+            }*/
+            type = ChatContentType.IMAGE
+          } else if (mediaComponent.isAssetTypeAVideo(fileType)) {
+            type = ChatContentType.VIDEO
+          } else if (mediaComponent.isAssetTypeAnAudio(fileType)) {
+            type = ChatContentType.AUDIO
+          } else {
+            type = ChatContentType.FILE
+          }
+          name = file.name
+          fileSize = file.size
+          await store.saveFileAndSendMessage(store.state.currentChat, fileData, type, name)
+          //_that.$refs.messageUpload.reset()
         }
-        type = ChatContentType.IMAGE
-      } else if (mediaComponent.isAssetTypeAVideo(fileType)) {
-        type = ChatContentType.VIDEO
-      } else if (mediaComponent.isAssetTypeAnAudio(fileType)) {
-        type = ChatContentType.AUDIO
-      } else {
-        type = ChatContentType.FILE
-      }
-      name = file.name
-      fileSize = file.size
-      await store.saveFileAndSendMessage(store.state.currentChat, fileData, type, name)
-      _that.$refs.messageUpload.reset()
+      })
     },
     uploadMobileMessageImage: async function () {
       let _that = this
@@ -2786,13 +2815,11 @@ export default {
       if(store.state.networkStatus === 'CONNECTED'){
         _that.groupFileList = await queryValueAction.queryValue(null, conditionBean)
       }
-      let _messages = await chatComponent.loadMessage(
-          {
-              ownerPeerId: myself.myselfPeerClient.peerId,
-              messageType: P2pChatMessageType.GROUP_FILE,
-              subjectId : currentChat.subjectId
-          })
-          debugger
+      let _messages = await chatComponent.loadMessage({
+        ownerPeerId: myself.myselfPeerClient.peerId,
+        messageType: P2pChatMessageType.GROUP_FILE,
+        subjectId : currentChat.subjectId
+      })
       if(_messages && _messages.length > 0) {
         if(store.state.networkStatus === 'CONNECTED'){
           //只做比较删除，下载到本地后才会新增
@@ -2823,54 +2850,63 @@ export default {
       }
       console.log('groupFileList:' + JSON.stringify(_that.groupFileList))
     },
-    async uploadGroupFile(file) {
+    uploadGroupFile() {
       let _that = this
       let store = _that.$store
-      _that.$q.loading.show()
-      let peerId = store.state.currentChat.subjectId
-      let fileType
-      if (file.name) {
-        let index = file.name.lastIndexOf(".");
-        fileType = file.name.substr(index + 1);
-      }
-      let fileData = await BlobUtil.fileObjectToBase64(file)
-      let type, name, fileSize;
-      if (mediaComponent.isAssetTypeAnImage(fileType)) {
-        if (file.size > 2097152) { // 2M
-          _that.$q.notify({
-            message: _that.$i18n.t("Restricted to images, size less than 2M"),
-            timeout: 3000,
-            type: "warning",
-            color: "warning",
-          })
-          _that.$refs.groupFileUpload.reset()
-          return
+      _that.$nextTick(async () => {
+        let groupFileUpload = document.getElementById('groupFileUpload')
+        if (groupFileUpload && groupFileUpload.files) {
+          let file = groupFileUpload.files[0]
+          if (!file) {
+            return
+          }
+          _that.$q.loading.show()
+          let peerId = store.state.currentChat.subjectId
+          let fileType
+          if (file.name) {
+            let index = file.name.lastIndexOf(".")
+            fileType = file.name.substr(index + 1)
+          }
+          let fileData = await BlobUtil.fileObjectToBase64(file)
+          let type, name, fileSize
+          if (mediaComponent.isAssetTypeAnImage(fileType)) {
+            /*if (file.size > 2097152) { // 2M
+              _that.$q.notify({
+                message: _that.$i18n.t("Restricted to images, size less than 2M"),
+                timeout: 3000,
+                type: "warning",
+                color: "warning",
+              })
+              _that.$refs.groupFileUpload.reset()
+              return
+            }*/
+            type = ChatContentType.IMAGE
+          } else if (mediaComponent.isAssetTypeAVideo(fileType)) {
+            type = ChatContentType.VIDEO
+          } else if (mediaComponent.isAssetTypeAnAudio(fileType)) {
+            type = ChatContentType.AUDIO
+          } else {
+            type = ChatContentType.FILE
+          }
+          name = file.name
+          fileSize = file.size
+          let chat = store.state.currentChat
+          let message = {}
+          message.ownerPeerId = myself.myselfPeerClient.peerId
+          message.messageId = UUID.string(null, null)
+          message.messageType = P2pChatMessageType.GROUP_FILE
+          message.subjectId = peerId
+          message.fileSize = StringUtil.getSize(fileData)
+          message.contentType = type
+          // 云端保存
+          await store.saveFileInMessage(chat, message, fileData, type, name, message.messageId)
+          // 群主新增群文件后保存本地不发送
+          await chatComponent.insert(ChatDataType.MESSAGE, message)
+          //_that.$refs.groupFileUpload.reset()
+          await _that.getGroupFileList()
+          _that.$q.loading.hide()
         }
-        type = ChatContentType.IMAGE
-      } else if (mediaComponent.isAssetTypeAVideo(fileType)) {
-        type = ChatContentType.VIDEO
-      } else if (mediaComponent.isAssetTypeAnAudio(fileType)) {
-        type = ChatContentType.AUDIO
-      } else {
-        type = ChatContentType.FILE
-      }
-      name = file.name
-      fileSize = file.size
-      let chat = store.state.currentChat
-      let message = {}
-      message.ownerPeerId = myself.myselfPeerClient.peerId
-      message.messageId = UUID.string(null, null)
-      message.messageType = P2pChatMessageType.GROUP_FILE
-      message.subjectId = peerId
-      message.fileSize = StringUtil.getSize(fileData)
-      message.contentType = type
-      // 云端保存
-      await store.saveFileInMessage(chat, message, fileData, type, name, message.messageId)
-      // 群主新增群文件后保存本地不发送
-      await chatComponent.insert(ChatDataType.MESSAGE, message)
-      _that.$refs.groupFileUpload.reset()
-      await _that.getGroupFileList()
-      _that.$q.loading.hide()
+      })
     },
     confirmRemoveGroupFile(groupFile) {
       let _that = this
