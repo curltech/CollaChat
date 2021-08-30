@@ -3169,12 +3169,14 @@ Audio.prototype = {
         // tabs 的配置
         var tabsConfig = [{
             title: '音频',
-            tpl: '<div class="w-e-up-img-container">\n                    <div id="' + upTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-upload1"></i>\n                    </div>\n                    <div id="' + captureTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-capture-audio"></i>\n                    </div>\n                    <div style="display:none;">\n                        <input id="' + upFileId + '" type="file" multiple="multiple" accept="audio/mp3"/>\n                    </div>\n                </div>',
-            events: [{
+            tpl: //'<div class="w-e-up-img-container">\n                    <div id="' + upTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-upload1"></i>\n                    </div>\n                    <div id="' + captureTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-capture-audio"></i>\n                    </div>\n                    <div style="display:none;">\n                        <input id="' + upFileId + '" type="file" multiple="multiple" accept="audio/mp3"/>\n                    </div>\n                </div>',
+                 '<div class="w-e-up-img-container">\n                    <div id="' + upTriggerId + '" class="w-e-up-btn">\n                        <label for="' + upFileId + '" class="w-e-icon-upload1"></label>\n                    <input id="' + upFileId + '" type="file" multiple="multiple" accept="audio/mp3" class="visually-hidden"/>\n                    </div>\n                    <div id="' + captureTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-capture-audio"></i>\n                    <input id="placeholder" type="file" multiple="multiple" accept="audio/mp3" class="visually-hidden"/>\n                    </div>',
+            events: [/*{
                 // 触发选择音频
                 selector: '#' + upTriggerId,
                 type: 'click',
                 fn: function fn() {
+                    console.log('trigger click')
                     var selectAudio = config.selectAudio;
                     var ifMobile = config.ifMobile;
                     if (selectAudio && typeof selectAudio === 'function' && ifMobile) {
@@ -3192,11 +3194,12 @@ Audio.prototype = {
                         }
                     }
                 }
-            }, {
+            }, */{
                 // 选择音频完毕
                 selector: '#' + upFileId,
                 type: 'change',
                 fn: function fn() {
+                    console.log('file change')
                     var $file = $('#' + upFileId);
                     var fileElem = $file[0];
                     if (!fileElem) {
@@ -3218,6 +3221,7 @@ Audio.prototype = {
                 selector: '#' + captureTriggerId,
                 type: 'click',
                 fn: function fn() {
+                    console.log('capture click')
                     var captureAudio = config.captureAudio;
                     if (captureAudio && typeof captureAudio === 'function') {
                         editor.cmd.do('insertHTML', '([{PHFI}])');
@@ -3234,6 +3238,7 @@ Audio.prototype = {
                 selector: '#' + linkBtnId,
                 type: 'click',
                 fn: function fn() {
+                    console.log('link click')
                     var $linkUrl = $('#' + linkUrlId);
                     var url = $linkUrl.val().trim();
 

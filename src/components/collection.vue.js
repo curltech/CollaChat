@@ -779,13 +779,13 @@ export default {
         store.captureType = type
         _that.subKind = 'captureMedia'
       } else if (store.safari === true) {
-        if (type === 'image') {
+        //if (type === 'image') {
           store.captureMediaEntry = 'collection'
           store.captureType = type
           _that.subKind = 'captureMedia'
-        } else {
+        /*} else {
           console.error('Not support browser safari!')
-        }
+        }*/
       }
     },
     async select(type) {

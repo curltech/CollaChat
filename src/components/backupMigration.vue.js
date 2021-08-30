@@ -158,11 +158,6 @@ export default {
       newPayload.srcPeerId = clientPeerId
       await chatAction.chat(null, newPayload, clientPeerId)
     },
-    restore: function () {
-      let _that = this
-      let store = _that.$store
-      _that.$refs.upload.pickFiles()
-    },
     exportJson: async function() {
       let _that = this
       let store = _that.$store
