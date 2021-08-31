@@ -1032,7 +1032,6 @@ export default {
           message.messageType = P2pChatMessageType.CHAT_LINKMAN
           await store.saveFileInMessage(chat, message, item.content, item.collectionType, item.title, message.messageId)
         } else {
-          debugger
           message.content = item.plainContent
         }
         message.messageType = P2pChatMessageType.CHAT_LINKMAN

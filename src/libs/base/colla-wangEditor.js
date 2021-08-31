@@ -4620,16 +4620,16 @@ UploadImg.prototype = {
         }
 
         if (type === 'image') {
-            editor.cmd.do('insertHTML', '<img src="' + link + '" style="max-width:50%;width:100%;"/>' + '<p><br></p>');
+            editor.cmd.do('insertHTML', '<p><br></p>' + '<img src="' + link + '" style="max-width:50%;width:100%;"/>' + '<p><br></p>');
         } else if (type === 'video' || type === 'audio') {
             if (isBase64) {
                 if (type === 'video') {
-                    editor.cmd.do('insertHTML', '<video src="' + link + '" style="max-width:50%;width:100%;" autoplay controls webkit-playsinline playsinline x5-playsinline x-webkit-airplay="allow"/>' + '<p><br></p>');
+                    editor.cmd.do('insertHTML', '<p><br></p>' + '<video src="' + link + '" style="max-width:50%;width:100%;" autoplay controls webkit-playsinline playsinline x5-playsinline x-webkit-airplay="allow"/>' + '<p><br></p>');
                 } else if (type === 'audio') {
-                    editor.cmd.do('insertHTML', '<audio src="' + link + '" style="max-width:100%;width:100%;" controls/>' + '<p><br></p>');
+                    editor.cmd.do('insertHTML', '<p><br></p>' + '<audio src="' + link + '" style="max-width:100%;width:100%;" controls/>' + '<p><br></p>');
                 }
             } else {
-                editor.cmd.do('insertHTML', link + '<p><br></p>');
+                editor.cmd.do('insertHTML', '<p><br></p>' + link + '<p><br></p>');
             }
         }
 

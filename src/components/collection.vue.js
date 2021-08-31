@@ -1399,6 +1399,7 @@ export default {
       let _that = this
       let html = _that.myCollections.c_meta.current.content
       html = html.replace('<p>\(\[\{PHFI\}\]\)<br></p>', '')
+      html = html.replace('\(\[\{PHFI\}\]\)', '')
       _that.myCollections.c_meta.current.content = html
       editor.txt.html(html)
     },
