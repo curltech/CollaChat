@@ -87,6 +87,19 @@ export default {
     },
   },
   methods: {
+      changeAudioToggle(){
+          let _that = this
+          let store = _that.$store
+          if(AudioToggle){
+              if(_that.audioToggle === "speaker"){
+                  _that.audioToggle = "earpiece"
+                  AudioToggle.setAudioMode(AudioToggle.EARPIECE);
+              }else{
+                  _that.audioToggle = "speaker"
+                  AudioToggle.setAudioMode(AudioToggle.SPEAKER);
+              }
+          }
+      },
     changeChatMute(){
       let _that = this
       let store = _that.$store
@@ -453,14 +466,23 @@ export default {
         let callChat = store.state.currentCallChat
         let senderPeerId = message.senderPeerId
         if(callChat && callChat.subjectId === message.subjectId){
-          let webrtcPeers = await webrtcPeerPool.get(senderPeerId)
-          if (webrtcPeers && webrtcPeers.length > 0) {
-            for (let webrtcPeer of webrtcPeers) {
-              let _cloneStream = callChat.streamMap[callChat.ownerPeerId].stream.clone()
-              _that.localCloneStream[senderPeerId] = _cloneStream
-              webrtcPeer.addStream(_cloneStream)
-            }
-          }
+
+
+
+
+          let option = {}
+          let _cloneStream = callChat.streamMap[callChat.ownerPeerId].stream.clone()
+          option.stream = _cloneStream
+          webrtcPeerPool.create(senderPeerId, option)
+
+          // let webrtcPeers = await webrtcPeerPool.get(senderPeerId)
+          // if (webrtcPeers && webrtcPeers.length > 0) {
+          //   for (let webrtcPeer of webrtcPeers) {
+          //     let _cloneStream = callChat.streamMap[callChat.ownerPeerId].stream.clone()
+          //     _that.localCloneStream[senderPeerId] = _cloneStream
+          //     webrtcPeer.addStream(_cloneStream)
+          //   }
+          // }
           if(callChat.callMessage.hasAddStream){
             callChat.callMessage.hasAddStream[senderPeerId] = senderPeerId
           }else{
@@ -751,7 +773,6 @@ export default {
     Vue.prototype.acceptGroupCall = _that.acceptGroupCall
     Vue.prototype.sendCallCloseMessage  = _that.sendCallCloseMessage
     Vue.prototype.pendingCall = _that.pendingCall
-      window._that = this
   },
   created() {
   }

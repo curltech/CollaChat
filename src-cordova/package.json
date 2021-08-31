@@ -55,7 +55,8 @@
     "cordova-plugin-whitelist": "^1.3.4",
     "es6-promise-plugin": "^4.2.2",
     "pouchdb-adapter-cordova-sqlite": "^2.0.7",
-    "sqli-cordova-disk-space-plugin": "^1.0.3"
+    "sqli-cordova-disk-space-plugin": "^1.0.3",
+    "cordova-plugin-audiotoggle": "^1.0.3"
   },
   "devDependencies": {
     "cordova-android": "^8.1.0",
@@ -126,7 +127,8 @@
       "cordova-plugin-android-permissions": {},
       "cordova-plugin-compat": {},
       "com.rjfun.cordova.httpd-curltech": {},
-      "cordova-plugin-ionic-webview-curltech": {}
+      "cordova-plugin-ionic-webview-curltech": {},
+      "cordova-plugin-audiotoggle": {}
     },
     "platforms": [
       "ios",
