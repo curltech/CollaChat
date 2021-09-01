@@ -26,7 +26,7 @@
                 q-btn.btnIcon(unelevated round color="primary" icon="cached" @click="zoomVideoChange" v-if="Platform.is.ios")
                 q-btn.btnIcon(v-if = " $store.state.currentCallChat.stream && (Platform.is.android || showMore)" unelevated round color="primary" :icon="audioToggle === 'speaker'?'volume_off':'volume_up'" @click="changeAudioToggle")
                 q-btn.btnIcon(v-if = "(!(ifMobileSize || $store.state.ifMobileStyle) && $store.state.currentCallChat.stream) ||((ifMobileSize || $store.state.ifMobileStyle) && $store.state.currentCallChat.stream && showMore)" unelevated round color="primary" :icon="chatMute?'volume_off':'volume_up'" @click="changeChatMute")
-                q-space(v-if = "!(ifMobileSize || $store.state.ifMobileStyle) || $store.state.currentCallChat.stream")
+                q-space(v-if = "(!(ifMobileSize || $store.state.ifMobileStyle)&& !(canCall()===true)) || $store.state.currentCallChat.stream")
                 q-btn.btnIcon(unelevated round color="red" icon="call_end" @click="closeCall")
                 q-space
                 q-btn.btnIcon(v-if = "(!(ifMobileSize || $store.state.ifMobileStyle) && $store.state.currentCallChat.stream) ||((ifMobileSize || $store.state.ifMobileStyle) && $store.state.currentCallChat.stream && showMore)" unelevated round color="primary" :icon="chatMic?'mic':'mic_off'"  @click="changeChatMic")
@@ -77,7 +77,7 @@
                     span(ref="mediaTimer")
                 q-btn.btnIcon(v-if = "(ifMobileSize || $store.state.ifMobileStyle) && $store.state.currentCallChat.stream" unelevated round color="primary" :icon="audioToggle === 'speaker'?'volume_off':'volume_up'" @click="changeAudioToggle")
                 q-btn.btnIcon(v-if = "(!(ifMobileSize || $store.state.ifMobileStyle) && $store.state.currentCallChat.stream) ||((ifMobileSize || $store.state.ifMobileStyle) && $store.state.currentCallChat.stream && showMore)" unelevated round  color="primary" :icon="chatMute?'volume_off':'volume_up'" @click="changeChatMute")
-                q-space(v-if = "!(ifMobileSize || $store.state.ifMobileStyle) || $store.state.currentCallChat.stream")
+                q-space(v-if = "(!(ifMobileSize || $store.state.ifMobileStyle)&& !(canCall()===true)) || $store.state.currentCallChat.stream")
                 q-btn.btnIcon(unelevated round color="red" icon="call_end" v-close-popup @click="closeCall")
                 q-space
                 q-btn.btnIcon(v-if = "(!(ifMobileSize || $store.state.ifMobileStyle) && $store.state.currentCallChat.stream) ||((ifMobileSize || $store.state.ifMobileStyle) && $store.state.currentCallChat.stream && showMore)"  unelevated round color="primary" :icon="chatMic?'mic':'mic_off'"  @click="changeChatMic")
