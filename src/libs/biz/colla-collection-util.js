@@ -308,14 +308,14 @@ import { P2pChatMessageType } from '@/libs/biz/colla-chat'
       }
       if (content) {
         if (type === 'image') {
-          insertHtml += '<img src="' + content + '" style="max-width:50%;width:100%;"/>' + '<p><br></p>'
+          insertHtml += '<p><br></p>' + '<img src="' + content + '" style="max-width:50%;width:100%;"/>' + '<p><br></p>'
         } else if (type === 'video') {
           let thumbnail = await mediaComponent.createVideoThumbnailByBase64(content)
-          insertHtml += '<video src="' + content + '" poster="' + thumbnail + '" style="max-width:50%;width:100%;" controls webkit-playsinline playsinline x5-playsinline x-webkit-airplay="allow"/>' + '<p><br></p>'
+          insertHtml += '<p><br></p>' + '<video src="' + content + '" poster="' + thumbnail + '" style="max-width:50%;width:100%;" controls webkit-playsinline playsinline x5-playsinline x-webkit-airplay="allow"/>' + '<p><br></p>'
         } else if (type === 'audio') {
-          insertHtml += '<audio src="' + content + '" style="max-width:100%;width:100%;" controls/>' + '<p><br></p>'
+          insertHtml += '<p><br></p>' + '<audio src="' + content + '" style="max-width:100%;width:100%;" controls/>' + '<p><br></p>'
         } else {
-          insertHtml += '<p>' + content + '</p>' + '<p><br></p>'
+          insertHtml += '<p><br></p>' + '<p>' + content + '</p>' + '<p><br></p>'
         }
       }
     }

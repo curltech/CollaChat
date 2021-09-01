@@ -4629,7 +4629,7 @@ UploadImg.prototype = {
                     editor.cmd.do('insertHTML', '<p><br></p>' + '<audio src="' + link + '" style="max-width:100%;width:100%;" controls/>' + '<p><br></p>');
                 }
             } else {
-                editor.cmd.do('insertHTML', '<p><br></p>' + link + '<p><br></p>');
+                editor.cmd.do('insertHTML', '<p><br></p>' + '<p>' + link + '</p>' + '<p><br></p>');
             }
         }
 
