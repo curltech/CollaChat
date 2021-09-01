@@ -844,10 +844,9 @@ export default {
       let files = []
       for (let u of urls) {
         if (u) {
-          let localURL = null
           let blob = null
           if ((store.ios === true || store.android === true) && (u.localURL || u.uri)) {
-            localURL = u.localURL
+            let localURL = u.localURL
             if (!localURL) { // 使用mediaPicker时
               localURL = u.uri
             }
@@ -855,28 +854,28 @@ export default {
             let type = u.type
             if (!type && u.name) {
               let unameType = u.name.split('.')[1]
-              if (unameType === 'jpg') {
+              if (unameType.toUpperCase() === 'JPG') {
                 type = 'image/jpeg'
-              } else if (unameType === 'mp4') {
+              } else if (unameType.toUpperCase() === 'MP4') {
                 type = 'video/mp4'
-              } else if (unameType === 'wav') {
+              } else if (unameType.toUpperCase() === 'WAV') {
                 type = 'audio/wav'
               }
             }
             if (store.ios === true && localURL) {
-              if (localURL.indexOf('.HEIC') > -1) {
+              if (localURL.toUpperCase().indexOf('.HEIC') > -1) {
                 u.quality = 99
                 u = await mediaPickerComponent.compressImage(u)
                 localURL = u.uri
                 console.log('localURL2:' + localURL)
                 type = 'image/jpeg'
-              } else if (localURL.indexOf('.JPG') > -1) {
+              } else if (localURL.toUpperCase().indexOf('.JPG') > -1) {
                 type = 'image/jpeg'
-              } if (localURL.indexOf('.PNG') > -1) {
+              } if (localURL.toUpperCase().indexOf('.PNG') > -1) {
                 type = 'image/png'
-              } else if (localURL.indexOf('.mp4') > -1) {
+              } else if (localURL.toUpperCase().indexOf('.MP4') > -1) {
                 type = 'video/mp4'
-              } else if (localURL.indexOf('.MOV') > -1) {
+              } else if (localURL.toUpperCase().indexOf('.MOV') > -1) {
                 let fileEntry = await fileComponent.getFileEntry(localURL)
                 blob = await fileComponent.readFile(fileEntry, { format: 'blob', type: type })
                 let base64 = await BlobUtil.fileObjectToBase64(blob)

@@ -17,8 +17,8 @@
         span {{message.content}}
       q-btn(v-if = "message.contentType === ChatContentType.AUDIO" flat round icon="play_arrow" :label="message.content?message.content:''" @click = '$store.getMessageFileAndOpen(message)')
       div(v-if = "message.contentType === ChatContentType.VIDEO"  @click = '$store.getMessageFileAndOpen(message)')
-        q-icon.video-thumbnail-icon( size="32px" name="play_circle_outline")
-        img.video-thumbnail-img(:src="message.thumbnail")
+        q-img(:src="message.thumbnail" style="width: 100px;")
+          q-icon(size="32px" name="play_circle_outline" color="white" style="top: 50%; left: 50%; margin-top: -16px; margin-left: -16px;")
       q-btn(v-if = "message.contentType === ChatContentType.VIDEO_INVITATION ||message.contentType == ChatContentType.AUDIO_INVITATION" color="secondary" text-color="grey-1" @click="acceptGroupCall(message)" :icon="message.contentType=='videoInvitation'?'videocam':'call'" style="width: 100%")
         span(v-if="message.contentType === ChatContentType.VIDEO_INVITATION") {{$t('join video')}}
         span(v-if="message.contentType === ChatContentType.AUDIO_INVITATION") {{$t('join audio')}}

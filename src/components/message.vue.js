@@ -568,14 +568,28 @@ export default {
       let files = []
       for (let u of urls) {
         if (u) {
-          let localURL = u.localURL
           let blob = null
-          if (store.ios === true || store.android === true) {
+          if ((store.ios === true || store.android === true) && (u.localURL || u.uri)) {
+            let localURL = u.localURL
+            if (!localURL) { // 使用mediaPicker时
+              localURL = u.uri
+            }
+            console.log('localURL:' + localURL)
             let type = u.type
-            if (localURL.indexOf('.HEIC') > -1) {
-                u.quality = 99
-                u = await mediaPickerComponent.compressImage(u)
-                localURL = u.uri
+            if (!type && u.name) {
+              let unameType = u.name.split('.')[1]
+              if (unameType.toUpperCase() === 'JPG') {
+                type = 'image/jpeg'
+              } else if (unameType.toUpperCase() === 'MP4') {
+                type = 'video/mp4'
+              } else if (unameType.toUpperCase() === 'WAV') {
+                type = 'audio/wav'
+              }
+            }
+            if (localURL && localURL.toUpperCase().indexOf('.HEIC') > -1) {
+              u.quality = 99
+              u = await mediaPickerComponent.compressImage(u)
+              localURL = u.uri
             }
             let fileEntry = await fileComponent.getFileEntry(localURL)
             blob = await fileComponent.readFile(fileEntry, { format: 'blob', type: type })
@@ -634,7 +648,7 @@ export default {
       let _that = this
       let store = _that.$store
       let fileData = _that.videoUrl
-      await store.saveFileAndSendMessage(store.state.currentChat,fileData, ChatContentType.VIDEO, null)
+      await store.saveFileAndSendMessage(store.state.currentChat, fileData, ChatContentType.VIDEO, null)
     },
     async reverseCamera() {
       let _that = this
