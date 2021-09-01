@@ -954,7 +954,7 @@ export default {
         await store.saveFileAndSendMessage(store.state.currentChat, fileData, ChatContentType.IMAGE)
       })
     },
-    preSend() {
+    async preSend() {
       let _that = this
       let store = _that.$store
       let editor = _that.$refs.editor
@@ -978,10 +978,18 @@ export default {
         messageType: P2pChatMessageType.CHAT_LINKMAN
       }
 
-      store.sendChatMessage(store.state.currentChat, message)
+      await store.sendChatMessage(store.state.currentChat, message)
       _that.textVal = ''
       _that.sending = false
       editor.focus();
+      _that.$nextTick(() => {
+          let container = document.getElementById('talk')
+          if (container) {
+              setTimeout(function () {
+                  container.scrollTop = container.scrollHeight
+              }, 100)
+          }
+      })
     },
     async recallMessage(message,index){
       let _that = this
