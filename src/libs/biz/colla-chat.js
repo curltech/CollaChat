@@ -716,7 +716,7 @@ export let ChatMessageStatus = {
          delete attach['content_']
        }
      } else {
-       await pounchDb.execute('chatAttach', attachs, [], null)
+       await pounchDb.execute('chatAttach', attachs, [], current.attachs)
      }
    }
    async loadLocalAttach(attachBlockId, from) {
@@ -755,6 +755,7 @@ export let ChatMessageStatus = {
              if (content_) {
                let payload = await SecurityPayload.decrypt(content_, securityParams)
                //d.content = StringUtil.decodeURI(payload)
+               d.content = payload
              }
            }
          }

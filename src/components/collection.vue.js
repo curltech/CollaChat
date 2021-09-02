@@ -621,7 +621,7 @@ export default {
       _that.myCollections.c_meta.current = item
       _that.myCollections.c_meta.currentIndex = index
       let collectionType = item.collectionType
-      if (store.collectionEntry !== 'message') {
+      /*if (store.collectionEntry !== 'message') {
         // if (item.collectionType !== CollectionType.CHAT) {
           if (collectionType === CollectionType.NOTE) {
             _that.backupContent = _that.myCollections.c_meta.current.blockId + ':' + _that.myCollections.c_meta.current.content
@@ -635,9 +635,9 @@ export default {
         //   }
         //   store.state.currentMergeMessage = message
         // }
-      } else {
+      } else {*/
         _that.subKind = 'view'
-      }
+      //}
     },
     doneSelectCollectionItem() {
       let _that = this
@@ -1166,25 +1166,35 @@ export default {
           id: 'cancel'
         }
       ]
-      if(collection.collectionType !== CollectionType.VOICE){
+      if (collection.collectionType === CollectionType.NOTE) {
+        actions.unshift({
+          label: _that.$i18n.t('Edit'),
+          icon: 'edit',
+          id: 'edit'
+        },{})
+      }
+      if (collection.collectionType !== CollectionType.NOTE && collection.collectionType !== CollectionType.VOICE && collection.collectionType !== CollectionType.FILE) {
+        actions.unshift({
+          label: _that.$i18n.t('Save as Note'),
+          icon: 'notes',
+          id: 'saveAsNote'
+        },{})
+      }
+      if (collection.collectionType !== CollectionType.VOICE) {
         actions.unshift({
           label: _that.$i18n.t('Forward'),
           icon: 'forward',
           id: 'forward'
-        })
-        if(collection.collectionType !== CollectionType.FILE ){
-          actions.unshift({
-            label: _that.$i18n.t('Save as Note'),
-            icon: 'notes',
-            id: 'saveAsNote'
-          })
-        }
+        },{})
       }
       _that.$q.bottomSheet({
         actions: actions
       }).onOk(async action => {
         // console.log('Action chosen:', action.id)
-        if (action.id === 'forward') {
+        if (action.id === 'edit') {
+          _that.backupContent = _that.myCollections.c_meta.current.blockId + ':' + _that.myCollections.c_meta.current.content
+          _that.subKind = 'edit'
+        } else if (action.id === 'forward') {
           store.selectChatEntry = 'collectionForward'
           _that.subKind = 'selectChat'
         } else if (action.id === 'openInOtherApp') {

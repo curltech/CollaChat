@@ -19,7 +19,7 @@ import * as CollaConstant from '@/libs/base/colla-constant'
 import { statusBarComponent, deviceComponent, localNotificationComponent, inAppBrowserComponent } from '@/libs/base/colla-cordova'
 import { cameraComponent, systemAudioComponent, mediaComponent } from '@/libs/base/colla-media'
 import { fileComponent } from '@/libs/base/colla-cordova'
-import { CollectionType } from '@/libs/biz/colla-collection'
+import { CollectionType, collectionComponent } from '@/libs/biz/colla-collection'
 import { ChatDataType, ChatContentType, ChatMessageStatus, P2pChatMessageType, SubjectType, chatComponent, chatBlockComponent} from '@/libs/biz/colla-chat'
 import { ContactDataType, RequestType, RequestStatus, LinkmanStatus, ActiveStatus, contactComponent, MemberType } from '@/libs/biz/colla-contact'
 import { collectionUtil, blockLogComponent } from '@/libs/biz/colla-collection-util'
@@ -983,9 +983,20 @@ export default {
         }
       })
     },
-    async collectionForwardToChat(item,chat) {
+    async collectionForwardToChat(item, chat) {
       let _that = this
       let store = _that.$store
+      // put content into attach
+      if (!item.content) {
+        let attachs = await collectionComponent.loadAttach(item, null, null)
+        if (attachs && attachs.length > 0) {
+          item.attachs = attachs
+          item.content = attachs[0].content
+        }
+        if (!item.content) {
+          item.content = ''
+        }
+      }
       if (item.collectionType === CollectionType.FILE || item.collectionType === CollectionType.VIDEO || item.collectionType === CollectionType.AUDIO || item.collectionType === CollectionType.IMAGE) {
         let _content = item.content
         let name
