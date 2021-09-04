@@ -19,8 +19,8 @@ export let SrcChannelType = {
 }
 
 export let SrcEntityType = {
-	'MYSELF': null,
-	'LINKMAN': null
+	'MYSELF': 'MYSELF',
+	'LINKMAN': 'LINKMAN'
 }
 
 export let CollectionType = {
@@ -47,13 +47,11 @@ export class Collection {
 		 */
 		this.collectionType = null
 		/**
-		 * 文章标题，文本内容，作者，作者头衔
+		 * 内容，作者，标题
 		 */
-		this.head = null
 		this.content = null
 		this.plainContent = null
 		this.pyPlainContent = null
-		this.author = null
 		this.title = null
 		/**
 		 * 收藏来源渠道类型，来源渠道ID，来源渠道名称，来源对象类型，来源对象ID，来源对象名称
@@ -74,16 +72,10 @@ export class Collection {
 		 */
 		this.blockId = null
 		/**
-		 * 缩略图、整个文章以及hash和签名
+		 * 缩略图
 		 */
 		this.thumbnail = null
 		this.thumbType = null
-		/**
-		 * 数组：文件的名称，类型，实际内容
-		 * this.kind = null;this.name = null;
-		 * 文件类型或者媒体类型this.mimeType = null;this.content = null;
-		 */
-		this.attachs = null
 		this.contentTitle = null
 		this.contentBody = null
 		this.firstFileInfo = null
@@ -94,25 +86,22 @@ export class Collection {
 		this.attachAAmount = null
 		this.attachOAmount = null
 		this.attachAmount = null
+		/**
+		 * 其它信息
+		 */
+		this.attachs = null
+		this.payloadKey = null
 		this.payloadHash = null
 		this.signature = null
-		this.status = null
-		this.statusReason = null
-		this.statusDate = null
-		this.primaryPeerId = null
-		/**
-		 * primary peer的publicKey
-		 */
-		this.primaryPublicKey = null
-		this.primaryAddress = null
-		this.payloadKey = null
 		this.versionFlag = null
+		this.primaryPeerId = null
 	}
 }
 
 export class Attach {
 	constructor() {
 		this._id = null
+		this.ownerPeerId = null // 区分本地不同peerClient属主
 		this.collectionId = null
 		this.mimeType = null
 		this.content = null
@@ -393,6 +382,7 @@ export class CollectionComponent {
 				}*/
 				attach.state = current.state
 				attach.collectionId = current._id
+				attach.ownerPeerId = myself.myselfPeerClient.peerId
 				if (EntityState.Deleted !== current.state) {
 					if (myself.myselfPeerClient.localDataCryptoSwitch === true) {
 						if (attach.content) {

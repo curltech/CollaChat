@@ -5,7 +5,7 @@
         q-toolbar
           q-btn(:class="ifMobileSize || $store.state.ifMobileStyle ? '' : 'hidden'" flat round dense icon="keyboard_arrow_left" @click="$store.toggleDrawer(false)")
           q-toolbar-title(align="center" :style="ifMobileSize || $store.state.ifMobileStyle ? '' : 'padding-left:54px'") {{$t('Contacts Requests')}}
-          q-btn.btnIcon(flat round dense icon="send" @click="subKind = 'sentList'" no-caps)
+          q-btn.btnIcon(flat round dense icon="send" @click="subKind = 'sentList'")
         q-list
           div(v-for="(linkmanRequest, index) in $store.state.linkmanRequests" v-if="linkmanRequest.receiverPeerId === $store.state.myselfPeerClient.peerId" :key="linkmanRequest._id")
             q-item(class="q-px-xs")

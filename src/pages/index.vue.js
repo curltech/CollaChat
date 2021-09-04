@@ -41,6 +41,8 @@ import FindContacts from '@/components/findContacts'
 import Channel from '@/components/channel'
 import Collection from '@/components/collection'
 import VideoChat from '@/components/videoChat'
+import ChannelDetails from '@/components/channelDetails'
+import NewChannel from '@/components/newChannel'
 
 let QRScanner = window.QRScanner
 
@@ -64,7 +66,9 @@ export default {
     collection: Collection,
     wallet: Wallet,
     setting: Setting,
-    videoChat: VideoChat
+    videoChat: VideoChat,
+    channelDetails: ChannelDetails,
+    newChannel: NewChannel
   },
   data() {
     return {

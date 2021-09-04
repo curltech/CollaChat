@@ -15,10 +15,10 @@ export default {
     return {
       Platform: Platform,
       mediaTimer: null,
-      chatMute:false,
-      chatMic:true,
+      chatMute: false,
+      chatMic: true,
       addStreamCount: 0,
-      iosShowMore:false,
+      showMore: false,
       localCloneStream: {},
       SubjectType: SubjectType,
       ActiveStatus: ActiveStatus,

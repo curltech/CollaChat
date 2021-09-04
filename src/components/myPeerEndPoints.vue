@@ -22,7 +22,7 @@
         q-toolbar
           q-btn(flat round dense icon="keyboard_arrow_left" @click="subKind = 'default'")
           q-toolbar-title(align="center") {{ $t('Edit Node') }}
-          q-btn.btnIcon(flat round dense icon="check" color="primary" @click="modify")
+          q-btn.btnIcon(flat round dense icon="check" @click="modify")
         q-form(ref="formModify" @submit="modify" class="q-pa-sm")
           q-select.c-field(filled :label="$t('No')" v-model="mpepData.priority" :options="options")
           p
@@ -39,7 +39,7 @@
         q-toolbar
           q-btn(flat round icon="keyboard_arrow_left" @click="subKind = 'default'")
           q-toolbar-title(align="center") {{ $t('Add Node') }}
-          q-btn(flat round dense icon="check" color="primary" @click="add")
+          q-btn.btnIcon(flat round dense icon="check" @click="add")
         q-form(ref="formAdd" @submit="add" class="q-pa-sm")
           q-select.c-field(filled :label="$t('No')" v-model="mpepData.priority" :options="options")
           p

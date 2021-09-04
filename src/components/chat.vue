@@ -147,7 +147,7 @@
           q-form(ref="formUnlockContacts" @submit="updateLockContactsSwitch")
             q-input.c-field(:label="$t('Please input Password')" autofocus filled hide-bottom-space clearable v-model="password" type="password" lazy-rules :rules="[]")
         q-card-actions(align="right")
-          q-btn(round dense unelevated icon="check" color="primary" v-close-popup @click="updateLockContactsSwitch")
+          q-btn.btnIcon(round dense unelevated icon="check" v-close-popup @click="updateLockContactsSwitch")
     q-uploader(style="display:none" ref="upload" @added="files => upload(files)" accept=".jpg, image/*")
  </template>
 <script src="./chat.vue.js" />

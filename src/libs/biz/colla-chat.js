@@ -137,8 +137,8 @@ export let ChatMessageStatus = {
  export class Attach {
    constructor() {
      this._id = null
-     this.messageId = null // 消息的唯一id标识
      this.ownerPeerId = null // 区分本地不同peerClient属主
+     this.messageId = null // 消息的唯一id标识
      this.subjectId = null // 外键（对应subject-subjectId）
      this.createDate = null // 创建时间
      this.content = null // 消息内容（基于mime+自定义标识区分内容类型，如：application/audio/image/message/text/video/x-word, contact联系人名片, groupChat群聊, channel频道）
@@ -670,14 +670,8 @@ export let ChatMessageStatus = {
        blockType = BlockType.GroupFile
        expireDate = new Date().getTime() + 3600*24*365*100 // 100 years
      }
-     let firstAttach = current.attachs[0]
-     let blockResult
-       if(current.messageType === P2pChatMessageType.GROUP_FILE && firstAttach.senderPeerId !== myself.myselfPeerClient.peerId){
-           blockResult = true
-       }else{
-           blockResult = await collectionUtil.saveBlock(current, true, blockType, _peers, expireDate)
-       }
-     let result = true;
+     let blockResult = await collectionUtil.saveBlock(current, true, blockType, _peers, expireDate)
+     let result = true
      if (blockResult) {
        current.state = EntityState.New
        await _that.saveLocalAttach(current)

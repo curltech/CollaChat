@@ -196,6 +196,10 @@ q-layout
         selectContacts.drawcontent
       q-tab-panel(name="selectConference", style="padding:0px 0px")
         selectConference.drawcontent
+      q-tab-panel(name="newChannel", style="padding:0px 0px")
+        newChannel.drawcontent
+      q-tab-panel(name="channelDetails", style="padding:0px 0px")
+        channelDetails.drawcontent
   videoChat
   q-page-sticky.expend-video-sticky(
     position="bottom-right",

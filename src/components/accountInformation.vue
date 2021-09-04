@@ -81,7 +81,7 @@
         q-toolbar
           q-btn(flat round dense icon="keyboard_arrow_left" @click="showPhotoBack")
           q-toolbar-title(align="center") {{ $t('Change Avatar') }}
-          q-btn(flat round dense icon="check" color="primary" @click="changeAvatar")
+          q-btn.btnIcon(flat round dense icon="check" @click="changeAvatar")
         div.fixed-center#crop_result(v-if="$store.ifMobile()" :class="showCrop ? '' : 'hidden'")
         q-img(v-if="$store.ifMobile()" :class="showCrop ? 'hidden' : ''" style="width:100%;max-height:calc(100% - 50px)" :src="avatarSrc")
         img#photoImg(v-if="!$store.ifMobile()")

@@ -33,7 +33,7 @@
         q-toolbar
           q-btn(flat round dense icon="keyboard_arrow_left" @click="subKind = 'default'")
           q-toolbar-title(align="center") {{$t('Change Password')}}
-          q-btn(flat round dense icon="check" color="primary" @click="changePassword")
+          q-btn.btnIcon(flat round dense icon="check" @click="changePassword")
         q-form(ref="formChangePassword" @submit="changePassword" class="q-pa-sm")
           //div(style="margin-left:12px" class="text-c-grey-10 q-my-sm") {{ $t('OldPassword') }}
           q-input.c-field(autofocus :label="$t('OldPassword')" filled clearable v-model="changePasswordData.oldPassword" type="password" lazy-rules :rules="[ val => val && val.length > 0 || $t('Please input OldPassword')]")
