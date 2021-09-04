@@ -188,6 +188,20 @@
             q-item-section(avatar v-if="ifIAmGroupOwner($store.state.currentChat)")
               q-icon(name="keyboard_arrow_right" color="c-grey-10")
           q-separator.c-separator.message-sep-1
+          q-item
+            q-item-section
+              q-item-label {{$t('Recall Time Limit')}}
+            q-item-section(side)
+              q-toggle(v-if="$store.state.currentChat && $store.state.groupChatMap[$store.state.currentChat.subjectId] && ifIAmGroupOwner($store.state.currentChat)" v-model="$store.state.groupChatMap[$store.state.currentChat.subjectId].recallTimeLimit" @input="changeRecallTimeLimit")
+              q-toggle(v-if="$store.state.currentChat && $store.state.groupChatMap[$store.state.currentChat.subjectId] && !ifIAmGroupOwner($store.state.currentChat)" disable = true v-model="$store.state.groupChatMap[$store.state.currentChat.subjectId].recallTimeLimit")
+          q-separator.c-separator.message-sep-1
+          q-item
+            q-item-section
+              q-item-label {{$t('Recall Alert')}}
+            q-item-section(side)
+              q-toggle(v-if="$store.state.currentChat && $store.state.groupChatMap[$store.state.currentChat.subjectId] && ifIAmGroupOwner($store.state.currentChat)" v-model="$store.state.groupChatMap[$store.state.currentChat.subjectId].recallAlert" @input="changeRecallAlert")
+              q-toggle(v-if="$store.state.currentChat && $store.state.groupChatMap[$store.state.currentChat.subjectId] && !ifIAmGroupOwner($store.state.currentChat)" disable = true  v-model="$store.state.groupChatMap[$store.state.currentChat.subjectId].recallAlert")
+          q-separator.c-separator.message-sep-1
           q-item(clickable v-ripple @click="showModifyGroupChat")
             q-item-section
               q-item-label {{$t('Given Name')}}
@@ -238,18 +252,6 @@
               q-item-label {{$t('Sticky Top')}}
             q-item-section(side)
               q-toggle(v-if="$store.state.currentChat && $store.state.groupChatMap[$store.state.currentChat.subjectId]" v-model="$store.state.groupChatMap[$store.state.currentChat.subjectId].top" @input="changeTopSwitch")
-          q-item
-            q-item-section
-              q-item-label {{$t('Recall Time Limit')}}
-            q-item-section(side)
-              q-toggle(v-if="$store.state.currentChat && $store.state.groupChatMap[$store.state.currentChat.subjectId] && ifIAmGroupOwner($store.state.currentChat)" v-model="$store.state.groupChatMap[$store.state.currentChat.subjectId].recallTimeLimit" @input="changeRecallTimeLimit")
-              q-toggle(v-if="$store.state.currentChat && $store.state.groupChatMap[$store.state.currentChat.subjectId] && !ifIAmGroupOwner($store.state.currentChat)" disable = true v-model="$store.state.groupChatMap[$store.state.currentChat.subjectId].recallTimeLimit")
-          q-item
-            q-item-section
-              q-item-label {{$t('Recall Alert')}}
-            q-item-section(side)
-              q-toggle(v-if="$store.state.currentChat && $store.state.groupChatMap[$store.state.currentChat.subjectId] && ifIAmGroupOwner($store.state.currentChat)" v-model="$store.state.groupChatMap[$store.state.currentChat.subjectId].recallAlert" @input="changeRecallAlert")
-              q-toggle(v-if="$store.state.currentChat && $store.state.groupChatMap[$store.state.currentChat.subjectId] && !ifIAmGroupOwner($store.state.currentChat)" disable = true  v-model="$store.state.groupChatMap[$store.state.currentChat.subjectId].recallAlert")
           q-separator.c-separator.message-sep-2
           q-item
             q-item-section(align="center")

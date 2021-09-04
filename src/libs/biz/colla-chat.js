@@ -670,13 +670,7 @@ export let ChatMessageStatus = {
        blockType = BlockType.GroupFile
        expireDate = new Date().getTime() + 3600*24*365*100 // 100 years
      }
-     let firstAttach = current.attachs[0]
-     let blockResult
-       if(current.messageType === P2pChatMessageType.GROUP_FILE && firstAttach.senderPeerId !== myself.myselfPeerClient.peerId){
-           blockResult = true
-       }else{
-           blockResult = await collectionUtil.saveBlock(current, true, blockType, _peers, expireDate)
-       }
+     let blockResult = await collectionUtil.saveBlock(current, true, blockType, _peers, expireDate)
      let result = true;
      if (blockResult) {
        current.state = EntityState.New

@@ -18,7 +18,7 @@ export default {
       chatMute:false,
       chatMic:true,
       addStreamCount: 0,
-      iosShowMore:false,
+      showMore:false,
       localCloneStream: {},
       SubjectType: SubjectType,
       ActiveStatus: ActiveStatus,

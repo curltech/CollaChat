@@ -23,7 +23,7 @@
             q-toolbar.linkman-video-toolbar.justify-center
                 q-toolbar-title.media-timer(:class="Platform.is.ios?'':'text-white'" align="center")
                     span(ref="mediaTimer")
-                q-btn.btnIcon(unelevated round color="primary" icon="cached" @click="zoomVideoChange" v-if="Platform.is.ios")
+                q-btn.btnIcon(unelevated round color="primary" icon="cached" @click="zoomVideoChange" v-if="Platform.is.ios && $store.state.currentCallChat.stream")
                 q-btn.btnIcon(v-if = " $store.state.currentCallChat.stream && (Platform.is.android || showMore)" unelevated round color="primary" :icon="audioToggle === 'speaker'?'volume_off':'volume_up'" @click="changeAudioToggle")
                 q-btn.btnIcon(v-if = "(!(ifMobileSize || $store.state.ifMobileStyle) && $store.state.currentCallChat.stream) ||((ifMobileSize || $store.state.ifMobileStyle) && $store.state.currentCallChat.stream && showMore)" unelevated round color="primary" :icon="chatMute?'volume_off':'volume_up'" @click="changeChatMute")
                 q-space(v-if = "(!(ifMobileSize || $store.state.ifMobileStyle)&& !(canCall()===true)) || $store.state.currentCallChat.stream")
