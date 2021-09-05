@@ -96,7 +96,7 @@ export default {
           }
         })
       }
-      console.log('channelList:' + JSON.stringify(_that.channelList))      
+      console.log('channelList:' + JSON.stringify(_that.channelList))
       _that.$q.loading.hide()
     },
     async channelSelected(channel, index) {
