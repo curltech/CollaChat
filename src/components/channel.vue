@@ -28,7 +28,7 @@
               img(:src="channel.avatar ? channel.avatar : $store.defaultActiveAvatar")
               q-badge(color="red" floating)
           q-item-section
-            q-item-label {{ channel.channelId }}
+            q-item-label {{ channel.name }}
             q-item-label last article's title
           q-item-section(side)
             q-item-label {{ detailDateFormat(channel.updateDate) }}
