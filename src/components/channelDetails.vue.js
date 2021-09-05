@@ -1,15 +1,9 @@
-
 export default {
   name: "ChannelDetails",
   components: {
   },
   data() {
     return {
-      channelData: {
-        avatar: this.$store.defaultActiveAvatar,
-        name: null,
-        description: null
-      },
     }
   },
   computed: {
@@ -23,10 +17,26 @@ export default {
     }
   },
   methods: {
+    articleSelected(channel, index) {
+      let _that = this
+      let store = _that.$store
+      let prevCurrentChannel = store.state.currentChannel
+      store.state.currentChannel = channel
+      store.channelDetailsEntry = 'channel'
+      store.changeKind('channelDetails')
+      store.toggleDrawer(true)
+      if (!(_that.ifMobileSize || store.state.ifMobileStyle) && prevCurrentChannel && prevCurrentChannel._id !== channel._id) {
+        store.changeChannelDetailsSubKind('default')
+      }
+    }
   },
-  created() {
+  async created() {
     let _that = this
     let store = _that.$store
+  },
+  mounted() {
+    let _that = this
+    let store = this.$store
   },
   watch: {
   }

@@ -59,7 +59,10 @@ let stateObj = {
   currentPhoneContact:null,
   currentCollection:null,
   dbLogMap: {},
-  selectedCollectionItems: []
+  selectedCollectionItems: [],
+  currentChannel: null,
+  currentArticle: null,
+  articleList: []
 }
 const store = new Vuex.Store({
   state: deepClone(stateObj) ,

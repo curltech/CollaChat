@@ -37,7 +37,7 @@ export default {
           channelFilteredArray = channelList
         }
         if(channelFilteredArray.length > 0) {
-            CollaUtil.sortByKey(channelFilteredArray, 'createTimestamp', 'desc')
+            CollaUtil.sortByKey(channelFilteredArray, 'updateDate', 'desc')
         }
       }
       return channelFilteredArray
@@ -68,6 +68,7 @@ export default {
     async getChannelList() {
       let _that = this
       let store = _that.$store
+      _that.$q.loading.show()
       // 查询cloud全量DataBlock索引信息
       let conditionBean = {}
       conditionBean['businessNumber'] = 'Channel'
@@ -95,15 +96,62 @@ export default {
           }
         })
       }
-      console.log('channelList:' + JSON.stringify(_that.channelList))
+      console.log('channelList:' + JSON.stringify(_that.channelList))      
+      _that.$q.loading.hide()
+    },
+    async channelSelected(channel, index) {
+      let _that = this
+      let store = _that.$store
+      let prevCurrentChannel = store.state.currentChannel
+      store.state.currentChannel = channel
+      store.channelDetailsEntry = 'channel'
+      store.changeKind('channelDetails')
+      store.toggleDrawer(true)
+      if (!(_that.ifMobileSize || store.state.ifMobileStyle) && prevCurrentChannel && prevCurrentChannel._id !== channel._id) {
+        store.changeChannelDetailsSubKind('default')
+      }
+      await _that.getArticleList()
+    },
+    async getArticleList() {
+      let _that = this
+      let store = _that.$store
+      _that.$q.loading.show()
+      // 查询cloud全量DataBlock索引信息
+      let conditionBean = {}
+      conditionBean['businessNumber'] = store.state.currentChannel['channelId']
+      conditionBean['getAllBlockIndex'] = true
+      conditionBean['blockType'] = BlockType.ChannelArticle
+      let articleList = []
+      let indexList = []
+      if(store.state.networkStatus === 'CONNECTED'){
+        indexList = await queryValueAction.queryValue(null, conditionBean)
+      }
+      console.log('indexList:' + JSON.stringify(indexList))
+      if (indexList && indexList.length > 0) {
+        let ps = []
+        for (let index of indexList) {
+          let promise = dataBlockService.findTxPayload(null, index['blockId'])
+          ps.push(promise)
+        }
+        CollaUtil.asyncPool(10, ps, async function(result) {
+          let articles = await result
+          if (articles && articles.length > 0) {
+            let article = articles[0]
+            if (article) {
+              articleList.push(article)
+            }
+          }
+        })
+      }
+      store.state.articleList = articleList
+      console.log('articleList:' + JSON.stringify(articleList))
+      _that.$q.loading.hide()
     },
   },
   async created() {
     let _that = this
     let store = _that.$store
-    _that.$q.loading.show()
     await _that.getChannelList()
-    _that.$q.loading.hide()
   },
   mounted() {
     let _that = this

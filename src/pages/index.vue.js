@@ -43,6 +43,7 @@ import Collection from '@/components/collection'
 import VideoChat from '@/components/videoChat'
 import ChannelDetails from '@/components/channelDetails'
 import NewChannel from '@/components/newChannel'
+import NewArticle from '@/components/newArticle'
 
 let QRScanner = window.QRScanner
 
@@ -68,7 +69,8 @@ export default {
     setting: Setting,
     videoChat: VideoChat,
     channelDetails: ChannelDetails,
-    newChannel: NewChannel
+    newChannel: NewChannel,
+    newArticle: NewArticle
   },
   data() {
     return {

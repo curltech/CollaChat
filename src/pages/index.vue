@@ -198,6 +198,8 @@ q-layout
         selectConference.drawcontent
       q-tab-panel(name="newChannel", style="padding:0px 0px")
         newChannel.drawcontent
+      q-tab-panel(name="newArticle", style="padding:0px 0px")
+        newArticle.drawcontent
       q-tab-panel(name="channelDetails", style="padding:0px 0px")
         channelDetails.drawcontent
   videoChat

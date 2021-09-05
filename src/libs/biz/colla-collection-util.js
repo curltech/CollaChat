@@ -385,9 +385,9 @@ import { P2pChatMessageType } from '@/libs/biz/colla-chat'
     let businessNumber = bizObj._id ? bizObj._id : bizObj.businessNumber // Collection-_id, P2pChat-businessNumber
     let peers = []
     peers.push(myself.myselfPeerClient)
-    let now = new Date().getTime()
+    let createTimestamp = new Date().getTime()
     // 这是一种特别的块，负载为空，服务器端发现负载为空而blockId有值，则理解为删除块
-    let dataBlock = DataBlockService.create(blockId, businessNumber, blockType, now, null, peers)
+    let dataBlock = DataBlockService.create(blockId, businessNumber, blockType, createTimestamp, null, peers)
     await dataBlockService.encrypt(dataBlock)
     let dataBlocks = await DataBlockService.slice(dataBlock)
     dataBlock = dataBlocks[0]
