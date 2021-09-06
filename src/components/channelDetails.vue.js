@@ -8,6 +8,7 @@ export default {
   },
   data() {
     return {
+      subKind: 'default',
     }
   },
   computed: {
@@ -51,22 +52,67 @@ export default {
     },
   },
   methods: {
-    articleSelected(channel, index) {
+    articleSelected(article, index) {
       let _that = this
       let store = _that.$store
-      let prevCurrentChannel = store.state.currentChannel
-      store.state.currentChannel = channel
-      store.channelDetailsEntry = 'channel'
-      store.changeKind('channelDetails')
-      store.toggleDrawer(true)
-      if (!(_that.ifMobileSize || store.state.ifMobileStyle) && prevCurrentChannel && prevCurrentChannel._id !== channel._id) {
-        store.changeChannelDetailsSubKind('default')
+      let prevCurrentArticle = store.state.currentArticle
+      store.state.currentArticle = article
+      _that.subKind = 'view'
+    },
+    viewCommand() {
+      let _that = this
+      let store = _that.$store
+      let actions = [
+        {
+          label: _that.$i18n.t('Forward'),
+          icon: 'forward',
+          id: 'forward'
+        },
+        {},
+        {
+          label: _that.$i18n.t('Delete'),
+          icon: 'delete',
+          id: 'delete'
+        },
+        {},
+        {
+          label: _that.$i18n.t('Cancel'),
+          icon: 'cancel',
+          id: 'cancel'
+        }
+      ]
+      if (true === true) { // 自己的文章
+        actions.unshift({
+          label: _that.$i18n.t('Edit'),
+          icon: 'edit',
+          id: 'edit'
+        },{})
       }
-    }
+      _that.$q.bottomSheet({
+        actions: actions
+      }).onOk(async action => {
+        // console.log('Action chosen:', action.id)
+        if (action.id === 'edit') {
+          _that.subKind = 'edit'
+        } else if (action.id === 'forward') {
+          store.selectChatEntry = 'articleForward'
+          _that.subKind = 'selectChat'
+        } else if (action.id === 'delete') {
+          _that.del()
+        }
+      }).onCancel(() => {
+        // console.log('Dismissed')
+      }).onDismiss(() => {
+        // console.log('I am triggered on both OK and Cancel')
+      })
+    },
   },
   async created() {
     let _that = this
     let store = _that.$store
+    store.changeChannelDetailsSubKind = function (subKind) {
+      _that.subKind = subKind
+    }
   },
   mounted() {
     let _that = this

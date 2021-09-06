@@ -258,6 +258,8 @@ export default {
           await store.saveChatMediaFile()
         } else if (store.captureMediaEntry === 'collection') {
           await store.collectionSaveMedia()
+        } else if (store.captureMediaEntry === 'article') {
+          await store.articleSaveMedia()
         }
       }
       store.captureType = null
@@ -269,6 +271,8 @@ export default {
         store.changeMessageSubKind('default')
       } else if (store.captureMediaEntry === 'collection') {
         store.changeCollectionSubKind('edit')
+      } else if (store.captureMediaEntry === 'article') {
+        store.changeArticleSubKind('default')
       }
     },
     closeStream: async function () {
@@ -302,8 +306,11 @@ export default {
       if (store.captureMediaEntry === 'message') {
         store.changeMessageSubKind('default')
       } else if (store.captureMediaEntry === 'collection') {
-        store.cancelSelectCaptureMedia()
+        store.cancelSelectCollectionCaptureMedia()
         store.changeCollectionSubKind('edit')
+      } else if (store.captureMediaEntry === 'article') {
+        store.cancelSelectArticleCaptureMedia()
+        store.changeArticleSubKind('default')
       }
     }
   },

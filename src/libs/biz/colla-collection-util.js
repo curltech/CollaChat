@@ -480,6 +480,75 @@ import { P2pChatMessageType } from '@/libs/biz/colla-chat'
 		}
 		return responses
 	}
+  async _saveMedia(url, ios, android, fn) {
+    let urls = []
+    if (!TypeUtil.isArray(url)) {
+      urls.push(url)
+    } else {
+      urls = url
+    }
+    let files = []
+    for (let u of urls) {
+      if (u) {
+        let blob = null
+        if ((ios === true || android === true) && (u.localURL || u.uri)) {
+          let localURL = u.localURL
+          if (!localURL) { // 使用mediaPicker时
+            localURL = u.uri
+          }
+          console.log('localURL:' + localURL)
+          let type = u.type
+          if (!type && u.name) {
+            let unameType = u.name.split('.')[1]
+            if (unameType.toUpperCase() === 'JPG') {
+              type = 'image/jpeg'
+            } else if (unameType.toUpperCase() === 'MP4') {
+              type = 'video/mp4'
+            } else if (unameType.toUpperCase() === 'WAV') {
+              type = 'audio/wav'
+            }
+          }
+          if (ios === true && localURL) {
+            if (localURL.toUpperCase().indexOf('.HEIC') > -1) {
+              u.quality = 99
+              u = await mediaPickerComponent.compressImage(u)
+              localURL = u.uri
+              console.log('localURL2:' + localURL)
+              type = 'image/jpeg'
+            } else if (localURL.toUpperCase().indexOf('.JPG') > -1) {
+              type = 'image/jpeg'
+            } if (localURL.toUpperCase().indexOf('.PNG') > -1) {
+              type = 'image/png'
+            } else if (localURL.toUpperCase().indexOf('.MP4') > -1) {
+              type = 'video/mp4'
+            } else if (localURL.toUpperCase().indexOf('.MOV') > -1) {
+              let fileEntry = await fileComponent.getFileEntry(localURL)
+              blob = await fileComponent.readFile(fileEntry, { format: 'blob', type: type })
+              let base64 = await BlobUtil.fileObjectToBase64(blob)
+              base64 = mediaComponent.fixVideoUrl(base64)
+              if (base64) {
+                let dirEntry = await fileComponent.getRootDirEntry('tmp')
+                let dirPath = dirEntry.toInternalURL()
+                let fileName = 'thumbnail' + UUID.string(null, null) + '.' + base64.substring(11, base64.indexOf(';', 11))
+                fileEntry = await fileComponent.createNewFileEntry(fileName, dirPath)
+                blob = BlobUtil.base64ToBlob(base64)
+                await fileComponent.writeFile(fileEntry, blob, false)
+                localURL = dirEntry.toInternalURL() + fileName
+                console.log('localURL2:' + localURL)
+                type = 'video/mp4'
+              }
+            }
+          }
+          let fileEntry = await fileComponent.getFileEntry(localURL)
+          blob = await fileComponent.readFile(fileEntry, { format: 'blob', type: type })
+        } else {
+          blob = u
+        }
+        files.push(blob)
+      }
+    }
+    await fn(files)
+  }
 }
 export let collectionUtil = new CollectionUtil()
 

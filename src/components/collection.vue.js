@@ -37,12 +37,10 @@ export default {
   },
   data() {
     return {
-      CollaUtil: CollaUtil,
       CollectionType: CollectionType,
       ifScrollTop: true,
       placeholder: '\ue672' + ' ' + this.$i18n.t('Search'),
       placeholder2: '\ue672' + ' ' + (myself.myselfPeerClient.localDataCryptoSwitch === true ? this.$i18n.t('Local Data Crypto mode only search by Tag') : this.$i18n.t('Search')),
-      date: date,
       collectionLoading: false,
       source: 'local', // 数据来源：local, cloud
       searchText: null,
@@ -772,7 +770,7 @@ export default {
           _that.collectionSaveMedia()
         } catch (e) {
           console.log(e)
-          _that.cancelSelectCaptureMedia()
+          _that.cancelSelectCollectionCaptureMedia()
         }
       } else if (store.chrome === true) {
         store.captureMediaEntry = 'collection'
@@ -829,79 +827,8 @@ export default {
         }
       } catch (e) {
         console.log(e)
-        this.cancelSelectCaptureMedia()
+        this.cancelSelectCollectionCaptureMedia()
       }
-    },
-    async _saveMedia(url) {
-      let _that = this
-      let store = _that.$store
-      let urls = []
-      if (!TypeUtil.isArray(url)) {
-        urls.push(url)
-      } else {
-        urls = url
-      }
-      let files = []
-      for (let u of urls) {
-        if (u) {
-          let blob = null
-          if ((store.ios === true || store.android === true) && (u.localURL || u.uri)) {
-            let localURL = u.localURL
-            if (!localURL) { // 使用mediaPicker时
-              localURL = u.uri
-            }
-            console.log('localURL:' + localURL)
-            let type = u.type
-            if (!type && u.name) {
-              let unameType = u.name.split('.')[1]
-              if (unameType.toUpperCase() === 'JPG') {
-                type = 'image/jpeg'
-              } else if (unameType.toUpperCase() === 'MP4') {
-                type = 'video/mp4'
-              } else if (unameType.toUpperCase() === 'WAV') {
-                type = 'audio/wav'
-              }
-            }
-            if (store.ios === true && localURL) {
-              if (localURL.toUpperCase().indexOf('.HEIC') > -1) {
-                u.quality = 99
-                u = await mediaPickerComponent.compressImage(u)
-                localURL = u.uri
-                console.log('localURL2:' + localURL)
-                type = 'image/jpeg'
-              } else if (localURL.toUpperCase().indexOf('.JPG') > -1) {
-                type = 'image/jpeg'
-              } if (localURL.toUpperCase().indexOf('.PNG') > -1) {
-                type = 'image/png'
-              } else if (localURL.toUpperCase().indexOf('.MP4') > -1) {
-                type = 'video/mp4'
-              } else if (localURL.toUpperCase().indexOf('.MOV') > -1) {
-                let fileEntry = await fileComponent.getFileEntry(localURL)
-                blob = await fileComponent.readFile(fileEntry, { format: 'blob', type: type })
-                let base64 = await BlobUtil.fileObjectToBase64(blob)
-                base64 = mediaComponent.fixVideoUrl(base64)
-                if (base64) {
-                  let dirEntry = await fileComponent.getRootDirEntry('tmp')
-                  let dirPath = dirEntry.toInternalURL()
-                  let fileName = 'thumbnail' + UUID.string(null, null) + '.' + base64.substring(11, base64.indexOf(';', 11))
-                  fileEntry = await fileComponent.createNewFileEntry(fileName, dirPath)
-                  blob = BlobUtil.base64ToBlob(base64)
-                  await fileComponent.writeFile(fileEntry, blob, false)
-                  localURL = dirEntry.toInternalURL() + fileName
-                  console.log('localURL2:' + localURL)
-                  type = 'video/mp4'
-                }
-              }
-            }
-            let fileEntry = await fileComponent.getFileEntry(localURL)
-            blob = await fileComponent.readFile(fileEntry, { format: 'blob', type: type })
-          } else {
-            blob = u
-          }
-          files.push(blob)
-        }
-      }
-      await _that.insertEditor(files)
     },
     async collectionSaveMedia() {
       let _that = this
@@ -920,7 +847,7 @@ export default {
         }
       }
       if (mediaUrl) {
-        await _that._saveMedia(mediaUrl)
+        await collectionUtil._saveMedia(mediaUrl, store.ios, store.android, _that.insertEditor)
       }
       _that.captureType = null
       _that.imageUrl = null
@@ -1404,7 +1331,7 @@ export default {
         editor.txt.html(_that.myCollections.c_meta.current.content)
       })
     },
-    cancelSelectCaptureMedia() {
+    cancelSelectCollectionCaptureMedia() {
       let _that = this
       let html = _that.myCollections.c_meta.current.content
       html = html.replace('<p>\(\[\{PHFI\}\]\)<br></p>', '')
@@ -1762,7 +1689,7 @@ export default {
     store.changeCollectionSubKind = function (subKind) {
       _that.subKind = subKind
     }
-    store.cancelSelectCaptureMedia = _that.cancelSelectCaptureMedia
+    store.cancelSelectCollectionCaptureMedia = _that.cancelSelectCollectionCaptureMedia
     store.collectionSaveMedia = _that.collectionSaveMedia
     Vue.set(this.myCollections, 'c_meta', {
       dataType: 'MyCollection',
