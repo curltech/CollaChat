@@ -26,6 +26,7 @@ export class Channel {
     constructor() {
         this._id = null
         this.ownerPeerId = null // 区分本地不同peerClient属主
+        this.creator = null
         /**
          * 基本信息：类型，ID，头像，名称，描述
          */
@@ -38,7 +39,6 @@ export class Channel {
          * 主体信息：类型，ID，名称
          */
         this.entityType = null
-        this.entityId = null
         this.entityName = null
         /**
          * 创建日期，修改日期
@@ -49,6 +49,7 @@ export class Channel {
          * 关注日期
          */
         this.markDate = null
+        this.top = null // 是否置顶，包括：true（置顶）, false（不置顶）
     }
 }
 

@@ -3,11 +3,13 @@
     q-tab-panels(v-model="subKind" animated transition-prev="slide-right" transition-next="slide-left")
       q-tab-panel(:style="heightStyle" name="default" class="q-pa-none")
         q-toolbar
-          q-btn(:class="ifMobileSize || $store.state.ifMobileStyle ? '' : 'hidden'" flat round dense icon="keyboard_arrow_left" @click="$store.toggleDrawer(false)")
-          q-toolbar-title(align="center" :style="ifMobileSize || $store.state.ifMobileStyle ? '' : 'padding-left:54px'") {{$t('New Article')}}
+          q-btn(flat round dense icon="keyboard_arrow_left" @click="$store.changeChannelDetailsSubKind('default')")
+          q-toolbar-title(align="center") {{$t('New Article')}}
           q-btn.btnIcon(flat round dense icon="check" @click="createArticle")
         q-card(flat)
-          q-card-section(align="center" class="q-py-xl")
+          q-card-section(align="center")
+            q-item-label(class="q-field__label q-py-sm" style="color: rgba(255,255,255,0.7)") {{$t('Article Cover')}}
+            P
             q-img(src="login-bg-wd-9.jpg" style="height: 200px; width: 400px")
           q-card-section(class="q-pt-none")
             q-form(ref="formCreateArticle" @submit="createArticle" class="q-pa-sm")
@@ -17,8 +19,10 @@
               p
               q-input.c-field(:label="$t('Article Abstract')" filled clearable v-model="articleData.abstract" lazy-rules :rules="[]")
               p
+              q-item-label(class="text-center q-field__label q-py-sm" style="color: rgba(255,255,255,0.7)") {{$t('Article Body')}}
+              P
               div.wangEditorToolbarMobileStyle(ref="editorToolbar")
-              div.bg-c-white(ref="editorContainer" :class="ifMobileSize || $store.state.ifMobileStyle ? 'scrollHeightMobileStyle-wangEditor' : 'scrollHeightStyle'")
+              div.bg-c-grey-2(ref="editorContainer" :class="ifMobileSize || $store.state.ifMobileStyle ? 'scrollHeightMobileStyle-wangEditor' : 'scrollHeightStyle'")
       q-tab-panel.bg-black#selectedContainer(:style="heightStyle" name="fullscreen" class="q-pa-none" align="center")
         q-toolbar(v-if="selected && selected.nodeName === 'VIDEO'" style="z-index: 999")
           q-btn.btnIcon(flat round icon="close" @click="fullscreenBack")

@@ -48,7 +48,7 @@ export default {
       let store = _that.$store
       _that.$q.loading.show()
       try {
-        let channelId = '3E29F3A7-50DC-46C0-BBBF-80662C09C2AD'
+        let channelId = store.state.currentChannel.channelId
         let blockId = UUID.string(null, null)
         let currentTime = new Date().getTime()
         let current = {

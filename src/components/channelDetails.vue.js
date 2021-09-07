@@ -1,10 +1,14 @@
 import { date } from 'quasar'
 
 import { CollaUtil } from 'libcolla'
+import { myself } from 'libcolla'
+
+import NewArticle from '@/components/newArticle'
 
 export default {
   name: "ChannelDetails",
   components: {
+    newArticle: NewArticle,
   },
   data() {
     return {
@@ -81,7 +85,8 @@ export default {
           id: 'cancel'
         }
       ]
-      if (true === true) { // 自己的文章
+      let channel = store.state.currentChannel
+      if (channel.creator === myself.myselfPeerClient.peerId) {
         actions.unshift({
           label: _that.$i18n.t('Edit'),
           icon: 'edit',
@@ -106,6 +111,66 @@ export default {
         // console.log('I am triggered on both OK and Cancel')
       })
     },
+    channelCommand() {
+      let _that = this
+      let store = _that.$store
+      let channel = store.state.currentChannel
+      let actions = [
+        {
+          label: channel.top ? _that.$i18n.t('Untop') : _that.$i18n.t('Top'),
+          icon: 'star',
+          id: 'top'
+        },
+        {},
+        {
+          label: _that.$i18n.t('Forward'),
+          icon: 'forward',
+          id: 'forward'
+        },
+        {},
+        {
+          label: _that.$i18n.t('Cancel'),
+          icon: 'cancel',
+          id: 'cancel'
+        }
+      ]
+      if (channel.creator === myself.myselfPeerClient.peerId) {
+        actions.unshift({
+          label: _that.$i18n.t('New Article'),
+          icon: 'article',
+          id: 'newArticle'
+        },{})
+      }
+      _that.$q.bottomSheet({
+        actions: actions
+      }).onOk(async action => {
+        // console.log('Action chosen:', action.id)
+        if (action.id === 'newArticle') {
+          _that.subKind = 'newArticle'
+        } else if (action.id === 'top') {
+          _that.top()
+        } else if (action.id === 'forward') {
+          store.selectChatEntry = 'channelForward'
+          _that.subKind = 'selectChat'
+        }
+      }).onCancel(() => {
+        // console.log('Dismissed')
+      }).onDismiss(() => {
+        // console.log('I am triggered on both OK and Cancel')
+      })
+    },
+    async follow() {
+      let _that = this
+      let store = _that.$store
+      let channel = store.state.currentChannel
+      let markDate = channel.markDate
+    },
+    async top() {
+      let _that = this
+      let store = _that.$store
+      let channel = store.state.currentChannel
+      let top = channel.top
+    }
   },
   async created() {
     let _that = this

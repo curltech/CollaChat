@@ -107,7 +107,7 @@ export default {
       store.channelDetailsEntry = 'channel'
       store.changeKind('channelDetails')
       store.toggleDrawer(true)
-      if (!(_that.ifMobileSize || store.state.ifMobileStyle) && prevCurrentChannel && prevCurrentChannel._id !== channel._id) {
+      if (!(_that.ifMobileSize || store.state.ifMobileStyle) && prevCurrentChannel && prevCurrentChannel.channelId !== channel.channelId) {
         store.changeChannelDetailsSubKind('default')
       }
       await _that.getArticleList()
@@ -147,6 +147,12 @@ export default {
       console.log('articleList:' + JSON.stringify(articleList))
       _that.$q.loading.hide()
     },
+    newChannel() {
+      let _that = this
+      let store = _that.$store
+      store.changeKind('newChannel', 'channel')
+      store.toggleDrawer(true)
+    }
   },
   async created() {
     let _that = this

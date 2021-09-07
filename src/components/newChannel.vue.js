@@ -38,18 +38,19 @@ export default {
         let currentTime = new Date().getTime()
         let current = {
           ownerPeerId: myself.myselfPeerClient.peerId,
+          creator: myself.myselfPeerClient.peerId,
           channelType: ChannelType.PUBLIC,
           channelId: blockId,
           avatar: _that.channelData.avatar,
           name: _that.channelData.name,
           description: _that.channelData.description,
           entityType: EntityType.INDIVIDUAL,
-          entityId: myself.myselfPeerClient.peerId,
           businessNumber: 'Channel',
           blockId: blockId,
           createDate: currentTime,
           updateDate: currentTime,
-          markDate: currentTime
+          markDate: currentTime,
+          top: true
         }
         let blockType = BlockType.Channel
         let _peers = []

@@ -1,17 +1,29 @@
 <template lang="pug">
   div.bg-c-grey-0
     q-tab-panels(v-model="subKind" animated transition-prev="slide-right" transition-next="slide-left")
-      q-tab-panel(:style="heightStyle" name="default" class="q-pa-none")
-        q-toolbar
+      q-tab-panel.bg-c-grey-message(:style="heightStyle" name="default" class="q-pa-none")
+        q-toolbar.bg-c-grey-0
           q-btn(:class="ifMobileSize || $store.state.ifMobileStyle ? '' : 'hidden'" flat round dense icon="keyboard_arrow_left" @click="$store.toggleDrawer(false)")
-          q-toolbar-title(align="center" :style="ifMobileSize || $store.state.ifMobileStyle ? '' : 'padding-left:54px'") {{ $store.state.currentChannel.name}}
-          q-btn.btnIcon(flat round dense icon="more_horiz" @click="")
+          q-toolbar-title(align="center" :style="ifMobileSize || $store.state.ifMobileStyle ? '' : 'padding-left:54px'") {{$t('Channel')}}
+          q-btn.btnIcon(flat round dense icon="more_horiz" @click="channelCommand()")
+        q-list.bg-c-grey-0(flat)
+          q-item
+            q-item-section(avatar)
+              q-avatar(size="64px")
+                img(:src="$store.state.currentChannel.avatar ? $store.state.currentChannel.avatar : $store.defaultActiveAvatar")
+            q-item-section
+              q-item-label(class="text-h5") {{$store.state.currentChannel.name}}
+            q-item-section(side)
+              q-btn.bg-c-grey-message(style="width: 80px;" @click="follow()" :label="$store.state.currentChannel.markDate ? $t('Unfollow') : $t('Follow')" no-caps)
+          q-item
+            q-item-section
+              q-item-label {{$store.state.currentChannel.description}}
         div(v-for="(article, index) in ArticleFilteredList" :key="article.articleId" style="width: 80%; margin: auto")
           q-card(flat @click="articleSelected(article, index)")
-            q-card-section.bg-c-grey-0(class="text-center" style="height: 50px") {{ detailDateFormat(article.updateDate) }}
+            q-card-section.bg-c-grey-message(class="text-center" style="height: 50px") {{ detailDateFormat(article.updateDate) }}
             q-card-section(class="q-pa-none")
               q-img(:src="article.cover" style="height: 200px; width: 100%")
-            q-card-section.bg-c-grey-3(class="q-py-md")
+            q-card-section(class="q-py-md")
               q-item-label(class="text-h5") {{ article.title }}
               q-item-label(v-if="article.abstract" class="q-py-sm") {{ article.abstract }}
       q-tab-panel(:style="heightStyle" name="view" class="q-pa-none")
@@ -28,5 +40,7 @@
           iframe(v-if="$store.state.currentArticle.content && $store.state.currentArticle.content.substr(0,4)==='http'" id="iframeContent"
             :src="$store.state.currentArticle.content" frameborder="no" border="0" marginwidth="0" marginheight="0" allowtransparency="yes" scrolling="yes")
           div(v-if="$store.state.currentArticle.content && $store.state.currentArticle.content.substr(0,4)!=='http'" v-html="$store.state.currentArticle.content")
+      q-tab-panel(:style="heightStyle" name="newArticle" class="q-pa-none")
+        newArticle.drawcontent
 </template>
 <script src="./channelDetails.vue.js" />
