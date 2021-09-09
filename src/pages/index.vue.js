@@ -22,6 +22,7 @@ import { fileComponent } from '@/libs/base/colla-cordova'
 import { CollectionType, collectionComponent } from '@/libs/biz/colla-collection'
 import { ChatDataType, ChatContentType, ChatMessageStatus, P2pChatMessageType, SubjectType, chatComponent, chatBlockComponent} from '@/libs/biz/colla-chat'
 import { ContactDataType, RequestType, RequestStatus, LinkmanStatus, ActiveStatus, contactComponent, MemberType } from '@/libs/biz/colla-contact'
+import { channelComponent } from '@/libs/biz/colla-channel'
 import { collectionUtil, blockLogComponent } from '@/libs/biz/colla-collection-util'
 import Chat from '@/components/chat'
 import Contacts from '@/components/contacts'
@@ -3294,7 +3295,7 @@ export default {
         }
       }
       if (changeFlag) {
-        await store.refreshContactsData()
+        await store.refreshData()
       }
       // 联系人同步：跨实例云端同步功能提供前临时使用 - end
       let chatsJson = null
@@ -3439,7 +3440,7 @@ export default {
       }
       _that.$q.loading.hide()
     },
-    async refreshContactsData() {
+    async refreshData() {
       let _that = this
       let store = _that.$store
       let clientPeerId = myself.myselfPeerClient.peerId
@@ -3450,6 +3451,8 @@ export default {
       store.state.linkmanMap = {}
       store.state.groupChats = []
       store.state.groupChatMap = {}
+      store.state.channels = []
+      store.state.channelMap = {}
       let linkmanTags = await contactComponent.loadLinkmanTag({
         ownerPeerId: clientPeerId,
         createDate: { $gt: null }
@@ -3531,6 +3534,16 @@ export default {
             groupDBItem.groupMembers = groupMemberDBItems
           }
           store.state.groupChatMap[groupDBItem.groupId] = groupDBItem
+        }
+      }
+      let channelDBItems = await channelComponent.loadChannel({
+        ownerPeerId: clientPeerId,
+        updateDate: { $gt: null }
+      }, [{ updateDate: 'asc' }])
+      if (channelDBItems && channelDBItems.length > 0) {
+        store.state.channels = channelDBItems
+        for (let channelDBItem of channelDBItems) {
+          store.state.channelMap[channelDBItem.channelId] = channelDBItem
         }
       }
     },
@@ -3771,7 +3784,7 @@ export default {
         }
       }
     }
-    await _that.refreshContactsData()
+    await _that.refreshData()
 
     store.changeTab = function (tab) {
       _that.tab = tab
@@ -3852,7 +3865,7 @@ export default {
     store.connect = _that.connect
     store.getChatContent = _that.getChatContent
     store.p2pSend = _that.p2pSend
-    store.refreshContactsData = _that.refreshContactsData
+    store.refreshData = _that.refreshData
     store.showInitBackupDialog = _that.showInitBackupDialog
     store.showInitMigrateDialog = _that.showInitMigrateDialog
     store.restoreChatRecord = _that.restoreChatRecord

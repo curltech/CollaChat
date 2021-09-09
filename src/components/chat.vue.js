@@ -175,7 +175,24 @@ export default {
             }
           })
         }
-        CollaUtil.sortByKey(chatFilteredArray, 'updateTime', 'desc')
+        let topChatArrary = []
+        let untopChatArray = []
+        for (let chat of chatFilteredArray) {
+          let linkman = store.state.linkmanMap[chat.subjectId]
+          let groupChat = store.state.groupChatMap[chat.subjectId]
+          if ((linkman && linkman.top === true) || (groupChat && groupChat.top === true)) {
+            chat.top = true
+            topChatArrary.push(chat)
+          } else {
+            untopChatArray.push(chat)
+          }
+        }
+        CollaUtil.sortByKey(topChatArrary, 'updateTime', 'asc')
+        CollaUtil.sortByKey(untopChatArray, 'updateTime', 'desc')
+        for (let topChat of topChatArrary) {
+          untopChatArray.unshift(topChat)
+        }
+        chatFilteredArray = untopChatArray
       }
       return chatFilteredArray
     }

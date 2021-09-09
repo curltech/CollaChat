@@ -11,8 +11,17 @@ export default {
   data() {
     return {
       channelfilter: null,
-      channelList: [],
-      placeholder: '\ue672' + ' ' + this.$i18n.t('Search')
+      placeholder: '\ue672' + ' ' + this.$i18n.t('Search'),
+      searchDone: false,
+      searching: false,
+      searchLoading: false,
+      searchText: null,
+      subKind: 'default',
+      followChannelResultList: [],
+      followChannelArticleResultList: [],
+      notFollowChannelResultList: [],
+      notFollowChannelArticleResultList: [],
+      searchResult: 'allResult'
     }
   },
   computed: {
@@ -23,7 +32,7 @@ export default {
       let _that = this
       let store = _that.$store
       let channelFilteredArray = []
-      let channelList = _that.channelList
+      let channelList = store.state.channels
       if (channelList && channelList.length > 0) {
         let channelFilter = _that.channelFilter
         if (channelFilter) {
@@ -65,6 +74,88 @@ export default {
     },
   },
   methods: {
+    searchBack() {
+      let _that = this
+      let store = _that.$store
+      _that.searchText = null
+      _that.searching = false
+      if (store.messageEntry === 'search') {
+        store.messageEntry = null
+      }
+      _that.subKind = 'default'
+    },
+    searchFocus(e) {
+      let _that = this
+      _that.subKind = 'search'
+    },
+    searchInput(value) {
+      let _that = this
+      _that.searching = false
+    },
+    async searchKeyup(e) {
+      let _that = this
+      _that.searchText = (_that.searchText || '').replace(/^(\s|\u00A0)+|(\s|\u00A0)+$/g, '')
+      if (e.keyCode === 13 && _that.searchText) {
+        await _that.search()
+        let searchTextInputs = document.getElementsByClassName('q-field__native')
+        if (searchTextInputs || searchTextInputs[0] || searchTextInputs[0].style.display !== 'none') {
+          searchTextInputs[0].blur()
+        }
+      }
+    },
+    async search() {
+      let _that = this
+      let store = _that.$store
+      _that.searching = true
+      _that.followChannelResultList.splice(0)
+      _that.followChannelArticleResultList.splice(0)
+      _that.notFollowChannelResultList.splice(0)
+      _that.notFollowChannelArticleResultList.splice(0)
+      let followChannelResults = await channelComponent.searchPhase(ChannelDataType.CHANNEL, _that.searchText)
+      console.info(followChannelResults)
+      let followChannelResultMap = {}
+      if (followChannelResults && followChannelResults.rows && followChannelResults.rows.length > 0) {
+        for (let followChannelResult of followChannelResults.rows) {
+          let channel = store.state.channelMap[followChannelResult.doc.channelId]
+          if (channel) {
+            channel.highlightingName = null
+            channel.highlightingDescription = null
+            channel.highlighting = null
+            if (followChannelResult.highlighting.name) {
+              channel.highlightingName = followChannelResult.highlighting.name
+            } else if (followChannelResult.highlighting.description) {
+              if (!channel.name) {
+                channel.highlightingDescription = followChannelResult.highlighting.description
+              } else {
+                channel.highlighting = _that.$i18n.t('Description: ') + followChannelResult.highlighting.description
+              }
+            }
+            _that.followChannelResultList.push(channel)
+            followChannelResultMap[channel.channelId] = channel
+          }
+        }
+      }
+      let followChannelArticleResults = await channelComponent.searchPhase(ChannelDataType.ARTICLE, _that.searchText)
+      console.info(followChannelArticleResults)
+      let followChannelArticleResultMap = {}
+      if (followChannelArticleResults && followChannelArticleResults.rows && followChannelArticleResults.rows.length > 0) {
+        for (let followChannelArticleResult of followChannelArticleResults.rows) {
+          let article = store.state.articleMap[followChannelArticleResult.doc.articleId]
+          if (article) {
+            article.highlightingTitle = null
+            article.highlightingAbstract = null
+            article.highlighting = null
+            if (followChannelArticleResult.highlighting.title) {
+              article.highlightingTitle = followChannelResult.highlighting.title
+            } else if (followChannelResult.highlighting.abstract) {
+              article.highlighting = _that.$i18n.t('Abstract: ') + followChanneArticlelResult.highlighting.abstract
+            }
+            _that.notFollowChannelArticleResultList.push(article)
+            followChannelArticleResultMap[article.articleId] = article
+          }
+        }
+      }
+    },
     async getChannelList() {
       let _that = this
       let store = _that.$store
@@ -74,7 +165,7 @@ export default {
       conditionBean['businessNumber'] = 'Channel'
       conditionBean['getAllBlockIndex'] = true
       conditionBean['blockType'] = BlockType.Channel
-      _that.channelList = []
+      let channelList = []
       let indexList = []
       if(store.state.networkStatus === 'CONNECTED'){
         indexList = await queryValueAction.queryValue(null, conditionBean)
@@ -91,13 +182,14 @@ export default {
           if (channels && channels.length > 0) {
             let channel = channels[0]
             if (channel) {
-              _that.channelList.push(channel)
+              channelList.push(channel)
             }
           }
         })
       }
-      console.log('channelList:' + JSON.stringify(_that.channelList))
+      console.log('channelList:' + JSON.stringify(channelList))
       _that.$q.loading.hide()
+      return channelList
     },
     async channelSelected(channel, index) {
       let _that = this
@@ -157,7 +249,7 @@ export default {
   async created() {
     let _that = this
     let store = _that.$store
-    await _that.getChannelList()
+    let channelList = await _that.getChannelList()
   },
   mounted() {
     let _that = this

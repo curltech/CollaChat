@@ -41,7 +41,7 @@
                 q-item-section
                   q-item-label(caption lines="1") {{$t('no internet connection, please check network settings')}}
             div(v-for="(chat, index) in ChatFilteredList" :key="chat.subjectId")
-              q-item(clickable v-ripple @click="chatSelected(chat, index)" :active="$store.state.currentChat && chat.subjectId == $store.state.currentChat.subjectId" :active-class="ifMobileSize || $store.state.ifMobileStyle ? 'bg-c-grey-1' : 'bg-c-grey-2'" class="text-c-grey-10")
+              q-item(clickable v-ripple @click="chatSelected(chat, index)" :active="($store.state.currentChat && chat.subjectId == $store.state.currentChat.subjectId) || chat.top === true" :active-class="ifMobileSize || $store.state.ifMobileStyle ? 'bg-c-grey-1' : 'bg-c-grey-2'" class="text-c-grey-10")
                 q-item-section(avatar)
                   q-avatar(v-if='chat.subjectType === SubjectType.CHAT')
                     img(:src="$store.state.linkmanMap[chat.subjectId].avatar ? $store.state.linkmanMap[chat.subjectId].avatar : $store.defaultActiveAvatar")

@@ -110,9 +110,50 @@ export class Attach {
 
 export class ChannelComponent {
     constructor() {
-        pounchDb.create('myChannel', ['ownerPeerId', 'updateDate'])
-        pounchDb.create('myChannelArticle', ['ownerPeerId', 'channelId', 'updateDate'])
-        pounchDb.create('myArticleAttach', ['ownerPeerId', 'articleId', 'updateDate'])
+        pounchDb.create('myChannel', ['ownerPeerId', 'channelId', 'updateDate'])
+        pounchDb.create('myChannelArticle', ['ownerPeerId', 'channelId', 'articleId', 'updateDate'])
+        pounchDb.create('myArticleAttach', ['ownerPeerId', 'articleId'])
+    }
+    async loadChannel(originCondition, sort, from, limit) {
+        let condition = {}
+        let qs = []
+        if (from) {
+          qs.push({ _id: { $gt: from } })
+        } else {
+          qs.push({ _id: { $gt: null } })
+        }
+        if (originCondition.ownerPeerId) {
+          let q = {}
+          q['ownerPeerId'] = originCondition.ownerPeerId
+          qs.push(q)
+        }
+        if (originCondition.channelId) {
+          let q = {}
+          q['channelId'] = originCondition.channelId
+          qs.push(q)
+        }
+        if (originCondition.creator) {
+          let q = {}
+          q['creator'] = originCondition.creator
+          qs.push(q)
+        }
+        if (originCondition.updateDate) {
+          let q = {}
+          q['updateDate'] = originCondition.updateDate
+          qs.push(q)
+        }
+        if (qs.length > 0) {
+          condition['$and'] = qs
+        }
+    
+        let data
+        if (limit) {
+          let page = await pounchDb.findPage('myChannel', condition, sort, null, null, limit)
+          data = page.result
+        } else {
+          data = await pounchDb.find('myChannel', condition, sort)
+        }
+        return data
     }
     async loadArticle(condition, sort, fields, from, limit) {
         let data

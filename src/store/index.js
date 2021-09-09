@@ -60,6 +60,8 @@ let stateObj = {
   currentCollection:null,
   dbLogMap: {},
   selectedCollectionItems: [],
+  channels: [],
+  channelMap: {},
   currentChannel: null,
   currentArticle: null,
   articleList: []
