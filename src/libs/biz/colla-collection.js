@@ -13,6 +13,13 @@ export let CollectionDataType = {
 	'BLOCKLOG': 'BLOCKLOG'
 }
 
+let tables = {
+    'COLLECTION': 'myCollection',
+    'ATTACH': 'myAttach',
+    'COLLECTION_TAGCOLLECTION': 'collectionTagCollection',
+	'BLOCKLOG': 'blockLog'
+}
+
 export let SrcChannelType = {
 	'CHAT': 'CHAT',
 	'GROUP_CHAT': 'GROUP_CHAT'
@@ -577,7 +584,6 @@ export class CollectionComponent {
 	}
 	async get(dataType, id) {
 		if (dataType) {
-			let tables = { 'COLLECTION': 'myCollection', 'ATTACH': 'myAttach', 'COLLECTION_TAGCOLLECTION': 'collectionTagCollection', 'BLOCKLOG': 'blockLog' }
 			return await pounchDb.get(tables[dataType], id)
 		} else {
 			return null

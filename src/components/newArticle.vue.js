@@ -51,6 +51,8 @@ export default {
         let channelId = store.state.currentChannel.channelId
         let blockId = UUID.string(null, null)
         let currentTime = new Date().getTime()
+        let content = _that.articleData.content
+        let plainContent = content.replace(/<[^>]+>/g, '').replace(/^\s*/g, '')
         let current = {
           ownerPeerId: myself.myselfPeerClient.peerId,
           channelId: channelId,
@@ -59,9 +61,9 @@ export default {
           author: _that.articleData.author,
           title: _that.articleData.title,
           abstract: _that.articleData.abstract,
-          content: _that.articleData.content,
-          plainContent: _that.articleData.content,
-          pyPlainContent: pinyinUtil.getPinyin(_that.articleData.content),
+          content: content,
+          plainContent: plainContent,
+          pyPlainContent: pinyinUtil.getPinyin(plainContent),
           businessNumber: channelId,
           blockId: blockId,
           createDate: currentTime,

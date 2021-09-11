@@ -54,7 +54,7 @@ export default {
         }
         let blockType = BlockType.Channel
         let _peers = []
-        let expireDate = new Date().getTime() + 3600*24*365*100 // 100 years
+        let expireDate = currentTime + 3600*24*365*100 // 100 years
         // 云端保存
         let result = await collectionUtil.saveBlock(current, true, blockType, _peers, expireDate)
         if (!result) {
@@ -68,7 +68,14 @@ export default {
         }
         // 本地保存
         await channelComponent.insert(ChannelDataType.CHANNEL, current)
+        store.state.channels.unshift(current)
+        store.state.channelMap[current.channelId] = current
         store.toggleDrawer(false)
+        _that.channelData = {
+          avatar: this.$store.defaultActiveAvatar,
+          name: null,
+          description: null
+        }
       } catch (error) {
         console.error(error)
         _that.$q.notify({

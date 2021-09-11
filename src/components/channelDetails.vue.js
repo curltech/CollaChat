@@ -2,7 +2,10 @@ import { date } from 'quasar'
 
 import { CollaUtil } from 'libcolla'
 import { myself } from 'libcolla'
+import { BlockType } from 'libcolla'
 
+import { collectionUtil } from '@/libs/biz/colla-collection-util'
+import { channelComponent, ChannelDataType } from '@/libs/biz/colla-channel'
 import NewArticle from '@/components/newArticle'
 
 export default {
@@ -13,6 +16,11 @@ export default {
   data() {
     return {
       subKind: 'default',
+      channelData: {
+        avatar: this.$store.defaultActiveAvatar,
+        name: null,
+        description: null
+      }
     }
   },
   computed: {
@@ -136,6 +144,16 @@ export default {
       ]
       if (channel.creator === myself.myselfPeerClient.peerId) {
         actions.unshift({
+          label: _that.$i18n.t('Delete'),
+          icon: 'delete',
+          id: 'delete'
+        },{})
+        actions.unshift({
+          label: _that.$i18n.t('Edit'),
+          icon: 'edit',
+          id: 'edit'
+        },{})
+        actions.unshift({
           label: _that.$i18n.t('New Article'),
           icon: 'article',
           id: 'newArticle'
@@ -147,6 +165,15 @@ export default {
         // console.log('Action chosen:', action.id)
         if (action.id === 'newArticle') {
           _that.subKind = 'newArticle'
+        } else if (action.id === 'edit') {
+          _that.channelData = {
+            avatar: store.state.currentChannel.avatar,
+            name: store.state.currentChannel.name,
+            description: store.state.currentChannel.description
+          }
+          _that.subKind = 'editChannel'
+        } else if (action.id === 'delete') {
+          _that.deleteChannel()
         } else if (action.id === 'top') {
           _that.top()
         } else if (action.id === 'forward') {
@@ -170,6 +197,75 @@ export default {
       let store = _that.$store
       let channel = store.state.currentChannel
       let top = channel.top
+    },
+    async editChannel() {
+      let _that = this
+      let store = _that.$store
+      _that.$q.loading.show()
+      try {
+        let currentTime = new Date().getTime()
+        let current = store.state.currentChannel
+        current.avatar = _that.channelData.avatar
+        current.name = _that.channelData.name
+        current.description = _that.channelData.description
+        current.updateDate = new Date().getTime()
+        let blockType = BlockType.Channel
+        let _peers = []
+        let expireDate = currentTime + 3600*24*365*100 // 100 years
+        // 云端保存
+        let result = await collectionUtil.saveBlock(current, true, blockType, _peers, expireDate)
+        if (!result) {
+          _that.$q.notify({
+            message: _that.$i18n.t("Save failed"),
+            timeout: 3000,
+            type: "warning",
+            color: "info",
+          })
+          return
+        }
+        // 本地保存
+        await channelComponent.update(ChannelDataType.CHANNEL, current)
+        store.state.channelMap[current.channelId] = current
+      } catch (error) {
+        console.error(error)
+        _that.$q.notify({
+          message: _that.$i18n.t("Save failed"),
+          timeout: 3000,
+          type: "warning",
+          color: "warning"
+        })
+      } finally {
+        _that.$q.loading.hide()
+      }
+    },
+    async deleteChannel() {
+      let _that = this
+      let store = _that.$store
+      _that.$q.loading.show()
+      try {
+        let current = store.state.currentChannel
+        // 云端删除
+        await collectionUtil.deleteBlock(current, true, BlockType.Channel)
+        // 本地删除
+        let channelRecord = await channelComponent.get(ChannelDataType.CHANNEL, current._id)
+        await channelComponent.remove(ChannelDataType.CHANNEL, channelRecord, store.state.channels)
+        delete store.state.channelMap[current.channelId]
+        store.state.currentChannel = null
+        _that.subKind = "default"
+        if (store.state.ifMobileStyle) {
+            store.toggleDrawer(false)
+        }
+      } catch (error) {
+        console.error(error)
+        _that.$q.notify({
+          message: _that.$i18n.t("Delete failed"),
+          timeout: 3000,
+          type: "warning",
+          color: "warning"
+        })
+      } finally {
+        _that.$q.loading.hide()
+      }
     }
   },
   async created() {

@@ -104,7 +104,7 @@ q-layout
           chat.drawcontent
         q-tab-panel(name="contacts", style="padding:0px 0px")
           contacts.drawcontent
-        q-tab-panel(v-if="$store.ifMobile()" name="channel", style="padding:0px 0px")
+        q-tab-panel(name="channel", style="padding:0px 0px")
           channel.drawcontent
         //q-tab-panel(name="collection" style="padding:0px 0px")
           collection.drawcontent
@@ -136,7 +136,6 @@ q-layout
         )
           q-badge(v-if="ReceivedList.length > 0", color="red", floating) {{ ReceivedList.length }}
         q-tab(
-          v-if="$store.ifMobile()",
           name="channel",
           icon="settings_input_antenna",
           @click="$store.changeTab('channel')",

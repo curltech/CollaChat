@@ -4,6 +4,8 @@ import { BlockType } from 'libcolla'
 import { dataBlockService, queryValueAction } from 'libcolla'
 import { CollaUtil } from 'libcolla'
 
+import { channelComponent, ChannelDataType } from '@/libs/biz/colla-channel'
+
 export default {
   name: "Channel",
   components: {
@@ -113,45 +115,30 @@ export default {
       _that.notFollowChannelArticleResultList.splice(0)
       let followChannelResults = await channelComponent.searchPhase(ChannelDataType.CHANNEL, _that.searchText)
       console.info(followChannelResults)
-      let followChannelResultMap = {}
       if (followChannelResults && followChannelResults.rows && followChannelResults.rows.length > 0) {
         for (let followChannelResult of followChannelResults.rows) {
           let channel = store.state.channelMap[followChannelResult.doc.channelId]
           if (channel) {
-            channel.highlightingName = null
-            channel.highlightingDescription = null
-            channel.highlighting = null
             if (followChannelResult.highlighting.name) {
               channel.highlightingName = followChannelResult.highlighting.name
-            } else if (followChannelResult.highlighting.description) {
-              if (!channel.name) {
-                channel.highlightingDescription = followChannelResult.highlighting.description
-              } else {
-                channel.highlighting = _that.$i18n.t('Description: ') + followChannelResult.highlighting.description
-              }
             }
             _that.followChannelResultList.push(channel)
-            followChannelResultMap[channel.channelId] = channel
           }
         }
       }
       let followChannelArticleResults = await channelComponent.searchPhase(ChannelDataType.ARTICLE, _that.searchText)
       console.info(followChannelArticleResults)
-      let followChannelArticleResultMap = {}
       if (followChannelArticleResults && followChannelArticleResults.rows && followChannelArticleResults.rows.length > 0) {
         for (let followChannelArticleResult of followChannelArticleResults.rows) {
-          let article = store.state.articleMap[followChannelArticleResult.doc.articleId]
+          let article = followChannelArticleResult.doc
           if (article) {
-            article.highlightingTitle = null
-            article.highlightingAbstract = null
-            article.highlighting = null
             if (followChannelArticleResult.highlighting.title) {
-              article.highlightingTitle = followChannelResult.highlighting.title
-            } else if (followChannelResult.highlighting.abstract) {
-              article.highlighting = _that.$i18n.t('Abstract: ') + followChanneArticlelResult.highlighting.abstract
+              article.highlightingTitle = followChannelArticleResult.highlighting.title
             }
-            _that.notFollowChannelArticleResultList.push(article)
-            followChannelArticleResultMap[article.articleId] = article
+            if (followChannelArticleResult.highlighting.plainContent) {
+              article.highlightingPlainContent = followChannelArticleResult.highlighting.plainContent
+            }
+            _that.followChannelArticleResultList.push(article)
           }
         }
       }
@@ -244,6 +231,26 @@ export default {
       let store = _that.$store
       store.changeKind('newChannel', 'channel')
       store.toggleDrawer(true)
+    },
+    async followChannelResultSelected(followChannel, followChannelIndex) {
+      let _that = this
+      let store = _that.$store
+      await _that.channelSelected(followChannel, followChannelIndex)
+    },
+    async followChannelArticleResultSelected(followChannelArticle, followChannelArticleIndex) {
+
+    },
+    followChannelResult() {
+      let _that = this
+      _that.searchResult = 'followChannelResult'
+    },
+    followChannelArticleResult() {
+      let _that = this
+      _that.searchResult = 'followChannelArticleResult'
+    },
+    resultBack() {
+      let _that = this
+      _that.searchResult = 'allResult'
     }
   },
   async created() {

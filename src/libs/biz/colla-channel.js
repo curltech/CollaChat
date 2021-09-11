@@ -12,6 +12,17 @@ export let ChannelDataType = {
     'ATTACH': 'ATTACH',
 }
 
+let tables = {
+    'CHANNEL': 'myChannel',
+    'ARTICLE': 'myChannelArticle',
+    'ATTACH': 'myArticleAttach'
+}
+let indexFields = {
+    'CHANNEL': ['name'],
+    'ARTICLE': ['title', 'plainContent'],
+    'ATTACH': []
+}
+
 export let ChannelType = {
     'PUBLIC': 'PUBLIC',
     'PRIVATE': 'PRIVATE'
@@ -110,9 +121,9 @@ export class Attach {
 
 export class ChannelComponent {
     constructor() {
-        pounchDb.create('myChannel', ['ownerPeerId', 'channelId', 'updateDate'])
-        pounchDb.create('myChannelArticle', ['ownerPeerId', 'channelId', 'articleId', 'updateDate'])
-        pounchDb.create('myArticleAttach', ['ownerPeerId', 'articleId'])
+        pounchDb.create('myChannel', ['ownerPeerId', 'channelId', 'updateDate'], indexFields[ChannelDataType.CHANNEL])
+        pounchDb.create('myChannelArticle', ['ownerPeerId', 'channelId', 'articleId', 'updateDate'], indexFields[ChannelDataType.ARTICLE])
+        pounchDb.create('myArticleAttach', ['ownerPeerId', 'articleId'], indexFields[ChannelDataType.ATTACH])
     }
     async loadChannel(originCondition, sort, from, limit) {
         let condition = {}
@@ -336,7 +347,6 @@ export class ChannelComponent {
     }
     async get(dataType, id) {
         if (dataType) {
-            let tables = { 'CHANNEL': 'myChannel', 'ARTICLE': 'myChannelArticle', 'ATTACH': 'myArticleAttach' }
             return await pounchDb.get(tables[dataType], id)
         } else {
             return null
@@ -380,7 +390,6 @@ export class ChannelComponent {
           entities = [entities]
         }
         if (dataType) {
-            let tables = { 'CHANNEL': 'myChannel', 'ARTICLE': 'myChannelArticle', 'ATTACH': 'myArticleAttach' }
             await this._save(tables[dataType], entities, null, parent)
         }
     }
@@ -389,6 +398,20 @@ export class ChannelComponent {
           await pounchDb.run(table, entities[0], ignore, parent)
         } else if (entities.length > 0 && entities.length > 1) {
           await pounchDb.execute(table, entities, ignore, parent)
+        }
+    }
+    searchPhase(dataType, phase, filter) {
+        if (dataType) {
+          let options = {
+            highlighting_pre: '<font color="' + myself.myselfPeerClient.primaryColor + '">',
+            highlighting_post: '</font>'
+          }
+          /*if (!filter) {
+            filter = function (doc) {
+              return doc.ownerPeerId === myself.myselfPeerClient.peerId
+            }
+          }*/
+          return pounchDb.searchPhase(tables[dataType], phase, indexFields[dataType], options, filter)
         }
     }
 }
