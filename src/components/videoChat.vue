@@ -47,20 +47,22 @@
                 q-btn.btnIcon(unelevated round color="primary" icon="more_horiz" @click="showMoreChange" v-if="ifMobileSize || $store.state.ifMobileStyle")
             q-card-section.group-video-section
                 q-list.row.group-video-list(v-if="$store.state.currentCallChat && $store.state.currentCallChat.stream")
-                    q-item.group-video-item(:class="fullSize?'col-3':'col-6'" v-for="(memberPeerId, index) in $store.state.currentCallChat.callMessage.content" :key="index")
-                        q-item-section(v-if="$store.state.currentCallChat.stream" style="display:none")
-                            span {{$store.state.currentCallChat.stream.length}}
-                            span {{addStreamCount}}
-                        q-item-section.group-video-par(style="width:100%" v-if="$store.state.currentCallChat.callType == 'video' && ($store.state.currentCallChat.streamMap && $store.state.currentCallChat.streamMap[memberPeerId])")
-                            video(:ref='`memberVideo${memberPeerId}`' autoplay = 'autoplay')
-                        q-item-section(v-else)
-                            q-avatar(style = 'width:100%;height:auto;')
-                                img(:src="($store.state.linkmanMap[memberPeerId] && $store.state.linkmanMap[memberPeerId].avatar) ? $store.state.linkmanMap[memberPeerId].avatar : $store.defaultActiveAvatar")
-                            q-item(style="justify-content: center;" v-if="$store.state.currentCallChat.callType != 'video'")
-                                span {{getName(memberPeerId)}}
-                                q-icon(size="20px" name="person" :color="$store.state.currentCallChat.streamMap && $store.state.currentCallChat.streamMap[memberPeerId] ? 'secondary' : 'c-grey'")
-                        q-item-section.call-pending-section(v-if = '$store.state.currentCallChat.streamMap && $store.state.currentCallChat.streamMap[memberPeerId] && $store.state.currentCallChat.streamMap[memberPeerId].pending')
-                            q-spinner-dots(size="2rem")
+                    template(v-for="(memberPeerId, index) in $store.state.currentCallChat.callMessage.content")
+                        q-item.group-video-item(:class="fullSize?'col-3':'col-6'" )
+                            q-item-section(v-if="$store.state.currentCallChat.stream" style="display:none")
+                                span {{$store.state.currentCallChat.stream.length}}
+                                span {{addStreamCount}}
+                            q-item-section.group-video-par(style="width:100%" v-if="$store.state.currentCallChat.callType == 'video' && ($store.state.currentCallChat.streamMap && $store.state.currentCallChat.streamMap[memberPeerId])")
+                                video(:ref='`memberVideo${memberPeerId}`' autoplay = 'autoplay')
+                            q-item-section(v-else)
+                                q-avatar(style = 'width:100%;height:auto;')
+                                    img(:src="($store.state.linkmanMap[memberPeerId] && $store.state.linkmanMap[memberPeerId].avatar) ? $store.state.linkmanMap[memberPeerId].avatar : $store.defaultActiveAvatar")
+                                q-item(style="justify-content: center;" v-if="$store.state.currentCallChat.callType != 'video'")
+                                    span {{getName(memberPeerId)}}
+                                    q-icon(size="20px" name="person" :color="$store.state.currentCallChat.streamMap && $store.state.currentCallChat.streamMap[memberPeerId] ? 'secondary' : 'c-grey'")
+                            q-item-section.call-pending-section(v-if = '$store.state.currentCallChat.streamMap && $store.state.currentCallChat.streamMap[memberPeerId] && $store.state.currentCallChat.streamMap[memberPeerId].pending')
+                                q-spinner-dots(size="2rem")
+                        q-separator.c-separator-message(style="height:1px;margin-left:0px;margin-right:0px" v-if="index %2 !== 0") 
             q-card-section.mini-btn-section(v-if = "!Platform.is.ios && $store.state.currentCallChat.stream" )
                 q-btn.btnIcon(flat round color="primary" icon="remove_circle" @click="changeMiniVideoDialog")
                 q-btn(flat round color="primary" icon="fullscreen" @click="fullSize = true" v-if="!ifMobileSize && $store.state.currentCallChat && $store.state.currentCallChat.stream && $store.state.currentCallChat.stream.length > 1 && !fullSize")

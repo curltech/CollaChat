@@ -466,23 +466,10 @@ export default {
         let callChat = store.state.currentCallChat
         let senderPeerId = message.senderPeerId
         if(callChat && callChat.subjectId === message.subjectId){
-
-
-
-
           let option = {}
-          let _cloneStream = callChat.streamMap[callChat.ownerPeerId].stream.clone()
-          option.stream = _cloneStream
+          _that.localCloneStream[senderPeerId] = callChat.streamMap[callChat.ownerPeerId].stream.clone()
+          option.stream =  _that.localCloneStream[senderPeerId]
           webrtcPeerPool.create(senderPeerId, option)
-
-          // let webrtcPeers = await webrtcPeerPool.get(senderPeerId)
-          // if (webrtcPeers && webrtcPeers.length > 0) {
-          //   for (let webrtcPeer of webrtcPeers) {
-          //     let _cloneStream = callChat.streamMap[callChat.ownerPeerId].stream.clone()
-          //     _that.localCloneStream[senderPeerId] = _cloneStream
-          //     webrtcPeer.addStream(_cloneStream)
-          //   }
-          // }
           if(callChat.callMessage.hasAddStream){
             callChat.callMessage.hasAddStream[senderPeerId] = senderPeerId
           }else{
@@ -735,8 +722,8 @@ export default {
         }
       }
     },
-    iosShowMoreChange(){
-      this.iosShowMore = !this.iosShowMore
+    showMoreChange(){
+      this.showMore = !this.showMore
     },
     zoomVideoChange() {
       let _that = this

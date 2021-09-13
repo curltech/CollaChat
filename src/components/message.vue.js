@@ -1970,7 +1970,7 @@ export default {
       let oldOwner, newOwner
       for (let groupMember of groupMembers) {
         let linkman = store.state.linkmanMap[groupMember.memberPeerId]
-        if (linkman) { // 自己和非联系人除外
+        if (linkman && linkman.peerId !== myselfPeerClient.peerId) { // 自己和非联系人除外
           groupChatLinkmans.push(store.state.linkmanMap[groupMember.memberPeerId])
         }
         if (groupMember.memberPeerId === myselfPeerClient.peerId) {

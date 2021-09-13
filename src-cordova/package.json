@@ -36,7 +36,7 @@
     "cordova-plugin-geolocation": "~4.0.2",
     "cordova-plugin-inappbrowser": "~4.1.0",
     "cordova-plugin-ionic-webview-curltech": "^5.0.0",
-    "cordova-plugin-iosrtc": "^6.0.13",
+    "cordova-plugin-iosrtc": "^6.0.21",
     "cordova-plugin-local-notification": "^0.9.0-beta.2",
     "cordova-plugin-media": "^5.0.3",
     "cordova-plugin-media-capture": "^3.0.3",

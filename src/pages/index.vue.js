@@ -1950,7 +1950,7 @@ export default {
         let currentTime = new Date()
         let duplicated = false
         for (let groupChat of store.state.groupChats) {
-          if (groupChat._id === _id) {
+          if (groupChat._id === _id + myselfPeerClient.peerId) {
             duplicated = true
             break
           }
@@ -1958,7 +1958,7 @@ export default {
         if (!duplicated) {
           // 新增群组
           let groupChat = {}
-          groupChat._id = _id // 标识重复消息
+          groupChat._id = _id + myselfPeerClient.peerId // 标识重复消息
           groupChat.ownerPeerId = myselfPeerClient.peerId
           groupChat.groupId = content.groupId
           groupChat.groupCategory = 'Chat'
@@ -2156,7 +2156,7 @@ export default {
         let currentTime = new Date()
         let duplicated = false
         for (let groupChat of store.state.groupChats) {
-          if (groupChat._id === _id) {
+          if (groupChat._id === _id + myselfPeerClient.peerId) {
             duplicated = true
             break
           }
@@ -2168,7 +2168,7 @@ export default {
           if (!groupChat) {
             newCreated = true
             groupChat = {}
-            groupChat._id = _id // 标识重复消息
+            groupChat._id = _id + myselfPeerClient.peerId // 标识重复消息
             groupChat.ownerPeerId = myselfPeerClient.peerId
             groupChat.groupId = content.groupId
             groupChat.groupCategory = 'Chat'
@@ -2456,7 +2456,6 @@ export default {
           content: newOwner.memberPeerId === myselfPeerClient.peerId ? _that.$i18n.t("You") + _that.$i18n.t(" have become the new Group Owner") : newOwnerName + _that.$i18n.t(" has become the new Group Owner")
         }
         await store.addCHATSYSMessage(chat, chatMessage)
-
         // 发送Receive收条
         let linkmanRequest = {}
         linkmanRequest._id = _id
@@ -2477,10 +2476,7 @@ export default {
         let _id = content._id
         let receiveTime = content.receiveTime
         let receives = await chatComponent.loadReceive({
-          ownerPeerId: myselfPeerClient.peerId,
-          messageId: _id,
-          receiverPeerId: myselfPeerClient.peerId,
-          receiveTime: { $eq: null }
+          _id: _id,
         }, null, null, null)
         if (receives && receives.length > 0) {
           for (let receive of receives) {
