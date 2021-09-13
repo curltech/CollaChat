@@ -2476,7 +2476,10 @@ export default {
         let _id = content._id
         let receiveTime = content.receiveTime
         let receives = await chatComponent.loadReceive({
-          _id: _id,
+          ownerPeerId: myselfPeerClient.peerId,
+          messageId: _id,
+          receiverPeerId: message.ownerPeerId,
+          receiveTime: { $eq: null }
         }, null, null, null)
         if (receives && receives.length > 0) {
           for (let receive of receives) {
