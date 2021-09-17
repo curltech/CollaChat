@@ -666,6 +666,7 @@ export default {
       let _that = this
       let store = _that.$store
       let currentDate = new Date().getTime()
+      let subjectId = message.subjectId
       if(!message.actualReceiveTime){
          await _that.sendChatReceipt(message)
       }
@@ -680,12 +681,14 @@ export default {
         let ownerPeerId = message.ownerPeerId
         message.ownerPeerId = message.subjectId
         message.subjectId = ownerPeerId
-      } else {
+      } else if(message.subjectType === SubjectType.GROUP_CHAT){
+        if(!store.state.groupChatMap[subjectId]){
+          return
+        }
         message.ownerPeerId = myself.myselfPeerClient.peerId
       }
       message.receiveTime = currentDate
       message.actualReceiveTime = currentDate
-      let subjectId = message.subjectId
       if (message.contentType == ChatContentType.FILE || message.contentType == ChatContentType.IMAGE || message.contentType == ChatContentType.VIDEO || message.contentType == ChatContentType.NOTE) {
         message.percent = null
         message.loading = false
@@ -715,32 +718,6 @@ export default {
         message.readTime = new Date()
         if (message.destroyTime) {
             message.opened = false
-          // let callbackMessage = {
-          //   messageId: message.messageId,
-          //   subjectId: message.senderPeerId,
-          //   senderPeerId: myself.myselfPeerClient.peerId,
-          //   messageType: P2pChatMessageType.CHAT_READ_RECEIPT,
-          //   preSubjectType: message.subjectType,
-          //   readTime: message.readTime
-          // }
-          // await store.p2pSend(callbackMessage,message.senderPeerId)
-
-
-          // message.countDown = message.destroyTime / 1000
-          // let countDownInterval = setInterval(async function () {
-          //   if (!message.countDown) {
-          //     clearInterval(countDownInterval)
-          //     let currentChatMessages = store.state.chatMap[subjectId].messages
-          //     for (let i = currentChatMessages.length - 1; i >= 0; i--) {
-          //       if (message == currentChatMessages[i]) {
-          //         await chatComponent.remove(ChatDataType.MESSAGE, message, messages)
-          //       }
-          //     }
-          //     return
-          //   }
-          //   message.countDown--
-          //   console.log(message.countDown)
-          // }, 1000)
         }
       } else {
         store.state.chatMap[subjectId].unReadCount = store.state.chatMap[subjectId].unReadCount != undefined ? store.state.chatMap[subjectId].unReadCount + 1 : 0
@@ -2184,7 +2161,7 @@ export default {
             groupChat.top = false
             groupChat.recallTimeLimit = true
             groupChat.recallAlert = true
-            await contactComponent.insert(ContactDataType.LINKMAN, groupChat, null)
+            await contactComponent.insert(ContactDataType.GROUP, groupChat, null)
           }
 
           // 新增群组成员（对于新增群组成员为全量，否则为增量）

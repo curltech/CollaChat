@@ -2,11 +2,12 @@
     q-dialog.bg-c-grey-0.text-c-grey-10(v-model="$store.state.videoDialog" id='videoDialog' persistent :maximized = 'ifMobileSize || $store.state.ifMobileStyle || fullSize')
         //single video
         q-card.message-dialog-card(:class="dialogSizeClass" v-if="$store.state.currentCallChat && ($store.state.currentCallChat.subjectType === SubjectType.CHAT) && $store.state.currentCallChat.callType === 'video'")
-            q-card-section.current-video-section(v-show ="$store.state.currentCallChat.stream")
+            q-card-section.current-video-section(v-show ="$store.state.currentCallChat.stream" :class = "Platform.is.ios && iosFlatDisplay?'ios-flat-display':''")
                 q-item(style="display:none")
                     q-item-section
                         span {{addStreamCount}}
                 video(ref='currentVideo' autoplay = 'autoplay')
+                video(ref='zoomVideo' autoplay='autoplay' v-if="Platform.is.ios && iosFlatDisplay")
             q-card-section.linkman-video-section(v-if="$store.state.currentCallChat && $store.state.currentCallChat.stream && $store.state.currentCallChat.stream.length === 1 && !Platform.is.ios")
                 q-item
                     q-item-section(avatar)

@@ -1660,7 +1660,7 @@ export default {
       let groupChatLinkmans = []
       for (let groupMember of groupMembers) {
         let linkman = store.state.linkmanMap[groupMember.memberPeerId]
-        if (linkman) { // 自己和非联系人除外
+        if (linkman && linkman.peerId !== myselfPeerClient.peerId) { // 自己和非联系人除外
           groupChatLinkmans.push(store.state.linkmanMap[groupMember.memberPeerId])
           let _index = 0
           for (let gc of linkman.groupChats) {
@@ -1719,7 +1719,7 @@ export default {
           content: linkmanRequest
         }
         for (let groupChatLinkman of groupChatLinkmans) {
-          await store.saveAndSendMessage(message, groupChatLinkman)
+            await store.saveAndSendMessage(message, groupChatLinkman)
         }
       }
     },
@@ -1871,7 +1871,7 @@ export default {
       let groupChatLinkmans = []
       for (let groupMember of groupMembers) {
         let linkman = store.state.linkmanMap[groupMember.memberPeerId]
-        if (linkman) { // 自己和非联系人除外
+        if (linkman && linkman.peerId !== myselfPeerClient.peerId) { // 自己和非联系人除外
           groupChatLinkmans.push(store.state.linkmanMap[groupMember.memberPeerId])
         }
       }
@@ -1943,7 +1943,7 @@ export default {
         content: linkmanRequest
       }
       for (let groupChatLinkman of groupChatLinkmans) {
-        await store.saveAndSendMessage(message, groupChatLinkman)
+          await store.saveAndSendMessage(message, groupChatLinkman)
       }
 
       let chat = await store.getChat(groupChat.groupId)

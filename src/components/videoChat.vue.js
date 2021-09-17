@@ -24,7 +24,8 @@ export default {
       ActiveStatus: ActiveStatus,
       fullSize: false,
       ChatContentType: ChatContentType,
-      P2pChatMessageType: P2pChatMessageType
+      P2pChatMessageType: P2pChatMessageType,
+      iosFlatDisplay:true
     }
   },
   computed: {
@@ -44,7 +45,8 @@ export default {
     dialogSizeClass(){
       let _that = this
       let store = _that.$store
-      return Platform.is.ios?'ios-linkman-video': _that.ifMobileSize || store.state.ifMobileStyle ?'linkman-video':'linkman-video pc-video-card'
+      let styleClass = Platform.is.ios?'ios-linkman-video':( _that.ifMobileSize || store.state.ifMobileStyle ?'linkman-video':'linkman-video pc-video-card')
+      return styleClass
     },
     activeStatus() {
       let _that = this
@@ -731,17 +733,36 @@ export default {
       let callChat = store.state.currentCallChat
       let currentVideoDom = _that.$refs.currentVideo
       let zoomVideoDom = _that.$refs.zoomVideo
-      
+      debugger  
+      if(Platform.is.ios && _that.iosFlatDisplay){
+        _that.iosFlatDisplay = false
+        _that.$nextTick(() => {
+          currentVideoDom.srcObject = callChat.streamMap[callChat.ownerPeerId].stream
+        })
+        return
+      }
       if(currentVideoDom.srcObject === callChat.streamMap[callChat.ownerPeerId].stream){
         if(zoomVideoDom){
           zoomVideoDom.srcObject = callChat.streamMap[callChat.ownerPeerId].stream
         }
         currentVideoDom.srcObject = callChat.streamMap[callChat.subjectId].stream
       }else{
-        if(zoomVideoDom){
+        if(Platform.is.ios && !_that.iosFlatDisplay){
+          _that.iosFlatDisplay = true
+          _that.$nextTick(() => {
+            zoomVideoDom = _that.$refs.zoomVideo
+            if(zoomVideoDom){
+              zoomVideoDom.srcObject = callChat.streamMap[callChat.subjectId].stream
+            }
+            currentVideoDom.srcObject = callChat.streamMap[callChat.ownerPeerId].stream
+          })
+        }else{
+          if(zoomVideoDom){
           zoomVideoDom.srcObject = callChat.streamMap[callChat.subjectId].stream
         }
         currentVideoDom.srcObject = callChat.streamMap[callChat.ownerPeerId].stream
+        }
+       
       }
     },
     canCall() {
