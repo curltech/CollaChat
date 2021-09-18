@@ -303,7 +303,9 @@ export default {
         content: linkmanRequest
       }
       for (let includedLinkman of store.state.includedLinkmans) {
-        await store.saveAndSendMessage(message, includedLinkman)
+        if(includedLinkman.peerId !== myselfPeerClient.peerId){
+          await store.saveAndSendMessage(message, includedLinkman)
+        }
       }
 
       let chat = await store.getChat(groupChat.groupId)
