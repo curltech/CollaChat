@@ -1,5 +1,5 @@
 <template lang="pug">
-  div(:class="ifMobileSize || $store.state.ifMobileStyle ? 'bg-c-grey-1 heightMobileStyle-me' : 'bg-c-grey-1 heightStyle-me'")
+  div(:class="ifMobileSize || $store.state.ifMobileStyle ? (ifMobileSize ? 'bg-c-grey-1 heightMobileSize-me' : 'bg-c-grey-1 heightMobileStyle-me') : 'bg-c-grey-1 heightStyle-me'")
     q-tab-panels.bg-c-grey-1(v-model="subKind" animated transition-prev="slide-right" transition-next="slide-left")
       q-tab-panel(name="default" class="q-pa-none")
         q-toolbar.header-toolbar(:class="ifMobileSize || $store.state.ifMobileStyle ? 'bg-c-grey-1' : 'bg-c-grey-1'")
@@ -27,7 +27,7 @@
                   q-item-section(avatar style="padding-right:0px;min-width: 40px !important")
                     q-icon(name="fullscreen" color="primary")
                   q-item-section {{$t('Scan')}}
-        div.scroll.header-mar-top(:class="ifMobileSize || $store.state.ifMobileStyle ? 'scrollHeightMobileStyle' : 'scrollHeightStyle'")
+        div.scroll.header-mar-top(:class="ifMobileSize || $store.state.ifMobileStyle ? (ifMobileSize ? 'scrollHeightMobileSize' : 'scrollHeightMobileStyle') : 'scrollHeightStyle'")
           q-toolbar(insert :class="ifMobileSize || $store.state.ifMobileStyle ? 'bg-c-grey-1' : 'bg-c-grey-1'" class="q-px-xs")
             q-input.c-field(debounce="100" filled dense v-model="searchText" :placeholder="placeholder" input-class="text-center iconfont" @focus="searchFocus")
               template(slot="append")
@@ -69,7 +69,7 @@
             template(slot="append")
               q-icon(v-if="searchText" name="cancel" class="cursor-pointer" @click.stop="searchText = null;searching = false")
           q-btn.btnIcon(flat round icon="close" @click="searchBack()")
-        div.scroll.header-mar-top(:class="ifMobileSize || $store.state.ifMobileStyle ? 'scrollHeightMobileStyle-editor' : 'scrollHeightStyle'")
+        div.scroll.header-mar-top(:class="ifMobileSize || $store.state.ifMobileStyle ? (ifMobileSize ? 'scrollHeightMobileSize-editor' : 'scrollHeightMobileStyle-editor') : 'scrollHeightStyle'")
           q-list(v-if="searching===true")
             q-item(v-if="searchResult === 'allResult' || searchResult === 'linkmanResult'" class="text-c-grey-10")
               q-item-section(side)

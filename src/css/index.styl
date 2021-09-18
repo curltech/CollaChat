@@ -705,14 +705,20 @@ body.body--dark.bgc {
 .heightMobileStyle {
   height: calc(100vh - 106px - var(--safe-area-inset-top) - var(--safe-area-inset-bottom)) !important;
 }
+.heightMobileSize {
+  height: calc(100vh - 106px - 114px - var(--safe-area-inset-top) - var(--safe-area-inset-bottom)) !important;
+}
 .scrollHeightMobileStyle {
   height: calc(100vh - 156px - var(--safe-area-inset-top) - var(--safe-area-inset-bottom)) !important;
 }
-.scrollHeightMobileStyle-drawer {
-  height: calc(100vh - 50px - var(--safe-area-inset-top) - var(--safe-area-inset-bottom)) !important;
+.scrollHeightMobileSize {
+  height: calc(100vh - 156px - 114px - var(--safe-area-inset-top) - var(--safe-area-inset-bottom)) !important;
 }
 .scrollHeightMobileStyle-editor {
   height: calc(100vh - 58px - var(--safe-area-inset-top)) !important;
+}
+.scrollHeightMobileSize-editor {
+  height: calc(100vh - 58px - 114px - var(--safe-area-inset-top)) !important;
 }
 .wangEditorToolbarMobileStyle {
   height: 36px;
@@ -725,8 +731,15 @@ body.body--dark.bgc {
   height: calc(100vh - 50px - 30px - var(--safe-area-inset-top)) !important;
   font-size: 16px;
 }
+.scrollHeightMobileSize-wangEditor {
+  height: calc(100vh - 50px - 30px - 114px - var(--safe-area-inset-top)) !important;
+  font-size: 16px;
+}
 .heightMobileStyle-me {
   height: calc(100vh - 56px - var(--safe-area-inset-top) - var(--safe-area-inset-bottom)) !important;
+}
+.heightMobileSize-me {
+  height: calc(100vh - 56px - 114px - var(--safe-area-inset-top) - var(--safe-area-inset-bottom)) !important;
 }
 //}
 
@@ -813,11 +826,17 @@ body.body--dark.bgc {
 .talk-height-pc {
   height: calc(100vh - 159px - var(--safe-area-inset-top) - var(--safe-area-inset-bottom)) !important;
 }
-.talk-height-mobile1{
+.talk-height-mobileStyle1{
   height: calc(100vh - 105px - var(--safe-area-inset-top) - var(--safe-area-inset-bottom)) !important;
 }
-.talk-height-mobile2{
+.talk-height-mobileSize1{
+  height: calc(100vh - 105px - 114px - var(--safe-area-inset-top) - var(--safe-area-inset-bottom)) !important;
+}
+.talk-height-mobileStyle2{
   height: calc(100vh - 385px - var(--safe-area-inset-top) - var(--safe-area-inset-bottom)) !important;
+}
+.talk-height-mobileSize2{
+  height: calc(100vh - 385px - 114px - var(--safe-area-inset-top) - var(--safe-area-inset-bottom)) !important;
 }
 .q-message-avatar {
   height: 40px;
@@ -1110,6 +1129,10 @@ body.body--dark.bgc {
 }
 .ios-linkman-video .current-video-section video{
   height:85vh;
+}
+.ios-flat-display video {
+    width: 50% !important;
+    display:inline-block !important;;
 }
 //.group-video-list:nth-child(odd) video{
 //padding-left:1px

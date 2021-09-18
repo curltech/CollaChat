@@ -22,7 +22,7 @@
               q-item-label(class="text-center q-field__label q-py-sm" style="color: rgba(255,255,255,0.7)") {{$t('Article Body')}}
               P
               div.wangEditorToolbarMobileStyle(ref="editorToolbar")
-              div.bg-c-grey-2(ref="editorContainer" :class="ifMobileSize || $store.state.ifMobileStyle ? 'scrollHeightMobileStyle-wangEditor' : 'scrollHeightStyle'")
+              div.bg-c-grey-2(ref="editorContainer" :class="ifMobileSize || $store.state.ifMobileStyle ? (ifMobileSize ? 'scrollHeightMobileSize-wangEditor' : 'scrollHeightMobileStyle-wangEditor') : 'scrollHeightStyle'")
       q-tab-panel.bg-black#selectedContainer(:style="heightStyle" name="fullscreen" class="q-pa-none" align="center")
         q-toolbar(v-if="selected && selected.nodeName === 'VIDEO'" style="z-index: 999")
           q-btn.btnIcon(flat round icon="close" @click="fullscreenBack")

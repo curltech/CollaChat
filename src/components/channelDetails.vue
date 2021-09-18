@@ -31,7 +31,7 @@
           q-btn(flat round icon="keyboard_arrow_left" @click="subKind='default'")
           q-space
           q-btn.btnIcon(flat round icon="more_horiz" @click="viewCommand()")
-        div.scroll.header-mar-top.bg-c-white(v-if="$store.state.currentArticle" class="q-pl-md" id="scroll-target-view" :class="ifMobileSize || $store.state.ifMobileStyle ? 'scrollHeightMobileStyle-editor' : 'scrollHeightStyle'")
+        div.scroll.header-mar-top.bg-c-white(v-if="$store.state.currentArticle" class="q-pl-md" id="scroll-target-view" :class="ifMobileSize || $store.state.ifMobileStyle ? (ifMobileSize ? 'scrollHeightMobileSize-editor' : 'scrollHeightMobileStyle-editor') : 'scrollHeightStyle'")
           div(class="q-py-md text-h6") {{ $store.state.currentArticle.title }}
           div(class="q-pb-lg ")
             span {{ $store.state.currentArticle.author }}

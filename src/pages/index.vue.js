@@ -106,7 +106,7 @@ export default {
       return (!window.device && this.$q.screen.width < 481)
     },
     width() {
-      return this.$store.state.ifMobileStyle ? this.$q.screen.width : this.$q.screen.width - 420
+      return this.ifMobileSize || this.$store.state.ifMobileStyle ? this.$q.screen.width : this.$q.screen.width - 420
     },
     menuHeight() {
       return {
@@ -666,6 +666,7 @@ export default {
       let _that = this
       let store = _that.$store
       let currentDate = new Date().getTime()
+      let subjectId = message.subjectId
       if(!message.actualReceiveTime){
          await _that.sendChatReceipt(message)
       }
@@ -680,12 +681,14 @@ export default {
         let ownerPeerId = message.ownerPeerId
         message.ownerPeerId = message.subjectId
         message.subjectId = ownerPeerId
-      } else {
+      } else if(message.subjectType === SubjectType.GROUP_CHAT){
+        if(!store.state.groupChatMap[subjectId]){
+          return
+        }
         message.ownerPeerId = myself.myselfPeerClient.peerId
       }
       message.receiveTime = currentDate
       message.actualReceiveTime = currentDate
-      let subjectId = message.subjectId
       if (message.contentType == ChatContentType.FILE || message.contentType == ChatContentType.IMAGE || message.contentType == ChatContentType.VIDEO || message.contentType == ChatContentType.NOTE) {
         message.percent = null
         message.loading = false
@@ -715,32 +718,6 @@ export default {
         message.readTime = new Date()
         if (message.destroyTime) {
             message.opened = false
-          // let callbackMessage = {
-          //   messageId: message.messageId,
-          //   subjectId: message.senderPeerId,
-          //   senderPeerId: myself.myselfPeerClient.peerId,
-          //   messageType: P2pChatMessageType.CHAT_READ_RECEIPT,
-          //   preSubjectType: message.subjectType,
-          //   readTime: message.readTime
-          // }
-          // await store.p2pSend(callbackMessage,message.senderPeerId)
-
-
-          // message.countDown = message.destroyTime / 1000
-          // let countDownInterval = setInterval(async function () {
-          //   if (!message.countDown) {
-          //     clearInterval(countDownInterval)
-          //     let currentChatMessages = store.state.chatMap[subjectId].messages
-          //     for (let i = currentChatMessages.length - 1; i >= 0; i--) {
-          //       if (message == currentChatMessages[i]) {
-          //         await chatComponent.remove(ChatDataType.MESSAGE, message, messages)
-          //       }
-          //     }
-          //     return
-          //   }
-          //   message.countDown--
-          //   console.log(message.countDown)
-          // }, 1000)
         }
       } else {
         store.state.chatMap[subjectId].unReadCount = store.state.chatMap[subjectId].unReadCount != undefined ? store.state.chatMap[subjectId].unReadCount + 1 : 0
@@ -1950,7 +1927,7 @@ export default {
         let currentTime = new Date()
         let duplicated = false
         for (let groupChat of store.state.groupChats) {
-          if (groupChat._id === _id) {
+          if (groupChat._id === _id + myselfPeerClient.peerId) {
             duplicated = true
             break
           }
@@ -1958,7 +1935,7 @@ export default {
         if (!duplicated) {
           // 新增群组
           let groupChat = {}
-          groupChat._id = _id // 标识重复消息
+          groupChat._id = _id + myselfPeerClient.peerId // 标识重复消息
           groupChat.ownerPeerId = myselfPeerClient.peerId
           groupChat.groupId = content.groupId
           groupChat.groupCategory = 'Chat'
@@ -2156,7 +2133,7 @@ export default {
         let currentTime = new Date()
         let duplicated = false
         for (let groupChat of store.state.groupChats) {
-          if (groupChat._id === _id) {
+          if (groupChat._id === _id + myselfPeerClient.peerId) {
             duplicated = true
             break
           }
@@ -2168,7 +2145,7 @@ export default {
           if (!groupChat) {
             newCreated = true
             groupChat = {}
-            groupChat._id = _id // 标识重复消息
+            groupChat._id = _id + myselfPeerClient.peerId // 标识重复消息
             groupChat.ownerPeerId = myselfPeerClient.peerId
             groupChat.groupId = content.groupId
             groupChat.groupCategory = 'Chat'
@@ -2184,7 +2161,7 @@ export default {
             groupChat.top = false
             groupChat.recallTimeLimit = true
             groupChat.recallAlert = true
-            await contactComponent.insert(ContactDataType.LINKMAN, groupChat, null)
+            await contactComponent.insert(ContactDataType.GROUP, groupChat, null)
           }
 
           // 新增群组成员（对于新增群组成员为全量，否则为增量）
@@ -2456,7 +2433,6 @@ export default {
           content: newOwner.memberPeerId === myselfPeerClient.peerId ? _that.$i18n.t("You") + _that.$i18n.t(" have become the new Group Owner") : newOwnerName + _that.$i18n.t(" has become the new Group Owner")
         }
         await store.addCHATSYSMessage(chat, chatMessage)
-
         // 发送Receive收条
         let linkmanRequest = {}
         linkmanRequest._id = _id
@@ -2479,7 +2455,7 @@ export default {
         let receives = await chatComponent.loadReceive({
           ownerPeerId: myselfPeerClient.peerId,
           messageId: _id,
-          receiverPeerId: myselfPeerClient.peerId,
+          receiverPeerId: message.ownerPeerId,
           receiveTime: { $eq: null }
         }, null, null, null)
         if (receives && receives.length > 0) {

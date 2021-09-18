@@ -7,7 +7,7 @@
           q-toolbar-title(align="center" :style="ifMobileSize || $store.state.ifMobileStyle ? '' : 'padding-left:54px'") {{ ChatTitle($store.state.currentChat) }}
           q-btn.btnIcon(flat round dense icon="more_horiz" @click="subKind = $store.state.currentChat.subjectType + 'Details'")
         q-separator.c-separator-message.header-mar-top(style="height:1px;margin-left:0px;margin-right:0px")
-        #talk.q-pa-md.bg-c-grey-message.row.justify-center.scroll.q-chat-message(:class="!(ifMobileSize || $store.state.ifMobileStyle)?'talk-height-pc':(keyboardMode?'talk-height-mobile1':'talk-height-mobile2')")
+        #talk.q-pa-md.bg-c-grey-message.row.justify-center.scroll.q-chat-message(:class="!(ifMobileSize || $store.state.ifMobileStyle)?'talk-height-pc':(keyboardMode?(ifMobileSize?'talk-height-mobileSize1':'talk-height-mobileStyle1'):(ifMobileSize?'talk-height-mobileSize2':'talk-height-mobileStyle2'))")
           q-infinite-scroll(style="width:100%" @load="load_message" debounce="100" reverse :offset="50")
             q-chat-message(v-if="$store.state.currentChat && $store.state.currentChat.noMoreMessageTag" @touchstart="preventDefault" :label="$t('No more messages')")
             template(v-for="(message,index) in $store.state.currentChat.messages")
@@ -332,7 +332,7 @@
           form#groupFileUploadForm(v-if="ifIAmGroupOwner($store.state.currentChat) && (ifMobileSize || $store.state.ifMobileStyle)")
             label(for="groupFileUpload" class="notranslate material-icons q-icon btnIcon" aria-hidden="true" style="font-size: 27px;") add_circle_outline
             input#groupFileUpload(type="file" class="visually-hidden" @change="uploadGroupFileMobile()")
-        div.scroll.header-mar-top(id="scroll-target-default" :class="ifMobileSize || $store.state.ifMobileStyle ? 'scrollHeightMobileStyle-editor' : 'scrollHeightStyle'")
+        div.scroll.header-mar-top(id="scroll-target-default" :class="ifMobileSize || $store.state.ifMobileStyle ? (ifMobileSize ? 'scrollHeightMobileSize-editor' : 'scrollHeightMobileStyle-editor') : 'scrollHeightStyle'")
           q-toolbar(insert class="q-px-xs")
             q-input.c-field(debounce="100" filled dense v-model="groupFileFilter" :placeholder="placeholder" input-class="text-center iconfont")
               template(slot="append")

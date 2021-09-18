@@ -1,5 +1,5 @@
 <template lang="pug">
-  div(:class="ifMobileSize || $store.state.ifMobileStyle ? 'bg-c-grey-1 heightMobileStyle-me' : 'bg-c-grey-1 heightStyle-me'")
+  div(:class="ifMobileSize || $store.state.ifMobileStyle ? (ifMobileSize ? 'bg-c-grey-1 heightMobileSize-me' : 'bg-c-grey-1 heightMobileStyle-me') : 'bg-c-grey-1 heightStyle-me'")
     q-list
       q-item(clickable v-ripple @click="$store.changeKind('accountInformation', 'me');$store.toggleDrawer(true)" class="q-py-md")
         q-item-section(avatar)

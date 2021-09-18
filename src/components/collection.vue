@@ -7,7 +7,7 @@
           q-toolbar-title(align="center" :style="ifMobileSize || $store.state.ifMobileStyle ? ($store.collectionEntry === 'message' ? 'padding-right:54px' : '') : ($store.collectionEntry === 'message' ? 'padding-right:54px' : 'padding-left:54px')") {{ cloudSyncing ? $t('Updating...') : $t('Collection') + '-' + $t(collectionTypes[collectionTypeIndex].value) + '(' + myCollections.length + ')' }}
           q-btn.btnIcon(v-if="$store.collectionEntry !== 'message' && (collectionTypeIndex === 0 || collectionTypeIndex === 1)" flat round dense icon="add_circle_outline" @click="insert")
           q-btn(v-if="$store.collectionEntry === 'message'" flat icon="check" :disable="$store.state.selectedCollectionItems.length < 1" :label="($store.state.selectedCollectionItems.length > 0 ? '(' + $store.state.selectedCollectionItems.length + ')' : '')" :class="$store.state.selectedCollectionItems.length > 0 ? 'text-primary' : 'c-grey-0'" @click="doneSelectCollectionItem")
-        div.scroll.header-mar-top(id="scroll-target-default" :class="ifMobileSize || $store.state.ifMobileStyle ? 'scrollHeightMobileStyle-editor' : 'scrollHeightStyle'")
+        div.scroll.header-mar-top(id="scroll-target-default" :class="ifMobileSize || $store.state.ifMobileStyle ? (ifMobileSize ? 'scrollHeightMobileSize-editor' : 'scrollHeightMobileStyle-editor') : 'scrollHeightStyle'")
           q-pull-to-refresh(@refresh="cloudSync" color="primary" bg-color="c-grey-0" icon="sync")
             q-infinite-scroll(@load="load" debounce="100" :offset="150" scroll-target="#scroll-target-default")
               q-toolbar(insert class="q-px-xs")
@@ -49,7 +49,7 @@
                       q-separator.c-separator(vertical)
                       q-item-section(class="cursor-pointer" align="center" @click="confirmRemoveTag(tag, index)" v-close-popup) {{$t('Delete')}}
               q-separator.c-separator
-        div.scroll.header-mar-top(v-if="search===true" id="scroll-target-search" :class="ifMobileSize || $store.state.ifMobileStyle ? 'scrollHeightMobileStyle-editor' : 'scrollHeightStyle'")
+        div.scroll.header-mar-top(v-if="search===true" id="scroll-target-search" :class="ifMobileSize || $store.state.ifMobileStyle ? (ifMobileSize ? 'scrollHeightMobileSize-editor' : 'scrollHeightMobileStyle-editor') : 'scrollHeightStyle'")
           q-infinite-scroll(@load="load" debounce="100" :offset="150" scroll-target="#scroll-target-search")
             q-list
               div(v-for="(item, index) in myCollections" :key="index")
@@ -67,7 +67,7 @@
           q-btn(flat round icon="keyboard_arrow_left" @click="subKind='default'")
           q-space
           q-btn.btnIcon(v-if="$store.collectionEntry !== 'message'" flat round icon="more_horiz" @click="viewCommand()")
-        div.scroll.header-mar-top.bg-c-white(id="scroll-target-view" :class="ifMobileSize || $store.state.ifMobileStyle ? 'scrollHeightMobileStyle-editor' : 'scrollHeightStyle'")
+        div.scroll.header-mar-top.bg-c-white(id="scroll-target-view" :class="ifMobileSize || $store.state.ifMobileStyle ? (ifMobileSize ? 'scrollHeightMobileSize-editor' : 'scrollHeightMobileStyle-editor') : 'scrollHeightStyle'")
           iframe(v-if="myCollections.c_meta.current && myCollections.c_meta.current.content && myCollections.c_meta.current.content.substr(0,4)==='http'" id="iframeContent"
             :src="myCollections.c_meta.current.content" frameborder="no" border="0" marginwidth="0" marginheight="0" allowtransparency="yes" scrolling="yes")
           div(v-if="myCollections.c_meta.current && myCollections.c_meta.current.content && myCollections.c_meta.current.content.substr(0,4)!=='http' && myCollections.c_meta.current.collectionType !== CollectionType.VOICE && myCollections.c_meta.current.collectionType !== CollectionType.FILE && myCollections.c_meta.current.collectionType !== CollectionType.CHAT" v-html="myCollections.c_meta.current.content")
@@ -86,7 +86,7 @@
             q-badge(v-if="myCollections.c_meta.current && myCollections.c_meta.current.attachAmount > 0" floating) {{ myCollections.c_meta.current.attachAmount }}
           q-btn.btnIcon(flat round icon="more_horiz" @click="editCommand()")
         div.wangEditorToolbarMobileStyle(ref="editorToolbar")
-        div.bg-c-white(ref="editorContainer" :class="ifMobileSize || $store.state.ifMobileStyle ? 'scrollHeightMobileStyle-wangEditor' : 'scrollHeightStyle'")
+        div.bg-c-white(ref="editorContainer" :class="ifMobileSize || $store.state.ifMobileStyle ? (ifMobileSize ? 'scrollHeightMobileSize-wangEditor' : 'scrollHeightMobileStyle-wangEditor') : 'scrollHeightStyle'")
       q-tab-panel(:style="heightStyle" name="tag" class="q-pa-none")
         q-toolbar
           q-btn(flat round icon="keyboard_arrow_left" @click="subKind=tagEntry")
