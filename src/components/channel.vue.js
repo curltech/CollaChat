@@ -222,8 +222,8 @@ export default {
           }
         })
       }
-      store.state.articleList = articleList
       console.log('articleList:' + JSON.stringify(articleList))
+      store.state.articles = articleList
       _that.$q.loading.hide()
     },
     newChannel() {

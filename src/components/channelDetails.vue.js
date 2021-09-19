@@ -35,7 +35,7 @@ export default {
     ArticleFilteredList() {
       let _that = this
       let store = _that.$store
-      let articleList = store.state.articleList
+      let articleList = store.state.articles
       if (articleList && articleList.length > 0) {
         CollaUtil.sortByKey(articleList, 'updateDate', 'asc')
       }
@@ -106,12 +106,21 @@ export default {
       }).onOk(async action => {
         // console.log('Action chosen:', action.id)
         if (action.id === 'edit') {
-          _that.subKind = 'edit'
+          let article = store.state.currentArticle
+          store.state.articleData = {
+            cover: article.cover,
+            author: article.author,
+            title: article.title,
+            abstract: article.abstract,
+            content: article.content
+          }
+          store.newArticleEntry = 'editArticle'
+          _that.subKind = 'newArticle'
         } else if (action.id === 'forward') {
           store.selectChatEntry = 'articleForward'
           _that.subKind = 'selectChat'
         } else if (action.id === 'delete') {
-          _that.del()
+          await _that.deleteArticle()
         }
       }).onCancel(() => {
         // console.log('Dismissed')
@@ -164,6 +173,14 @@ export default {
       }).onOk(async action => {
         // console.log('Action chosen:', action.id)
         if (action.id === 'newArticle') {
+          store.state.articleData = {
+            cover: null,
+            author: null,
+            title: null,
+            abstract: null,
+            content: null
+          }
+          store.newArticleEntry = 'newArticle'
           _that.subKind = 'newArticle'
         } else if (action.id === 'edit') {
           _that.channelData = {
@@ -251,9 +268,8 @@ export default {
         await channelComponent.remove(ChannelDataType.CHANNEL, channelRecord, store.state.channels)
         delete store.state.channelMap[current.channelId]
         store.state.currentChannel = null
-        _that.subKind = "default"
         if (store.state.ifMobileStyle) {
-            store.toggleDrawer(false)
+          store.toggleDrawer(false)
         }
       } catch (error) {
         console.error(error)
@@ -266,7 +282,43 @@ export default {
       } finally {
         _that.$q.loading.hide()
       }
-    }
+    },
+    channelUpload() {
+      
+    },
+    async deleteArticle() {
+      let _that = this
+      let store = _that.$store
+      _that.$q.loading.show()
+      try {
+        let current = store.state.currentArticle
+        // 云端删除
+        await collectionUtil.deleteBlock(current, true, BlockType.Article)
+        // 本地删除
+        let articleDBItems = await channelComponent.loadArticle({
+          ownerPeerId: myself.myselfPeerClient.peerId,
+          articleId: current.articleId,
+          updateDate: { $gt: null }
+        }, [{ updateDate: 'desc' }])
+        if (articleDBItems && articleDBItems.length > 0) {
+          current._id = articleDBItems[0]._id
+          let articleRecord = await channelComponent.get(ChannelDataType.ARTICLE, current._id)
+          await channelComponent.remove(ChannelDataType.ARTICLE, articleRecord, store.state.articles)
+        }
+        store.state.currentArticle = null
+        _that.subKind = "default"
+      } catch (error) {
+        console.error(error)
+        _that.$q.notify({
+          message: _that.$i18n.t("Delete failed"),
+          timeout: 3000,
+          type: "warning",
+          color: "warning"
+        })
+      } finally {
+        _that.$q.loading.hide()
+      }
+    },
   },
   async created() {
     let _that = this

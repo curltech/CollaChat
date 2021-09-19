@@ -13,11 +13,11 @@
             q-img(src="login-bg-wd-9.jpg" style="height: 200px; width: 400px")
           q-card-section(class="q-pt-none")
             q-form(ref="formCreateArticle" @submit="createArticle" class="q-pa-sm")
-              q-input.c-field(autofocus :label="$t('Article Author')" filled clearable v-model="articleData.author" lazy-rules :rules="[]")
+              q-input.c-field(autofocus :label="$t('Article Author')" filled clearable v-model="$store.state.articleData.author" lazy-rules :rules="[]")
               p
-              q-input.c-field(autofocus :label="$t('Article Title')" filled clearable v-model="articleData.title" lazy-rules :rules="[]")
+              q-input.c-field(autofocus :label="$t('Article Title')" filled clearable v-model="$store.state.articleData.title" lazy-rules :rules="[]")
               p
-              q-input.c-field(:label="$t('Article Subtitle')" filled clearable v-model="articleData.abstract" lazy-rules :rules="[]")
+              q-input.c-field(:label="$t('Article Subtitle')" filled clearable v-model="$store.state.articleData.abstract" lazy-rules :rules="[]")
               p
               q-item-label(class="text-center q-field__label q-py-sm" :style="$q.dark.isActive ? 'color: rgba(255,255,255,0.7)' : ''") {{$t('Article Body')}}
               P
@@ -37,6 +37,6 @@
         video#selectedVideo(v-if="selected && selected.nodeName === 'VIDEO'" :src="selected.src" controls webkit-playsinline playsinline x5-playsinline x-webkit-airplay="allow" autoplay)
       q-tab-panel(name="captureMedia" style="padding:0px 0px")
         captureMedia.drawcontent
-    q-uploader(style="display:none" ref="upload" @added="files => upload(files)" accept=".jpg, image/*")
+    q-uploader(style="display:none" ref="articleUpload" @added="files => articleUpload(files)" accept=".jpg, image/*")
 </template>
 <script src="./newArticle.vue.js" />

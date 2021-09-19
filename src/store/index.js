@@ -63,8 +63,15 @@ let stateObj = {
   channels: [],
   channelMap: {},
   currentChannel: null,
+  articles: [],
   currentArticle: null,
-  articleList: []
+  articleData: {
+    cover: null,
+    author: null,
+    title: null,
+    abstract: null,
+    content: null
+  }
 }
 const store = new Vuex.Store({
   state: deepClone(stateObj) ,
