@@ -126,7 +126,7 @@ export default {
       let actions = [
         {
           label: channel.top ? _that.$i18n.t('Untop') : _that.$i18n.t('Top'),
-          icon: 'star',
+          icon: channel.top ? 'star_outline' : 'star',
           id: 'top'
         },
         {},

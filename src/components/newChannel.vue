@@ -5,7 +5,9 @@
       q-toolbar-title(align="center" :style="ifMobileSize || $store.state.ifMobileStyle ? '' : 'padding-left:54px'") {{$t('New Channel')}}
       q-btn.btnIcon(flat round dense icon="check" @click="createChannel")
     q-card(flat)
-      q-card-section(align="center" class="q-py-xl")
+      q-card-section(align="center")
+        q-item-label(class="q-field__label q-py-sm" :style="$q.dark.isActive ? 'color: rgba(255,255,255,0.7)' : ''") {{$t('Channel Avatar')}}
+        P
         q-avatar(size="64px")
           img(:src="channelData.avatar")
       q-card-section(class="q-pt-none")

@@ -23,9 +23,9 @@
                     q-badge(color="red" floating)
                 q-item-section
                   q-item-label {{ channel.name }}
-                  q-item-label last article's title
+                  q-item-label(caption) last article's title
                 q-item-section(side)
-                  q-item-label {{ detailDateFormat(channel.updateDate) }}
+                  q-item-label(caption) {{ detailDateFormat(channel.updateDate) }}
       q-tab-panel(name="search" class="q-pa-none")
         q-toolbar.header-toolbar
           q-btn(v-if="searchResult !== 'allResult'" flat round icon="keyboard_arrow_left" @click="resultBack()")

@@ -491,6 +491,28 @@
   "User list": "用戶列表",
   "User under": "下的用戶",
 
+  // Channel
+  "Follow": "關注",
+  "Unfollow": "不再關注",
+  "Top": "置頂",
+  "Untop": "取消置頂",
+  "New Channel": "新建頻道",
+  "Channel Avatar": "頭像",
+  "Channel Name": "名稱",
+  "Channel Description": "描述",
+  "New Article": "新建文章",
+  "Article Cover": "封面",
+  "Article Author": "作者",
+  "Article Title": "標題",
+  "Article Subtitle": "副標題",
+  "Article Body": "正文",
+  "Followed Channel": "關注頻道",
+  "Followed Channel Article": "關注頻道文章",
+  "Unfollowed Channel": "未關注頻道",
+  "Unfollowed Channel Article": "未關注頻道文章",
+  "More Channels": "更多頻道",
+  "More Articles": "更多文章",
+
   // Others
   "Migrate successfully": "遷移成功",
   "Backup successfully": "備份成功",

@@ -491,6 +491,28 @@
   "User list": "사용자 목록",
   "User under": "아래 사용자",
 
+  // Channel
+  "Follow": "팔로우",
+  "Unfollow": "언팔로우",
+  "Top": "상단",
+  "Untop": "언핑크",
+  "New Channel": "새 채널",
+  "Channel Avatar": "아바타",
+  "Channel Name": "이름",
+  "Channel Description": "설명",
+  "New Article": "새 기사",
+  "Article Cover": "표지",
+  "Article Author": "저자",
+  "Article Title": "제목",
+  "Article Subtitle": "부제목",
+  "Article Body": "본문",
+  "Followed Channel": "팔로잉 채널",
+  "Followed Channel Article": "팔로잉 채널 기사",
+  "Unfollowed Channel": "팔로우하지 않은 채널",
+  "Unfollowed Channel Article": "팔로우하지 않은 채널 기사",
+  "More Channels": "더 많은 채널",
+  "More Articles": "더 많은 기사",
+
   // Others
   "Migrate successfully": "성공적으로 마이그레이션",
   "Backup successfully": "성공적으로 백업",

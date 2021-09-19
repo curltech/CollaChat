@@ -495,6 +495,28 @@ export default {
   "User list": "用户列表",
   "User under": "下的用户",
 
+  // Channel
+  "Follow": "关注",
+  "Unfollow": "不再关注",
+  "Top": "置顶",
+  "Untop": "取消置顶",
+  "New Channel": "新建频道",
+  "Channel Avatar": "头像",
+  "Channel Name": "名称",
+  "Channel Description": "描述",
+  "New Article": "新建文章",
+  "Article Cover": "封面",
+  "Article Author": "作者",
+  "Article Title": "标题",
+  "Article Subtitle": "副标题",
+  "Article Body": "正文",
+  "Followed Channel": "关注频道",
+  "Followed Channel Article": "关注频道文章",
+  "Unfollowed Channel": "未关注频道",
+  "Unfollowed Channel Article": "未关注频道文章",
+  "More Channels": "更多频道",
+  "More Articles": "更多文章",
+
   // Others
   "Migrate successfully": "迁移成功",
   "Backup successfully": "备份成功",

@@ -8,7 +8,7 @@
           q-btn.btnIcon(flat round dense icon="check" @click="createArticle")
         q-card(flat)
           q-card-section(align="center")
-            q-item-label(class="q-field__label q-py-sm" style="color: rgba(255,255,255,0.7)") {{$t('Article Cover')}}
+            q-item-label(class="q-field__label q-py-sm" :style="$q.dark.isActive ? 'color: rgba(255,255,255,0.7)' : ''") {{$t('Article Cover')}}
             P
             q-img(src="login-bg-wd-9.jpg" style="height: 200px; width: 400px")
           q-card-section(class="q-pt-none")
@@ -17,9 +17,9 @@
               p
               q-input.c-field(autofocus :label="$t('Article Title')" filled clearable v-model="articleData.title" lazy-rules :rules="[]")
               p
-              q-input.c-field(:label="$t('Article Abstract')" filled clearable v-model="articleData.abstract" lazy-rules :rules="[]")
+              q-input.c-field(:label="$t('Article Subtitle')" filled clearable v-model="articleData.abstract" lazy-rules :rules="[]")
               p
-              q-item-label(class="text-center q-field__label q-py-sm" style="color: rgba(255,255,255,0.7)") {{$t('Article Body')}}
+              q-item-label(class="text-center q-field__label q-py-sm" :style="$q.dark.isActive ? 'color: rgba(255,255,255,0.7)' : ''") {{$t('Article Body')}}
               P
               div.wangEditorToolbarMobileStyle(ref="editorToolbar")
               div.bg-c-grey-2(ref="editorContainer" :class="ifMobileSize || $store.state.ifMobileStyle ? (ifMobileSize ? 'scrollHeightMobileSize-wangEditor' : 'scrollHeightMobileStyle-wangEditor') : 'scrollHeightStyle'")

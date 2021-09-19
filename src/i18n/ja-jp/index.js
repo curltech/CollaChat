@@ -491,6 +491,28 @@
   "User list": "ユーザーリスト",
   "User under": "下のユーザ",
 
+  // Channel
+  "Follow": "フォロー",
+  "Unfollow": "フォロー解除",
+  "Top": "上",
+  "Untop": "ピンクを外す",
+  "New Channel": "新しいチャンネル",
+  "Channel Avatar": "アバター",
+  "Channel Name": "名前",
+  "Channel Description": "説明",
+  "New Article": "新記事",
+  "Article Cover": "カバー",
+  "Article Author": "著者",
+  "Article Title": "タイトル",
+  "Article Subtitle": "サブタイトル",
+  "Article Body": "文章",
+  "Followed Channel": "フォローされているチャンネル",
+  "Followed Channel Article": "フォローされているチャンネル記事",
+  "Unfollowed Channel": "フォローされていないチャンネル",
+  "Unfollowed Channel Article": "フォローされていないチャンネル記事",
+  "More Channels": "その他のチャンネル",
+  "More Articles": "その他の記事",
+
   // Others
   "Migrate successfully": "正常に移行する",
   "Backup successfully": "正常にバックアップ",

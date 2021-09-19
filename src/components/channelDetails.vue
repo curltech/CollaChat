@@ -12,31 +12,33 @@
               q-avatar(size="64px")
                 img(:src="$store.state.currentChannel.avatar ? $store.state.currentChannel.avatar : $store.defaultActiveAvatar")
             q-item-section
-              q-item-label(class="text-h6") {{$store.state.currentChannel.name}}
+              q-item-label(class="text-h5") {{$store.state.currentChannel.name}}
+                q-icon(:name="$store.state.currentChannel.top ? 'star' : ''" color="primary")
             q-item-section(side)
-              q-btn.bg-c-grey-message(style="width: 80px;" @click="follow()" :label="$store.state.currentChannel.markDate ? $t('Unfollow') : $t('Follow')" no-caps)
+              q-btn.btnIcon.bg-c-grey-message(flat @click="follow()" :label="$store.state.currentChannel.markDate ? $t('Unfollow') : $t('Follow')" no-caps)
           q-item
             q-item-section
-              q-item-label {{$store.state.currentChannel.description}}
+              q-item-label(caption) {{$store.state.currentChannel.description}}
         div(v-for="(article, index) in ArticleFilteredList" :key="article.articleId" style="width: 80%; margin: auto")
           q-card(flat @click="articleSelected(article, index)")
-            q-card-section.bg-c-grey-message(class="text-center" style="height: 50px") {{ detailDateFormat(article.updateDate) }}
+            q-card-section.bg-c-grey-message(class="text-center" style="height: 50px")
+              q-item-label(caption :style="$q.dark.isActive ? 'color: rgba(255,255,255,0.7)' : ''") {{ detailDateFormat(article.updateDate) }}
             q-card-section(class="q-pa-none")
               q-img(:src="article.cover" style="height: 200px; width: 100%")
             q-card-section(class="q-py-md")
               q-item-label(class="text-h6") {{ article.title }}
-              q-item-label(v-if="article.abstract" class="q-py-sm") {{ article.abstract }}
+              q-item-label(v-if="article.abstract" class="q-py-sm" caption :style="$q.dark.isActive ? 'color: rgba(255,255,255,0.7)' : ''") {{ article.abstract }}
       q-tab-panel(:style="heightStyle" name="view" class="q-pa-none")
         q-toolbar.header-toolbar
           q-btn(flat round icon="keyboard_arrow_left" @click="subKind='default'")
           q-space
           q-btn.btnIcon(flat round icon="more_horiz" @click="viewCommand()")
         div.scroll.header-mar-top.bg-c-white(v-if="$store.state.currentArticle" class="q-pl-md" id="scroll-target-view" :class="ifMobileSize || $store.state.ifMobileStyle ? (ifMobileSize ? 'scrollHeightMobileSize-editor' : 'scrollHeightMobileStyle-editor') : 'scrollHeightStyle'")
-          div(class="q-py-md text-h6") {{ $store.state.currentArticle.title }}
-          div(class="q-pb-lg ")
-            span {{ $store.state.currentArticle.author }}
+          div(class="q-py-md text-h5") {{ $store.state.currentArticle.title }}
+          div(class="q-pb-lg")
+            span(class="q-item__label--caption text-caption" :style="$q.dark.isActive ? 'color: rgba(255,255,255,0.7)' : ''") {{ $store.state.currentArticle.author }}
             a(class="q-px-sm") {{ $store.state.currentChannel.name }}
-            span {{ detailDateFormat($store.state.currentArticle.updateDate) }}
+            span(class="q-item__label--caption text-caption" :style="$q.dark.isActive ? 'color: rgba(255,255,255,0.7)' : ''") {{ detailDateFormat($store.state.currentArticle.updateDate) }}
           iframe(v-if="$store.state.currentArticle.content && $store.state.currentArticle.content.substr(0,4)==='http'" id="iframeContent"
             :src="$store.state.currentArticle.content" frameborder="no" border="0" marginwidth="0" marginheight="0" allowtransparency="yes" scrolling="yes")
           div(v-if="$store.state.currentArticle.content && $store.state.currentArticle.content.substr(0,4)!=='http'" v-html="$store.state.currentArticle.content")

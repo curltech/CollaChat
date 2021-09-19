@@ -482,6 +482,28 @@ export default {
   "User list": "User list",
   "User under": "User under",
 
+  // Channel
+  "Follow": "Follow",
+  "Unfollow": "Unfollow",
+  "Top": "Top",
+  "Untop": "Untop",
+  "New Channel": "New Channel",
+  "Channel Avatar": "Channel Avatar",
+  "Channel Name": "Channel Name",
+  "Channel Description": "Channel Description",
+  "New Article": "New Article",
+  "Article Cover": "Article Cover",
+  "Article Author": "Article Author",
+  "Article Title": "Article Title",
+  "Article Subtitle": "Article Subtitle",
+  "Article Body": "Article Body",
+  "Followed Channel": "Followed Channel",
+  "Followed Channel Article": "Followed Channel Article",
+  "Unfollowed Channel": "Unfollowed Channel",
+  "Unfollowed Channel Article": "Unfollowed Channel Article",
+  "More Channels": "More Channels",
+  "More Articles": "More Articles",
+
   // Others
   "Migrate successfully": "Migrate successfully",
   "Backup successfully": "Backup successfully",
