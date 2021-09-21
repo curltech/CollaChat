@@ -1082,6 +1082,7 @@ export default {
           originalMessageId: originalMessageId
         }],
         tag: name,
+        name: name,
         updateDate: new Date().getTime()
       }
       this.$q.loading.show()

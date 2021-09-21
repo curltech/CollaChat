@@ -50,8 +50,10 @@
           q-toolbar-title(align="center" :style="ifMobileSize || $store.state.ifMobileStyle ? '' : 'padding-left:54px'") {{$t('Edit Channel')}}
           q-btn.btnIcon(flat round dense icon="check" @click="editChannel")
         q-card(flat)
-          q-card-section(align="center" class="q-py-xl")
-            q-avatar(size="64px")
+          q-card-section(align="center")
+            q-item-label(class="q-field__label q-py-sm" :style="$q.dark.isActive ? 'color: rgba(255,255,255,0.7)' : ''") {{$t('Channel Avatar')}}
+            P
+            q-avatar(size="64px" class="cursor-pointer" @click="$refs.channelUpload.pickFiles()")
               img(:src="channelData.avatar")
           q-card-section(class="q-pt-none")
             q-form(ref="formCreateChannel" @submit="editChannel" class="q-pa-sm")

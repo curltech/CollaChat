@@ -10,7 +10,7 @@
           q-card-section(align="center")
             q-item-label(class="q-field__label q-py-sm" :style="$q.dark.isActive ? 'color: rgba(255,255,255,0.7)' : ''") {{$t('Article Cover')}}
             P
-            q-img(src="login-bg-wd-9.jpg" style="height: 200px; width: 400px")
+            q-img(:src="$store.state.articleData.cover" style="height: 200px; width: 400px" class="cursor-pointer" @click="$refs.articleUpload.pickFiles()")
           q-card-section(class="q-pt-none")
             q-form(ref="formCreateArticle" @submit="createArticle" class="q-pa-sm")
               q-input.c-field(autofocus :label="$t('Article Author')" filled clearable v-model="$store.state.articleData.author" lazy-rules :rules="[]")

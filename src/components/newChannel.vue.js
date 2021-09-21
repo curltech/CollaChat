@@ -12,7 +12,7 @@ export default {
   data() {
     return {
       channelData: {
-        avatar: this.$store.defaultActiveAvatar,
+        avatar: this.$store.defaultChannelAvatar,
         name: null,
         description: null
       },
@@ -72,7 +72,7 @@ export default {
         store.state.channelMap[current.channelId] = current
         store.toggleDrawer(false)
         _that.channelData = {
-          avatar: this.$store.defaultActiveAvatar,
+          avatar: this.$store.defaultChannelAvatar,
           name: null,
           description: null
         }
@@ -86,6 +86,61 @@ export default {
         })
       } finally {
         _that.$q.loading.hide()
+      }
+    },
+    channelUpload: function (files) {
+      let _that = this
+      let file = files[0]
+      let reader = new FileReader()
+      reader.onload = _that.onChangeAvatar
+      reader.readAsDataURL(file)
+      _that.$refs.channelUpload.reset()
+    },
+    onChangeAvatar: function (e) {
+      this.processAvatar2(e.target.result)
+    },
+    processAvatar2(avatarBase64) {
+      let _that = this
+      let newImage = new Image()
+      newImage.src = avatarBase64
+      newImage.setAttribute('crossOrigin', 'Anonymous') // url为外域时需要
+      newImage.onload = function () {
+        let imgWidth = this.width
+        let imgHeight = this.height
+        let canvas = document.createElement('canvas')
+        let ctx = canvas.getContext('2d')
+        // 缩小图片尺寸：短边300px
+        console.log('imgWidth: ' + imgWidth + ', imgHeight: ' + imgHeight)
+        let w = 300
+        if (imgWidth > imgHeight) {
+          canvas.width = w
+          canvas.height = w * imgHeight / imgWidth
+        } else {
+          canvas.height = w
+          canvas.width = w * imgWidth / imgHeight
+        }
+        console.log('canvasWidth: ' + canvas.width + ', canvasHeight: ' + canvas.height)
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+        ctx.drawImage(newImage, 0, 0, canvas.width, canvas.height)
+        // 压缩图片大小：长度10k以下
+        console.log('avatarBase64.length: ' + avatarBase64.length)
+        let quality = 1.0
+        let arr = avatarBase64.split(',')
+        let mime = arr[0].match(/:(.*?);/)[1]
+        mime = (mime === 'image/png' ? 'image/jpeg' : mime)
+        while (avatarBase64.length / 1024 > 10) {
+          let length = avatarBase64.length
+          quality -= 0.01
+          avatarBase64 = canvas.toDataURL(mime, quality)
+          if (avatarBase64.length === length) {
+            console.log('no change')
+            break
+          }
+        }
+        console.log('compressed avatarBase64.length: ' + avatarBase64.length)
+        console.log('quality: ' + quality)
+        console.log('avatarBase64: ' + avatarBase64)
+        _that.channelData.avatar = avatarBase64
       }
     },
   },

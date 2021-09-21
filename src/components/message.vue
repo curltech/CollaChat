@@ -341,9 +341,9 @@
             div(v-for="(groupFile, index) in GroupFileFilteredList" :key="groupFile.blockId")
               q-item(:active-class="ifMobileSize || $store.state.ifMobileStyle ? 'bg-c-grey-1' : 'bg-c-grey-2'" class="text-c-grey-10")
                 q-item-section(avatar)
-                  q-icon.menuIcon(:name="FileIconName(groupFile.metadata)" color="primary")
+                  q-icon.menuIcon(:name="FileIconName(groupFile.name)" color="primary")
                 q-item-section
-                  q-item-label(lines="1" clickable v-ripple @click="groupFileSelected(groupFile, index)" ) {{ groupFile.metadata }}
+                  q-item-label(lines="1" clickable v-ripple @click="groupFileSelected(groupFile, index)" ) {{ groupFile.name }}
                 q-item-section(side)
                   q-item-label(lines="1") {{ detailDateFormat(groupFile.createTimestamp) }}
                 q-item-section(v-if="ifIAmGroupOwner($store.state.currentChat)" side)

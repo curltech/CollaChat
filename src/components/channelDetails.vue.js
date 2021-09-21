@@ -2,7 +2,7 @@ import { date } from 'quasar'
 
 import { CollaUtil } from 'libcolla'
 import { myself } from 'libcolla'
-import { BlockType } from 'libcolla'
+import { BlockType, dataBlockService } from 'libcolla'
 
 import { collectionUtil } from '@/libs/biz/colla-collection-util'
 import { channelComponent, ChannelDataType } from '@/libs/biz/colla-channel'
@@ -64,10 +64,18 @@ export default {
     },
   },
   methods: {
-    articleSelected(article, index) {
+    async articleSelected(article, index) {
       let _that = this
       let store = _that.$store
-      let prevCurrentArticle = store.state.currentArticle
+      if (!article) {
+        return
+      }
+      if (!article.content) {
+        let blocks = await dataBlockService.findTxPayload(null, article.blockId)
+        if (blocks && blocks.length > 0) {
+          article = blocks[0]
+        }
+      }
       store.state.currentArticle = article
       _that.subKind = 'view'
     },
@@ -174,7 +182,7 @@ export default {
         // console.log('Action chosen:', action.id)
         if (action.id === 'newArticle') {
           store.state.articleData = {
-            cover: null,
+            cover: store.defaultChannelArticleCover,
             author: null,
             title: null,
             abstract: null,
@@ -283,8 +291,60 @@ export default {
         _that.$q.loading.hide()
       }
     },
-    channelUpload() {
-      
+    channelUpload: function (files) {
+      let _that = this
+      let file = files[0]
+      let reader = new FileReader()
+      reader.onload = _that.onChangeAvatar
+      reader.readAsDataURL(file)
+      _that.$refs.channelUpload.reset()
+    },
+    onChangeAvatar: function (e) {
+      this.processAvatar2(e.target.result)
+    },
+    processAvatar2(avatarBase64) {
+      let _that = this
+      let newImage = new Image()
+      newImage.src = avatarBase64
+      newImage.setAttribute('crossOrigin', 'Anonymous') // url为外域时需要
+      newImage.onload = function () {
+        let imgWidth = this.width
+        let imgHeight = this.height
+        let canvas = document.createElement('canvas')
+        let ctx = canvas.getContext('2d')
+        // 缩小图片尺寸：短边300px
+        console.log('imgWidth: ' + imgWidth + ', imgHeight: ' + imgHeight)
+        let w = 300
+        if (imgWidth > imgHeight) {
+          canvas.width = w
+          canvas.height = w * imgHeight / imgWidth
+        } else {
+          canvas.height = w
+          canvas.width = w * imgWidth / imgHeight
+        }
+        console.log('canvasWidth: ' + canvas.width + ', canvasHeight: ' + canvas.height)
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+        ctx.drawImage(newImage, 0, 0, canvas.width, canvas.height)
+        // 压缩图片大小：长度10k以下
+        console.log('avatarBase64.length: ' + avatarBase64.length)
+        let quality = 1.0
+        let arr = avatarBase64.split(',')
+        let mime = arr[0].match(/:(.*?);/)[1]
+        mime = (mime === 'image/png' ? 'image/jpeg' : mime)
+        while (avatarBase64.length / 1024 > 10) {
+          let length = avatarBase64.length
+          quality -= 0.01
+          avatarBase64 = canvas.toDataURL(mime, quality)
+          if (avatarBase64.length === length) {
+            console.log('no change')
+            break
+          }
+        }
+        console.log('compressed avatarBase64.length: ' + avatarBase64.length)
+        console.log('quality: ' + quality)
+        console.log('avatarBase64: ' + avatarBase64)
+        _that.channelData.avatar = avatarBase64
+      }
     },
     async deleteArticle() {
       let _that = this

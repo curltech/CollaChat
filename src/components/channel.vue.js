@@ -40,8 +40,10 @@ export default {
         if (channelFilter) {
           channelFilteredArray = channelList.filter((channel) => {
             if (channel) {
-              return channel.metadata.toLowerCase().includes(channelFilter.toLowerCase())
-              || pinyinUtil.getPinyin(channel.metadata).toLowerCase().includes(channelFilter.toLowerCase())
+              return channel.name.toLowerCase().includes(channelFilter.toLowerCase())
+              || pinyinUtil.getPinyin(channel.name).toLowerCase().includes(channelFilter.toLowerCase())
+              || channel.description.toLowerCase().includes(channelFilter.toLowerCase())
+              || pinyinUtil.getPinyin(channel.description).toLowerCase().includes(channelFilter.toLowerCase())
             }
           })
         } else {
@@ -152,14 +154,14 @@ export default {
       conditionBean['businessNumber'] = 'Channel'
       conditionBean['getAllBlockIndex'] = true
       conditionBean['blockType'] = BlockType.Channel
-      let channelList = []
+      //let channelList = []
       let indexList = []
       if(store.state.networkStatus === 'CONNECTED'){
         indexList = await queryValueAction.queryValue(null, conditionBean)
       }
-      console.log('indexList:' + JSON.stringify(indexList))
+      console.log('getChannelList-indexList:' + JSON.stringify(indexList))
       if (indexList && indexList.length > 0) {
-        let ps = []
+        /*let ps = []
         for (let index of indexList) {
           let promise = dataBlockService.findTxPayload(null, index['blockId'])
           ps.push(promise)
@@ -172,11 +174,16 @@ export default {
               channelList.push(channel)
             }
           }
-        })
+        })*/
+        for (let index of indexList) {
+          index.avatar = index.thumbnail
+          index.thumbnail = null
+        }
       }
-      console.log('channelList:' + JSON.stringify(channelList))
+      //console.log('getChannelList-channelList:' + JSON.stringify(channelList))
       _that.$q.loading.hide()
-      return channelList
+      //return channelList
+      return indexList
     },
     async channelSelected(channel, index) {
       let _that = this
@@ -200,14 +207,14 @@ export default {
       conditionBean['businessNumber'] = store.state.currentChannel['channelId']
       conditionBean['getAllBlockIndex'] = true
       conditionBean['blockType'] = BlockType.ChannelArticle
-      let articleList = []
+      //let articleList = []
       let indexList = []
       if(store.state.networkStatus === 'CONNECTED'){
         indexList = await queryValueAction.queryValue(null, conditionBean)
       }
-      console.log('indexList:' + JSON.stringify(indexList))
+      console.log('getArticleList-indexList:' + JSON.stringify(indexList))
       if (indexList && indexList.length > 0) {
-        let ps = []
+        /*let ps = []
         for (let index of indexList) {
           let promise = dataBlockService.findTxPayload(null, index['blockId'])
           ps.push(promise)
@@ -220,10 +227,19 @@ export default {
               articleList.push(article)
             }
           }
-        })
+        })*/
+        for (let index of indexList) {
+          index.cover = index.thumbnail
+          index.thumbnail = null
+          index.title = index.name
+          index.name = null
+          index.abstract = index.description
+          index.description = null
+        }
       }
-      console.log('articleList:' + JSON.stringify(articleList))
-      store.state.articles = articleList
+      //console.log('getArticleList-articleList:' + JSON.stringify(articleList))
+      //store.state.articles = articleList
+      store.state.articles = indexList
       _that.$q.loading.hide()
     },
     newChannel() {

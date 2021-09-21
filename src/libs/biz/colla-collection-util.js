@@ -346,6 +346,17 @@ import { P2pChatMessageType } from '@/libs/biz/colla-chat'
       expireDate = new Date().getTime() + 3600*24*365*100 // 100 years
     }
     let payload = { payload: CollaUtil.clone(bizObj), metadata: bizObj.tag, expireDate: expireDate }
+    if (blockType === BlockType.GroupFile) {
+      payload.name = bizObj.name
+    } else if (blockType === BlockType.Channel) {
+      payload.thumbnail = bizObj.avatar
+      payload.name = bizObj.name
+      payload.description = bizObj.name
+    } else if (blockType === BlockType.ChannelArticle) {
+      payload.thumbnail = bizObj.cover
+      payload.name = bizObj.title
+      payload.description = bizObj.abstract
+    }
     let dataBlock = DataBlockService.create(blockId, businessNumber, blockType, bizObj.updateDate, payload, peers)
     console.log('collection dataBlock length:' + JSON.stringify(dataBlock).length)
     let start = new Date().getTime()

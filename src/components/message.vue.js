@@ -386,8 +386,8 @@ export default {
         if (groupFileFilter) {
           groupFileFilteredArray = groupFileList.filter((groupFile) => {
             if (groupFile) {
-              return groupFile.metadata.toLowerCase().includes(groupFileFilter.toLowerCase())
-              || pinyinUtil.getPinyin(groupFile.metadata).toLowerCase().includes(groupFileFilter.toLowerCase())
+              return groupFile.name.toLowerCase().includes(groupFileFilter.toLowerCase())
+              || pinyinUtil.getPinyin(groupFile.name).toLowerCase().includes(groupFileFilter.toLowerCase())
             }
           })
         } else {
@@ -402,10 +402,10 @@ export default {
     FileIconName() {
       let _that = this
       let store = _that.$store
-      return function (metadata) {
+      return function (name) {
         let iconName = 'insert_drive_file'
-        if (metadata) {
-          let arr = metadata.split('.')
+        if (name) {
+          let arr = name.split('.')
           let suffix = arr[arr.length - 1]
           suffix = suffix.toUpperCase()
           if (suffix === 'JPG' || suffix === 'JPEG' || suffix === 'PNG' || suffix === 'BMP') {
@@ -2879,7 +2879,7 @@ export default {
             _that.groupFileList.push({
               blockId : _groupFileMessage.attachBlockId,
               createTimestamp : _groupFileMessage.createDate,
-              metadata : _groupFileMessage.content,
+              name : _groupFileMessage.content,
               businessNumber : _groupFileMessage.subjectId
             })
           }
@@ -3013,7 +3013,7 @@ export default {
       if(!message){
           message = {
               attachBlockId : groupFile.blockId,
-              content : groupFile.metadata,
+              content : groupFile.name,
               createDate : groupFile.createTimestamp,
               subjectId : groupFile.businessNumber
           }
