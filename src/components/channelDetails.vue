@@ -24,7 +24,7 @@
             q-card-section.bg-c-grey-message(class="text-center" style="height: 50px")
               q-item-label(caption :style="$q.dark.isActive ? 'color: rgba(255,255,255,0.7)' : ''") {{ detailDateFormat(article.updateDate) }}
             q-card-section(class="q-pa-none")
-              q-img(:src="article.cover" style="height: 200px; width: 100%")
+              q-img(:src="article.cover ? article.cover : $store.defaultChannelArticleCover" style="height: 200px; width: 100%")
             q-card-section(class="q-py-md")
               q-item-label(class="text-h6") {{ article.title }}
               q-item-label(v-if="article.abstract" class="q-py-sm" caption :style="$q.dark.isActive ? 'color: rgba(255,255,255,0.7)' : ''") {{ article.abstract }}
@@ -54,7 +54,7 @@
             q-item-label(class="q-field__label q-py-sm" :style="$q.dark.isActive ? 'color: rgba(255,255,255,0.7)' : ''") {{$t('Channel Avatar')}}
             P
             q-avatar(size="64px" class="cursor-pointer" @click="$refs.channelUpload.pickFiles()")
-              img(:src="channelData.avatar")
+              img(:src="channelData.avatar ? channelData.avatar : $store.defaultChannelAvatar")
           q-card-section(class="q-pt-none")
             q-form(ref="formCreateChannel" @submit="editChannel" class="q-pa-sm")
               q-input.c-field(autofocus :label="$t('Channel Name')" filled clearable v-model="channelData.name" lazy-rules :rules="[]")

@@ -9,7 +9,7 @@
         q-item-label(class="q-field__label q-py-sm" :style="$q.dark.isActive ? 'color: rgba(255,255,255,0.7)' : ''") {{$t('Channel Avatar')}}
         P
         q-avatar(size="64px" class="cursor-pointer" @click="$refs.channelUpload.pickFiles()")
-          img(:src="channelData.avatar")
+          img(:src="channelData.avatar ? channelData.avatar : $store.defaultChannelAvatar")
       q-card-section(class="q-pt-none")
         q-form(ref="formCreateChannel" @submit="createChannel" class="q-pa-sm")
           q-input.c-field(autofocus :label="$t('Channel Name')" filled clearable v-model="channelData.name" lazy-rules :rules="[]")

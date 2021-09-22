@@ -12,7 +12,7 @@ export default {
   data() {
     return {
       channelData: {
-        avatar: this.$store.defaultChannelAvatar,
+        avatar: null,
         name: null,
         description: null
       },
@@ -72,7 +72,7 @@ export default {
         store.state.channelMap[current.channelId] = current
         store.toggleDrawer(false)
         _that.channelData = {
-          avatar: this.$store.defaultChannelAvatar,
+          avatar: null,
           name: null,
           description: null
         }

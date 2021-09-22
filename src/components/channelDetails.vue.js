@@ -17,7 +17,7 @@ export default {
     return {
       subKind: 'default',
       channelData: {
-        avatar: this.$store.defaultActiveAvatar,
+        avatar: null,
         name: null,
         description: null
       }
@@ -182,7 +182,7 @@ export default {
         // console.log('Action chosen:', action.id)
         if (action.id === 'newArticle') {
           store.state.articleData = {
-            cover: store.defaultChannelArticleCover,
+            cover: null,
             author: null,
             title: null,
             abstract: null,

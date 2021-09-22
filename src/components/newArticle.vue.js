@@ -43,10 +43,6 @@ export default {
       try {
         let clientPeerId = myself.myselfPeerClient.peerId
         let currentTime = new Date().getTime()
-        let cover = store.state.articleData.cover
-        if (!cover) {
-          cover = store.defaultActiveAvatar
-        }
         let content = store.state.articleData.content
         let plainContent = content.replace(/<[^>]+>/g, '').replace(/^\s*/g, '')
         let pyPlainContent = pinyinUtil.getPinyin(plainContent)
@@ -58,7 +54,7 @@ export default {
             ownerPeerId: clientPeerId,
             channelId: channelId,
             articleId: blockId,
-            cover: cover,
+            cover: store.state.articleData.cover,
             author: store.state.articleData.author,
             title: store.state.articleData.title,
             abstract: store.state.articleData.abstract,
@@ -72,7 +68,7 @@ export default {
           }
         } else if (store.newArticleEntry === 'editArticle') {
           current = store.state.currentArticle
-          current.cover = cover
+          current.cover = store.state.articleData.cover
           current.author = store.state.articleData.author
           current.title = store.state.articleData.title
           current.abstract = store.state.articleData.abstract
