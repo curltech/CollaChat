@@ -3516,7 +3516,7 @@ export default {
       let channelDBItems = await channelComponent.loadChannel({
         ownerPeerId: clientPeerId,
         updateDate: { $gt: null }
-      }, [{ updateDate: 'asc' }])
+      }, [{ updateDate: 'desc' }])
       if (channelDBItems && channelDBItems.length > 0) {
         store.state.channels = channelDBItems
         for (let channelDBItem of channelDBItems) {

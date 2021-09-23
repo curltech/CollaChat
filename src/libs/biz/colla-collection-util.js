@@ -341,7 +341,10 @@ import { P2pChatMessageType } from '@/libs/biz/colla-chat'
       peers.push(myself.myselfPeerClient)
     }
     let blockId = bizObj.blockId
-    let businessNumber = bizObj._id ? bizObj._id : bizObj.businessNumber // Collection-_id, ChatAttach/GroupFile-businessNumber
+    let businessNumber = bizObj._id
+    if (blockType !== BlockType.Collection) {
+      businessNumber = bizObj.businessNumber
+    }
     if (!expireDate) {
       expireDate = new Date().getTime() + 3600*24*365*100 // 100 years
     }
@@ -393,7 +396,10 @@ import { P2pChatMessageType } from '@/libs/biz/colla-chat'
    */
   async deleteBlock(bizObj, ifUpload, blockType) {
     let blockId = bizObj.blockId
-    let businessNumber = bizObj._id ? bizObj._id : bizObj.businessNumber // Collection-_id, P2pChat-businessNumber
+    let businessNumber = bizObj._id
+    if (blockType !== BlockType.Collection) {
+      businessNumber = bizObj.businessNumber
+    }
     let peers = []
     peers.push(myself.myselfPeerClient)
     let createTimestamp = new Date().getTime()

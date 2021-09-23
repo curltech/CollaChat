@@ -143,7 +143,7 @@ export class CollectionComponent {
 		if (from) {
 			qs.push({ updateDate: { $lt: from } })
 		} else {
-			qs.push({ updateDate: { $lt: null } })
+			qs.push({ updateDate: { $gt: null } })
 		}
 		if (ownerPeerId) {
 			let q = {}
@@ -249,6 +249,8 @@ export class CollectionComponent {
 		let qs = []
 		if (from) {
 			qs.push({ createDate: { $lt: from } })
+		} else {
+			qs.push({ createDate: { $gt: null } })
 		}
 		let collectionId = currentCollection._id
 		if (collectionId) {
@@ -257,14 +259,12 @@ export class CollectionComponent {
 			qs.push({ collectionId: '' })
 		}
 		// put content into attach
-		//qs.push({ createDate: { $gt: null } })
 		if (qs.length > 0) {
 			condition['$and'] = qs
 		}
 		console.log('will load more attachs, collectionId:' + collectionId + 'from:' + from)
 		// put content into attach
-		//let page = await pounchDb.findPage('myAttach', condition, [{ createDate: 'desc' }], null, null, limit)
-		let page = await pounchDb.findPage('myAttach', condition, null, null, null, limit)
+		let page = await pounchDb.findPage('myAttach', condition, [{ createDate: 'desc' }], null, null, limit)
 		let data = page.result
 		if (data && data.length > 0) {
 			let payloadKey = currentCollection.payloadKey

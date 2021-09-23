@@ -496,6 +496,7 @@
   "Unfollow": "언팔로우",
   "Top": "상단",
   "Untop": "언핑크",
+  "Search Channel": "채널 검색",
   "New Channel": "새 채널",
   "Edit Channel": "채널 수정",
   "Channel Avatar": "아바타",

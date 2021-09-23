@@ -496,6 +496,7 @@
   "Unfollow": "不再關注",
   "Top": "置頂",
   "Untop": "取消置頂",
+  "Search Channel": "搜索頻道",
   "New Channel": "新建頻道",
   "Edit Channel": "修改頻道",
   "Channel Avatar": "頭像",

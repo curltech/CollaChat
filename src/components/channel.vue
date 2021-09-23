@@ -3,19 +3,17 @@
     q-tab-panels.bg-c-grey-1(v-model="subKind" animated transition-prev="slide-right" transition-next="slide-left")
       q-tab-panel(name="default" class="q-pa-none")
         q-toolbar.header-toolbar(:class="ifMobileSize || $store.state.ifMobileStyle ? 'bg-c-grey-1' : 'bg-c-grey-1'")
-          q-btn.btnIcon(flat round dense :icon="$store.state.lockContactsSwitch ? 'visibility_off' : 'visibility'" @click="")
-          q-toolbar-title(align="center") {{$t('Channel')}}
+          q-toolbar-title(align="center" style="padding-left:54px") {{ cloudSyncing ? $t('Updating...') : $t('Channel') }}
           q-btn.btnIcon(flat round dense icon="add_circle_outline" @click="newChannel")
         div.scroll.header-mar-top(:class="ifMobileSize || $store.state.ifMobileStyle ? (ifMobileSize ? 'scrollHeightMobileSize' : 'scrollHeightMobileStyle') : 'scrollHeightStyle'")
-          q-toolbar(insert :class="ifMobileSize || $store.state.ifMobileStyle ? 'bg-c-grey-1' : 'bg-c-grey-1'" class="q-px-xs")
-            q-input.c-field(debounce="100" filled dense v-model="searchText" :placeholder="placeholder" input-class="text-center iconfont" @focus="searchFocus")
-              template(slot="append")
-                //q-icon(v-if="!channelfilter" name="search")
-                //q-icon(v-else name="cancel" class="cursor-pointer" @click.stop="channelfilter = null")
-                //q-icon(v-if="channelfilter" name="cancel" class="cursor-pointer" color="primary" @click.stop="channelfilter = null")
-                q-icon(v-if="searchText" name="cancel" class="cursor-pointer" @click.stop="searchText = null")
+          q-pull-to-refresh(@refresh="cloudSync" color="primary" bg-color="c-grey-0" icon="sync")
+            q-toolbar(insert :class="ifMobileSize || $store.state.ifMobileStyle ? 'bg-c-grey-1' : 'bg-c-grey-1'" class="q-px-xs")
+              q-input.c-field(debounce="100" filled dense v-model="searchText" :placeholder="placeholder" input-class="text-center iconfont" @focus="searchFocus")
+                //template(slot="append")
+                  q-icon(v-if="!channelfilter" name="search")
+                  q-icon(v-else name="cancel" class="cursor-pointer" @click.stop="channelfilter = null")
           q-list
-            div(v-for="(channel, index) in ChannelFilteredList" :key="channel.channelId")
+            div(v-for="(channel, index) in $store.state.channels" :key="channel.channelId")
               q-item(clickable v-ripple :active-class="ifMobileSize || $store.state.ifMobileStyle ? 'bg-c-grey-1' : 'bg-c-grey-2'" class="text-c-grey-10" :active="($store.getKind() === 'channelDetails' && channel === $store.state.currentChannel) || channel.top === true" @click="channelSelected(channel, index)")
                 q-item-section(avatar)
                   q-avatar(size="32px")
@@ -75,6 +73,50 @@
                 q-icon(name="search")
               q-item-section
                 q-item-label(caption) {{ $t('More Articles') + '(' + followChannelArticleResultList.length + ')' }}
+              q-item-section(avatar)
+                q-icon(name="keyboard_arrow_right")
+            q-separator.c-separator(v-if="searchResult === 'allResult'" style="height:8px;margin-left:0px;margin-right:0px")
+          q-list(v-if="searching===true")
+            q-item(v-if="searchResult === 'allResult' || searchResult === 'unfollowChannelResult'" class="text-c-grey-10")
+              q-item-section(side)
+                q-item-label(caption) {{ $t('Unfollowed Channel') }}
+            div(v-for="(unfollowChannel, unfollowChannelIndex) in (unfollowChannelResultList ? unfollowChannelResultList : [])" :key="unfollowChannelIndex")
+              q-item(v-if="(searchResult === 'allResult' && unfollowChannelIndex < 3) || searchResult === 'unfollowChannelResult'" clickable v-ripple class="text-c-grey-10" @click="unfollowChannelResultSelected(unfollowChannel, unfollowChannelIndex)")
+                q-item-section(avatar)
+                  q-avatar
+                    img(:src="unfollowChannel.avatar ? unfollowChannel.avatar : $store.defaultActiveAvatar")
+                q-item-section
+                  q-item-label(v-html="unfollowChannel.highlightingName ? unfollowChannel.highlightingName : unfollowChannel.name")
+            q-item(v-if="searchResult === 'allResult' && unfollowChannelResultList && unfollowChannelResultList.length > 3" clickable v-ripple class="text-c-grey-10" @click="unfollowChannelResult()")
+              q-item-section(side)
+                q-icon(name="search")
+              q-item-section
+                q-item-label(caption) {{ $t('More Channels') + '(' + unfollowChannelResultList.length + ')' }}
+              q-item-section(avatar)
+                q-icon(name="keyboard_arrow_right")
+            q-separator.c-separator(v-if="searchResult === 'allResult'" style="height:8px;margin-left:0px;margin-right:0px")
+          q-list(v-if="searching===true")
+            q-item(v-if="searchResult === 'allResult' || searchResult === 'unfollowChannelArticleResult'" class="text-c-grey-10")
+              q-item-section(side)
+                q-item-label(caption) {{ $t('Unfollowed Channel Article') }}
+            div(v-for="(unfollowChannelArticle, unfollowChannelArticleIndex) in (unfollowChannelArticleResultList ? unfollowChannelArticleResultList : [])" :key="unfollowChannelArticleIndex")
+              q-item(v-if="(searchResult === 'allResult' && unfollowChannelArticleIndex < 3) || searchResult === 'unfollowChannelArticleResult'" clickable v-ripple class="text-c-grey-10" @click="unfollowChannelArticleResultSelected(unfollowChannelArticle, unfollowChannelArticleIndex)")
+                q-list
+                  q-item(class="q-pa-none" style="min-height: 32px")
+                    q-item-section
+                      q-item-label(v-html="unfollowChannelArticle.highlightingTitle ? unfollowChannelArticle.highlightingTitle : unfollowChannelArticle.title")
+                  q-item(class="q-pa-none")
+                    q-item-section(avatar)
+                      q-avatar
+                        img(:src="unfollowChannelArticle.cover ? unfollowChannelArticle.cover : $store.defaultActiveAvatar")
+                    q-item-section
+                      q-item-label(v-if="unfollowChannelArticle.plainContent" caption lines="2" v-html="unfollowChannelArticle.highlightingPlainContent ? unfollowChannelArticle.highlightingPlainContent : unfollowChannelArticle.plainContent")
+                      q-item-label(caption class="q-pt-xs") {{ ($store.state.channelMap[unfollowChannelArticle.channelId] ? $store.state.channelMap[unfollowChannelArticle.channelId].name : '') + ' ' + ($store.state.channelMap[unfollowChannelArticle.channelId] ? detailDateFormat($store.state.channelMap[unfollowChannelArticle.channelId].updateDate) : '') }}
+            q-item(v-if="searchResult === 'allResult' && unfollowChannelArticleResultList && unfollowChannelArticleResultList.length > 3" clickable v-ripple class="text-c-grey-10" @click="unfollowChannelArticleResult()")
+              q-item-section(side)
+                q-icon(name="search")
+              q-item-section
+                q-item-label(caption) {{ $t('More Articles') + '(' + unfollowChannelArticleResultList.length + ')' }}
               q-item-section(avatar)
                 q-icon(name="keyboard_arrow_right")
 </template>

@@ -496,6 +496,7 @@
   "Unfollow": "フォロー解除",
   "Top": "上",
   "Untop": "ピンクを外す",
+  "Search Channel": "検索チャンネル",
   "New Channel": "新しいチャンネル",
   "Edit Channel": "チャネルの編集",
   "Channel Avatar": "アバター",

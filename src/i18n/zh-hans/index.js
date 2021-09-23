@@ -500,6 +500,7 @@ export default {
   "Unfollow": "不再关注",
   "Top": "置顶",
   "Untop": "取消置顶",
+  "Search Channel": "搜索频道",
   "New Channel": "新建频道",
   "Edit Channel": "修改频道",
   "Channel Avatar": "头像",

@@ -487,6 +487,7 @@ export default {
   "Unfollow": "Unfollow",
   "Top": "Top",
   "Untop": "Untop",
+  "Search Channel": "Search Channel",
   "New Channel": "New Channel",
   "Edit Channel": "Edit Channel",
   "Channel Avatar": "Channel Avatar",

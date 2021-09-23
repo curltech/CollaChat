@@ -177,30 +177,30 @@ export class ChannelComponent {
 
         return data
     }
-    async loadAttach(currentChannel, from, limit) {
+    async loadAttach(currentArticle, from, limit) {
         let condition = {}
         let qs = []
         if (from) {
             qs.push({ createDate: { $lt: from } })
-        }
-        let channelId = currentChannel._id
-        if (channelId) {
-            qs.push({ channelId: channelId })
         } else {
-            qs.push({ channelId: '' })
+            qs.push({ createDate: { $gt: null } })
+        }
+        let articleId = currentArticle.articleId
+        if (articleId) {
+            qs.push({ articleId: articleId })
+        } else {
+            qs.push({ articleId: '' })
         }
         // put content into attach
-        //qs.push({ createDate: { $gt: null } })
         if (qs.length > 0) {
             condition['$and'] = qs
         }
-        console.log('will load more attachs, channelId:' + channelId + 'from:' + from)
+        console.log('will load more attachs, articleId:' + articleId + 'from:' + from)
         // put content into attach
-        //let page = await pounchDb.findPage('myArticleAttach', condition, [{ createDate: 'desc' }], null, null, limit)
-        let page = await pounchDb.findPage('myArticleAttach', condition, null, null, null, limit)
+        let page = await pounchDb.findPage('myArticleAttach', condition, [{ createDate: 'desc' }], null, null, limit)
         let data = page.result
         if (data && data.length > 0) {
-            let payloadKey = currentChannel.payloadKey
+            let payloadKey = currentArticle.payloadKey
             if (payloadKey) {
                 let securityParams = {}
                 securityParams.PayloadKey = payloadKey

@@ -14,12 +14,12 @@
             q-item-section
               q-item-label(class="text-h5") {{$store.state.currentChannel.name}}
                 q-icon(:name="$store.state.currentChannel.top ? 'star' : ''" color="primary")
-            q-item-section(side)
+            q-item-section(v-if="$store.state.currentChannel.creator !== $store.state.myselfPeerClient.peerId" side)
               q-btn.btnIcon.bg-c-grey-message(flat @click="follow()" :label="$store.state.currentChannel.markDate ? $t('Unfollow') : $t('Follow')" no-caps)
           q-item
             q-item-section
               q-item-label(caption) {{$store.state.currentChannel.description}}
-        div(v-for="(article, index) in ArticleFilteredList" :key="article.articleId" style="width: 80%; margin: auto")
+        div(v-for="(article, index) in $store.state.articles" :key="article.articleId" style="width: 80%; margin: auto")
           q-card(flat @click="articleSelected(article, index)")
             q-card-section.bg-c-grey-message(class="text-center" style="height: 50px")
               q-item-label(caption :style="$q.dark.isActive ? 'color: rgba(255,255,255,0.7)' : ''") {{ detailDateFormat(article.updateDate) }}

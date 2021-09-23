@@ -32,15 +32,6 @@ export default {
         height: `${this.$q.screen.height}px`
       }
     },
-    ArticleFilteredList() {
-      let _that = this
-      let store = _that.$store
-      let articleList = store.state.articles
-      if (articleList && articleList.length > 0) {
-        CollaUtil.sortByKey(articleList, 'updateDate', 'asc')
-      }
-      return articleList
-    },
     detailDateFormat() {
       let _that = this
       return function (createDate) {
@@ -70,10 +61,17 @@ export default {
       if (!article) {
         return
       }
+      // put content into attach
       if (!article.content) {
-        let blocks = await dataBlockService.findTxPayload(null, article.blockId)
-        if (blocks && blocks.length > 0) {
-          article = blocks[0]
+        let attachs = await channelComponent.loadAttach(article, null, null)
+        if (attachs && attachs.length > 0) {
+          article.content = attachs[0].content
+        }
+        if (!article.content) {
+          let blocks = await dataBlockService.findTxPayload(null, article.blockId)
+          if (blocks && blocks.length > 0) {
+            article = blocks[0]
+          }
         }
       }
       store.state.currentArticle = article
@@ -361,8 +359,7 @@ export default {
           updateDate: { $gt: null }
         }, [{ updateDate: 'desc' }])
         if (articleDBItems && articleDBItems.length > 0) {
-          current._id = articleDBItems[0]._id
-          let articleRecord = await channelComponent.get(ChannelDataType.ARTICLE, current._id)
+          let articleRecord = articleDBItems[0]
           await channelComponent.remove(ChannelDataType.ARTICLE, articleRecord, store.state.articles)
         }
         store.state.currentArticle = null
