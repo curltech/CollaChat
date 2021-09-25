@@ -10,15 +10,15 @@
           q-item
             q-item-section(avatar)
               q-avatar(size="64px")
-                img(:src="$store.state.currentChannel.avatar ? $store.state.currentChannel.avatar : $store.defaultActiveAvatar")
+                img(:src="$store.state.currentChannel && $store.state.currentChannel.avatar ? $store.state.currentChannel.avatar : $store.defaultActiveAvatar")
             q-item-section
-              q-item-label(class="text-h5") {{$store.state.currentChannel.name}}
-                q-icon(:name="$store.state.currentChannel.top ? 'star' : ''" color="primary")
-            q-item-section(v-if="$store.state.currentChannel.creator !== $store.state.myselfPeerClient.peerId" side)
-              q-btn.btnIcon.bg-c-grey-message(flat @click="follow()" :label="$store.state.currentChannel.markDate ? $t('Unfollow') : $t('Follow')" no-caps)
+              q-item-label(class="text-h5") {{ $store.state.currentChannel ? $store.state.currentChannel.name : '' }}
+                q-icon(:name="$store.state.currentChannel && $store.state.currentChannel.top ? 'star' : ''" color="primary")
+            q-item-section(v-if="$store.state.currentChannel && $store.state.currentChannel.creator !== $store.state.myselfPeerClient.peerId" side)
+              q-btn.btnIcon.bg-c-grey-message(flat @click="follow()" :label="$store.state.currentChannel && $store.state.currentChannel.markDate ? $t('Unfollow') : $t('Follow')" no-caps)
           q-item
             q-item-section
-              q-item-label(caption) {{$store.state.currentChannel.description}}
+              q-item-label(caption) {{ $store.state.currentChannel ? $store.state.currentChannel.description : '' }}
         div(v-for="(article, index) in $store.state.articles" :key="article.articleId" style="width: 80%; margin: auto")
           q-card(flat @click="articleSelected(article, index)")
             q-card-section.bg-c-grey-message(class="text-center" style="height: 50px")
@@ -37,7 +37,7 @@
           div(class="q-py-md text-h5") {{ $store.state.currentArticle.title }}
           div(class="q-pb-lg")
             span(class="q-item__label--caption text-caption" :style="$q.dark.isActive ? 'color: rgba(255,255,255,0.7)' : ''") {{ $store.state.currentArticle.author }}
-            a(class="q-px-sm") {{ $store.state.currentChannel.name }}
+            span(class="q-px-sm text-primary cursor-pointer" @click="channelNameClick") {{ $store.state.channelMap[$store.state.currentArticle.channelId].name }}
             span(class="q-item__label--caption text-caption" :style="$q.dark.isActive ? 'color: rgba(255,255,255,0.7)' : ''") {{ detailDateFormat($store.state.currentArticle.updateDate) }}
           iframe(v-if="$store.state.currentArticle.content && $store.state.currentArticle.content.substr(0,4)==='http'" id="iframeContent"
             :src="$store.state.currentArticle.content" frameborder="no" border="0" marginwidth="0" marginheight="0" allowtransparency="yes" scrolling="yes")
@@ -46,8 +46,8 @@
         newArticle.drawcontent
       q-tab-panel(:style="heightStyle" name="editChannel" class="q-pa-none")
         q-toolbar
-          q-btn(:class="ifMobileSize || $store.state.ifMobileStyle ? '' : 'hidden'" flat round dense icon="keyboard_arrow_left" @click="$store.toggleDrawer(false)")
-          q-toolbar-title(align="center" :style="ifMobileSize || $store.state.ifMobileStyle ? '' : 'padding-left:54px'") {{$t('Edit Channel')}}
+          q-btn(flat round dense icon="keyboard_arrow_left" @click="subKind='default'")
+          q-toolbar-title(align="center") {{$t('Edit Channel')}}
           q-btn.btnIcon(flat round dense icon="check" @click="editChannel")
         q-card(flat)
           q-card-section(align="center")

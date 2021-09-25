@@ -67,7 +67,7 @@
                         img(:src="followChannelArticle.cover ? followChannelArticle.cover : $store.defaultActiveAvatar")
                     q-item-section
                       q-item-label(v-if="followChannelArticle.plainContent" caption lines="2" v-html="followChannelArticle.highlightingPlainContent ? followChannelArticle.highlightingPlainContent : followChannelArticle.plainContent")
-                      q-item-label(caption class="q-pt-xs") {{ ($store.state.channelMap[followChannelArticle.channelId] ? $store.state.channelMap[followChannelArticle.channelId].name : '') + ' ' + ($store.state.channelMap[followChannelArticle.channelId] ? detailDateFormat($store.state.channelMap[followChannelArticle.channelId].updateDate) : '') }}
+                      q-item-label(caption class="q-pt-xs") {{ ($store.state.channelMap[followChannelArticle.channelId] ? $store.state.channelMap[followChannelArticle.channelId].name : '') + ' ' + detailDateFormat(followChannelArticle.updateDate) }}
             q-item(v-if="searchResult === 'allResult' && followChannelArticleResultList && followChannelArticleResultList.length > 3" clickable v-ripple class="text-c-grey-10" @click="followChannelArticleResult()")
               q-item-section(side)
                 q-icon(name="search")
@@ -111,7 +111,7 @@
                         img(:src="unfollowChannelArticle.cover ? unfollowChannelArticle.cover : $store.defaultActiveAvatar")
                     q-item-section
                       q-item-label(v-if="unfollowChannelArticle.plainContent" caption lines="2" v-html="unfollowChannelArticle.highlightingPlainContent ? unfollowChannelArticle.highlightingPlainContent : unfollowChannelArticle.plainContent")
-                      q-item-label(caption class="q-pt-xs") {{ ($store.state.channelMap[unfollowChannelArticle.channelId] ? $store.state.channelMap[unfollowChannelArticle.channelId].name : '') + ' ' + ($store.state.channelMap[unfollowChannelArticle.channelId] ? detailDateFormat($store.state.channelMap[unfollowChannelArticle.channelId].updateDate) : '') }}
+                      q-item-label(caption class="q-pt-xs") {{ ($store.state.channelMap[unfollowChannelArticle.channelId] ? $store.state.channelMap[unfollowChannelArticle.channelId].name : '') + ' ' + detailDateFormat(unfollowChannelArticle.updateDate) }}
             q-item(v-if="searchResult === 'allResult' && unfollowChannelArticleResultList && unfollowChannelArticleResultList.length > 3" clickable v-ripple class="text-c-grey-10" @click="unfollowChannelArticleResult()")
               q-item-section(side)
                 q-icon(name="search")

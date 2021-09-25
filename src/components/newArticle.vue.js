@@ -47,6 +47,7 @@ export default {
         let plainContent = content.replace(/<[^>]+>/g, '').replace(/^\s*/g, '')
         let pyPlainContent = pinyinUtil.getPinyin(plainContent)
         let current
+        let blockType = BlockType.ChannelArticle
         if (store.newArticleEntry === 'newArticle') {
           let channelId = store.state.currentChannel.channelId
           let blockId = UUID.string(null, null)
@@ -61,12 +62,17 @@ export default {
             content: content,
             plainContent: plainContent,
             pyPlainContent: pyPlainContent,
+            metadata: plainContent,
             businessNumber: channelId,
             blockId: blockId,
             createDate: currentTime,
             updateDate: currentTime
           }
         } else if (store.newArticleEntry === 'editArticle') {
+          // 云端删除old
+          let old = CollaUtil.clone(current)
+          await collectionUtil.deleteBlock(old, true, blockType)
+          // current
           current = store.state.currentArticle
           current.cover = store.state.articleData.cover
           current.author = store.state.articleData.author
@@ -75,12 +81,13 @@ export default {
           current.content = content
           current.plainContent = plainContent
           current.pyPlainContent = pyPlainContent
+          current.metadata = plainContent
           current.updateDate = currentTime
+          current.blockId = UUID.string(null, null)
         }
-        let blockType = BlockType.ChannelArticle
-        let _peers = []
-        let expireDate = new Date().getTime() + 3600*24*365*100 // 100 years
         // 云端保存
+        let _peers = []
+        let expireDate = currentTime + 3600*24*365*100 // 100 years
         let result = await collectionUtil.saveBlock(current, true, blockType, _peers, expireDate)
         if (!result) {
           _that.$q.notify({
@@ -95,17 +102,8 @@ export default {
         if (store.newArticleEntry === 'newArticle') {
           await channelComponent.insert(ChannelDataType.ARTICLE, current)
           store.state.articles.unshift(current)
-          console.log(JSON.stringify('insertNewArticle' + current))
         } else if (store.newArticleEntry === 'editArticle') {
-          let articleDBItems = await channelComponent.loadArticle({
-            ownerPeerId: clientPeerId,
-            articleId: current.articleId,
-            updateDate: { $gt: null }
-          }, [{ updateDate: 'desc' }])
-          if (articleDBItems && articleDBItems.length > 0) {
-            current._id = articleDBItems[0]._id
-            await channelComponent.update(ChannelDataType.ARTICLE, current)
-          }
+          await channelComponent.update(ChannelDataType.ARTICLE, current)
           let i = 0
           for (let article of store.state.articles) {
             if (article.articleId === current.articleId) {

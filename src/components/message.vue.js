@@ -712,29 +712,29 @@ export default {
         if (localAttachs && localAttachs.length > 0) {
           fileData = localAttachs[0].content
         } else {
-          let connectPeerId = message.connectPeerId
           message.loading = true
+          // 指定connectPeerId以优化速度
+          let connectPeerId = message.connectPeerId
           let block = await dataBlockService.findTxPayload(connectPeerId, message.attachBlockId)
           if (block && block.length > 0 && block[0]) {
             if (block[0].attachs && block[0].attachs.length > 0) {
               let attach = block[0].attachs[0]
               if (attach) {
                   fileData = attach.content
-                if(!message.messageId){//群共享接收方创建message
-                    message.ownerPeerId = myself.myselfPeerClient.peerId
-                    message.messageId = UUID.string(null, null)
-                    message.messageType = P2pChatMessageType.GROUP_FILE
-                    message.fileSize = StringUtil.getSize(fileData)
-                    message.contentType = attach.contentType
-                    message.connectPeerId = null
-                    if (attach.contentType === ChatContentType.IMAGE) {
-                        message.thumbnail = await mediaComponent.compressImage(fileData)
-                    } else if (attach.contentType === ChatContentType.VIDEO) {
-                        message.thumbnail = await mediaComponent.createVideoThumbnailByBase64(fileData)
-                    }
-                    await chatComponent.insert(ChatDataType.MESSAGE, message, null)
+                if (!message.messageId) { // 群共享接收方创建message
+                  message.ownerPeerId = myself.myselfPeerClient.peerId
+                  message.messageId = UUID.string(null, null)
+                  message.messageType = P2pChatMessageType.GROUP_FILE
+                  message.fileSize = StringUtil.getSize(fileData)
+                  message.contentType = attach.contentType
+                  message.connectPeerId = null
+                  if (attach.contentType === ChatContentType.IMAGE) {
+                    message.thumbnail = await mediaComponent.compressImage(fileData)
+                  } else if (attach.contentType === ChatContentType.VIDEO) {
+                    message.thumbnail = await mediaComponent.createVideoThumbnailByBase64(fileData)
+                  }
+                  await chatComponent.insert(ChatDataType.MESSAGE, message, null)
                 }
-
                 attach.ownerPeerId = myself.myselfPeerClient.peerId
                 await chatBlockComponent.saveLocalAttach({attachs : [attach]})
                 if (message.contentType === ChatContentType.VIDEO) {
@@ -746,7 +746,7 @@ export default {
               }
             }
           }
-         message.loading = false
+          message.loading = false
         }
         chatComponent.localFileDataMap[message.attachBlockId] = fileData
       }

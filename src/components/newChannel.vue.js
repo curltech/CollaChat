@@ -45,7 +45,7 @@ export default {
           name: _that.channelData.name,
           description: _that.channelData.description,
           entityType: EntityType.INDIVIDUAL,
-          businessNumber: 'Channel',
+          businessNumber: blockId,
           blockId: blockId,
           createDate: currentTime,
           updateDate: currentTime,

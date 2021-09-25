@@ -396,7 +396,6 @@ export default {
           let myselfPeerClient = myself.myselfPeerClient
           myselfPeerClient.connectPeerId = connectAddress
           let myselfPeer = myself.myselfPeer
-          myselfPeer.connectPeerId = connectAddress
           let linkmanPeerId = myselfPeerClient.peerId
           let linkman = store.state.linkmanMap[linkmanPeerId]
           let linkmanRecord = null

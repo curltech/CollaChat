@@ -348,7 +348,7 @@ import { P2pChatMessageType } from '@/libs/biz/colla-chat'
     if (!expireDate) {
       expireDate = new Date().getTime() + 3600*24*365*100 // 100 years
     }
-    let payload = { payload: CollaUtil.clone(bizObj), metadata: bizObj.tag, expireDate: expireDate }
+    let payload = { payload: CollaUtil.clone(bizObj), metadata: bizObj.metadata ? bizObj.metadata : bizObj.tag, expireDate: expireDate }
     if (blockType === BlockType.GroupFile) {
       payload.name = bizObj.name
     } else if (blockType === BlockType.Channel) {
@@ -416,7 +416,7 @@ import { P2pChatMessageType } from '@/libs/biz/colla-chat'
       await blockLogComponent.save(dbLogs, null, null)
     }
     if (ifUpload === true) {
-      dbLogs = await this.upload(dbLogs, blockType)
+      dbLogs = await this.upload(dbLogs, blockType, opType)
     }
     return dbLogs
   }
@@ -425,13 +425,19 @@ import { P2pChatMessageType } from '@/libs/biz/colla-chat'
    *
    * @param {*} dbLogs: 分片粒度的blockLog记录
    * @param {*} blockType: ChatAttach-临时block，按单事务处理，不保存blockLog日志；Collection-上传云端如果返回错误需要保留blockLog在以后继续处理，否则删除；P2pChat-离线消息
+   * @param {*} opType: saveBlock or deleteBlock
    */
-  async upload(dbLogs, blockType) {
+  async upload(dbLogs, blockType, opType) {
     console.log("upload time:" + new Date())
     if (dbLogs && dbLogs.length > 0) {
       let ps = []
       for (let dbLog of dbLogs) {
-        let promise = consensusAction.consensus(null, null, dbLog.dataBlock)
+        let promise
+        if (opType === 'saveBlock') {
+          promise = consensusAction.consensus(null, null, dbLog.dataBlock)
+        } else if (opType === 'deleteBlock') {
+          promise = putValueAction.putValue(null, null, dbLog.dataBlock)
+        }
         ps.push(promise)
       }
       let ifFailed = false
@@ -448,7 +454,7 @@ import { P2pChatMessageType } from '@/libs/biz/colla-chat'
             let response = responses[i]
             console.log("response:" + JSON.stringify(response))
             if (response &&
-              response.MessageType === MsgType[MsgType.CONSENSUS_REPLY] &&
+              (response.MessageType === MsgType[MsgType.CONSENSUS_REPLY] || response.MessageType === MsgType[MsgType.PUTVALUE]) &&
               response.Payload === MsgType[MsgType.OK]) {
               if (blockType === BlockType.Collection) { // 如果上传不成功，需要保留blockLog在以后继续处理，否则删除
                 dbLogs[i].state = EntityState.Deleted

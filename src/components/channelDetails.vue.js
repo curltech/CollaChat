@@ -134,6 +134,13 @@ export default {
         // console.log('I am triggered on both OK and Cancel')
       })
     },
+    async channelNameClick() {
+      let _that = this
+      let store = _that.$store
+      store.state.currentChannel = store.state.channelMap[store.state.currentArticle.channelId]
+      await store.getArticleList()
+      _that.subKind = 'default'
+    },
     channelCommand() {
       let _that = this
       let store = _that.$store
@@ -226,16 +233,21 @@ export default {
       let store = _that.$store
       _that.$q.loading.show()
       try {
-        let currentTime = new Date().getTime()
         let current = store.state.currentChannel
+        let blockType = BlockType.Channel
+        let currentTime = new Date().getTime()
+        // 云端删除old
+        let old = CollaUtil.clone(current)
+        await collectionUtil.deleteBlock(old, true, blockType)
+        // current
         current.avatar = _that.channelData.avatar
         current.name = _that.channelData.name
         current.description = _that.channelData.description
-        current.updateDate = new Date().getTime()
-        let blockType = BlockType.Channel
+        current.updateDate = currentTime
+        current.blockId = UUID.string(null, null)
+        // 云端保存
         let _peers = []
         let expireDate = currentTime + 3600*24*365*100 // 100 years
-        // 云端保存
         let result = await collectionUtil.saveBlock(current, true, blockType, _peers, expireDate)
         if (!result) {
           _that.$q.notify({
@@ -249,6 +261,7 @@ export default {
         // 本地保存
         await channelComponent.update(ChannelDataType.CHANNEL, current)
         store.state.channelMap[current.channelId] = current
+        _that.subKind = 'default'
       } catch (error) {
         console.error(error)
         _that.$q.notify({
@@ -274,7 +287,7 @@ export default {
         await channelComponent.remove(ChannelDataType.CHANNEL, channelRecord, store.state.channels)
         delete store.state.channelMap[current.channelId]
         store.state.currentChannel = null
-        if (store.state.ifMobileStyle) {
+        if (store.state.channels.length === 0 || store.state.ifMobileStyle) {
           store.toggleDrawer(false)
         }
       } catch (error) {
@@ -351,7 +364,7 @@ export default {
       try {
         let current = store.state.currentArticle
         // 云端删除
-        await collectionUtil.deleteBlock(current, true, BlockType.Article)
+        await collectionUtil.deleteBlock(current, true, BlockType.ChannelArticle)
         // 本地删除
         let articleDBItems = await channelComponent.loadArticle({
           ownerPeerId: myself.myselfPeerClient.peerId,

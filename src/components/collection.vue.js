@@ -406,11 +406,6 @@ export default {
           current = _that.myCollections.c_meta.current
         }
         try {
-          let start = new Date().getTime()
-          await collectionUtil.save(type, current, _that.myCollections)
-          let end = new Date().getTime()
-          console.log('collection save time:' + (end - start))
-          _that.backupContent = current['blockId'] + ':' + current['content']
           // 云端cloud保存
           if (store.collectionWorkerEnabler) {
             /*let dbLogs = await collectionUtil.saveBlock(current, false, BlockType.Collection)
@@ -421,7 +416,29 @@ export default {
             worker.postMessage(['one', dbLogs, myself.myselfPeerClient, options.privateKey])*/
           } else {
             start = new Date().getTime()
-            let dbLogs = await collectionUtil.saveBlock(current, true, BlockType.Collection)
+            let dbLogs
+            let blockType = BlockType.Collection
+            if (current.state === EntityState.Modified) {
+              // 云端删除old
+              let old = CollaUtil.clone(current)
+              dbLogs = await collectionUtil.deleteBlock(old, true, blockType)
+              // 刷新syncFailed标志
+              let newDbLogMap = CollaUtil.clone(store.state.dbLogMap)
+              if (dbLogs && dbLogs.length > 0) {
+                for (let dbLog of dbLogs) {
+                  let dl = newDbLogMap[dbLog.blockId]
+                  if (!dl) {
+                    newDbLogMap[dbLog.blockId] = true
+                    console.log('add dbLog, blockId:' + dbLog.blockId)
+                  }
+                }
+              }
+              store.state.dbLogMap = newDbLogMap
+              // current
+              current.blockId = UUID.string(null, null)
+            }
+            // 云端保存
+            dbLogs = await collectionUtil.saveBlock(current, true, blockType)
             end = new Date().getTime()
             console.log('collection saveBlock time:' + (end - start))
             // 刷新syncFailed标志
@@ -437,6 +454,12 @@ export default {
             }
             store.state.dbLogMap = newDbLogMap
           }
+          // 本地保存
+          let start = new Date().getTime()
+          await collectionUtil.save(type, current, _that.myCollections)
+          let end = new Date().getTime()
+          console.log('collection save time:' + (end - start))
+          _that.backupContent = current['blockId'] + ':' + current['content']
         } catch (error) {
           console.error(error)
           _that.$q.notify({

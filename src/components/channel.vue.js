@@ -374,7 +374,6 @@ export default {
       _that.$q.loading.show()
       // 查询cloud全量DataBlock索引信息
       let conditionBean = {}
-      conditionBean['businessNumber'] = 'Channel'
       conditionBean['getAllBlockIndex'] = true
       conditionBean['blockType'] = BlockType.Channel
       //let channelList = []
@@ -413,7 +412,6 @@ export default {
       let store = _that.$store
       let prevCurrentChannel = store.state.currentChannel
       store.state.currentChannel = channel
-      store.channelDetailsEntry = 'channel'
       store.changeKind('channelDetails')
       store.toggleDrawer(true)
       if (!(_that.ifMobileSize || store.state.ifMobileStyle) && prevCurrentChannel && prevCurrentChannel.channelId !== channel.channelId) {
@@ -515,7 +513,6 @@ export default {
         }
       }
       store.state.currentArticle = article
-      store.channelDetailsEntry = 'channel'
       store.changeKind('channelDetails')
       store.toggleDrawer(true)
       store.changeChannelDetailsSubKind('view')
@@ -552,6 +549,7 @@ export default {
   async created() {
     let _that = this
     let store = _that.$store
+    store.getArticleList = _that.getArticleList
   },
   mounted() {
     let _that = this
