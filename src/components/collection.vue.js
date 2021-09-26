@@ -415,13 +415,15 @@ export default {
             let worker = _that.initCollectionUploadWorker()
             worker.postMessage(['one', dbLogs, myself.myselfPeerClient, options.privateKey])*/
           } else {
-            start = new Date().getTime()
             let dbLogs
             let blockType = BlockType.Collection
             if (current.state === EntityState.Modified) {
               // 云端删除old
               let old = CollaUtil.clone(current)
+              let start = new Date().getTime()
               dbLogs = await collectionUtil.deleteBlock(old, true, blockType)
+              let end = new Date().getTime()
+              console.log('collection deleteBlock time:' + (end - start))
               // 刷新syncFailed标志
               let newDbLogMap = CollaUtil.clone(store.state.dbLogMap)
               if (dbLogs && dbLogs.length > 0) {
@@ -438,8 +440,9 @@ export default {
               current.blockId = UUID.string(null, null)
             }
             // 云端保存
+            let start = new Date().getTime()
             dbLogs = await collectionUtil.saveBlock(current, true, blockType)
-            end = new Date().getTime()
+            let end = new Date().getTime()
             console.log('collection saveBlock time:' + (end - start))
             // 刷新syncFailed标志
             let newDbLogMap = CollaUtil.clone(store.state.dbLogMap)

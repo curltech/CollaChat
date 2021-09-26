@@ -1,6 +1,6 @@
 import { date } from 'quasar'
 
-import { CollaUtil } from 'libcolla'
+import { CollaUtil, UUID } from 'libcolla'
 import { myself } from 'libcolla'
 import { BlockType, dataBlockService } from 'libcolla'
 
@@ -203,7 +203,33 @@ export default {
           }
           _that.subKind = 'editChannel'
         } else if (action.id === 'delete') {
-          _that.deleteChannel()
+          _that.$q.bottomSheet({
+            message: _that.$i18n.t('Remove this channel (together with all channel articles)?'),
+            actions: [
+              {},
+              {
+                label: _that.$i18n.t('Confirm'),
+                classes: 'text-red',
+                icon: 'check_circle',
+                id: 'confirm'
+              },
+              {},
+              {
+                label: _that.$i18n.t('Cancel'),
+                icon: 'cancel',
+                id: 'cancel'
+              }
+            ]
+          }).onOk(async action => {
+            // console.log('Action chosen:', action.id)
+            if (action.id === 'confirm') {
+              _that.deleteChannel()
+            }
+          }).onCancel(() => {
+            // console.log('Dismissed')
+          }).onDismiss(() => {
+            // console.log('I am triggered on both OK and Cancel')
+          })
         } else if (action.id === 'top') {
           _that.top()
         } else if (action.id === 'forward') {
@@ -279,6 +305,23 @@ export default {
       let store = _that.$store
       _that.$q.loading.show()
       try {
+        // 删除所有文章
+        for (let article of store.state.articles) {
+          // 云端删除
+          await collectionUtil.deleteBlock(article, true, BlockType.ChannelArticle)
+          // 本地删除
+          let articleDBItems = await channelComponent.loadArticle({
+            ownerPeerId: myself.myselfPeerClient.peerId,
+            articleId: article.articleId,
+            updateDate: { $gt: null }
+          }, [{ updateDate: 'desc' }])
+          if (articleDBItems && articleDBItems.length > 0) {
+            let articleRecord = articleDBItems[0]
+            await channelComponent.remove(ChannelDataType.ARTICLE, articleRecord, store.state.articles)
+          }
+        }
+
+        // 删除频道
         let current = store.state.currentChannel
         // 云端删除
         await collectionUtil.deleteBlock(current, true, BlockType.Channel)
@@ -286,9 +329,11 @@ export default {
         let channelRecord = await channelComponent.get(ChannelDataType.CHANNEL, current._id)
         await channelComponent.remove(ChannelDataType.CHANNEL, channelRecord, store.state.channels)
         delete store.state.channelMap[current.channelId]
-        store.state.currentChannel = null
         if (store.state.channels.length === 0 || store.state.ifMobileStyle) {
+          store.state.currentChannel = null
           store.toggleDrawer(false)
+        } else {
+          store.state.currentChannel = store.state.channels[0]
         }
       } catch (error) {
         console.error(error)

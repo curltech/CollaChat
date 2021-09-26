@@ -519,6 +519,7 @@ export default {
   "Unfollowed Channel Article": "未关注频道文章",
   "More Channels": "更多频道",
   "More Articles": "更多文章",
+  "Remove this channel (together with all channel articles)?": "删除此频道（包括所有文章）？",
 
   // Others
   "Migrate successfully": "迁移成功",

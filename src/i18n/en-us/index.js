@@ -506,6 +506,7 @@ export default {
   "Unfollowed Channel Article": "Unfollowed Channel Article",
   "More Channels": "More Channels",
   "More Articles": "More Articles",
+  "Remove this channel (together with all channel articles)?": "Remove this channel (together with all channel articles)?",
 
   // Others
   "Migrate successfully": "Migrate successfully",

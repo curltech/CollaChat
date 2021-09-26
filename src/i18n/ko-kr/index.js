@@ -515,6 +515,7 @@
   "Unfollowed Channel Article": "팔로우하지 않은 채널 기사",
   "More Channels": "더 많은 채널",
   "More Articles": "더 많은 기사",
+  "Remove this channel (together with all channel articles)?": "이 채널（모든 기사 포함）을 삭제하시겠습니까？",
 
   // Others
   "Migrate successfully": "성공적으로 마이그레이션",

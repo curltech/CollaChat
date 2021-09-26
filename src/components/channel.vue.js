@@ -427,11 +427,14 @@ export default {
       if (currentChannel) {
         if (currentChannel.markDate) {
           // 查询local
-          store.state.articles = await channelComponent.loadArticle({
+          let articleList = await channelComponent.loadArticle({
             ownerPeerId: myself.myselfPeerClient.peerId,
             channelId: currentChannel.channelId,
             updateDate: { $gt: null }
           }, [{ updateDate: 'desc' }])
+          if (articleList && articleList.length > 0) {
+            store.state.articles = articleList
+          }
         } else {
           // 查询cloud全量DataBlock索引信息
           let conditionBean = {}

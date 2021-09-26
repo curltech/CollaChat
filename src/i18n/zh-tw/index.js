@@ -515,6 +515,7 @@
   "Unfollowed Channel Article": "未關注頻道文章",
   "More Channels": "更多頻道",
   "More Articles": "更多文章",
+  "Remove this channel (together with all channel articles)?": "刪除此頻道（包括所有文章）？",
 
   // Others
   "Migrate successfully": "遷移成功",

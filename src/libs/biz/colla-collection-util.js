@@ -1,6 +1,6 @@
 import { EntityState } from 'libcolla'
-import { CollaUtil, TypeUtil, BlobUtil } from 'libcolla'
-import { myself, consensusAction, DataBlockService, dataBlockService, BlockType, MsgType } from 'libcolla'
+import { CollaUtil, TypeUtil, BlobUtil, UUID } from 'libcolla'
+import { myself, consensusAction, putValueAction, DataBlockService, dataBlockService, BlockType, MsgType, PayloadType } from 'libcolla'
 import { pounchDb } from 'libcolla'
 
 import pinyinUtil from '@/libs/base/colla-pinyin'
@@ -381,7 +381,7 @@ import { P2pChatMessageType } from '@/libs/biz/colla-chat'
     let end3 = new Date().getTime()
     console.log('collection blockLog save time:' + (end3 - end2))
     if (ifUpload === true) {
-      dbLogs = await this.upload(dbLogs, blockType)
+      dbLogs = await this.upload(dbLogs, blockType, 'saveBlock')
     }
     let end4 = new Date().getTime()
     console.log('collection upload time:' + (end4 - end3))
@@ -416,7 +416,7 @@ import { P2pChatMessageType } from '@/libs/biz/colla-chat'
       await blockLogComponent.save(dbLogs, null, null)
     }
     if (ifUpload === true) {
-      dbLogs = await this.upload(dbLogs, blockType, opType)
+      dbLogs = await this.upload(dbLogs, blockType, 'deleteBlock')
     }
     return dbLogs
   }
@@ -436,7 +436,7 @@ import { P2pChatMessageType } from '@/libs/biz/colla-chat'
         if (opType === 'saveBlock') {
           promise = consensusAction.consensus(null, null, dbLog.dataBlock)
         } else if (opType === 'deleteBlock') {
-          promise = putValueAction.putValue(null, null, dbLog.dataBlock)
+          promise = putValueAction.putValue(null, PayloadType.DataBlock, dbLog.dataBlock)
         }
         ps.push(promise)
       }
