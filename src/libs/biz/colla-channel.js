@@ -42,7 +42,7 @@ export class Channel {
          * 基本信息：类型，ID，头像，名称，描述
          */
         this.channelType = null
-        this.channelId = null // 即数据块的编号blockId
+        this.channelId = null
         this.avatar = null
         this.name = null
         this.description = null
@@ -72,7 +72,7 @@ export class Article {
         /**
          * 基本信息：ID，作者，标题，封面，摘要
          */
-        this.articleId = null // 即数据块的编号blockId
+        this.articleId = null
         this.author = null
         this.title = null
         this.cover = null

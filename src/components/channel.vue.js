@@ -438,7 +438,7 @@ export default {
         } else {
           // 查询cloud全量DataBlock索引信息
           let conditionBean = {}
-          conditionBean['businessNumber'] = currentChannel.channelId
+          conditionBean['parentBusinessNumber'] = currentChannel.channelId
           conditionBean['getAllBlockIndex'] = true
           conditionBean['blockType'] = BlockType.ChannelArticle
           //let articleList = []

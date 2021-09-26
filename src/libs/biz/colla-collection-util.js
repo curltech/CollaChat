@@ -345,6 +345,10 @@ import { P2pChatMessageType } from '@/libs/biz/colla-chat'
     if (blockType !== BlockType.Collection) {
       businessNumber = bizObj.businessNumber
     }
+    let parentBusinessNumber
+    if (blockType === BlockType.ChannelArticle) {
+      parentBusinessNumber = bizObj.channelId
+    }
     if (!expireDate) {
       expireDate = new Date().getTime() + 3600*24*365*100 // 100 years
     }
@@ -360,7 +364,7 @@ import { P2pChatMessageType } from '@/libs/biz/colla-chat'
       payload.name = bizObj.title
       payload.description = bizObj.abstract
     }
-    let dataBlock = DataBlockService.create(blockId, businessNumber, blockType, bizObj.updateDate, payload, peers)
+    let dataBlock = DataBlockService.create(blockId, parentBusinessNumber, businessNumber, blockType, bizObj.updateDate, payload, peers)
     console.log('collection dataBlock length:' + JSON.stringify(dataBlock).length)
     let start = new Date().getTime()
     await dataBlockService.encrypt(dataBlock)

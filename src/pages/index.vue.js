@@ -2790,7 +2790,7 @@ export default {
         let createTimestamp = new Date().getTime()
         let expireDate = new Date().getTime() + 3600*24*10 // 10 days
         let payload = { payload: message, metadata: null, expireDate: expireDate }
-        let dataBlock = DataBlockService.create(blockId, peerId, BlockType.P2pChat, createTimestamp, payload, [])
+        let dataBlock = DataBlockService.create(blockId, null, peerId, BlockType.P2pChat, createTimestamp, payload, [])
         await dataBlockService.encrypt(dataBlock)
         let dataBlocks = await DataBlockService.slice(dataBlock)
         if (dataBlocks.length !== 1) {

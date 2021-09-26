@@ -63,7 +63,7 @@ export default {
             plainContent: plainContent,
             pyPlainContent: pyPlainContent,
             metadata: plainContent,
-            businessNumber: channelId,
+            businessNumber: blockId,
             blockId: blockId,
             createDate: currentTime,
             updateDate: currentTime
