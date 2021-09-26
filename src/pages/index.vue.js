@@ -665,7 +665,6 @@ export default {
       let _that = this
       let store = _that.$store
       let currentDate = new Date().getTime()
-      let subjectId = message.subjectId
       if(!message.actualReceiveTime){
          await _that.sendChatReceipt(message)
       }
@@ -681,13 +680,14 @@ export default {
         message.ownerPeerId = message.subjectId
         message.subjectId = ownerPeerId
       } else if(message.subjectType === SubjectType.GROUP_CHAT){
-        if(!store.state.groupChatMap[subjectId]){
+        if(!store.state.groupChatMap[message.subjectId]){
           return
         }
         message.ownerPeerId = myself.myselfPeerClient.peerId
       }
       message.receiveTime = currentDate
       message.actualReceiveTime = currentDate
+      let subjectId = message.subjectId
       if (message.contentType == ChatContentType.FILE || message.contentType == ChatContentType.IMAGE || message.contentType == ChatContentType.VIDEO || message.contentType == ChatContentType.NOTE) {
         message.percent = null
         message.loading = false
@@ -705,7 +705,10 @@ export default {
           currentChat.focusedMessage = message
         }
       }
-      await chatComponent.update(ChatDataType.CHAT, currentChat)
+      let db_chat = await chatComponent.get(ChatDataType.CHAT, currentChat._id)
+      db_chat.content = currentChat.content
+      db_chat.updateTime = currentChat.updateTime
+      await chatComponent.update(ChatDataType.CHAT, db_chat)
       localNotificationComponent.sendNotification(
         store.getChatName(currentChat.subjectType, currentChat.subjectId),
         currentChat.content,
@@ -890,14 +893,17 @@ export default {
           }
         }
       }
-      if (message.messageType === P2pChatMessageType.CALL_CLOSE || message.contentType === ChatContentType.CALL_JOIN_REQUEST || (message.subjectType === SubjectType.CHAT && message.messageType === P2pChatMessageType.CALL_REQUEST)) {
+      if (message.messageType === P2pChatMessageType.CALL_CLOSE || message.contentType === ChatContentType.CALL_JOIN_REQUEST || (message.subjectType === SubjectType.CHAT && message.messageType === P2pChatMessageType.CALL_REQUEST) || message.messageType === P2pChatMessageType.RECALL) {
         return
       }
       if (message.messageType === P2pChatMessageType.CHAT_LINKMAN) {
           await store.handleChatTime(message, chat)
           chat.content = store.getChatContent(message.contentType, message.content)
           chat.updateTime = message.createDate
-          await chatComponent.update(ChatDataType.CHAT, chat)
+          let db_chat = await chatComponent.get(ChatDataType.CHAT, chat._id)
+          db_chat.content = chat.content
+          db_chat.updateTime = chat.updateTime
+          await chatComponent.update(ChatDataType.CHAT, db_chat)
           _that.$nextTick(() => {
               let container = _that.$el.querySelector('#talk')
               if (container) {
@@ -914,7 +920,7 @@ export default {
         return
       }
       let messages = chat.messages
-      let currentTime = current.receiveTime
+      let currentTime = current.receiveTime - 1 //排序在对应message前
       let preTime = new Date()
       preTime.setTime(currentTime - 1000 * 500)
       let isNeedInsert = true
@@ -958,7 +964,9 @@ export default {
       message.receiveTime = message.receiveTime ? message.receiveTime : currentDate
       await chatComponent.insert(ChatDataType.MESSAGE, message, chat.messages)
       chat.updateTime = currentDate
-      await chatComponent.update(ChatDataType.CHAT, chat)
+      let db_chat = await chatComponent.get(ChatDataType.CHAT, chat._id)
+      db_chat.updateTime = chat.updateTime
+      await chatComponent.update(ChatDataType.CHAT, db_chat)
       _that.$nextTick(() => {
         let container = _that.$el.querySelector('#talk')
         if (container) {
@@ -2496,7 +2504,13 @@ export default {
       let chat = store.state.chatMap[subjectId]
       if(chat){
           let chatMessages = chat.messages
-          if (chatMessages && chatMessages.length > 0) {
+            if (chatMessages && chatMessages.length > 0) {
+              if(chatMessages[chatMessages.length-1].messageId === preMessageId){
+                chat.content =  `[${_that.$i18n.t("This message has been recalled")}]`
+                let db_chat = await chatComponent.get(ChatDataType.CHAT, chat._id)
+                db_chat.content = chat.content
+                await chatComponent.update(ChatDataType.CHAT, db_chat)
+              }
               for (let i = chatMessages.length; i--; i > -1) {
                   let _currentMes = chatMessages[i]
                   if (_currentMes.messageId === preMessageId) {

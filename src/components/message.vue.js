@@ -1010,12 +1010,21 @@ export default {
       let store = _that.$store
       let currentChat = store.state.currentChat
       message.status = ChatMessageStatus.RECALL
-      await chatComponent.update(ChatDataType.MESSAGE, message, null)
+      let curr_message = await chatComponent.get(ChatDataType.MESSAGE, message._id)
+      curr_message.status = message.status
+      await chatComponent.update(ChatDataType.MESSAGE, curr_message, null)
       let _message = {
           messageType: P2pChatMessageType.RECALL,
           preSubjectType: message.subjectType,
           preSubjectId: message.subjectId,
           preMessageId: message.messageId,
+      }
+      //撤回的是最新的消息
+      if(currentChat.messages[currentChat.messages.length-1]._id === message._id){
+        currentChat.content =  `[${_that.$i18n.t("This message has been recalled")}]`
+        let db_chat = await chatComponent.get(ChatDataType.CHAT, currentChat._id)
+        db_chat.content = currentChat.content
+        await chatComponent.update(ChatDataType.CHAT, db_chat)
       }
       await store.sendChatMessage(currentChat, _message)
     },
