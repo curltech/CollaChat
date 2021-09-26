@@ -7,7 +7,7 @@
                     q-item-section
                         span {{addStreamCount}}
                 video(ref='currentVideo' autoplay = 'autoplay')
-                video(ref='zoomVideo' autoplay='autoplay' v-if="Platform.is.ios && iosFlatDisplay")
+                video(ref='zoomVideo' autoplay='autoplay' v-if="Platform.is.ios && iosFlatDisplay" style='padding-left:1px')
             q-card-section.linkman-video-section(v-if="$store.state.currentCallChat && $store.state.currentCallChat.stream && $store.state.currentCallChat.stream.length === 1 && !Platform.is.ios")
                 q-item
                     q-item-section(avatar)
