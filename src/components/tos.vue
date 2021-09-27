@@ -3,7 +3,7 @@
     q-page-container
       q-page
         q-toolbar
-          q-btn(flat round dense icon="keyboard_arrow_left" @click="$store.changeAboutSubKind('default')")
+          q-btn(flat round icon="keyboard_arrow_left" @click="$store.changeAboutSubKind('default')")
           q-toolbar-title(align="center" style="padding-right:54px") {{$t('Terms Of Service')}}
         div
           vue-markdown(class="result-html full-height full-width" :watches="['show','html','breaks','linkify','emoji','typographer','toc']"

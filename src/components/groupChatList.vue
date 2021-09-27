@@ -1,7 +1,7 @@
 <template lang="pug">
   div.bg-c-grey-0
     q-toolbar
-      q-btn(:class="ifMobileSize || $store.state.ifMobileStyle ? '' : 'hidden'" flat round dense icon="keyboard_arrow_left" @click="$store.toggleDrawer(false)")
+      q-btn(:class="ifMobileSize || $store.state.ifMobileStyle ? '' : 'hidden'" flat round icon="keyboard_arrow_left" @click="$store.toggleDrawer(false)")
       q-toolbar-title(align="center" :style="ifMobileSize || $store.state.ifMobileStyle ? 'padding-right:54px' : ''") {{$t('Group Chat')}}
     q-tabs(dense v-model="tab" align="justify" indicator-color="primary" active-color="primary")
       q-tab(name="ownerGroupChatList" :label="$t('I Am Group Owner') + '(' + OwnerGroupChatList.length + ')'" no-caps :ripple="false")

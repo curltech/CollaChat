@@ -1,9 +1,9 @@
 <template lang="pug">
   div.bg-c-grey-0
     q-toolbar
-      q-btn(:class="ifMobileSize || $store.state.ifMobileStyle ? '' : 'hidden'" flat round dense icon="keyboard_arrow_left" @click="$store.toggleDrawer(false)")
+      q-btn(:class="ifMobileSize || $store.state.ifMobileStyle ? '' : 'hidden'" flat round icon="keyboard_arrow_left" @click="$store.toggleDrawer(false)")
       q-toolbar-title(align="center" :style="ifMobileSize || $store.state.ifMobileStyle ? '' : 'padding-left:54px'") {{$t('New Channel')}}
-      q-btn.btnIcon(flat round dense icon="check" @click="createChannel")
+      q-btn.btnIcon(flat round icon="check" @click="createChannel")
     q-card(flat)
       q-card-section(align="center")
         q-item-label(class="q-field__label q-py-sm" :style="$q.dark.isActive ? 'color: rgba(255,255,255,0.7)' : ''") {{$t('Channel Avatar')}}

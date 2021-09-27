@@ -3,7 +3,7 @@
     q-tab-panels(v-model="subKind" animated transition-prev="slide-right" transition-next="slide-left")
       q-tab-panel(:style="heightStyle" name="default" style="padding:0px 0px")
         q-toolbar
-          q-btn(flat round dense icon="keyboard_arrow_left" @click="$store.changeGeneralSubKind('default')")
+          q-btn(flat round icon="keyboard_arrow_left" @click="$store.changeGeneralSubKind('default')")
           q-toolbar-title(align="center" style="padding-right:54px") {{$t('Chat Records Backup and Migration')}}
         q-list
           q-item(v-if="$store.ifMobile()" clickable v-ripple @click="initMigrate")

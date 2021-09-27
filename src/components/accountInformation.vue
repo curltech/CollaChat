@@ -79,18 +79,18 @@
         canvas#avatar(class="hidden")
       q-tab-panel#alloycropContainer(:style="heightStyle" name="showPhoto" style="padding:0px 0px" align="center")
         q-toolbar
-          q-btn(flat round dense icon="keyboard_arrow_left" @click="showPhotoBack")
+          q-btn(flat round icon="keyboard_arrow_left" @click="showPhotoBack")
           q-toolbar-title(align="center") {{ $t('Change Avatar') }}
-          q-btn.btnIcon(flat round dense icon="check" @click="changeAvatar")
+          q-btn.btnIcon(flat round icon="check" @click="changeAvatar")
         div.fixed-center#crop_result(v-if="$store.ifMobile()" :class="showCrop ? '' : 'hidden'")
         q-img(v-if="$store.ifMobile()" :class="showCrop ? 'hidden' : ''" style="width:100%;max-height:calc(100% - 50px)" :src="avatarSrc")
         img#photoImg(v-if="!$store.ifMobile()")
       q-tab-panel(:style="heightStyle" name="qrCode" style="padding:0px 0px")
         q-toolbar
-          q-btn(flat round dense icon="keyboard_arrow_left" @click="subKind = 'default'")
+          q-btn(flat round icon="keyboard_arrow_left" @click="subKind = 'default'")
           //q-toolbar-title(align="center") {{$t('QR Code')}}
           q-space
-          q-btn.btnIcon(flat round dense color="primary" icon="more_horiz" @click="operateQRCode")
+          q-btn.btnIcon(flat round icon="more_horiz" @click="operateQRCode")
         q-card(flat class="fixed-center q-pa-none")
           q-card-section#qrCodeCard(class="q-pa-xs")
             q-card(flat class="q-pa-sm")
@@ -108,14 +108,14 @@
         q-toolbar
           q-btn(flat round icon="keyboard_arrow_left" @click="subKind = 'default'")
           q-toolbar-title(align="center") {{ $t('Change Name') }}
-          q-btn.btnIcon(flat round dense icon="check" @click="changeName")
+          q-btn.btnIcon(flat round icon="check" @click="changeName")
         q-form(ref="formChangeName" @submit="changeName" class="q-pa-sm")
           q-input.c-field(autofocus filled :label="$t('UserName')" clearable v-model="name" lazy-rules :rules="[ val => val && val.length > 0 || $t('Please input Name')]")
       q-tab-panel(:style="heightStyle" name="mobile" style="padding:0px 0px")
         q-toolbar
           q-btn(flat round icon="keyboard_arrow_left" @click="subKind = 'default'")
           q-toolbar-title(align="center") {{ $t('Change Mobile') }}
-          q-btn.btnIcon(flat round dense icon="check" @click="changeMobile")
+          q-btn.btnIcon(flat round icon="check" @click="changeMobile")
         q-form(ref="formChangeMobile" @submit="changeMobile" class="q-pa-sm")
           q-select.c-field(:label="$t('Country/Region')" filled flat v-model="countryRegion_" :options="options"
             clearable

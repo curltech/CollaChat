@@ -3,9 +3,9 @@
     q-tab-panels(v-model="subKind" animated transition-prev="slide-right" transition-next="slide-left")
       q-tab-panel(name="default" style="padding:0px 0px")
         q-toolbar.header-toolbar.bg-c-grey-message(:class="$store.state.currentChat.subjectId ? '' : 'hidden'")
-          q-btn(:class="ifMobileSize || $store.state.ifMobileStyle ? '' : 'hidden'" flat round dense icon="keyboard_arrow_left" @click="$store.toggleDrawer(false)")
+          q-btn(:class="ifMobileSize || $store.state.ifMobileStyle ? '' : 'hidden'" flat round icon="keyboard_arrow_left" @click="$store.toggleDrawer(false)")
           q-toolbar-title(align="center" :style="ifMobileSize || $store.state.ifMobileStyle ? '' : 'padding-left:54px'") {{ ChatTitle($store.state.currentChat) }}
-          q-btn.btnIcon(flat round dense icon="more_horiz" @click="subKind = $store.state.currentChat.subjectType + 'Details'")
+          q-btn.btnIcon(flat round icon="more_horiz" @click="subKind = $store.state.currentChat.subjectType + 'Details'")
         q-separator.c-separator-message.header-mar-top(style="height:1px;margin-left:0px;margin-right:0px")
         #talk.q-pa-md.bg-c-grey-message.row.justify-center.scroll.q-chat-message(:class="!(ifMobileSize || $store.state.ifMobileStyle)?'talk-height-pc':(keyboardMode?(ifMobileSize?'talk-height-mobileSize1':'talk-height-mobileStyle1'):(ifMobileSize?'talk-height-mobileSize2':'talk-height-mobileStyle2'))")
           q-infinite-scroll(style="width:100%" @load="load_message" debounce="100" reverse :offset="50")
@@ -88,7 +88,7 @@
                   span#audio-touch-text {{ $t('Hold to talk')}}
       q-tab-panel(name="CHATDetails" style="padding:0px 0px")
         q-toolbar
-          q-btn(flat round dense icon="keyboard_arrow_left" @click="backToDefault")
+          q-btn(flat round icon="keyboard_arrow_left" @click="backToDefault")
           q-toolbar-title(align="center" style="padding-right:54px") {{$t('Chat Details')}}
         q-list
           q-item
@@ -140,7 +140,7 @@
       // group chat ///////////////////////////////////////////////////////////////////////////////////
       q-tab-panel(name="GROUP_CHATDetails" style="padding:0px 0px")
         q-toolbar
-          q-btn(flat round dense icon="keyboard_arrow_left" @click="subKind = 'default'")
+          q-btn(flat round icon="keyboard_arrow_left" @click="subKind = 'default'")
           q-toolbar-title(align="center" style="padding-right:54px") {{$t('Chat Details') + ($store.state.currentChat && $store.state.groupChatMap[$store.state.currentChat.subjectId] && $store.state.groupChatMap[$store.state.currentChat.subjectId].groupMembers ? '(' + $store.state.groupChatMap[$store.state.currentChat.subjectId].groupMembers.length + ')' : '')}}
         q-list
           q-item
@@ -270,9 +270,9 @@
         captureMedia.drawcontent
       q-tab-panel(name="modifyGroupChat" style="padding:0px 0px")
         q-toolbar
-          q-btn(flat round dense icon="keyboard_arrow_left" @click="subKind = 'GROUP_CHATDetails'")
+          q-btn(flat round icon="keyboard_arrow_left" @click="subKind = 'GROUP_CHATDetails'")
           q-toolbar-title(align="center") {{ $t('GroupChat Details') }}
-          q-btn.btnIcon(flat round dense icon="check" @click="modifyGroupChat")
+          q-btn.btnIcon(flat round icon="check" @click="modifyGroupChat")
         q-form(ref="formModifyGroupChat" @submit="modifyGroupChat" class="q-pa-sm")
           //div(v-if="ifIAmGroupOwner($store.state.currentChat)" style="margin-left:12px" class="text-c-grey-10 q-my-sm") {{ $t('Group Name') }}
           q-input.c-field(v-if="ifIAmGroupOwner($store.state.currentChat)"
@@ -294,11 +294,11 @@
           q-input.c-field(:label="$t('My Alias')" filled clearable v-model="groupChatData.myAlias" lazy-rules :rules="[]")
       q-tab-panel(name="searchChatHistory" style="padding:0px 0px")
         q-toolbar
-          q-btn(v-if="$store.messageEntry === 'search'" flat round dense icon="keyboard_arrow_left" @click="resultBack()")
+          q-btn(v-if="$store.messageEntry === 'search'" flat round icon="keyboard_arrow_left" @click="resultBack()")
           q-input.c-field(:disable="$store.state.myselfPeerClient.localDataCryptoSwitch===true" debounce="100" filled dense v-model="searchText" :placeholder="placeholder2" input-class="iconfont" style="width: 86%" :prefix="searchPrefix" @keyup="searchKeyup" @input="searchInput")
             template(slot="append")
               q-icon(v-if="searchText" name="cancel" class="cursor-pointer" @click.stop="searchText = null;searching = false")
-          q-btn.btnIcon(flat round dense icon="close" @click="searchBack()")
+          q-btn.btnIcon(flat round icon="close" @click="searchBack()")
         ly-tab.cursor-pointer(v-if="$store.messageEntry !== 'search' && !searchText" v-model="nonsysChatContentTypeIndex" :items="nonsysChatContentTypes" :options="chatContentTypeOptions" @change="changeChatContentType")
         ly-tab.cursor-pointer(v-if="searchText && searching" v-model="searchableChatContentTypeIndex" :items="searchableChatContentTypes" :options="chatContentTypeOptions" @change="changeChatContentType")
         q-toolbar(insert)
@@ -326,9 +326,9 @@
             q-item-section(side top) {{detailDateFormat(message.createDate)}}
       q-tab-panel(name="groupFile" style="padding:0px 0px")
         q-toolbar.header-toolbar
-          q-btn(flat round dense icon="keyboard_arrow_left" @click="subKind='GROUP_CHATDetails'")
+          q-btn(flat round icon="keyboard_arrow_left" @click="subKind='GROUP_CHATDetails'")
           q-toolbar-title(align="center" :style="ifIAmGroupOwner($store.state.currentChat) ? '' : 'padding-right:54px'") {{ $t('Group File') + '(' + GroupFileFilteredList.length + ')' }}
-          q-btn.btnIcon(v-if="ifIAmGroupOwner($store.state.currentChat) && !(ifMobileSize || $store.state.ifMobileStyle)" flat round dense icon="add_circle_outline" @click="$refs.groupFileUpload.pickFiles()")
+          q-btn.btnIcon(v-if="ifIAmGroupOwner($store.state.currentChat) && !(ifMobileSize || $store.state.ifMobileStyle)" flat round icon="add_circle_outline" @click="$refs.groupFileUpload.pickFiles()")
           form#groupFileUploadForm(v-if="ifIAmGroupOwner($store.state.currentChat) && (ifMobileSize || $store.state.ifMobileStyle)")
             label(for="groupFileUpload" class="notranslate material-icons q-icon btnIcon" aria-hidden="true" style="font-size: 27px;") add_circle_outline
             input#groupFileUpload(type="file" class="visually-hidden" @change="uploadGroupFileMobile()")

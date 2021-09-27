@@ -3,9 +3,9 @@
     q-tab-panels(v-model="subKind" animated transition-prev="slide-right" transition-next="slide-left")
       q-tab-panel(:style="heightStyle" name="default" style="padding:0px 0px")
         q-toolbar
-          q-btn(:class="ifMobileSize || $store.state.ifMobileStyle ? '' : 'hidden'" flat round dense icon="keyboard_arrow_left" @click="$store.toggleDrawer(false)")
+          q-btn(:class="ifMobileSize || $store.state.ifMobileStyle ? '' : 'hidden'" flat round icon="keyboard_arrow_left" @click="$store.toggleDrawer(false)")
           q-toolbar-title(align="center" :style="ifMobileSize || $store.state.ifMobileStyle ? '' : 'padding-left:54px'") {{$t('Tags') + '(' + linkmanTags.length + ')'}}
-          q-btn.btnIcon(style="padding-right:4px" color="primary" flat round dense icon="add_circle_outline" @click="showAddContactsTag")
+          q-btn.btnIcon(flat round icon="add_circle_outline" @click="showAddContactsTag")
         q-list
           div(v-for="(linkmanTag, index) in linkmanTags" :key="linkmanTag._id")
             q-item(clickable v-ripple @click="showModifyContactsTag(linkmanTag)")
@@ -30,7 +30,7 @@
           q-item(style="padding-left:12px" clickable v-ripple @click="addLinkmanTagLinkman")
             q-item-section(class="text-c-grey-10") {{$t('Contacts') + '(' + $store.state.linkmanTagData.linkmans.length + ')'}}
             q-item-section(side)
-              q-btn.btnIcon(dense round flat color="primary" icon="add_circle_outline")
+              q-btn.btnIcon(dense round flat icon="add_circle_outline")
           div(v-for="(linkman, index) in $store.state.linkmanTagData.linkmans" :key="linkman.peerId")
             q-item.bg-c-grey-0(style="padding-left:12px" clickable v-ripple)
               q-item-section(avatar @click="showContacts(linkman, index)")

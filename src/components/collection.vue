@@ -3,10 +3,11 @@
     q-tab-panels(v-model="subKind" animated transition-prev="slide-right" transition-next="slide-left")
       q-tab-panel(:style="heightStyle" name="default" class="q-pa-none")
         q-toolbar.header-toolbar
-          q-btn(v-if="ifMobileSize || $store.state.ifMobileStyle || $store.collectionEntry === 'message'" flat round dense icon="keyboard_arrow_left" @click="back()")
-          q-toolbar-title(align="center" :style="ifMobileSize || $store.state.ifMobileStyle ? ($store.collectionEntry === 'message' ? 'padding-right:54px' : '') : ($store.collectionEntry === 'message' ? 'padding-right:54px' : 'padding-left:54px')") {{ cloudSyncing ? $t('Updating...') : $t('Collection') + '-' + $t(collectionTypes[collectionTypeIndex].value) + '(' + myCollections.length + ')' }}
-          q-btn.btnIcon(v-if="$store.collectionEntry !== 'message' && (collectionTypeIndex === 0 || collectionTypeIndex === 1)" flat round dense icon="add_circle_outline" @click="insert")
-          q-btn(v-if="$store.collectionEntry === 'message'" flat icon="check" :disable="$store.state.selectedCollectionItems.length < 1" :label="($store.state.selectedCollectionItems.length > 0 ? '(' + $store.state.selectedCollectionItems.length + ')' : '')" :class="$store.state.selectedCollectionItems.length > 0 ? 'text-primary' : 'c-grey-0'" @click="doneSelectCollectionItem")
+          q-btn(v-if="ifMobileSize || $store.state.ifMobileStyle || $store.collectionEntry === 'message'" flat round icon="keyboard_arrow_left" @click="back()")
+          q-toolbar-title(align="center" :style="ifMobileSize || $store.state.ifMobileStyle ? ($store.collectionEntry === 'message' ? '' : (collectionTypeIndex === 0 || collectionTypeIndex === 1 ? 'padding-left:54px' : '')) : ($store.collectionEntry === 'message' ? 'padding-right:54px' : (collectionTypeIndex === 0 || collectionTypeIndex === 1 ? 'padding-left:96px' : 'padding-left:54px'))") {{ cloudSyncing ? $t('Updating...') : $t('Collection') + '-' + $t(collectionTypes[collectionTypeIndex].value) + '(' + myCollections.length + ')' }}
+          q-btn.btnIcon(v-if="$store.collectionEntry !== 'message'" flat round icon="sync" @click="cloudSync()")
+          q-btn.btnIcon(v-if="$store.collectionEntry !== 'message' && (collectionTypeIndex === 0 || collectionTypeIndex === 1)" flat round icon="add_circle_outline" @click="insert")
+          q-btn(v-if="$store.collectionEntry === 'message'" flat round icon="check" :disable="$store.state.selectedCollectionItems.length < 1" :label="($store.state.selectedCollectionItems.length > 0 ? '(' + $store.state.selectedCollectionItems.length + ')' : '')" :class="$store.state.selectedCollectionItems.length > 0 ? 'text-primary' : 'c-grey-0'" @click="doneSelectCollectionItem")
         div.scroll.header-mar-top(id="scroll-target-default" :class="ifMobileSize || $store.state.ifMobileStyle ? (ifMobileSize ? 'scrollHeightMobileSize-editor' : 'scrollHeightMobileStyle-editor') : 'scrollHeightStyle'")
           q-pull-to-refresh(@refresh="cloudSync" color="primary" bg-color="c-grey-0" icon="sync")
             q-infinite-scroll(@load="load" debounce="100" :offset="150" scroll-target="#scroll-target-default")
@@ -91,7 +92,7 @@
         q-toolbar
           q-btn(flat round icon="keyboard_arrow_left" @click="subKind=tagEntry")
           q-toolbar-title(align="center") {{ $t('Edit Tags') }}
-          q-btn.btnIcon(flat round dense icon="check" @click="saveTag()")
+          q-btn.btnIcon(flat round icon="check" @click="saveTag()")
         q-form(ref="formEditTags" @submit="saveTag()")
           div(style="margin-left:12px" class="text-c-grey-10 q-my-sm") {{ $t('Tags') + $t(' (please input Return after input new tags)') }}
           q-select.c-field(v-if="myCollections.c_meta.current" bg-color="c-white" color="c-grey-7" square standout hide-bottom-space clearable v-model="collectionData.tags"
@@ -100,7 +101,7 @@
         q-toolbar
           q-btn(flat round icon="keyboard_arrow_left" @click="subKind = 'search'")
           q-toolbar-title(align="center") {{ $t('Tag Name') }}
-          q-btn.btnIcon(flat round dense icon="check" ':disable'="!tagName" :class="tagName ? 'primary' : 'c-grey-0'" @click="saveTagName")
+          q-btn(flat round icon="check" ':disable'="!tagName" :class="tagName ? 'primary' : 'c-grey-0'" @click="saveTagName")
         q-form(ref="formTagName")
           div(style="margin-left:12px" class="text-c-grey-10 q-my-sm") {{ $t('Name') }}
           q-input.c-field(bg-color="c-white" color="c-grey-3" square outlined hide-bottom-space clearable autofocus v-model="tagName" lazy-rules :rules="[ val => val && val.length > 0 || $t('Please input Name'), val => !tagExceedsLengthLimit(val) || $t('Tag name exceeds length limit'), val=> !tagAlreadyExists(val) || $t('Tag name already exists') ]")

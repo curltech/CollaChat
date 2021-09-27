@@ -3,8 +3,9 @@
     q-tab-panels.bg-c-grey-1(v-model="subKind" animated transition-prev="slide-right" transition-next="slide-left")
       q-tab-panel(name="default" class="q-pa-none")
         q-toolbar.header-toolbar(:class="ifMobileSize || $store.state.ifMobileStyle ? 'bg-c-grey-1' : 'bg-c-grey-1'")
-          q-toolbar-title(align="center" style="padding-left:54px") {{ cloudSyncing ? $t('Updating...') : $t('Channel') }}
-          q-btn.btnIcon(flat round dense icon="add_circle_outline" @click="newChannel")
+          q-btn.btnIcon(flat round icon="sync" @click="cloudSync")
+          q-toolbar-title(align="center") {{ cloudSyncing ? $t('Updating...') : $t('Channel') }}
+          q-btn.btnIcon(flat round icon="add_circle_outline" @click="newChannel")
         div.scroll.header-mar-top(:class="ifMobileSize || $store.state.ifMobileStyle ? (ifMobileSize ? 'scrollHeightMobileSize' : 'scrollHeightMobileStyle') : 'scrollHeightStyle'")
           q-pull-to-refresh(@refresh="cloudSync" color="primary" bg-color="c-grey-0" icon="sync")
             q-toolbar(insert :class="ifMobileSize || $store.state.ifMobileStyle ? 'bg-c-grey-1' : 'bg-c-grey-1'" class="q-px-xs")
@@ -13,7 +14,7 @@
                   q-icon(v-if="!channelfilter" name="search")
                   q-icon(v-else name="cancel" class="cursor-pointer" @click.stop="channelfilter = null")
           q-list
-            div(v-for="(channel, index) in $store.state.channels" :key="channel.channelId")
+            div(v-for="(channel, index) in ChannelFilteredList" :key="channel.channelId")
               q-item(clickable v-ripple :active-class="ifMobileSize || $store.state.ifMobileStyle ? 'bg-c-grey-1' : 'bg-c-grey-2'" class="text-c-grey-10" :active="($store.getKind() === 'channelDetails' && channel === $store.state.currentChannel) || channel.top === true" @click="channelSelected(channel, index)")
                 q-item-section(avatar)
                   q-avatar(size="32px")

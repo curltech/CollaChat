@@ -13,7 +13,7 @@ export default {
   },
   data() {
     return {
-      /*channelfilter: null,*/
+      channelfilter: null,
       placeholder: '\ue672' + ' ' + this.$i18n.t('Search'),
       searchDone: false,
       searching: false,
@@ -32,7 +32,7 @@ export default {
     ifMobileSize() {
       return (!window.device && this.$q.screen.width < 481)
     },
-    /*ChannelFilteredList() {
+    ChannelFilteredList() {
       let _that = this
       let store = _that.$store
       let channelFilteredArray = []
@@ -42,21 +42,25 @@ export default {
         if (channelFilter) {
           channelFilteredArray = channelList.filter((channel) => {
             if (channel) {
-              return channel.name.toLowerCase().includes(channelFilter.toLowerCase())
+              return channel.markDate && (channel.name.toLowerCase().includes(channelFilter.toLowerCase())
               || pinyinUtil.getPinyin(channel.name).toLowerCase().includes(channelFilter.toLowerCase())
               || channel.description.toLowerCase().includes(channelFilter.toLowerCase())
-              || pinyinUtil.getPinyin(channel.description).toLowerCase().includes(channelFilter.toLowerCase())
+              || pinyinUtil.getPinyin(channel.description).toLowerCase().includes(channelFilter.toLowerCase()))
             }
           })
         } else {
-          channelFilteredArray = channelList
+          channelFilteredArray = channelList.filter((channel) => {
+            if (channel) {
+              return channel.markDate
+            }
+          })
         }
         if(channelFilteredArray.length > 0) {
             CollaUtil.sortByKey(channelFilteredArray, 'updateDate', 'desc')
         }
       }
       return channelFilteredArray
-    },*/
+    },
     detailDateFormat() {
       let _that = this
       return function (createDate) {
@@ -83,216 +87,36 @@ export default {
     async cloudSync(done) {
       let _that = this
       let store = _that.$store
-      return
       if (!_that.cloudSyncing) {
         _that.cloudSyncing = true
         try {
-          let currentChannel = store.state.currentChannel
-          let clientPeerId = myself.myselfPeerClient.peerId
-          // 查询cloud全量DataBlock索引信息
+          let channelList = store.state.channels
+          // 查询cloud全量Channel索引信息
           let conditionBean = {}
-          conditionBean['createPeerId'] = clientPeerId
-          conditionBean['receiverPeerId'] = clientPeerId
-          conditionBean['receiverPeer'] = true
           conditionBean['getAllBlockIndex'] = true
-          conditionBean['blockType'] = BlockType.Collection
-          let cloudBlockIndices = await queryValueAction.queryValue(null, conditionBean)
-          //console.log('cloudBlockIndices:' + JSON.stringify(cloudBlockIndices))
-          // 查询local全量collection索引信息
-          let condition = {}
-          condition['ownerPeerId'] = clientPeerId
-          let localBlockIndices = await collectionComponent.loadCollection(condition, null, ['_id', 'updateDate', 'versionFlag'])
-          //console.log('localBlockIndices:' + JSON.stringify(localBlockIndices))
-          // 查询local失败记录
-          let dbLogs = await blockLogComponent.load(condition, null, null)
-          console.log("dbLogs-start:" + JSON.stringify(dbLogs))
-          // syncUp: 对比local失败与cloud和local，重做未过时操作
-          let localFailedBlockIds = []
-          if (dbLogs && dbLogs.length > 0) {
-            for (let dbLog of dbLogs) {
-              localFailedBlockIds.push(dbLog.dataBlock.businessNumber)
-              let obsolete = false
-              if (localBlockIndices && localBlockIndices.length > 0) {
-                for (let localBlockIndex of localBlockIndices) {
-                  if (dbLog.dataBlock.businessNumber === localBlockIndex._id
-                    && dbLog.dataBlock.createTimestamp < localBlockIndex.updateDate) {
-                    obsolete = true
-                    console.log('obsolete1')
-                    break
-                  }
-                }
-              }
-              if (!obsolete && cloudBlockIndices && cloudBlockIndices.length > 0) {
-                for (let cloudBlockIndex of cloudBlockIndices) {
-                  if (dbLog.dataBlock.businessNumber === cloudBlockIndex.businessNumber
-                    && dbLog.dataBlock.createTimestamp < cloudBlockIndex.createTimestamp) {
-                    obsolete = true
-                    console.log('obsolete2')
-                    break
-                  }
-                }
-              }
-              if (obsolete) {
-                dbLog.state = EntityState.Deleted
-              }
-            }
-            await blockLogComponent.save(dbLogs, null, dbLogs)
-            // 云端cloud保存
-            if (dbLogs && dbLogs.length > 0) {
-              if (store.collectionWorkerEnabler) {
-                /*let options = {}
-                options.privateKey = myself.privateKey
-                openpgp.clonePackets(options)
-                let worker = _that.initCollectionUploadWorker()
-                worker.postMessage(['all', dbLogs, myself.myselfPeerClient, options.privateKey])*/
-              } else {
-                dbLogs = await collectionUtil.upload(dbLogs, BlockType.Collection)
-                // 刷新syncFailed标志
-                let newDbLogMap = CollaUtil.clone(store.state.dbLogMap)
-                if (dbLogs && dbLogs.length > 0) {
-                  for (let dbLog of dbLogs) {
-                    let dl = newDbLogMap[dbLog.blockId]
-                    if (!dl) {
-                      newDbLogMap[dbLog.blockId] = true
-                      console.log('add dbLog, blockId:' + dbLog.blockId)
-                    }
-                  }
-                }
-                store.state.dbLogMap = newDbLogMap
-              }
-            }
+          conditionBean['blockType'] = BlockType.Channel
+          let channelIndexList = []
+          if(store.state.networkStatus === 'CONNECTED'){
+            channelIndexList = await queryValueAction.queryValue(null, conditionBean)
           }
-          // syncDown: 对比cloud和local，得到需sync列表
-          //let uploadList = []
-          let downloadList = []
-          let deleteList = []
-          if (cloudBlockIndices && cloudBlockIndices.length > 0) {
-            for (let cloudBlockIndex of cloudBlockIndices) {
-              let exists = false
-              if (localBlockIndices && localBlockIndices.length > 0) {
-                for (let localBlockIndex of localBlockIndices) {
-                  if (localBlockIndex._id === cloudBlockIndex.businessNumber) {
-                    if (localBlockIndex.updateDate < cloudBlockIndex.createTimestamp) {
-                      let download = {}
-                      download['blockId'] = cloudBlockIndex.blockId
-                      download['businessNumber'] = cloudBlockIndex.businessNumber
-                      download['primaryPeerId'] = cloudBlockIndex.primaryPeerId
-                      downloadList.push(download)
-                    }/* else if (localBlockIndex.updateDate > cloudBlockIndex.createTimestamp) {
-                      if (//localBlockIndex.versionFlag === 'local' &&
-                          !localFailedBlockIds.includes(localBlockIndex._id)) {
-                        uploadList.push(localBlockIndex._id)
-                      }
-                    }*/
-                    exists = true
-                    break
-                  }
-                }
-              }
-              if (!exists) {
-                if (!localFailedBlockIds.includes(cloudBlockIndex.businessNumber)) {
-                  let download = {}
-                  download['blockId'] = cloudBlockIndex.blockId
-                  download['businessNumber'] = cloudBlockIndex.businessNumber
-                  download['primaryPeerId'] = cloudBlockIndex.primaryPeerId
-                  downloadList.push(download)
-                }
-              }
+          console.log('channelIndexList:' + JSON.stringify(channelIndexList))
+          if (channelIndexList && channelIndexList.length > 0) {
+            for (let channelIndex of channelIndexList) {
+              channelIndex.avatar = channelIndex.thumbnail
+              channelIndex.thumbnail = null
             }
-          }
-          if (localBlockIndices && localBlockIndices.length > 0) {
-            for (let localBlockIndex of localBlockIndices) {
+            for (let channel of channelList) {
               let exists = false
-              if (cloudBlockIndices && cloudBlockIndices.length > 0) {
-                for (let cloudBlockIndex of cloudBlockIndices) {
-                  if (localBlockIndex._id === cloudBlockIndex.businessNumber) {
-                    exists = true
-                    break
-                  }
+              for (let channelIndex of channelIndexList) {
+                if (channel.channelId === channelIndex.channelId) {
+                  exists = true
+                  break
                 }
               }
               if (!exists) {
                 if (localBlockIndex.versionFlag === 'sync' || (localBlockIndex.versionFlag === 'local' && !localFailedBlockIds.includes(localBlockIndex._id))) {
                   deleteList.push(localBlockIndex._id)
                 }
-              }
-            }
-          }
-          //console.log("uploadList:" + JSON.stringify(uploadList))
-          console.log("downloadList:" + JSON.stringify(downloadList))
-          console.log("deleteList:" + JSON.stringify(deleteList))
-          // 上传
-          /*for (let collectionId of uploadList) {
-            let collection = await collectionComponent.get(CollectionDataType.COLLECTION, collectionId)
-            if (collection) {
-              await collectionUtil.saveBlock(collection, false, BlockType.Collection)
-            }
-          }*/
-          // 下载
-          if (downloadList && downloadList.length > 0) {
-            if (store.collectionWorkerEnabler) {
-              /*let options = {}
-              options.privateKey = myself.privateKey
-              openpgp.clonePackets(options)
-              let worker = _that.initCollectionDownloadWorker()
-              worker.postMessage([downloadList, myself.myselfPeerClient, options.privateKey])*/
-            } else {
-              let ps = []
-              for (let download of downloadList) {
-                let promise = dataBlockService.findTxPayload(null, download['blockId'])
-                ps.push(promise)
-              }
-              CollaUtil.asyncPool(10, ps, async function(result) {
-                let collections = await result
-                if (collections && collections.length > 0) {
-                  let collection = collections[0]
-                  if (collection) {
-                    let collectionId = collection._id
-                    let local = await collectionComponent.get(CollectionDataType.COLLECTION, collectionId)
-                    if (!(local && current && current._id === collectionId && _that.subKind === 'edit')) {
-                      if (!local) {
-                        collection.state = EntityState.New
-                      } else {
-                        collection._rev = local._rev
-                        collection.state = EntityState.Modified
-                      }
-                      collection.versionFlag = 'sync'
-                      await collectionComponent.saveCollection(collection, null)
-                      if (_that.collectionTypeIndex === 0 || _that.collectionTypes[_that.collectionTypeIndex].value === collection.collectionType) {
-                        let index = 0
-                        for (let i = 0; i < _that.myCollections.length; i++) {
-                          if (_that.myCollections[i].updateDate > collection.updateDate) {
-                            index++
-                          } else {
-                            break
-                          }
-                        }
-                        _that.myCollections.splice(index, (!local ? 0 : 1), collection)
-                      }
-                    }
-                  }
-                }
-              })
-            }
-          }
-          // 删除
-          for (let collectionId of deleteList) {
-            let collection = await collectionComponent.get(CollectionDataType.COLLECTION, collectionId)
-            if (collection && !(current && current._id === collectionId && _that.subKind === 'edit')) {
-              collection.state = EntityState.Deleted
-              await collectionComponent.saveCollection(collection, null)
-              let index = 0
-              for (let i = 0; i < _that.myCollections.length; i++) {
-                if (_that.myCollections[i]._id === collectionId) {
-                  _that.myCollections.splice(index, 1)
-                  if (current && current._id === collectionId && _that.subKind === 'view') {
-                    _that.myCollections.c_meta.currentIndex = -1
-                    _that.myCollections.c_meta.current = null
-                    _that.subKind = 'default'
-                  }
-                  break
-                }
-                index++
               }
             }
           }
@@ -367,45 +191,6 @@ export default {
           }
         }
       }
-    },
-    async getChannelList() {
-      let _that = this
-      let store = _that.$store
-      _that.$q.loading.show()
-      // 查询cloud全量DataBlock索引信息
-      let conditionBean = {}
-      conditionBean['getAllBlockIndex'] = true
-      conditionBean['blockType'] = BlockType.Channel
-      //let channelList = []
-      let indexList = []
-      if(store.state.networkStatus === 'CONNECTED'){
-        indexList = await queryValueAction.queryValue(null, conditionBean)
-      }
-      console.log('getChannelList-indexList:' + JSON.stringify(indexList))
-      if (indexList && indexList.length > 0) {
-        /*let ps = []
-        for (let index of indexList) {
-          let promise = dataBlockService.findTxPayload(null, index['blockId'])
-          ps.push(promise)
-        }
-        CollaUtil.asyncPool(10, ps, async function(result) {
-          let channels = await result
-          if (channels && channels.length > 0) {
-            let channel = channels[0]
-            if (channel) {
-              channelList.push(channel)
-            }
-          }
-        })*/
-        for (let index of indexList) {
-          index.avatar = index.thumbnail
-          index.thumbnail = null
-        }
-      }
-      //console.log('getChannelList-channelList:' + JSON.stringify(channelList))
-      _that.$q.loading.hide()
-      //return channelList
-      return indexList
     },
     async channelSelected(channel, index) {
       let _that = this

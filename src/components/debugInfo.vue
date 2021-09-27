@@ -1,9 +1,9 @@
 <template lang="pug">
   div.bg-c-grey-0(:style="heightStyle")
     q-toolbar
-      q-btn(flat round dense icon="keyboard_arrow_left" @click="$store.changeDeveloperOptionsSubKind('default')")
+      q-btn(flat round icon="keyboard_arrow_left" @click="$store.changeDeveloperOptionsSubKind('default')")
       q-toolbar-title(align="center") {{$t('Debug Info')}}
-      q-btn.btnIcon(flat round dense icon="delete" @click="clean")
+      q-btn.btnIcon(flat round icon="delete" @click="clean")
     q-toolbar(insert)
       q-input.c-field(debounce="100" filled dense v-model="searchText" :placeholder="placeholder" input-class="text-center iconfont" style="width: 86%" @keyup="searchKeyup" @input="searchInput")
         template(slot="append")

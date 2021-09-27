@@ -3,9 +3,9 @@
     q-tab-panels.bg-c-grey-1(v-model="subKind" animated transition-prev="slide-right" transition-next="slide-left")
       q-tab-panel(name="default" class="q-pa-none")
         q-toolbar.header-toolbar(:class="ifMobileSize || $store.state.ifMobileStyle ? 'bg-c-grey-1' : 'bg-c-grey-1'")
-          q-btn.btnIcon(flat round dense :icon="$store.state.lockContactsSwitch ? 'visibility_off' : 'visibility'" @click="showLockContactsSwitchDialog")
+          q-btn.btnIcon(flat round :icon="$store.state.lockContactsSwitch ? 'visibility_off' : 'visibility'" @click="showLockContactsSwitchDialog")
           q-toolbar-title(align="center" class="text-c-grey-10") {{ $store.state.networkStatus === 'CONNECTING' ? $t('Chat') + '(' + $t('CONNECTING') + ')' : ($store.state.networkStatus === 'CONNECTED' ? $t('Chat') : $t('Chat') + '(' + $t('DISCONNECTED') + ')') }}
-          q-btn.btnIcon(flat round dense icon="add_circle_outline")
+          q-btn.btnIcon(flat round icon="add_circle_outline")
             q-menu(auto-close)
               q-list
                 q-item(clickable v-ripple @click="showSelectGroupChatLinkman" v-close-popup)

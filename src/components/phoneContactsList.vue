@@ -12,19 +12,17 @@
           :class="ifMobileSize || $store.state.ifMobileStyle || $store.phoneContactsEntry === 'findContacts' ? '' : 'hidden'",
           flat,
           round,
-          dense,
           icon="keyboard_arrow_left",
           @click="back"
         )
         q-toolbar-title(
           align="center",
-          :style="ifMobileSize || $store.state.ifMobileStyle || $store.phoneContactsEntry === 'findContacts' ? 'padding-left:54px' : ''"
+          :style="ifMobileSize || $store.state.ifMobileStyle || $store.phoneContactsEntry === 'findContacts' ? 'padding-left:42px' : ''"
         ) {{ $t('Phone Contacts') }}
         q-btn(
           :class="ifMobileSize || $store.state.ifMobileStyle || $store.phoneContactsEntry === 'findContacts' ? '' : 'hidden'",
           flat,
           round,
-          dense,
           :color="linkmanFilter === true ? 'primary' : 'c-grey-10'",
           icon="account_box",
           @click="linkmanFilter = !linkmanFilter"
@@ -33,7 +31,6 @@
           :class="ifMobileSize || $store.state.ifMobileStyle || $store.phoneContactsEntry === 'findContacts' ? '' : 'hidden'",
           flat,
           round,
-          dense,
           :color="peerFilter === true ? 'primary' : 'c-grey-10'",
           icon="person_pin",
           @click="peerFilter = !peerFilter"

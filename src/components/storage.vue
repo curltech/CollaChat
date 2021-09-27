@@ -1,7 +1,7 @@
 <template lang="pug">
   div.bg-c-grey-0
     q-toolbar
-      q-btn(flat round dense icon="keyboard_arrow_left" @click="$store.changeGeneralSubKind('default')")
+      q-btn(flat round icon="keyboard_arrow_left" @click="$store.changeGeneralSubKind('default')")
       q-toolbar-title(align="center" style="padding-right:54px") {{$t('Storage')}}
     div(:style="heightStyle" align="center")
       q-list(style="width: 90%")

@@ -3,7 +3,7 @@
     q-page-container
       q-page
         q-toolbar
-          q-btn(flat round dense icon="keyboard_arrow_left" @click="$store.changeSettingSubKind('default')")
+          q-btn(flat round icon="keyboard_arrow_left" @click="$store.changeSettingSubKind('default')")
           q-toolbar-title(align="center" style="padding-right:54px") {{$t('FAQ')}}
         div
           div(id="toc" style="padding-top:10px")

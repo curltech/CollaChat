@@ -3,9 +3,9 @@
     q-tab-panels(v-model="subKind" animated transition-prev="slide-right" transition-next="slide-left")
       q-tab-panel(:style="heightStyle" name="default" style="padding:0px 0px")
         q-toolbar
-          q-btn(flat round dense icon="keyboard_arrow_left" @click="$store.changeSettingSubKind('default')")
+          q-btn(flat round icon="keyboard_arrow_left" @click="$store.changeSettingSubKind('default')")
           q-toolbar-title(align="center" style="padding-right:54px") {{$t('Advance Setting')}}
-          //q-btn.btnIcon(flat round dense icon="settings_backup_restore" @click="showRestoreDialog" no-caps)
+          //q-btn.btnIcon(flat round icon="settings_backup_restore" @click="showRestoreDialog" no-caps)
         q-list
           //q-separator.c-separator(style="margin-left:16px;width:calc(100% - 16px)")
           //q-item(dense)

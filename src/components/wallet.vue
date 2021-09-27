@@ -3,9 +3,9 @@
     q-tab-panels(v-model="subKind" animated transition-prev="slide-right" transition-next="slide-left")
       q-tab-panel(:style="heightStyle" name="default" style="padding:0px 0px")
         q-toolbar
-          q-btn(:class="ifMobileSize || $store.state.ifMobileStyle ? '' : 'hidden'" flat round dense icon="keyboard_arrow_left" @click="$store.toggleDrawer(false)")
+          q-btn(:class="ifMobileSize || $store.state.ifMobileStyle ? '' : 'hidden'" flat round icon="keyboard_arrow_left" @click="$store.toggleDrawer(false)")
           q-toolbar-title(align="center" :style="ifMobileSize || $store.state.ifMobileStyle ? '' : 'padding-left:54px'") {{ loading ? $t('Updating...') : $t('Wallet') }}
-          q-btn(flat round dense icon="receipt" color="primary" @click="subKind = 'transaction'" no-caps)
+          q-btn.btnIcon(flat round icon="receipt" @click="subKind = 'transaction'" no-caps)
         q-list
           q-item(style="padding-top:30px")
             q-space
@@ -22,9 +22,9 @@
               q-btn(style="width:200px;height:40px;margin:auto" unelevated color="primary" :label="$t('Deposite')" no-caps @click="")
       q-tab-panel(:style="heightStyle" name="transaction" style="padding:0px 0px")
         q-toolbar
-          q-btn(flat round dense icon="keyboard_arrow_left" @click="subKind = 'default'")
+          q-btn(flat round icon="keyboard_arrow_left" @click="subKind = 'default'")
           q-toolbar-title(align="center") {{$t('Transactions') + '(' + peerTrans.length + ')'}}
-          q-btn.btnIcon(flat round dense icon="save_alt" no-caps :disable="!peerTrans.length" @click="showExportDialog")
+          q-btn.btnIcon(flat round icon="save_alt" no-caps :disable="!peerTrans.length" @click="showExportDialog")
         q-list
           q-item(class="q-px-none")
             q-item-section(class="q-px-xs")

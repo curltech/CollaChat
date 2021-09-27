@@ -3,9 +3,9 @@
     q-tab-panels(v-model="subKind" animated transition-prev="slide-right" transition-next="slide-left")
       q-tab-panel.bg-c-grey-message(:style="heightStyle" name="default" class="q-pa-none")
         q-toolbar.bg-c-grey-0
-          q-btn(:class="ifMobileSize || $store.state.ifMobileStyle ? '' : 'hidden'" flat round dense icon="keyboard_arrow_left" @click="$store.toggleDrawer(false)")
+          q-btn(:class="ifMobileSize || $store.state.ifMobileStyle ? '' : 'hidden'" flat round icon="keyboard_arrow_left" @click="$store.toggleDrawer(false)")
           q-toolbar-title(align="center" :style="ifMobileSize || $store.state.ifMobileStyle ? '' : 'padding-left:54px'") {{$t('Channel')}}
-          q-btn.btnIcon(flat round dense icon="more_horiz" @click="channelCommand()")
+          q-btn.btnIcon(flat round icon="more_horiz" @click="channelCommand()")
         q-list.bg-c-grey-0(flat)
           q-item
             q-item-section(avatar)
@@ -46,9 +46,9 @@
         newArticle.drawcontent
       q-tab-panel(:style="heightStyle" name="editChannel" class="q-pa-none")
         q-toolbar
-          q-btn(flat round dense icon="keyboard_arrow_left" @click="subKind='default'")
+          q-btn(flat round icon="keyboard_arrow_left" @click="subKind='default'")
           q-toolbar-title(align="center") {{$t('Edit Channel')}}
-          q-btn.btnIcon(flat round dense icon="check" @click="editChannel")
+          q-btn.btnIcon(flat round icon="check" @click="editChannel")
         q-card(flat)
           q-card-section(align="center")
             q-item-label(class="q-field__label q-py-sm" :style="$q.dark.isActive ? 'color: rgba(255,255,255,0.7)' : ''") {{$t('Channel Avatar')}}

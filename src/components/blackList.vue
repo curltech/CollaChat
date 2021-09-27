@@ -5,7 +5,7 @@
         q-toolbar
           q-btn(flat round icon="keyboard_arrow_left" @click="$store.changePrivacySubKind('default')")
           q-toolbar-title(align="center") {{$t('Blacklist') + '(' + BlackList.length + ')'}}
-          q-btn.btnIcon(flat round dense :icon="$store.state.lockContactsSwitch ? 'visibility_off' : 'visibility'" @click="showLockContactsSwitchDialog")
+          q-btn.btnIcon(flat round :icon="$store.state.lockContactsSwitch ? 'visibility_off' : 'visibility'" @click="showLockContactsSwitchDialog")
         q-toolbar(insert class="q-px-xs")
           q-input.c-field(autofocus debounce="100" filled dense v-model="filter" :placeholder="placeholder" input-class="text-center iconfont")
             template(slot="append")

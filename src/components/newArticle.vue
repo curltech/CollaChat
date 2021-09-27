@@ -3,9 +3,9 @@
     q-tab-panels(v-model="subKind" animated transition-prev="slide-right" transition-next="slide-left")
       q-tab-panel(:style="heightStyle" name="default" class="q-pa-none")
         q-toolbar
-          q-btn(flat round dense icon="keyboard_arrow_left" @click="$store.changeChannelDetailsSubKind('default')")
+          q-btn(flat round icon="keyboard_arrow_left" @click="$store.changeChannelDetailsSubKind('default')")
           q-toolbar-title(align="center") {{$t('New Article')}}
-          q-btn.btnIcon(flat round dense icon="check" @click="createArticle")
+          q-btn.btnIcon(flat round icon="check" @click="createArticle")
         q-card(flat)
           q-card-section(align="center")
             q-item-label(class="q-field__label q-py-sm" :style="$q.dark.isActive ? 'color: rgba(255,255,255,0.7)' : ''") {{$t('Article Cover')}}

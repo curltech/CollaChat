@@ -8,20 +8,18 @@ div
   )
     q-tab-panel(:style="heightStyle", name="default", style="padding:0px 0px")
       q-toolbar
-        q-btn(flat, round, dense, icon="keyboard_arrow_left", @click="back")
-        q-toolbar-title(align="center", style="padding-left:54px") {{ $t('Conference') }}
-        q-btn.btnIcon(flat, round, dense, icon="alarm_add", @click="add")
+        q-btn(flat, round, icon="keyboard_arrow_left", @click="back")
+        q-toolbar-title(align="center", style="padding-left:84px") {{ $t('Conference') }}
+        q-btn.btnIcon(flat, round, icon="alarm_add", @click="add")
         q-btn.btnIcon(
           flat,
           round,
-          dense,
           icon="addchart",
           @click="showJoinDialog"
         )
         q-btn.btnIcon(
           flat,
           round,
-          dense,
           icon="history",
           @click="subKind = 'history'"
         )
@@ -156,7 +154,6 @@ div
             flat,
             round,
             icon="schedule",
-            color="primary",
             @click="schedule"
           )
     q-tab-panel(:style="heightStyle", name="history", style="padding:0px 0px")
@@ -164,7 +161,6 @@ div
         q-btn(
           flat,
           round,
-          dense,
           icon="keyboard_arrow_left",
           @click="subKind = 'default'"
         )

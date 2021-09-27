@@ -3,7 +3,7 @@
     q-tab-panels.bg-c-grey-0(v-model="subKind" animated transition-prev="slide-right" transition-next="slide-left")
       q-tab-panel(:style="heightStyle" name="default" style="padding:0px 0px")
         q-toolbar
-         q-btn(flat round dense icon="keyboard_arrow_left" @click="$store.changeSettingSubKind('default')")
+         q-btn(flat round icon="keyboard_arrow_left" @click="$store.changeSettingSubKind('default')")
          q-toolbar-title(align="center" style="padding-right:54px") {{$t('Privacy')}}
         q-list
           q-item(clickable v-ripple @click="subKind = 'blackList'")
@@ -25,7 +25,7 @@
               q-icon(name="keyboard_arrow_right")
       q-tab-panel(:style="heightStyle" name="visibilitySetting" style="padding:0px 0px")
         q-toolbar
-         q-btn(flat round dense icon="keyboard_arrow_left" @click="subKind = 'default'")
+         q-btn(flat round icon="keyboard_arrow_left" @click="subKind = 'default'")
          q-toolbar-title(align="center" style="padding-right:54px") {{$t('Visibility Setting')}}
         q-list
           q-item

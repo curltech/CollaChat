@@ -75,10 +75,10 @@
         tos.drawcontent
       q-tab-panel(:style="heightStyle" name="qrCode" style="padding:0px 0px")
         q-toolbar
-          q-btn(flat round dense icon="keyboard_arrow_left" @click="subKind = 'default'")
+          q-btn(flat round icon="keyboard_arrow_left" @click="subKind = 'default'")
           //q-toolbar-title(align="center") {{$t('QR Code')}}
           q-space
-          q-btn.btnIcon(flat round dense icon="more_horiz" @click="operateQRCode")
+          q-btn.btnIcon(flat round icon="more_horiz" @click="operateQRCode")
         q-card(flat class="fixed-center q-pa-none")
           q-card-section#qrCodeCard(class="q-pa-xs")
             q-card(flat class="q-pa-sm")

@@ -113,9 +113,9 @@
       align="center"
     )
       q-toolbar(v-if="!$store.ifMobile()" style="z-index: 999")
-        q-btn.btnIcon(flat round dense icon="close" @click="fullscreenBack")
+        q-btn.btnIcon(flat round icon="close" @click="fullscreenBack")
         q-space
-        q-btn.btnIcon(flat round dense icon="more_horiz" @click="operateAvatar")
+        q-btn.btnIcon(flat round icon="more_horiz" @click="operateAvatar")
       img#avatarImg(
         :src="$store.state.currentLinkman ? ($store.state.currentLinkman.avatar ? $store.state.currentLinkman.avatar : $store.defaultActiveAvatar) : null"
       )
@@ -125,7 +125,6 @@
         q-btn(
           flat,
           round,
-          dense,
           icon="keyboard_arrow_left",
           @click="subKind = 'default'"
         )
@@ -173,7 +172,6 @@
         q-btn(
           flat,
           round,
-          dense,
           icon="keyboard_arrow_left",
           @click="subKind = 'default'"
         )

@@ -3,9 +3,9 @@
     q-tab-panels(v-model="subKind" animated transition-prev="slide-right" transition-next="slide-left")
       q-tab-panel(:style="heightStyle" name="default" style="padding:0px 0px")
         q-toolbar
-          q-btn(flat round dense icon="keyboard_arrow_left" @click="$store.changeAdvanceSettingSubKind('default')")
+          q-btn(flat round icon="keyboard_arrow_left" @click="$store.changeAdvanceSettingSubKind('default')")
           q-toolbar-title(align="center") {{$t('MyNodes') + '(' + data.length + ')'}}
-          q-btn.btnIcon(flat round dense icon="add_circle_outline" @click="showAddItem")
+          q-btn.btnIcon(flat round icon="add_circle_outline" @click="showAddItem")
         q-toolbar(insert class="q-px-xs")
           q-input.c-field(debounce="100" filled dense v-model="filter" :placeholder="placeholder" input-class="text-center iconfont")
             template(slot="append")
@@ -20,9 +20,9 @@
           @row-click="showModifyItem")
       q-tab-panel(:style="heightStyle" name="modifyItem" style="padding:0px 0px")
         q-toolbar
-          q-btn(flat round dense icon="keyboard_arrow_left" @click="subKind = 'default'")
+          q-btn(flat round icon="keyboard_arrow_left" @click="subKind = 'default'")
           q-toolbar-title(align="center") {{ $t('Edit Node') }}
-          q-btn.btnIcon(flat round dense icon="check" @click="modify")
+          q-btn.btnIcon(flat round icon="check" @click="modify")
         q-form(ref="formModify" @submit="modify" class="q-pa-sm")
           q-select.c-field(filled :label="$t('No')" v-model="mpepData.priority" :options="options")
           p
@@ -39,7 +39,7 @@
         q-toolbar
           q-btn(flat round icon="keyboard_arrow_left" @click="subKind = 'default'")
           q-toolbar-title(align="center") {{ $t('Add Node') }}
-          q-btn.btnIcon(flat round dense icon="check" @click="add")
+          q-btn.btnIcon(flat round icon="check" @click="add")
         q-form(ref="formAdd" @submit="add" class="q-pa-sm")
           q-select.c-field(filled :label="$t('No')" v-model="mpepData.priority" :options="options")
           p

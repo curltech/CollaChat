@@ -406,19 +406,18 @@ export default {
           current = _that.myCollections.c_meta.current
         }
         try {
-          // 云端cloud保存
-          if (store.collectionWorkerEnabler) {
-            /*let dbLogs = await collectionUtil.saveBlock(current, false, BlockType.Collection)
-            let options = {}
-            options.privateKey = myself.privateKey
-            openpgp.clonePackets(options)
-            let worker = _that.initCollectionUploadWorker()
-            worker.postMessage(['one', dbLogs, myself.myselfPeerClient, options.privateKey])*/
-          } else {
-            let dbLogs
-            let blockType = BlockType.Collection
-            if (current.state === EntityState.Modified) {
-              // 云端删除old
+          let dbLogs
+          let blockType = BlockType.Collection
+          if (current.state === EntityState.Modified) {
+            // 云端删除old
+            if (store.collectionWorkerEnabler) {
+              /*let dbLogs = await collectionUtil.saveBlock(current, false, BlockType.Collection)
+              let options = {}
+              options.privateKey = myself.privateKey
+              openpgp.clonePackets(options)
+              let worker = _that.initCollectionUploadWorker()
+              worker.postMessage(['one', dbLogs, myself.myselfPeerClient, options.privateKey])*/
+            } else {
               let old = CollaUtil.clone(current)
               let start = new Date().getTime()
               dbLogs = await collectionUtil.deleteBlock(old, true, blockType)
@@ -436,10 +435,25 @@ export default {
                 }
               }
               store.state.dbLogMap = newDbLogMap
-              // current
-              current.blockId = UUID.string(null, null)
             }
-            // 云端保存
+            // current
+            current.blockId = UUID.string(null, null)
+          }
+          // 本地保存
+          let start = new Date().getTime()
+          await collectionUtil.save(type, current, _that.myCollections)
+          let end = new Date().getTime()
+          console.log('collection save time:' + (end - start))
+          _that.backupContent = current['blockId'] + ':' + current['content']
+          // 云端保存
+          if (store.collectionWorkerEnabler) {
+            /*let dbLogs = await collectionUtil.saveBlock(current, false, BlockType.Collection)
+            let options = {}
+            options.privateKey = myself.privateKey
+            openpgp.clonePackets(options)
+            let worker = _that.initCollectionUploadWorker()
+            worker.postMessage(['one', dbLogs, myself.myselfPeerClient, options.privateKey])*/
+          } else {
             let start = new Date().getTime()
             dbLogs = await collectionUtil.saveBlock(current, true, blockType)
             let end = new Date().getTime()
@@ -457,12 +471,6 @@ export default {
             }
             store.state.dbLogMap = newDbLogMap
           }
-          // 本地保存
-          let start = new Date().getTime()
-          await collectionUtil.save(type, current, _that.myCollections)
-          let end = new Date().getTime()
-          console.log('collection save time:' + (end - start))
-          _that.backupContent = current['blockId'] + ':' + current['content']
         } catch (error) {
           console.error(error)
           _that.$q.notify({
@@ -1369,6 +1377,7 @@ export default {
       let _that = this
       let store = _that.$store
       if (!_that.cloudSyncing && !_that.collectionLoading) {
+        _that.$q.loading.show()
         _that.cloudSyncing = true
         try {
           let current = _that.myCollections.c_meta.current
@@ -1583,8 +1592,11 @@ export default {
         } catch (e) {
           console.error(e)
         } finally {
-          done()
+          if (done && typeof done === 'function') {
+            done()
+          }
           _that.cloudSyncing = false
+          _that.$q.loading.hide()
         }
       }
     },
