@@ -19,12 +19,12 @@
                 q-item-section(avatar)
                   q-avatar(size="32px")
                     img(:src="channel.avatar ? channel.avatar : $store.defaultActiveAvatar")
-                    q-badge(color="red" floating)
+                    q-badge(v-if="channel.markDate && channel.newArticleFlag" color="red" floating)
                 q-item-section
                   q-item-label {{ channel.name }}
-                  q-item-label(caption) last article's title
+                  q-item-label(caption) {{ channel.newArticleTitle ? channel.newArticleTitle : '' }}
                 q-item-section(side)
-                  q-item-label(caption) {{ detailDateFormat(channel.updateDate) }}
+                  q-item-label(caption) {{ channel.newArticleUpdateDate ? detailDateFormat(channel.newArticleUpdateDate) : detailDateFormat(channel.updateDate) }}
       q-tab-panel(name="search" class="q-pa-none")
         q-toolbar.header-toolbar
           q-btn(v-if="searchResult !== 'allResult'" flat round icon="keyboard_arrow_left" @click="resultBack()")

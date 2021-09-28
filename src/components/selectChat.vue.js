@@ -39,6 +39,10 @@ export default {
         store.changeMessageSubKind('default')
       } else if (store.selectChatEntry === 'accountInformationQrCode') {
         store.accountInformationEnterQRCode()
+      } else if (store.selectChatEntry === 'channelForward') {
+        store.changeChannelDetailsSubKind('default')
+      } else if (store.selectChatEntry === 'articleForward') {
+        store.changeChannelDetailsSubKind('view')
       }
     },
     gotoSelectChatRecord() {

@@ -60,6 +60,8 @@
               q-input.c-field(autofocus :label="$t('Channel Name')" filled clearable v-model="channelData.name" lazy-rules :rules="[]")
               p
               q-input.c-field(:label="$t('Channel Description')" filled clearable v-model="channelData.description" lazy-rules :rules="[]")
+      q-tab-panel(name="selectChat" style="padding:0px 0px")
+        selectChat.drawcontent
     q-uploader(style="display:none" ref="channelUpload" @added="files => channelUpload(files)" accept=".jpg, image/*")
 </template>
 <script src="./channelDetails.vue.js" />

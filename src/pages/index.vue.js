@@ -3531,10 +3531,24 @@ export default {
         updateDate: { $gt: null }
       }, [{ updateDate: 'desc' }])
       if (channelDBItems && channelDBItems.length > 0) {
-        store.state.channels = channelDBItems
         for (let channelDBItem of channelDBItems) {
+          channelDBItem.newArticleFlag = false
+          // 查询local article
+          let articleList = []
+          let ret = await channelComponent.loadArticle({
+            ownerPeerId: myself.myselfPeerClient.peerId,
+            channelId: channelDBItem.channelId,
+            updateDate: { $gt: null }
+          }, [{ updateDate: 'desc' }])
+          if (ret && ret.length > 0) {
+            articleList = ret
+            channelDBItem.newArticleFlag = false
+            channelDBItem.newArticleUpdateDate = articleList[0].updateDate
+            channelDBItem.newArticleTitle = articleList[0].title
+          }
           store.state.channelMap[channelDBItem.channelId] = channelDBItem
         }
+        store.state.channels = channelDBItems
       }
     },
     startServer: function(type, filename) {

@@ -7,11 +7,13 @@ import { BlockType, dataBlockService } from 'libcolla'
 import { collectionUtil } from '@/libs/biz/colla-collection-util'
 import { channelComponent, ChannelDataType } from '@/libs/biz/colla-channel'
 import NewArticle from '@/components/newArticle'
+import SelectChat from '@/components/selectChat'
 
 export default {
   name: "ChannelDetails",
   components: {
     newArticle: NewArticle,
+    selectChat: SelectChat,
   },
   data() {
     return {
@@ -247,12 +249,23 @@ export default {
       let store = _that.$store
       let channel = store.state.currentChannel
       let markDate = channel.markDate
+      if (markDate) {
+        channel.markDate = null
+      } else {
+        channel.markDate = new Date().getTime()
+      }
+      await channelComponent.update(ChannelDataType.CHANNEL, channel)
+      store.state.channelMap[channel.channelId] = channel
+      _that.$forceUpdate()
     },
     async top() {
       let _that = this
       let store = _that.$store
       let channel = store.state.currentChannel
-      let top = channel.top
+      channel.top = !channel.top
+      await channelComponent.update(ChannelDataType.CHANNEL, channel)
+      store.state.channelMap[channel.channelId] = channel
+      _that.$forceUpdate()
     },
     async editChannel() {
       let _that = this
@@ -329,11 +342,19 @@ export default {
         let channelRecord = await channelComponent.get(ChannelDataType.CHANNEL, current._id)
         await channelComponent.remove(ChannelDataType.CHANNEL, channelRecord, store.state.channels)
         delete store.state.channelMap[current.channelId]
-        if (store.state.channels.length === 0 || store.state.ifMobileStyle) {
+        let channelFilteredArray = store.state.channels.filter((channel) => {
+          if (channel) {
+            return channel.markDate
+          }
+        })
+        if (channelFilteredArray.length > 0) {
+          CollaUtil.sortByKey(channelFilteredArray, 'updateDate', 'desc')
+        }
+        if (channelFilteredArray.length === 0 || store.state.ifMobileStyle) {
           store.state.currentChannel = null
           store.toggleDrawer(false)
         } else {
-          store.state.currentChannel = store.state.channels[0]
+          store.state.currentChannel = channelFilteredArray[0]
         }
       } catch (error) {
         console.error(error)
