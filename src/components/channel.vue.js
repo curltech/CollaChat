@@ -26,7 +26,8 @@ export default {
       unfollowChannelResultList: [],
       unfollowChannelArticleResultList: [],
       searchResult: 'allResult',
-      cloudSyncing: false
+      cloudSyncing: false,
+      _cloudSyncTimer: null
     }
   },
   computed: {
@@ -99,11 +100,13 @@ export default {
     },
   },
   methods: {
-    async cloudSync(done) {
+    async cloudSyncCore(timer) {
       let _that = this
       let store = _that.$store
       if (!_that.cloudSyncing) {
-        _that.$q.loading.show()
+        if (!timer) {
+          _that.$q.loading.show()
+        }
         _that.cloudSyncing = true
         try {
           // 同步Channel
@@ -291,30 +294,39 @@ export default {
               await channelComponent.save(ChannelDataType.ARTICLE, articleList, null)
             }
           }
-          let channelFilteredArray = channelList.filter((channel) => {
-            if (channel) {
-              return channel.markDate
+          if (!timer) {
+            let channelFilteredArray = channelList.filter((channel) => {
+              if (channel) {
+                return channel.markDate
+              }
+            })
+            if (channelFilteredArray.length > 0) {
+              CollaUtil.sortByKey(channelFilteredArray, 'updateDate', 'desc')
             }
-          })
-          if (channelFilteredArray.length > 0) {
-            CollaUtil.sortByKey(channelFilteredArray, 'updateDate', 'desc')
-          }
-          if (channelFilteredArray.length === 0 || store.state.ifMobileStyle) {
-            store.state.currentChannel = null
-            store.toggleDrawer(false)
-          } else {
-            store.state.currentChannel = channelFilteredArray[0]
-            _that.channelSelected(store.state.currentChannel, 0)
+            if (channelFilteredArray.length === 0 || store.state.ifMobileStyle) {
+              store.state.currentChannel = null
+              store.toggleDrawer(false)
+            } else {
+              store.state.currentChannel = channelFilteredArray[0]
+              _that.channelSelected(store.state.currentChannel, 0)
+            }
           }
         } catch (e) {
           console.error(e)
         } finally {
-          if (done && typeof done === 'function') {
-            done()
-          }
           _that.cloudSyncing = false
-          _that.$q.loading.hide()
+          if (!timer) {
+            _that.$q.loading.hide()
+          }
         }
+      }
+    },
+    async cloudSync(done) {
+      let _that = this
+      let store = _that.$store
+      await _that.cloudSyncCore()
+      if (done && typeof done === 'function') {
+        done()
       }
     },
     searchBack() {
@@ -511,10 +523,21 @@ export default {
     let _that = this
     let store = _that.$store
     store.getArticleList = _that.getArticleList
+    _that._cloudSyncTimer = setInterval(async function () {
+      await _that.cloudSyncCore(true)
+    }, 60 * 1000)
   },
   mounted() {
     let _that = this
     let store = this.$store
+  },
+  beforeDestroy() {
+    let _that = this
+    let store = _that.$store
+    if (_that._cloudSyncTimer) {
+      clearInterval(_that._cloudSyncTimer)
+      delete _that._cloudSyncTimer
+    }
   },
   watch: {
   }
