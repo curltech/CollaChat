@@ -256,7 +256,6 @@ export default {
       }
       await channelComponent.update(ChannelDataType.CHANNEL, current)
       store.state.channelMap[current.channelId] = current
-      //_that.$forceUpdate()
       let i = 0
       for (let channel of store.state.channels) {
         if (channel.channelId === current.channelId) {
@@ -265,6 +264,7 @@ export default {
         }
         i++
       }
+      //_that.$forceUpdate()
     },
     async top() {
       let _that = this
@@ -273,7 +273,6 @@ export default {
       current.top = !current.top
       await channelComponent.update(ChannelDataType.CHANNEL, current)
       store.state.channelMap[current.channelId] = current
-      //_that.$forceUpdate()
       let i = 0
       for (let channel of store.state.channels) {
         if (channel.channelId === current.channelId) {
@@ -282,6 +281,7 @@ export default {
         }
         i++
       }
+      _that.$forceUpdate()
     },
     async editChannel() {
       let _that = this
