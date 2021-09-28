@@ -264,7 +264,7 @@ export default {
         }
         i++
       }
-      //_that.$forceUpdate()
+      _that.$forceUpdate()
     },
     async top() {
       let _that = this
