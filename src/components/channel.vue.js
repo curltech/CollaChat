@@ -192,6 +192,7 @@ export default {
                 }
               }
               if (!deleted) {
+                channelList.splice(index, 1, channel)
                 store.state.channelMap[channel.channelId] = channel
               }
               index++
@@ -308,7 +309,7 @@ export default {
               store.toggleDrawer(false)
             } else {
               store.state.currentChannel = channelFilteredArray[0]
-              _that.channelSelected(store.state.currentChannel, 0)
+              await _that.channelSelected(store.state.currentChannel, 0)
             }
           }
         } catch (e) {
@@ -449,22 +450,30 @@ export default {
         return
       }
       // put content into attach
-      if (!article.content) {
+      /*if (!article.content) {
         let attachs = await channelComponent.loadAttach(article, null, null)
         if (attachs && attachs.length > 0) {
           article.content = attachs[0].content
-        }
+        }*/
         if (!article.content) {
           let blocks = await dataBlockService.findTxPayload(null, article.blockId)
           if (blocks && blocks.length > 0) {
             article = blocks[0]
           }
         }
-      }
+      /*}*/
       store.state.currentArticle = article
       store.changeKind('channelDetails')
       store.toggleDrawer(true)
-      store.changeChannelDetailsSubKind('view')
+      if (store.changeChannelDetailsSubKind) {
+        store.changeChannelDetailsSubKind('view')
+      } else {
+        store.state.currentChannel = store.state.channelMap[article.channelId]
+        await _that.channelSelected(store.state.currentChannel)
+        if (store.changeChannelDetailsSubKind) {
+          store.changeChannelDetailsSubKind('view')
+        }
+      }
     },
     newChannel() {
       let _that = this
@@ -525,7 +534,7 @@ export default {
     store.getArticleList = _that.getArticleList
     _that._cloudSyncTimer = setInterval(async function () {
       await _that.cloudSyncCore(true)
-    }, 60 * 1000)
+    }, 300 * 1000)
   },
   mounted() {
     let _that = this

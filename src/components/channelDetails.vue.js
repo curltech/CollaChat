@@ -65,16 +65,16 @@ export default {
       }
       // put content into attach
       if (!article.content) {
-        let attachs = await channelComponent.loadAttach(article, null, null)
+        /*let attachs = await channelComponent.loadAttach(article, null, null)
         if (attachs && attachs.length > 0) {
           article.content = attachs[0].content
         }
-        if (!article.content) {
+        if (!article.content) {*/
           let blocks = await dataBlockService.findTxPayload(null, article.blockId)
           if (blocks && blocks.length > 0) {
             article = blocks[0]
           }
-        }
+        /*}*/
       }
       store.state.currentArticle = article
       _that.subKind = 'view'
@@ -247,25 +247,41 @@ export default {
     async follow() {
       let _that = this
       let store = _that.$store
-      let channel = store.state.currentChannel
-      let markDate = channel.markDate
+      let current = store.state.currentChannel
+      let markDate = current.markDate
       if (markDate) {
-        channel.markDate = null
+        current.markDate = null
       } else {
-        channel.markDate = new Date().getTime()
+        current.markDate = new Date().getTime()
       }
-      await channelComponent.update(ChannelDataType.CHANNEL, channel)
-      store.state.channelMap[channel.channelId] = channel
-      _that.$forceUpdate()
+      await channelComponent.update(ChannelDataType.CHANNEL, current)
+      store.state.channelMap[current.channelId] = current
+      //_that.$forceUpdate()
+      let i = 0
+      for (let channel of store.state.channels) {
+        if (channel.channelId === current.channelId) {
+          store.state.channels.splice(i, 1, current)
+          break
+        }
+        i++
+      }
     },
     async top() {
       let _that = this
       let store = _that.$store
-      let channel = store.state.currentChannel
-      channel.top = !channel.top
-      await channelComponent.update(ChannelDataType.CHANNEL, channel)
-      store.state.channelMap[channel.channelId] = channel
-      _that.$forceUpdate()
+      let current = store.state.currentChannel
+      current.top = !current.top
+      await channelComponent.update(ChannelDataType.CHANNEL, current)
+      store.state.channelMap[current.channelId] = current
+      //_that.$forceUpdate()
+      let i = 0
+      for (let channel of store.state.channels) {
+        if (channel.channelId === current.channelId) {
+          store.state.channels.splice(i, 1, current)
+          break
+        }
+        i++
+      }
     },
     async editChannel() {
       let _that = this
@@ -300,6 +316,14 @@ export default {
         // 本地保存
         await channelComponent.update(ChannelDataType.CHANNEL, current)
         store.state.channelMap[current.channelId] = current
+        let i = 0
+        for (let channel of store.state.channels) {
+          if (channel.channelId === current.channelId) {
+            store.state.channels.splice(i, 1, current)
+            break
+          }
+          i++
+        }
         _that.subKind = 'default'
       } catch (error) {
         console.error(error)

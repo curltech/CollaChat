@@ -337,7 +337,7 @@ import { P2pChatMessageType } from '@/libs/biz/colla-chat'
     } else {
       peers = _peers
     }
-    if (bizObj.messageType !== P2pChatMessageType.GROUP_FILE) {
+    if (blockType !== BlockType.GroupFile && blockType !== BlockType.Channel && blockType !== BlockType.ChannelArticle) {
       peers.push(myself.myselfPeerClient)
     }
     let blockId = bizObj.blockId
