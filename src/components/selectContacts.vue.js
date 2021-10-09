@@ -128,6 +128,10 @@ export default {
             await store.collectionForwardToChat(currentCollection,chatRecord)
           }else if(store.selectChatEntry === 'messageForward'){
             await store.forwardToChat(chatRecord)
+          }else if(store.selectChatEntry === 'channelForward'){
+            await store.channelForwardToChat(store.state.currentChannel,chatRecord)
+          }else if(store.selectChatEntry === 'articleForward'){
+            await store.articleForwardToChat(store.state.currentArticle,chatRecord)
           }
         }
       }
