@@ -1047,6 +1047,65 @@ export default {
       }
       store.changeKind('message')
     },
+    async getArticleList() {
+      let _that = this
+      let store = _that.$store
+      let currentChannel = store.state.currentChannel
+      if (currentChannel) {
+        // 查询local
+        let articleList = []
+        let ret = await channelComponent.loadArticle({
+          ownerPeerId: myself.myselfPeerClient.peerId,
+          channelId: currentChannel.channelId,
+          updateDate: { $gt: null }
+        }, [{ updateDate: 'desc' }])
+        if (ret && ret.length > 0) {
+          articleList = ret
+        }
+        store.state.articles = articleList
+      }
+    },
+    async channelForwardToChat(item,chat){
+      let _that = this
+      let store = _that.$store
+      let channel = {
+        avatar: item.avatar,
+        peerId: item.channelId,
+        name: item.name
+      }
+      let message = {
+        content: channel,
+        contentType: ChatContentType.CHANNEL,
+        messageType: P2pChatMessageType.CHAT_LINKMAN
+      }
+      await store.sendChatMessage(chat, message)
+      _that.setCurrentChat(chat.subjectId)
+      if(_that.tab !== 'chat'){
+        store.changeTab('chat')
+      }
+      store.changeKind('message')
+    },
+    async articleForwardToChat(item, chat) {
+      let _that = this
+      let store = _that.$store
+      let article = {
+        cover: item.cover,
+        abstract: item.abstract,
+        title: item.title,
+        articleId:item.articleId
+      }
+      let message = {
+        content: article,
+        contentType: ChatContentType.ARTICLE,
+        messageType: P2pChatMessageType.CHAT_LINKMAN
+      }
+      await store.sendChatMessage(chat, message)
+      _that.setCurrentChat(chat.subjectId)
+      if(_that.tab !== 'chat'){
+        store.changeTab('chat')
+      }
+      store.changeKind('message')
+    },
     async saveFileInMessage(chat, message, fileData, type, name, originalMessageId) {
       let _that = this
       let store = _that.$store
@@ -3861,6 +3920,8 @@ export default {
     store.saveAndSendMessage = _that.saveAndSendMessage
     store.handleChatTime = _that.handleChatTime
     store.collectionForwardToChat = _that.collectionForwardToChat
+    store.channelForwardToChat = _that.channelForwardToChat
+    store.articleForwardToChat = _that.articleForwardToChat
     store.saveFileInMessage = _that.saveFileInMessage
     store.saveFileAndSendMessage = _that.saveFileAndSendMessage
     store.findContacts = _that.findContacts
@@ -3870,6 +3931,7 @@ export default {
     store.getChatContent = _that.getChatContent
     store.p2pSend = _that.p2pSend
     store.refreshData = _that.refreshData
+    store.getArticleList = _that.getArticleList
     store.showInitBackupDialog = _that.showInitBackupDialog
     store.showInitMigrateDialog = _that.showInitMigrateDialog
     store.restoreChatRecord = _that.restoreChatRecord

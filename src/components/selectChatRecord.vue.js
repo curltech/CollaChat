@@ -122,7 +122,11 @@ export default {
             let currentCollection = store.state.currentCollection
             await store.collectionForwardToChat(currentCollection,chatRecord)
           }else if(store.selectChatEntry === 'messageForward'){
-            await store.forwardToSend(chatRecord)
+            await store.forwardToChat(chatRecord)
+          }else if(store.selectChatEntry === 'channelForward'){
+            await store.channelForwardToChat(store.state.currentChannel,chatRecord)
+          }else if(store.selectChatEntry === 'articleForward'){
+            await store.articleForwardToChat(store.state.currentArticle,chatRecord)
           }
         }
       } else if (store.selectChatRecordEntry.indexOf('backupMigration') === 0) {

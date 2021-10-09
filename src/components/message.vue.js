@@ -1050,10 +1050,9 @@ export default {
       this.$store.selectChatEntry = 'messageForward'
       this.subKind = 'selectChat'
     },
-    async forwardToSend(chat) {
+    async forwardToChat(chat) {
       let _that = this
       let store = _that.$store
-      let includedChatRecords = store.state.includedChatRecords
       let forwardMessage = store.forwardMessage
       if (!Array.isArray(forwardMessage)) {
         let message = {}
@@ -3122,7 +3121,7 @@ export default {
     store.getMessageFile = _that.getMessageFile
     store.getMessageFileAndOpen = _that.getMessageFileAndOpen
     store.collectionPicked = _that.collectionPicked
-    store.forwardToSend = _that.forwardToSend
+    store.forwardToChat = _that.forwardToChat
     if(audioInputComponent.audioinput){
       audioInputComponent.audioinput.stopCallback = function (blob) {
         _that.audioUrl = blob

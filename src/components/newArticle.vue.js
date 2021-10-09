@@ -1,7 +1,7 @@
 import { UUID } from 'libcolla'
 import { myself } from 'libcolla'
 import { BlockType } from 'libcolla'
-
+import { CollaUtil } from 'libcolla'
 import E from '@/libs/base/colla-wangEditor'
 import pinyinUtil from '@/libs/base/colla-pinyin'
 import { channelComponent, ChannelDataType } from '@/libs/biz/colla-channel'

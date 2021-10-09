@@ -127,7 +127,7 @@ export default {
             let currentCollection = store.state.currentCollection
             await store.collectionForwardToChat(currentCollection,chatRecord)
           }else if(store.selectChatEntry === 'messageForward'){
-            await store.forwardToSend(chatRecord)
+            await store.forwardToChat(chatRecord)
           }
         }
       }

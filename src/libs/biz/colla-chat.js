@@ -41,6 +41,8 @@
    'VIDEO': 'Video',
    'CARD': 'Card',
    'NOTE': 'Note',
+   'CHANNEL': 'Channel',
+   'ARTICLE': 'Article',
    'CHAT': 'Chat',
    'LINK': 'Link',
    'VOICE': 'Voice',

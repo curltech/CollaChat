@@ -31,6 +31,21 @@
             q-item-label {{message.content.name}}
         q-separator.c-separator
         p {{$t('Personal Card')}}
+      q-card.personal-card(v-if="message.contentType === ChatContentType.CHANNEL" @click="openChannel(message)")
+        q-item
+          q-item-section(avatar)
+            q-avatar
+              img(:src="message.content.avatar?message.content.avatar:$store.defaultActiveAvatar")
+          q-item-section
+            q-item-label {{message.content.name}}
+        q-separator.c-separator
+        p {{$t('Channel')}}
+      q-card(flat v-if="message.contentType === ChatContentType.ARTICLE"  @click="openArticle(message)")
+            q-card-section(class="q-pa-none")
+              q-img(:src="message.content.cover ? message.content.cover : $store.defaultChannelArticleCover" style="min-width:200px;")
+            q-card-section(class="q-py-md")
+              q-item-label(class="text-h6") {{ message.content.title }}
+              q-item-label(v-if="message.content.abstract" class="q-py-sm" caption :style="$q.dark.isActive ? 'color: rgba(255,255,255,0.7)' : ''") {{ message.content.abstract }}
       q-card.personal-card(v-if="message.contentType === ChatContentType.CHAT" @click="openMergeMessage(message)")
         q-item
           q-item-section

@@ -17,6 +17,7 @@ export default {
       mediaTimer: null,
       chatMute: false,
       chatMic: true,
+      audioToggle :'speaker',
       addStreamCount: 0,
       showMore: false,
       localCloneStream: {},

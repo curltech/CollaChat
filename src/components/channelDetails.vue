@@ -30,7 +30,7 @@
               q-item-label(v-if="article.abstract" class="q-py-sm" caption :style="$q.dark.isActive ? 'color: rgba(255,255,255,0.7)' : ''") {{ article.abstract }}
       q-tab-panel(:style="heightStyle" name="view" class="q-pa-none")
         q-toolbar.header-toolbar
-          q-btn(flat round icon="keyboard_arrow_left" @click="subKind='default'")
+          q-btn(flat round icon="keyboard_arrow_left" @click="articleBack()")
           q-space
           q-btn.btnIcon(flat round icon="more_horiz" @click="viewCommand()")
         div.scroll.header-mar-top.bg-c-white(v-if="$store.state.currentArticle" class="q-pl-md" id="scroll-target-view" :class="ifMobileSize || $store.state.ifMobileStyle ? (ifMobileSize ? 'scrollHeightMobileSize-editor' : 'scrollHeightMobileStyle-editor') : 'scrollHeightStyle'")

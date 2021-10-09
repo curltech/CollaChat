@@ -4,7 +4,7 @@ import { webrtcPeerPool, peerClientService } from 'libcolla'
 
 import {  ChatDataType, chatComponent, ChatMessageStatus, ChatContentType, P2pChatMessageType, SubjectType } from '@/libs/biz/colla-chat'
 import { ActiveStatus } from '@/libs/biz/colla-contact'
-
+import { channelComponent } from '@/libs/biz/colla-channel'
 import NotePreview from '@/components/notePreview'
 import MobileAudio from '@/components/mobileAudio'
 
@@ -166,6 +166,66 @@ export default {
       store.state.findLinkmanTip = ''
       store.findLinkman = null
       await store.findContacts('card', message.content.peerId)
+    },
+    async openChannel(message) {
+      let _that = this
+      let store = _that.$store
+      let channelDBItems = await channelComponent.loadChannel({
+        ownerPeerId: store.state.myselfPeerClient.peerId,
+        channelId:message.content.channelId
+      })
+      if (channelDBItems && channelDBItems.length > 0) {
+        let channel = message.content
+        store.changeTab('channel')
+        let prevCurrentChannel = store.state.currentChannel
+        channel.newArticleFlag = false
+        store.state.currentChannel = channel
+        store.changeKind('channelDetails')
+        store.toggleDrawer(true)
+        if (!(_that.ifMobileSize || store.state.ifMobileStyle) && prevCurrentChannel/* && prevCurrentChannel.channelId !== channel.channelId*/) {
+          if (store.changeChannelDetailsSubKind) {
+            store.changeChannelDetailsSubKind('default')
+          }
+        }
+        await store.getArticleList()
+      }else{
+        _that.$q.notify({
+          message: _that.$i18n.t("Channel unsynchronized or deleted"),
+          timeout: 3000,
+          type: "warning",
+          color: "warning",
+        })
+      }
+    },
+    async openArticle(message) {
+      let _that = this
+      let store = _that.$store
+      let articleDBItems = await channelComponent.loadArticle({
+        ownerPeerId: store.state.myselfPeerClient.peerId,
+        articleId:message.content.articleId
+      })
+      if (articleDBItems && articleDBItems.length > 0) {
+        let article = articleDBItems[0]
+        if (!article.content) {
+            let blocks = await dataBlockService.findTxPayload(null, article.blockId)
+            if (blocks && blocks.length > 0) {
+              article = blocks[0]
+            }
+        }
+        store.state.currentArticle = article
+        store.changeKind('channelDetails')
+        _that.$nextTick(() => {
+          store.channelDetailsEntry = "message"
+          store.changeChannelDetailsSubKind('view') 
+        })
+      }else{
+        _that.$q.notify({
+          message: _that.$i18n.t("Article unsynchronized or deleted"),
+          timeout: 3000,
+          type: "warning",
+          color: "warning",
+        })
+      }
     },
     async openMergeMessage(message) {
       let _that = this

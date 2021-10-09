@@ -479,6 +479,17 @@ export default {
         _that.$q.loading.hide()
       }
     },
+    articleBack(){
+      let _that = this
+      let store = _that.$store 
+      if(store.channelDetailsEntry === "message"){
+        store.changeKind('message')
+      }
+      else{
+        _that.subKind = 'default'
+      }
+      store.channelDetailsEntry = null
+    }
   },
   async created() {
     let _that = this

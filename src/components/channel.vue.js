@@ -423,25 +423,7 @@ export default {
           store.changeChannelDetailsSubKind('default')
         }
       }
-      await _that.getArticleList()
-    },
-    async getArticleList() {
-      let _that = this
-      let store = _that.$store
-      let currentChannel = store.state.currentChannel
-      if (currentChannel) {
-        // 查询local
-        let articleList = []
-        let ret = await channelComponent.loadArticle({
-          ownerPeerId: myself.myselfPeerClient.peerId,
-          channelId: currentChannel.channelId,
-          updateDate: { $gt: null }
-        }, [{ updateDate: 'desc' }])
-        if (ret && ret.length > 0) {
-          articleList = ret
-        }
-        store.state.articles = articleList
-      }
+      await store.getArticleList()
     },
     async articleSelected(article, index) {
       let _that = this
@@ -531,7 +513,6 @@ export default {
   async created() {
     let _that = this
     let store = _that.$store
-    store.getArticleList = _that.getArticleList
     _that._cloudSyncTimer = setInterval(async function () {
       await _that.cloudSyncCore(true)
     }, 300 * 1000)
