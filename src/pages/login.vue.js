@@ -170,7 +170,6 @@ export default {
       try {
         await myselfPeerService.login(loginData)
       } catch (e) {
-        console.log(e)
         if (e.message === 'InvalidAccount' || e.message === 'VerifyNotPass') {
           _that.$q.notify({
             message: _that.$i18n.t("Invalid account"),
@@ -199,6 +198,9 @@ export default {
             type: "warning",
             color: "warning",
           })
+        } else {
+          alert(e.stake)
+          await logService.log(e.stack, 'loginError', 'error')
         }
         return
       }
@@ -322,7 +324,6 @@ export default {
           })
         }
       } catch (e) {
-        console.log(e)
         if (e.message === 'InvalidID') {
           _that.$q.notify({
             message: _that.$i18n.t("Invalid account"),
@@ -337,6 +338,9 @@ export default {
             type: "warning",
             color: "warning",
           })
+        } else {
+          alert(e.stake)
+          await logService.log(e.stack, 'importIDError', 'error')
         }
       }
     },
@@ -373,7 +377,6 @@ export default {
       try {
         await myselfPeerService.register(registerData)
       } catch (e) {
-        console.log(e)
         if (e.message === 'ErrorPassword') {
           _that.$q.notify({
             message: _that.$i18n.t("Inconsistent passwords"),
@@ -395,6 +398,9 @@ export default {
             type: "warning",
             color: "warning",
           })
+        } else {
+          alert(e.stake)
+          await logService.log(e.stack, 'registerError', 'error')
         }
         return
       }
@@ -611,7 +617,7 @@ export default {
     upgradeVersion(flag) {
       let _that = this
       let store = _that.$store
-      store.currentVersion = '0.2.54'
+      store.currentVersion = '0.2.58'
       store.mandatory = false
       if (_that.versionHistory && _that.versionHistory.length > 0) {
         let no = 1
