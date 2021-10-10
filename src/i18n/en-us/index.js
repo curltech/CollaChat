@@ -507,6 +507,8 @@ export default {
   "More Channels": "More Channels",
   "More Articles": "More Articles",
   "Remove this channel (together with all channel articles)?": "Remove this channel (together with all channel articles)?",
+  "Article": "Article",
+  "Unsynchronized or deleted":"Unsynchronized or deleted",
 
   // Others
   "Migrate successfully": "Migrate successfully",

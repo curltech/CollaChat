@@ -190,7 +190,7 @@ export default {
         await store.getArticleList()
       }else{
         _that.$q.notify({
-          message: _that.$i18n.t("Channel unsynchronized or deleted"),
+          message: `${_that.$i18n.t("Channel")} ${_that.$i18n.t("Unsynchronized or deleted")}`,
           timeout: 3000,
           type: "warning",
           color: "warning",
@@ -220,7 +220,7 @@ export default {
         })
       }else{
         _that.$q.notify({
-          message: _that.$i18n.t("Article unsynchronized or deleted"),
+          message: `${_that.$i18n.t("Article")} ${_that.$i18n.t("Unsynchronized or deleted")}`,
           timeout: 3000,
           type: "warning",
           color: "warning",
