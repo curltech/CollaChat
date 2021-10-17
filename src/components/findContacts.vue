@@ -26,8 +26,9 @@
           dense,
           clearable,
           v-model="$store.state.findLinkmanData.peerId",
-          :placeholder="$t('Peer Id')",
-          input-class="text-center"
+          :placeholder="$t('PeerId or Mobile')",
+          input-class="text-center",
+          lazy-rules :rules="[val => val && val.length > 0 && validate(val) || $t('Invalid PeerId or Mobile')]"
         )
           template(v-slot:after)
             q-btn.btnIcon(
@@ -35,7 +36,7 @@
               round,
               dense,
               icon="search",
-              @click="$store.findContacts(null, null)"
+              @click="search"
             )
       q-list
         q-item(
@@ -77,23 +78,24 @@
       q-toolbar
         q-btn(flat, round, icon="keyboard_arrow_left", @click="resultBack")
       q-list.bg-c-grey-0
-        q-item
+        q-item(v-if="$store.findLinkman && ($store.state.findLinkmanResult === 3 || $store.state.findLinkmanResult === 4)")
           q-item-section(avatar, bolder)
             q-avatar(size="64px")
               img(
-                :src="$store.findLinkman && $store.findLinkman.avatar ? $store.findLinkman.avatar : $store.defaultActiveAvatar"
+                :src="$store.findLinkman.avatar ? $store.findLinkman.avatar : $store.defaultActiveAvatar"
               )
           q-item-section
-            q-item-label {{ $store.findLinkman ? $store.findLinkman.name : '' }}
-            //q-item-label(caption lines="1") {{ $t('Mobile: ') + ($store.findLinkman ? $store.findLinkman.mobile : '') }}
-            q-item-label(caption, lines="2") {{ $t('PeerId: ') + ($store.findLinkman ? $store.findLinkman.peerId : '') }}
+            q-item-label {{ $store.findLinkman.name ? $store.findLinkman.name : '' }}
+            //q-item-label(caption lines="1") {{ $t('Mobile: ') + ($store.findLinkman.mobile ? $store.findLinkman.mobile : '') }}
+            q-item-label(caption, lines="2") {{ $t('PeerId: ') + ($store.findLinkman.peerId ? $store.findLinkman.peerId : '') }}
         q-separator.c-separator(
+          v-if="$store.findLinkman && ($store.state.findLinkmanResult === 3 || $store.state.findLinkmanResult === 4)",
           style="height:8px;margin-left:0px;margin-right:0px"
         )
         q-item(
           clickable,
           v-ripple,
-          @click="showFindAcceptContacts",
+          @click="showAcceptContacts(null)",
           v-if="$store.state.findLinkmanResult === 3"
         )
           q-item-section
@@ -101,12 +103,58 @@
             q-icon(color="primary", name="person_add")
           q-item-section.text-primary(side) {{ $t('Accept Contacts') }}
           q-item-section
-        q-separator.c-separator(v-if="$store.state.findLinkmanResult === 3")
         q-item(
           clickable,
           v-ripple,
-          @click="showAddContacts",
+          @click="showAddContacts(null)",
           v-if="$store.state.findLinkmanResult === 4"
+        )
+          q-item-section
+          q-item-section(side, style="padding-left:0px")
+            q-icon(color="primary", name="person_add")
+          q-item-section.text-primary(side) {{ $t('Add Contacts') }}
+          q-item-section
+      div(v-for="(linkman, index) in $store.findLinkmans" :key="linkman.peerId")
+        q-item
+          q-item-section(avatar, bolder)
+            q-avatar(size="64px")
+              img(
+                :src="linkman && linkman.avatar ? linkman.avatar : $store.defaultActiveAvatar"
+              )
+          q-item-section
+            q-item-label {{ linkman ? linkman.name : '' }}
+            //q-item-label(caption lines="1") {{ $t('Mobile: ') + (linkman ? linkman.mobile : '') }}
+            q-item-label(caption, lines="2") {{ $t('PeerId: ') + (linkman ? linkman.peerId : '') }}
+        q-separator.c-separator(
+          style="height:8px;margin-left:0px;margin-right:0px"
+        )
+        q-item(
+          clickable,
+          v-ripple,
+          @click="showContactsDetails(linkman)",
+          v-if="linkman.findLinkmanResult === 2"
+        )
+          q-item-section
+          q-item-section(side, style="padding-left:0px")
+            q-icon(color="primary", name="person")
+          q-item-section.text-primary(side) {{ $t('Contacts Details') }}
+          q-item-section
+        q-item(
+          clickable,
+          v-ripple,
+          @click="showAcceptContacts(linkman)",
+          v-if="linkman.findLinkmanResult === 3"
+        )
+          q-item-section
+          q-item-section(side, style="padding-left:0px")
+            q-icon(color="primary", name="person_add")
+          q-item-section.text-primary(side) {{ $t('Accept Contacts') }}
+          q-item-section
+        q-item(
+          clickable,
+          v-ripple,
+          @click="showAddContacts(linkman)",
+          v-if="linkman.findLinkmanResult === 4"
         )
           q-item-section
           q-item-section(side, style="padding-left:0px")

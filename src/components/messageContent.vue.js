@@ -155,16 +155,16 @@ export default {
     async openCard(message) {
       let _that = this
       let store = _that.$store
-      store.findContactsEntry = 'card'
+      store.findLinkman = null
       store.state.findLinkmanData = {
         peerId: null,
         message: null,
         givenName: null,
         tag: null
       }
-      store.state.findLinkmanResult = 0
-      store.state.findLinkmanTip = ''
-      store.findLinkman = null
+      store.state.findContactsSubKind = 'default'
+      store.findContactsEntry = 'message'
+      store.changeKind('findContacts')
       await store.findContacts('card', message.content.peerId)
     },
     async openChannel(message) {

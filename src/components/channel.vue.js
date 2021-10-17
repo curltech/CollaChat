@@ -181,21 +181,19 @@ export default {
           }
           if (changed) {
             await channelComponent.save(ChannelDataType.CHANNEL, channelList, null)
-            let index = 0
-            for (let channel of channelList) {
+            for (let i=channelList.length-1;i>=0;i--) {
+              let channel = channelList[i]
               let deleted = false
               for (let deleteChannel of deleteChannelList) {
                 if (channel.channelId === deleteChannel.channelId) {
                   deleted = true
-                  channelList.splice(index, 1)
+                  channelList.splice(i, 1)
                   delete store.state.channelMap[channel.channelId]
                 }
               }
               if (!deleted) {
-                channelList.splice(index, 1, channel)
                 store.state.channelMap[channel.channelId] = channel
               }
-              index++
             }
           }
           // 同步ChannelArticle

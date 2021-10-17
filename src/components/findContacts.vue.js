@@ -5,6 +5,7 @@ import { EntityState } from 'libcolla'
 import { chatAction, myself } from 'libcolla'
 import { webrtcPeerPool } from 'libcolla'
 import { ChatMessageType } from 'libcolla'
+import { MobileNumberUtil } from 'libcolla'
 
 import pinyinUtil from '@/libs/base/colla-pinyin'
 import { statusBarComponent } from '@/libs/base/colla-cordova'
@@ -14,6 +15,8 @@ import { ContactDataType, RequestType, RequestStatus, LinkmanStatus, ActiveStatu
 
 import ContactsDetails from '@/components/contactsDetails'
 //import PhoneContactsList from '@/components/phoneContactsList'
+
+const PeerId = require('peer-id')
 
 export default {
   name: "AddContacts",
@@ -53,6 +56,55 @@ export default {
         }
       })
     },
+    validate(val) {
+      let _that = this
+      let store = _that.$store
+      let isPeerIdValid = false
+      try {
+        isPeerIdValid = PeerId.isPeerId(PeerId.createFromB58String(val))
+      } catch (e) {
+        console.log(e)
+      }
+      if (isPeerIdValid) {
+        return true
+      } else {
+        let myMobileCountryCode = MobileNumberUtil.parse(myself.myselfPeerClient.mobile).getCountryCode()
+        console.log('myMobileCountryCode:' + myMobileCountryCode)
+        let countryCode = null
+        try {
+          countryCode = MobileNumberUtil.parse(val).getCountryCode()
+        } catch (e) {
+          console.log(e)
+        }
+        if (!countryCode) {
+          countryCode = myMobileCountryCode
+        }
+        let isPhoneNumberValid = false
+        try {
+          isPhoneNumberValid = MobileNumberUtil.isPhoneNumberValid(val, MobileNumberUtil.getRegionCodeForCountryCode(countryCode))
+        } catch (e) {
+          console.log(e)
+        }
+        if (isPhoneNumberValid) {
+          let mobile = MobileNumberUtil.formatE164(val, MobileNumberUtil.getRegionCodeForCountryCode(countryCode))
+          console.log('formatE164:' + mobile)
+          if (!mobile) {
+            isPhoneNumberValid = false
+          } else {
+            store.state.findLinkmanData.peerId = mobile
+          }
+        }
+        return isPhoneNumberValid
+      }
+    },
+    search() {
+      let _that = this
+      let store = _that.$store
+      let val = store.state.findLinkmanData.peerId
+      if (val && val.length > 0 && _that.validate(val)) {
+        store.findContacts(null, null)
+      }
+    },
     showQRCodeDialog: function () {
       let _that = this
       let store = _that.$store
@@ -63,7 +115,18 @@ export default {
         mediaComponent.generateQRCode('qrCode', content, 256, logoSrc)
       })
     },
-    showAddContacts() {
+    showContactsDetails(linkman) {
+      if (linkman) {
+        this.$store.findLinkman = linkman
+        this.$store.state.currentLinkman = linkman
+        this.$store.state.findContactsSubKind = 'contactsDetails'
+        this.$store.contactsDetailsEntry = 'findContacts-result'
+      }
+    },
+    showAddContacts(linkman) {
+      if (linkman) {
+        this.$store.findLinkman = linkman
+      }
       this.$store.state.findLinkmanData.message = this.$i18n.t("I'm ") + myself.myselfPeerClient.name
       this.$store.state.findLinkmanData.givenName = null
       this.$store.state.findLinkmanData.tagNames = []
@@ -71,6 +134,14 @@ export default {
         this.$store.findContactsEntry = 'phoneContactsList-result' // 复杂页面导航处理
       }
       this.$store.state.findContactsSubKind = 'addContacts'
+    },
+    showAcceptContacts(linkman) {
+      if (linkman) {
+        this.$store.findLinkman = linkman
+      }
+      this.$store.state.findLinkmanData.givenName = null
+      this.$store.state.findLinkmanData.tagNames = []
+      this.$store.state.findContactsSubKind = 'acceptContacts'
     },
     async addLinkman() {
       let _that = this
@@ -238,11 +309,6 @@ export default {
 
       store.state.findContactsSubKind = 'default'
     },
-    showFindAcceptContacts() {
-      this.$store.state.findLinkmanData.givenName = null
-      this.$store.state.findLinkmanData.tagNames = []
-      this.$store.state.findContactsSubKind = 'acceptContacts'
-    },
     async acceptLinkman() {
       let _that = this
       let store = _that.$store
@@ -389,12 +455,11 @@ export default {
     defaultBack() {
       let _that = this
       let store = _that.$store
-      /*if (store.findContactsEntry === 'accountInformation') {
-        store.changeKind('accountInformation', 'me')
+      if (store.findContactsEntry === 'message') {
+        store.changeKind('message')
       } else {
         store.toggleDrawer(false)
-      }*/
-      store.toggleDrawer(false)
+      }
     },
     resultBack() {
       let _that = this
