@@ -783,6 +783,12 @@ export default {
         case ChatContentType.NOTE:
           result = `[${_that.$i18n.t("note")}]`
           break
+        case ChatContentType.CHANNEL:
+          result = `[${_that.$i18n.t("Channel")}]`
+          break
+        case ChatContentType.ARTICLE:
+          result = `[${_that.$i18n.t("Article")}]`
+          break
         default:
           result = content
       }

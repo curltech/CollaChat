@@ -146,9 +146,9 @@ export default {
       let streamMap = store.state.currentCallChat.streamMap ? store.state.currentCallChat.streamMap : store.state.currentCallChat.streamMap = {}
       streamArray.push({
         peerId : peerId,
-        stream : stream
+        stream : stream,
       })
-      streamMap[peerId] = {stream:stream, pending:false}
+      streamMap[peerId] = {stream:stream, pending:false, focus:false}
     },
      async removeStream(peerId){
       let _that = this
@@ -440,9 +440,11 @@ export default {
         _that.$forceUpdate()
         _that.$nextTick(() => {
           if (localStream.getVideoTracks().length > 0) {//video
-            let currentVideoDom = _that.$refs[`memberVideo${store.state.currentCallChat.ownerPeerId}`][0]
-            currentVideoDom.srcObject = localStream
-            currentVideoDom.muted = true
+            if(!Platform.is.ios){
+              let currentVideoDom = _that.$refs[`memberVideo${store.state.currentCallChat.ownerPeerId}`][0]
+              currentVideoDom.srcObject = localStream
+              currentVideoDom.muted = true
+            }
           } else {//audio
             if (!store.state.currentCallChat.audio) {
               store.state.currentCallChat.audio = {}
@@ -733,8 +735,7 @@ export default {
       let store = _that.$store
       let callChat = store.state.currentCallChat
       let currentVideoDom = _that.$refs.currentVideo
-      let zoomVideoDom = _that.$refs.zoomVideo
-      debugger  
+      let zoomVideoDom = _that.$refs.zoomVideo  
       if(Platform.is.ios && _that.iosFlatDisplay){
         _that.iosFlatDisplay = false
         _that.$nextTick(() => {
@@ -765,6 +766,31 @@ export default {
         }
        
       }
+    
+    
+    },
+    iosGroupVideoFocus(memberPeerId){
+      let _that = this
+      let store = _that.$store
+      let callChat = store.state.currentCallChat
+      if(Platform.is.ios && callChat.streamMap && callChat.streamMap[memberPeerId]){
+        if(!callChat.streamMap[memberPeerId].focus){
+          callChat.streamMap[memberPeerId].focus = true
+          _that.$forceUpdate()
+          _that.$nextTick(() => {
+              if (_that.$refs[`memberVideo${memberPeerId}`]) {//video
+                let currentVideoDom = _that.$refs[`memberVideo${memberPeerId}`][0]
+                currentVideoDom.srcObject = callChat.streamMap[memberPeerId].stream
+                if(memberPeerId === callChat.ownerPeerId){
+                  currentVideoDom.muted = true
+                }
+              }
+            })
+        }else{
+          callChat.streamMap[memberPeerId].focus = false
+        }
+      }
+      
     },
     canCall() {
       let _that = this
