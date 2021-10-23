@@ -53,16 +53,20 @@
                             q-item-section(v-if="$store.state.currentCallChat.stream" style="display:none")
                                 span {{$store.state.currentCallChat.stream.length}}
                                 span {{addStreamCount}}
-                            q-item-section.group-video-par(style="width:100%" v-if="$store.state.currentCallChat.callType == 'video' && ($store.state.currentCallChat.streamMap && $store.state.currentCallChat.streamMap[memberPeerId])")
+                            q-item-section.group-video-par(style="width:100%" v-if="$store.state.currentCallChat.callType == 'video' && ($store.state.currentCallChat.streamMap && $store.state.currentCallChat.streamMap[memberPeerId]) && !Platform.is.ios")
                                 video(:ref='`memberVideo${memberPeerId}`' autoplay = 'autoplay')
                             q-item-section(v-else)
                                 q-avatar(style = 'width:100%;height:auto;')
-                                    img(:src="($store.state.linkmanMap[memberPeerId] && $store.state.linkmanMap[memberPeerId].avatar) ? $store.state.linkmanMap[memberPeerId].avatar : $store.defaultActiveAvatar")
+                                    q-icon.btnIcon(name="videocam" style="position:absolute;right:3px;top:3px" v-if = 'Platform.is.ios && $store.state.currentCallChat.streamMap && $store.state.currentCallChat.streamMap[memberPeerId] && !$store.state.currentCallChat.streamMap[memberPeerId].focus')
+                                    img(:src="($store.state.linkmanMap[memberPeerId] && $store.state.linkmanMap[memberPeerId].avatar) ? $store.state.linkmanMap[memberPeerId].avatar : $store.defaultActiveAvatar"  @click="iosGroupVideoFocus(memberPeerId)")
                                 q-item(style="justify-content: center;" v-if="$store.state.currentCallChat.callType != 'video'")
                                     span {{getName(memberPeerId)}}
                                     q-icon(size="20px" name="person" :color="$store.state.currentCallChat.streamMap && $store.state.currentCallChat.streamMap[memberPeerId] ? 'secondary' : 'c-grey'")
                             q-item-section.call-pending-section(v-if = '$store.state.currentCallChat.streamMap && $store.state.currentCallChat.streamMap[memberPeerId] && $store.state.currentCallChat.streamMap[memberPeerId].pending')
                                 q-spinner-dots(size="2rem")
+                            q-item-section(v-if="Platform.is.ios && $store.state.currentCallChat.streamMap && $store.state.currentCallChat.streamMap[memberPeerId] && $store.state.currentCallChat.streamMap[memberPeerId].focus" style="position:fixed;width:100vw;z-index:99;height:100vh;background:#FFF;left:0;")
+                                q-btn.btnIcon(flat round icon="remove_circle" @click="iosGroupVideoFocus(memberPeerId)")
+                                video(:ref='`memberVideo${memberPeerId}`' autoplay = 'autoplay' style="height:92vh")
                         q-separator.c-separator-message(style="height:1px;margin-left:0px;margin-right:0px" v-if="index %2 !== 0") 
             q-card-section.mini-btn-section(v-if = "!Platform.is.ios && $store.state.currentCallChat.stream" )
                 q-btn.btnIcon(flat round icon="remove_circle" @click="changeMiniVideoDialog")
