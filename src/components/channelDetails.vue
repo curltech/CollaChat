@@ -3,7 +3,7 @@
     q-tab-panels(v-model="subKind" animated transition-prev="slide-right" transition-next="slide-left")
       q-tab-panel.bg-c-grey-message(:style="heightStyle" name="default" class="q-pa-none")
         q-toolbar.bg-c-grey-0
-          q-btn(:class="ifMobileSize || $store.state.ifMobileStyle ? '' : 'hidden'" flat round icon="keyboard_arrow_left" @click="$store.toggleDrawer(false)")
+          q-btn(:class="ifMobileSize || $store.state.ifMobileStyle || $store.channelDetailsChannelEntry === 'article' ? '' : 'hidden'" flat round icon="keyboard_arrow_left" @click="channelBack()")
           q-toolbar-title(align="center" :style="ifMobileSize || $store.state.ifMobileStyle ? '' : 'padding-left:54px'") {{$t('Channel')}}
           q-btn.btnIcon(flat round icon="more_horiz" @click="channelCommand()")
         q-list.bg-c-grey-0(flat)

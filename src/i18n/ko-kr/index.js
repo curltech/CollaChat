@@ -519,7 +519,6 @@
   "More Articles": "더 많은 기사",
   "Remove this channel (together with all channel articles)?": "이 채널（모든 기사 포함）을 삭제하시겠습니까？",
   "Article": "기사",
-  "Unsynchronized or deleted":"동기화되지 않았거나 삭제됨",
 
   // Others
   "Migrate successfully": "성공적으로 마이그레이션",

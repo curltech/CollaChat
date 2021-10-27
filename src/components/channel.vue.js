@@ -26,8 +26,7 @@ export default {
       unfollowChannelResultList: [],
       unfollowChannelArticleResultList: [],
       searchResult: 'allResult',
-      cloudSyncing: false,
-      _cloudSyncTimer: null
+      cloudSyncing: false
     }
   },
   computed: {
@@ -100,230 +99,26 @@ export default {
     },
   },
   methods: {
-    async cloudSyncCore(timer) {
-      let _that = this
-      let store = _that.$store
-      if (!_that.cloudSyncing) {
-        if (!timer) {
-          _that.$q.loading.show()
-        }
-        _that.cloudSyncing = true
-        try {
-          // 同步Channel
-          let channelList = store.state.channels
-          // 查询cloud全量Channel索引信息
-          let conditionBean = {}
-          conditionBean['getAllBlockIndex'] = true
-          conditionBean['blockType'] = BlockType.Channel
-          let channelIndexList = []
-          if (store.state.networkStatus === 'CONNECTED'){
-            let ret = await queryValueAction.queryValue(null, conditionBean)
-            if (ret && ret.length > 0) {
-              channelIndexList = ret
-            }
-          }
-          console.log('channelIndexList:' + JSON.stringify(channelIndexList))
-          for (let channelIndex of channelIndexList) {
-            channelIndex.avatar = channelIndex.thumbnail
-            channelIndex.thumbnail = null
-          }
-          let changed = false
-          let deleteChannelList = []
-          for (let channel of channelList) {
-            let exists = false
-            for (let channelIndex of channelIndexList) {
-              if (channel.channelId === channelIndex.businessNumber) {
-                exists = true
-                if (channelIndex.createTimestamp > channel.updateDate) {
-                  changed = true
-                  channel.state = EntityState.Modified
-                  channel.avatar = channelIndex.avatar
-                  channel.name = channelIndex.name
-                  channel.description = channelIndex.description
-                  channel.updateDate = channelIndex.createTimestamp
-                }
-                break
-              }
-            }
-            if (!exists) {
-              changed = true
-              channel.state = EntityState.Deleted
-              deleteChannelList.push(channel)
-            }
-          }
-          for (let channelIndex of channelIndexList) {
-            let exists = false
-            for (let channel of channelList) {
-              if (channel.channelId === channelIndex.businessNumber) {
-                exists = true
-                break
-              }
-            }
-            if (!exists) {
-              changed = true
-              let newChannel = {
-                ownerPeerId: myself.myselfPeerClient.peerId,
-                creator: channelIndex.peerId,
-                channelType: ChannelType.PUBLIC,
-                channelId: channelIndex.businessNumber,
-                avatar: channelIndex.avatar,
-                name: channelIndex.name,
-                description: channelIndex.description,
-                entityType: EntityType.INDIVIDUAL,
-                businessNumber: channelIndex.businessNumber,
-                blockId: channelIndex.blockId,
-                createDate: channelIndex.createTimestamp,
-                updateDate: channelIndex.createTimestamp,
-                state: EntityState.New
-              }
-              channelList.push(newChannel)
-            }
-          }
-          if (changed) {
-            await channelComponent.save(ChannelDataType.CHANNEL, channelList, null)
-            for (let i=channelList.length-1;i>=0;i--) {
-              let channel = channelList[i]
-              let deleted = false
-              for (let deleteChannel of deleteChannelList) {
-                if (channel.channelId === deleteChannel.channelId) {
-                  deleted = true
-                  channelList.splice(i, 1)
-                  delete store.state.channelMap[channel.channelId]
-                }
-              }
-              if (!deleted) {
-                store.state.channelMap[channel.channelId] = channel
-              }
-            }
-          }
-          // 同步ChannelArticle
-          for (let channel of channelList) {
-            let articleList = []
-            let ret = await channelComponent.loadArticle({
-              ownerPeerId: myself.myselfPeerClient.peerId,
-              channelId: channel.channelId,
-              updateDate: { $gt: null }
-            }, [{ updateDate: 'desc' }])
-            if (ret && ret.length > 0) {
-              articleList = ret
-            }
-            // 查询cloud全量ChannelArticle索引信息
-            let conditionBean = {}
-            conditionBean['parentBusinessNumber'] = channel.channelId
-            conditionBean['getAllBlockIndex'] = true
-            conditionBean['blockType'] = BlockType.ChannelArticle
-            let articleIndexList = []
-            if (store.state.networkStatus === 'CONNECTED'){
-              let ret = await queryValueAction.queryValue(null, conditionBean)
-              if (ret && ret.length > 0) {
-                articleIndexList = ret
-              }
-            }
-            console.log('articleIndexList:' + JSON.stringify(articleIndexList))
-            for (let articleIndex of articleIndexList) {
-              articleIndex.cover = articleIndex.thumbnail
-              articleIndex.thumbnail = null
-              articleIndex.title = articleIndex.name
-              articleIndex.name = null
-              articleIndex.abstract = articleIndex.description
-              articleIndex.description = null
-            }
-            let changed = false
-            for (let article of articleList) {
-              let exists = false
-              for (let articleIndex of articleIndexList) {
-                if (article.articleId === articleIndex.businessNumber) {
-                  exists = true
-                  if (articleIndex.createTimestamp > article.updateDate) {
-                    changed = true
-                    article.state = EntityState.Modified
-                    article.cover = articleIndex.cover
-                    article.title = articleIndex.title
-                    article.abstract = articleIndex.abstract
-                    article.updateDate = articleIndex.createTimestamp
-                  }
-                  break
-                }
-              }
-              if (!exists) {
-                changed = true
-                article.state = EntityState.Deleted
-              }
-            }
-            for (let articleIndex of articleIndexList) {
-              let exists = false
-              for (let article of articleList) {
-                if (article.articleId === articleIndex.businessNumber) {
-                  exists = true
-                  break
-                }
-              }
-              if (!exists) {
-                changed = true
-                let newArticle = {
-                  ownerPeerId: myself.myselfPeerClient.peerId,
-                  channelId: articleIndex.parentBusinessNumber,
-                  articleId: articleIndex.businessNumber,
-                  cover: articleIndex.cover,
-                  //author: articleIndex.author,
-                  title: articleIndex.title,
-                  abstract: articleIndex.abstract,
-                  //content: content,
-                  plainContent: articleIndex.metadata,
-                  pyPlainContent: pinyinUtil.getPinyin(articleIndex.metadata),
-                  metadata: articleIndex.metadata,
-                  businessNumber: articleIndex.businessNumber,
-                  blockId: articleIndex.blockId,
-                  createDate: articleIndex.createTimestamp,
-                  updateDate: articleIndex.createTimestamp,
-                  state: EntityState.New
-                }
-                articleList.push(newArticle)
-                let channel = store.state.channelMap[newArticle.channelId]
-                if (channel) {
-                  channel.newArticleFlag = true
-                  if (newArticle.updateDate && (!channel.newArticleUpdateDate || newArticle.updateDate > channel.newArticleUpdateDate)) {
-                    channel.newArticleUpdateDate = newArticle.updateDate
-                    channel.newArticleTitle = newArticle.title
-                  }
-                }
-              }
-            }
-            if (changed) {
-              await channelComponent.save(ChannelDataType.ARTICLE, articleList, null)
-            }
-          }
-          if (!timer) {
-            let channelFilteredArray = channelList.filter((channel) => {
-              if (channel) {
-                return channel.markDate
-              }
-            })
-            if (channelFilteredArray.length > 0) {
-              CollaUtil.sortByKey(channelFilteredArray, 'updateDate', 'desc')
-            }
-            if (channelFilteredArray.length === 0 || store.state.ifMobileStyle) {
-              store.state.currentChannel = null
-              store.toggleDrawer(false)
-            } else {
-              store.state.currentChannel = channelFilteredArray[0]
-              await _that.channelSelected(store.state.currentChannel, 0)
-            }
-          }
-        } catch (e) {
-          console.error(e)
-        } finally {
-          _that.cloudSyncing = false
-          if (!timer) {
-            _that.$q.loading.hide()
-          }
-        }
-      }
-    },
     async cloudSync(done) {
       let _that = this
       let store = _that.$store
-      await _that.cloudSyncCore()
+      await store.cloudSyncChannel()
+      let channelList = store.state.channels
+      let channelFilteredArray = channelList.filter((channel) => {
+        if (channel) {
+          return channel.markDate
+        }
+      })
+      if (channelFilteredArray.length > 0) {
+        CollaUtil.sortByKey(channelFilteredArray, 'updateDate', 'desc')
+      }
+      if (channelFilteredArray.length === 0 || store.state.ifMobileStyle) {
+        store.state.currentChannel = null
+        store.toggleDrawer(false)
+      } else {
+        store.state.currentChannel = channelFilteredArray[0]
+        await _that.channelSelected(store.state.currentChannel, 0)
+      }
       if (done && typeof done === 'function') {
         done()
       }
@@ -430,22 +225,28 @@ export default {
         return
       }
       // put content into attach
-      /*if (!article.content) {
-        let attachs = await channelComponent.loadAttach(article, null, null)
+      if (!article.content) {
+        /*let attachs = await channelComponent.loadAttach(article, null, null)
         if (attachs && attachs.length > 0) {
           article.content = attachs[0].content
-        }*/
-        if (!article.content) {
+        }
+        if (!article.content) {*/
           let blocks = await dataBlockService.findTxPayload(null, article.blockId)
           if (blocks && blocks.length > 0) {
             article = blocks[0]
+          } else {
+            _that.$q.notify({
+              message: `${_that.$i18n.t("Article")} ${_that.$i18n.t("Deleted")}`,
+              timeout: 3000,
+              type: "warning",
+              color: "warning",
+            })
           }
-        }
-      /*}*/
+        /*}*/
+      }
       store.state.currentArticle = article
       store.changeKind('channelDetails')
-      store.toggleDrawer(true)
-      if (store.changeChannelDetailsSubKind) {
+      /*if (store.changeChannelDetailsSubKind) {
         store.changeChannelDetailsSubKind('view')
       } else {
         store.state.currentChannel = store.state.channelMap[article.channelId]
@@ -453,7 +254,12 @@ export default {
         if (store.changeChannelDetailsSubKind) {
           store.changeChannelDetailsSubKind('view')
         }
-      }
+      }*/
+      _that.$nextTick(() => {
+        store.channelDetailsArticleEntry = 'search'
+        store.changeChannelDetailsSubKind('view')
+        store.toggleDrawer(true)
+      })
     },
     newChannel() {
       let _that = this
@@ -511,21 +317,10 @@ export default {
   async created() {
     let _that = this
     let store = _that.$store
-    _that._cloudSyncTimer = setInterval(async function () {
-      await _that.cloudSyncCore(true)
-    }, 300 * 1000)
   },
   mounted() {
     let _that = this
     let store = this.$store
-  },
-  beforeDestroy() {
-    let _that = this
-    let store = _that.$store
-    if (_that._cloudSyncTimer) {
-      clearInterval(_that._cloudSyncTimer)
-      delete _that._cloudSyncTimer
-    }
   },
   watch: {
   }

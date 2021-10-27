@@ -523,7 +523,6 @@ export default {
   "More Articles": "更多文章",
   "Remove this channel (together with all channel articles)?": "删除此频道（包括所有文章）？",
   "Article": "文章",
-  "Unsynchronized or deleted":"未同步或已删除",
 
   // Others
   "Migrate successfully": "迁移成功",

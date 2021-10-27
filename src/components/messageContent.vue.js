@@ -1,10 +1,10 @@
 import { date } from 'quasar'
 
-import { webrtcPeerPool, peerClientService } from 'libcolla'
+import { webrtcPeerPool, peerClientService, BlockType, queryValueAction, myself } from 'libcolla'
 
 import {  ChatDataType, chatComponent, ChatMessageStatus, ChatContentType, P2pChatMessageType, SubjectType } from '@/libs/biz/colla-chat'
 import { ActiveStatus } from '@/libs/biz/colla-contact'
-import { channelComponent } from '@/libs/biz/colla-channel'
+import { channelComponent, ChannelType, EntityType } from '@/libs/biz/colla-channel'
 import NotePreview from '@/components/notePreview'
 import MobileAudio from '@/components/mobileAudio'
 
@@ -170,12 +170,22 @@ export default {
     async openChannel(message) {
       let _that = this
       let store = _that.$store
-      let channelDBItems = await channelComponent.loadChannel({
-        ownerPeerId: store.state.myselfPeerClient.peerId,
-        channelId:message.content.channelId
-      })
-      if (channelDBItems && channelDBItems.length > 0) {
-        let channel = message.content
+      let channel = message.content
+      let currentChannel = store.state.channelMap[channel.channelId]
+      if (currentChannel) {
+        if (currentChannel.updateDate < channel.updateDate) {
+          currentChannel.state = EntityState.Modified
+          currentChannel.avatar = channel.avatar
+          currentChannel.name = channel.name
+          currentChannel.description = channel.description
+          currentChannel.updateDate = channel.updateDate
+          await channelComponent.save(ChannelDataType.CHANNEL, currentChannel, null)
+        }
+        channel = currentChannel
+      } else {
+        channel = await store.acquireChannel(channel.channelId)
+      }
+      if (channel) {
         store.changeTab('channel')
         let prevCurrentChannel = store.state.currentChannel
         channel.newArticleFlag = false
@@ -188,9 +198,9 @@ export default {
           }
         }
         await store.getArticleList()
-      }else{
+      } else {
         _that.$q.notify({
-          message: `${_that.$i18n.t("Channel")} ${_that.$i18n.t("Unsynchronized or deleted")}`,
+          message: `${_that.$i18n.t("Channel")} ${_that.$i18n.t("Deleted")}`,
           timeout: 3000,
           type: "warning",
           color: "warning",
@@ -200,32 +210,26 @@ export default {
     async openArticle(message) {
       let _that = this
       let store = _that.$store
-      let articleDBItems = await channelComponent.loadArticle({
-        ownerPeerId: store.state.myselfPeerClient.peerId,
-        articleId:message.content.articleId
-      })
-      if (articleDBItems && articleDBItems.length > 0) {
-        let article = articleDBItems[0]
-        if (!article.content) {
-            let blocks = await dataBlockService.findTxPayload(null, article.blockId)
-            if (blocks && blocks.length > 0) {
-              article = blocks[0]
-            }
-        }
-        store.state.currentArticle = article
-        store.changeKind('channelDetails')
-        _that.$nextTick(() => {
-          store.channelDetailsEntry = "message"
-          store.changeChannelDetailsSubKind('view') 
-        })
-      }else{
-        _that.$q.notify({
-          message: `${_that.$i18n.t("Article")} ${_that.$i18n.t("Unsynchronized or deleted")}`,
-          timeout: 3000,
-          type: "warning",
-          color: "warning",
-        })
+      let article = message.content
+      if (!article.content) {
+          let blocks = await dataBlockService.findTxPayload(null, article.blockId)
+          if (blocks && blocks.length > 0) {
+            article = blocks[0]
+          } else {
+            _that.$q.notify({
+              message: `${_that.$i18n.t("Article")} ${_that.$i18n.t("Deleted")}`,
+              timeout: 3000,
+              type: "warning",
+              color: "warning",
+            })
+          }
       }
+      store.state.currentArticle = article
+      store.changeKind('channelDetails')
+      _that.$nextTick(() => {
+        store.channelDetailsArticleEntry = 'message'
+        store.changeChannelDetailsSubKind('view') 
+      })
     },
     async openMergeMessage(message) {
       let _that = this

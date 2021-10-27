@@ -519,7 +519,6 @@
   "More Articles": "その他の記事",
   "Remove this channel (together with all channel articles)?": "このチャネル（すべての記事を含む）を削除しますか？",
   "Article": "論文",
-  "Unsynchronized or deleted":"非同期または削除",
 
   // Others
   "Migrate successfully": "正常に移行する",

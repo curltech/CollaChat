@@ -256,5 +256,4 @@ export default {
     "More Articles": "Mais artigos",
     "Remove this channel (together with all channel articles)?": "Remover este canal (junto com todos os artigos do canal)?",
     "Article": "Artigo",
-    "Unsynchronized or deleted":"Não sincronizado ou excluído",
 }

@@ -73,6 +73,13 @@ export default {
           let blocks = await dataBlockService.findTxPayload(null, article.blockId)
           if (blocks && blocks.length > 0) {
             article = blocks[0]
+          } else {
+            _that.$q.notify({
+              message: `${_that.$i18n.t("Article")} ${_that.$i18n.t("Deleted")}`,
+              timeout: 3000,
+              type: "warning",
+              color: "warning",
+            })
           }
         /*}*/
       }
@@ -139,9 +146,25 @@ export default {
     async channelNameClick() {
       let _that = this
       let store = _that.$store
-      store.state.currentChannel = store.state.channelMap[store.state.currentArticle.channelId]
-      await store.getArticleList()
-      _that.subKind = 'default'
+      let channelId = store.state.currentArticle.channelId
+      let channel = store.state.channelMap[channelId]
+      if (channel) {
+        store.state.currentChannel = channel
+      } else {
+        channel = await store.acquireChannel(channelId)
+      }
+      if (channel) {
+        await store.getArticleList()
+        store.channelDetailsChannelEntry = 'article'
+        _that.subKind = 'default'
+      } else {
+        _that.$q.notify({
+          message: `${_that.$i18n.t("Channel")} ${_that.$i18n.t("Deleted")}`,
+          timeout: 3000,
+          type: "warning",
+          color: "warning",
+        })
+      }
     },
     channelCommand() {
       let _that = this
@@ -479,16 +502,27 @@ export default {
         _that.$q.loading.hide()
       }
     },
-    articleBack(){
+    channelBack() {
       let _that = this
       let store = _that.$store 
-      if(store.channelDetailsEntry === "message"){
-        store.changeKind('message')
+      if (store.channelDetailsChannelEntry === 'article') {
+        _that.subKind = 'view'
+      } else {
+        $store.toggleDrawer(false)
       }
-      else{
+      store.channelDetailsChannelEntry = null
+    },
+    articleBack() {
+      let _that = this
+      let store = _that.$store 
+      if (store.channelDetailsArticleEntry === 'message') {
+        store.changeKind('message')
+      } else if (store.channelDetailsArticleEntry === 'search') {
+        store.toggleDrawer(false)
+      } else {
         _that.subKind = 'default'
       }
-      store.channelDetailsEntry = null
+      store.channelDetailsArticleEntry = null
     }
   },
   async created() {

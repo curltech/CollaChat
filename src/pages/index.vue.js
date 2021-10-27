@@ -22,7 +22,7 @@ import { fileComponent } from '@/libs/base/colla-cordova'
 import { CollectionType, collectionComponent } from '@/libs/biz/colla-collection'
 import { ChatDataType, ChatContentType, ChatMessageStatus, P2pChatMessageType, SubjectType, chatComponent, chatBlockComponent} from '@/libs/biz/colla-chat'
 import { ContactDataType, RequestType, RequestStatus, LinkmanStatus, ActiveStatus, contactComponent, MemberType } from '@/libs/biz/colla-contact'
-import { channelComponent } from '@/libs/biz/colla-channel'
+import { channelComponent, ChannelDataType, ChannelType, EntityType } from '@/libs/biz/colla-channel'
 import { collectionUtil, blockLogComponent } from '@/libs/biz/colla-collection-util'
 import Chat from '@/components/chat'
 import Contacts from '@/components/contacts'
@@ -99,7 +99,9 @@ export default {
       backupFilename: null,
       restoreDialog: false,
       restoreFilename: null,
-      logoutData: null
+      logoutData: null,
+      _heartbeatTimer: null,
+      _cloudSyncTimer: null
     }
   },
   computed: {
@@ -310,6 +312,9 @@ export default {
           let targetPeerId = connectAddressArr[connectAddressArr.length - 1]
           await pingAction.ping(null, payload, targetPeerId)
         }, 55 * 1000)
+        _that._cloudSyncTimer = setInterval(async function () {
+          await store.cloudSyncChannel(true)
+        }, 300 * 1000)
       }
       webSocket.onmessage = function (evt) {
         //console.log('WebSocket Message!')
@@ -322,6 +327,10 @@ export default {
           clearInterval(_that._heartbeatTimer)
           delete _that._heartbeatTimer
         }
+        if (_that._cloudSyncTimer) {
+          clearInterval(_that._cloudSyncTimer)
+          delete _that._cloudSyncTimer
+        }
         await _that.preSetupSocket()
       }
       webSocket.onclose = async function (evt) {
@@ -330,6 +339,10 @@ export default {
         if (_that._heartbeatTimer) {
           clearInterval(_that._heartbeatTimer)
           delete _that._heartbeatTimer
+        }
+        if (_that._cloudSyncTimer) {
+          clearInterval(_that._cloudSyncTimer)
+          delete _that._cloudSyncTimer
         }
         await _that.preSetupSocket()
       }
@@ -1072,22 +1085,17 @@ export default {
         store.state.articles = articleList
       }
     },
-    async channelForwardToChat(item,chat){
+    async channelForwardToChat(item, chat) {
       let _that = this
       let store = _that.$store
-      let channel = {
-        avatar: item.avatar,
-        peerId: item.channelId,
-        name: item.name
-      }
       let message = {
-        content: channel,
+        content: item,
         contentType: ChatContentType.CHANNEL,
         messageType: P2pChatMessageType.CHAT_LINKMAN
       }
       await store.sendChatMessage(chat, message)
       _that.setCurrentChat(chat.subjectId)
-      if(_that.tab !== 'chat'){
+      if (_that.tab !== 'chat') {
         store.changeTab('chat')
       }
       store.changeKind('message')
@@ -1095,20 +1103,14 @@ export default {
     async articleForwardToChat(item, chat) {
       let _that = this
       let store = _that.$store
-      let article = {
-        cover: item.cover,
-        abstract: item.abstract,
-        title: item.title,
-        articleId:item.articleId
-      }
       let message = {
-        content: article,
+        content: item,
         contentType: ChatContentType.ARTICLE,
         messageType: P2pChatMessageType.CHAT_LINKMAN
       }
       await store.sendChatMessage(chat, message)
       _that.setCurrentChat(chat.subjectId)
-      if(_that.tab !== 'chat'){
+      if (_that.tab !== 'chat') {
         store.changeTab('chat')
       }
       store.changeKind('message')
@@ -3767,6 +3769,272 @@ export default {
       }, async function(error) {
         await logService.log(error, 'startServerError', 'error')
       })
+    },
+    async cloudSyncChannelArticle(channelId) {
+      let _that = this
+      let store = _that.$store
+      let articleList = []
+      let ret = await channelComponent.loadArticle({
+        ownerPeerId: myself.myselfPeerClient.peerId,
+        channelId: channelId,
+        updateDate: { $gt: null }
+      }, [{ updateDate: 'desc' }])
+      if (ret && ret.length > 0) {
+        articleList = ret
+      }
+      // 查询cloud全量ChannelArticle索引信息
+      let conditionBean = {}
+      conditionBean['parentBusinessNumber'] = channelId
+      conditionBean['getAllBlockIndex'] = true
+      conditionBean['blockType'] = BlockType.ChannelArticle
+      let articleIndexList = []
+      if (store.state.networkStatus === 'CONNECTED'){
+        let ret = await queryValueAction.queryValue(null, conditionBean)
+        if (ret && ret.length > 0) {
+          articleIndexList = ret
+        }
+      }
+      console.log('articleIndexList:' + JSON.stringify(articleIndexList))
+      for (let articleIndex of articleIndexList) {
+        articleIndex.cover = articleIndex.thumbnail
+        articleIndex.thumbnail = null
+        articleIndex.title = articleIndex.name
+        articleIndex.name = null
+        articleIndex.abstract = articleIndex.description
+        articleIndex.description = null
+      }
+      let changed = false
+      for (let article of articleList) {
+        let exists = false
+        for (let articleIndex of articleIndexList) {
+          if (article.articleId === articleIndex.businessNumber) {
+            exists = true
+            if (articleIndex.createTimestamp > article.updateDate) {
+              changed = true
+              article.state = EntityState.Modified
+              article.cover = articleIndex.cover
+              article.title = articleIndex.title
+              article.abstract = articleIndex.abstract
+              article.updateDate = articleIndex.createTimestamp
+            }
+            break
+          }
+        }
+        if (!exists) {
+          changed = true
+          article.state = EntityState.Deleted
+        }
+      }
+      for (let articleIndex of articleIndexList) {
+        let exists = false
+        for (let article of articleList) {
+          if (article.articleId === articleIndex.businessNumber) {
+            exists = true
+            break
+          }
+        }
+        if (!exists) {
+          changed = true
+          let newArticle = {
+            ownerPeerId: myself.myselfPeerClient.peerId,
+            channelId: articleIndex.parentBusinessNumber,
+            articleId: articleIndex.businessNumber,
+            cover: articleIndex.cover,
+            //author: articleIndex.author,
+            title: articleIndex.title,
+            abstract: articleIndex.abstract,
+            //content: content,
+            plainContent: articleIndex.metadata,
+            pyPlainContent: pinyinUtil.getPinyin(articleIndex.metadata),
+            metadata: articleIndex.metadata,
+            businessNumber: articleIndex.businessNumber,
+            blockId: articleIndex.blockId,
+            createDate: articleIndex.createTimestamp,
+            updateDate: articleIndex.createTimestamp,
+            state: EntityState.New
+          }
+          articleList.push(newArticle)
+          let theChannel = store.state.channelMap[newArticle.channelId]
+          if (theChannel) {
+            theChannel.newArticleFlag = true
+            if (newArticle.updateDate && (!theChannel.newArticleUpdateDate || newArticle.updateDate > theChannel.newArticleUpdateDate)) {
+              theChannel.newArticleUpdateDate = newArticle.updateDate
+              theChannel.newArticleTitle = newArticle.title
+            }
+          }
+        }
+      }
+      if (changed) {
+        await channelComponent.save(ChannelDataType.ARTICLE, articleList, null)
+      }
+    },
+    async acquireChannel(channelId) {
+      let _that = this
+      let store = _that.$store
+      let channel = null
+      if (!store.cloudSyncing) {
+        store.cloudSyncing = true
+        try {
+          // 查询cloud全量Channel索引信息
+          let conditionBean = {}
+          conditionBean['getAllBlockIndex'] = true
+          conditionBean['blockType'] = BlockType.Channel
+          let channelIndexList = []
+          if (store.state.networkStatus === 'CONNECTED'){
+            let ret = await queryValueAction.queryValue(null, conditionBean)
+            if (ret && ret.length > 0) {
+              channelIndexList = ret
+            }
+          }
+          console.log('channelIndexList:' + JSON.stringify(channelIndexList))
+          let exists = false
+          for (let channelIndex of channelIndexList) {
+            if (channelId === channelIndex.businessNumber) {
+              exists = true
+              channelIndex.avatar = channelIndex.thumbnail
+              channelIndex.thumbnail = null
+              channel = {
+                ownerPeerId: myself.myselfPeerClient.peerId,
+                creator: channelIndex.peerId,
+                channelType: ChannelType.PUBLIC,
+                channelId: channelIndex.businessNumber,
+                avatar: channelIndex.avatar,
+                name: channelIndex.name,
+                description: channelIndex.description,
+                entityType: EntityType.INDIVIDUAL,
+                businessNumber: channelIndex.businessNumber,
+                blockId: channelIndex.blockId,
+                createDate: channelIndex.createTimestamp,
+                updateDate: channelIndex.createTimestamp,
+                state: EntityState.New
+              }
+              break
+            }
+          }
+          if (exists) {
+            await channelComponent.save(ChannelDataType.CHANNEL, channel, null)
+            store.state.channels.push(channel)
+            store.state.channelMap[channel.channelId] = channel
+            // 同步ChannelArticle
+            await store.cloudSyncChannelArticle(channel.channelId)
+          }
+        } catch (e) {
+          console.error(e)
+        } finally {
+          store.cloudSyncing = false
+          return channel
+        }
+      }
+    },
+    async cloudSyncChannel(timer) {
+      let _that = this
+      let store = _that.$store
+      if (!store.cloudSyncing) {
+        if (!timer) {
+          _that.$q.loading.show()
+        }
+        store.cloudSyncing = true
+        try {
+          // 同步Channel
+          let channelList = store.state.channels
+          // 查询cloud全量Channel索引信息
+          let conditionBean = {}
+          conditionBean['getAllBlockIndex'] = true
+          conditionBean['blockType'] = BlockType.Channel
+          let channelIndexList = []
+          if (store.state.networkStatus === 'CONNECTED'){
+            let ret = await queryValueAction.queryValue(null, conditionBean)
+            if (ret && ret.length > 0) {
+              channelIndexList = ret
+            }
+          }
+          console.log('channelIndexList:' + JSON.stringify(channelIndexList))
+          for (let channelIndex of channelIndexList) {
+            channelIndex.avatar = channelIndex.thumbnail
+            channelIndex.thumbnail = null
+          }
+          let changed = false
+          let deleteChannelList = []
+          for (let channel of channelList) {
+            let exists = false
+            for (let channelIndex of channelIndexList) {
+              if (channel.channelId === channelIndex.businessNumber) {
+                exists = true
+                if (channelIndex.createTimestamp > channel.updateDate) {
+                  changed = true
+                  channel.state = EntityState.Modified
+                  channel.avatar = channelIndex.avatar
+                  channel.name = channelIndex.name
+                  channel.description = channelIndex.description
+                  channel.updateDate = channelIndex.createTimestamp
+                }
+                break
+              }
+            }
+            if (!exists) {
+              changed = true
+              channel.state = EntityState.Deleted
+              deleteChannelList.push(channel)
+            }
+          }
+          for (let channelIndex of channelIndexList) {
+            let exists = false
+            for (let channel of channelList) {
+              if (channel.channelId === channelIndex.businessNumber) {
+                exists = true
+                break
+              }
+            }
+            if (!exists) {
+              changed = true
+              let newChannel = {
+                ownerPeerId: myself.myselfPeerClient.peerId,
+                creator: channelIndex.peerId,
+                channelType: ChannelType.PUBLIC,
+                channelId: channelIndex.businessNumber,
+                avatar: channelIndex.avatar,
+                name: channelIndex.name,
+                description: channelIndex.description,
+                entityType: EntityType.INDIVIDUAL,
+                businessNumber: channelIndex.businessNumber,
+                blockId: channelIndex.blockId,
+                createDate: channelIndex.createTimestamp,
+                updateDate: channelIndex.createTimestamp,
+                state: EntityState.New
+              }
+              channelList.push(newChannel)
+            }
+          }
+          if (changed) {
+            await channelComponent.save(ChannelDataType.CHANNEL, channelList, null)
+            for (let i=channelList.length-1;i>=0;i--) {
+              let channel = channelList[i]
+              let deleted = false
+              for (let deleteChannel of deleteChannelList) {
+                if (channel.channelId === deleteChannel.channelId) {
+                  deleted = true
+                  channelList.splice(i, 1)
+                  delete store.state.channelMap[channel.channelId]
+                }
+              }
+              if (!deleted) {
+                store.state.channelMap[channel.channelId] = channel
+              }
+            }
+          }
+          for (let channel of channelList) {
+            // 同步ChannelArticle
+            await store.cloudSyncChannelArticle(channel.channelId)
+          }
+        } catch (e) {
+          console.error(e)
+        } finally {
+          store.cloudSyncing = false
+          if (!timer) {
+            _that.$q.loading.hide()
+          }
+        }
+      }
     }
   },
   async created() {
@@ -3953,7 +4221,7 @@ export default {
         _that.kind = _that.contactsKind
       } else if (tab === 'channel') {
         if (!_that.channelKind) {
-          _that.channelKind = 'channel'
+          _that.channelKind = 'newChannel'
         }
         _that.kind = _that.channelKind
       } else if (tab === 'me') {
@@ -4024,11 +4292,14 @@ export default {
     store.restoreChatRecord = _that.restoreChatRecord
     store.startServer = _that.startServer
     store.sendLinkmanInfo = _that.sendLinkmanInfo
+    store.cloudSyncChannelArticle = _that.cloudSyncChannelArticle
+    store.acquireChannel = _that.acquireChannel
+    store.cloudSyncChannel = _that.cloudSyncChannel
     _that.tab = 'chat'
     _that.kind = 'message'
     _that.chatKind = 'message'
     _that.contactsKind = 'receivedList'
-    _that.channelKind = 'channel'
+    _that.channelKind = 'newChannel'
     _that.meKind = 'accountInformation'
     if (!(_that.ifMobileSize || store.state.ifMobileStyle)) {
       _that.drawer = true
