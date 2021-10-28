@@ -90,7 +90,27 @@ export default {
     },
   },
   methods: {
-      changeAudioToggle(){
+    changeDropdownChatMute(type){
+      let _that = this
+      let store = _that.$store
+      if(type === 'mute' && !_that.chatMute){
+        _that.changeChatMute()
+      }else if(type !== 'mute'){
+        if(_that.chatMute){
+          _that.changeChatMute()
+        }
+        if(AudioToggle && type !== _that.audioToggle){
+          if(_that.audioToggle === "speaker"){
+            _that.audioToggle = "earpiece"
+            AudioToggle.setAudioMode(AudioToggle.EARPIECE);
+          }else{
+              _that.audioToggle = "speaker"
+              AudioToggle.setAudioMode(AudioToggle.SPEAKER);
+          }
+        }
+      }
+    },
+    changeAudioToggle(){
           let _that = this
           let store = _that.$store
           if(AudioToggle){

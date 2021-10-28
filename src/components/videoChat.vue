@@ -25,8 +25,19 @@
                 q-toolbar-title.media-timer(:class="Platform.is.ios?'':'text-white'" align="center")
                     span(ref="mediaTimer")
                 q-btn.btnIcon(unelevated round icon="cached" @click="zoomVideoChange" v-if="Platform.is.ios && $store.state.currentCallChat.stream")
-                q-btn.btnIcon(v-if = " $store.state.currentCallChat.stream && (Platform.is.android || showMore)" unelevated round :icon="audioToggle === 'speaker'?'volume_off':'volume_up'" @click="changeAudioToggle")
-                q-btn.btnIcon(v-if = "(!(ifMobileSize || $store.state.ifMobileStyle) && $store.state.currentCallChat.stream) ||((ifMobileSize || $store.state.ifMobileStyle) && $store.state.currentCallChat.stream && showMore)" unelevated round :icon="chatMute?'volume_off':'volume_up'" @click="changeChatMute")
+                q-btn.btnIcon(v-if = "$store.state.currentCallChat.stream && showMore && !Platform.is.android " unelevated round :icon="audioToggle === 'speaker'?'volume_off':'volume_up'"  @click="changeAudioToggle")
+                q-btn-dropdown.btnIcon.chatmute-dropdown(:icon="chatMute?'volume_off':'volume_up'" v-if = "Platform.is.android && $store.state.currentCallChat.stream" style ='width:10vw')
+                    q-list
+                        q-item( clickable v-close-popup @click="changeDropdownChatMute('mute')")
+                            q-item-section
+                                q-item-label {{$t('Mute')}}
+                        q-item(clickable v-close-popup @click="changeDropdownChatMute('earpiece')")
+                            q-item-section
+                                q-item-label {{$t('Earphone')}}
+                        q-item(clickable v-close-popup @click="changeDropdownChatMute('speaker')")
+                            q-item-section
+                                q-item-label {{$t('Microphone')}}
+                q-btn.btnIcon(v-if = "(!(ifMobileSize || $store.state.ifMobileStyle) && $store.state.currentCallChat.stream) ||((ifMobileSize || $store.state.ifMobileStyle) && !Platform.is.android && $store.state.currentCallChat.stream && showMore)" unelevated round :icon="chatMute?'volume_off':'volume_up'" @click="changeChatMute")
                 q-space(v-if = "(!(ifMobileSize || $store.state.ifMobileStyle)&& !(canCall()===true)) || $store.state.currentCallChat.stream")
                 q-btn(unelevated round color="red" icon="call_end" @click="closeCall")
                 q-space
@@ -39,8 +50,19 @@
             q-toolbar.group-video-toolbar
                 q-toolbar-title.media-timer(align="center")
                     span(ref="mediaTimer")
-                q-btn.btnIcon(v-if = "(ifMobileSize || $store.state.ifMobileStyle) && $store.state.currentCallChat.stream && $store.state.currentCallChat.stream.length > 1" unelevated round :icon="audioToggle === 'speaker'?'volume_off':'volume_up'" @click="changeAudioToggle")
-                q-btn.btnIcon(v-if = "(!(ifMobileSize || $store.state.ifMobileStyle) && $store.state.currentCallChat.stream && $store.state.currentCallChat.stream.length > 1) ||((ifMobileSize || $store.state.ifMobileStyle) && $store.state.currentCallChat.stream && $store.state.currentCallChat.stream.length > 1 && showMore)" unelevated round :icon="chatMute?'volume_off':'volume_up'" @click="changeChatMute")
+                q-btn.btnIcon(v-if = "(ifMobileSize || $store.state.ifMobileStyle) && $store.state.currentCallChat.stream && $store.state.currentCallChat.stream.length > 1  && !Platform.is.android" unelevated round :icon="audioToggle === 'speaker'?'volume_off':'volume_up'" @click="changeAudioToggle")
+                q-btn-dropdown.btnIcon.chatmute-dropdown(:icon="chatMute?'volume_off':'volume_up'" v-if = "Platform.is.android && $store.state.currentCallChat.stream && $store.state.currentCallChat.stream.length > 1 " style ='width:10vw')
+                    q-list
+                        q-item( clickable v-close-popup @click="changeDropdownChatMute('mute')")
+                            q-item-section
+                                q-item-label {{$t('Mute')}}
+                        q-item(clickable v-close-popup @click="changeDropdownChatMute('earpiece')")
+                            q-item-section
+                                q-item-label {{$t('Earphone')}}
+                        q-item(clickable v-close-popup @click="changeDropdownChatMute('speaker')")
+                            q-item-section
+                                q-item-label {{$t('Microphone')}}
+                q-btn.btnIcon(v-if = "(!(ifMobileSize || $store.state.ifMobileStyle) && $store.state.currentCallChat.stream && $store.state.currentCallChat.stream.length > 1) ||((ifMobileSize || $store.state.ifMobileStyle) && !Platform.is.android && $store.state.currentCallChat.stream && $store.state.currentCallChat.stream.length > 1 && showMore)" unelevated round :icon="chatMute?'volume_off':'volume_up'" @click="changeChatMute")
                 q-space(v-if = "!(ifMobileSize || $store.state.ifMobileStyle) || ($store.state.currentCallChat.stream && $store.state.currentCallChat.stream.length > 1)")
                 q-btn(unelevated round color="red" icon="call_end" v-close-popup @click="closeCall")
                 q-space
@@ -82,8 +104,19 @@
             q-toolbar.justify-center
                 q-toolbar-title.media-timer(align="center")
                     span(ref="mediaTimer")
-                q-btn.btnIcon(v-if = "(ifMobileSize || $store.state.ifMobileStyle) && $store.state.currentCallChat.stream" unelevated round :icon="audioToggle === 'speaker'?'volume_off':'volume_up'" @click="changeAudioToggle")
-                q-btn.btnIcon(v-if = "(!(ifMobileSize || $store.state.ifMobileStyle) && $store.state.currentCallChat.stream) ||((ifMobileSize || $store.state.ifMobileStyle) && $store.state.currentCallChat.stream && showMore)" unelevated round :icon="chatMute?'volume_off':'volume_up'" @click="changeChatMute")
+                q-btn.btnIcon(v-if = "(ifMobileSize || $store.state.ifMobileStyle) && $store.state.currentCallChat.stream   && !Platform.is.android" unelevated round :icon="audioToggle === 'speaker'?'volume_off':'volume_up'" @click="changeAudioToggle")
+                q-btn-dropdown.btnIcon.chatmute-dropdown(:icon="chatMute?'volume_off':'volume_up'" v-if = "Platform.is.android && $store.state.currentCallChat.stream" style ='width:10vw')
+                    q-list
+                        q-item( clickable v-close-popup @click="changeDropdownChatMute('mute')")
+                            q-item-section
+                                q-item-label {{$t('Mute')}}
+                        q-item(clickable v-close-popup @click="changeDropdownChatMute('earpiece')")
+                            q-item-section
+                                q-item-label {{$t('Earphone')}}
+                        q-item(clickable v-close-popup @click="changeDropdownChatMute('speaker')")
+                            q-item-section
+                                q-item-label {{$t('Microphone')}}
+                q-btn.btnIcon(v-if = "(!(ifMobileSize || $store.state.ifMobileStyle) && $store.state.currentCallChat.stream) ||((ifMobileSize || $store.state.ifMobileStyle) && !Platform.is.android && $store.state.currentCallChat.stream && showMore)" unelevated round :icon="chatMute?'volume_off':'volume_up'" @click="changeChatMute")
                 q-space(v-if = "(!(ifMobileSize || $store.state.ifMobileStyle)&& !(canCall()===true)) || $store.state.currentCallChat.stream")
                 q-btn(unelevated round color="red" icon="call_end" v-close-popup @click="closeCall")
                 q-space

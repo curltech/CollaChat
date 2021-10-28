@@ -4087,11 +4087,11 @@ export default {
         if(AudioToggle){
             AudioToggle.setAudioMode(AudioToggle.EARPIECE);
         }
-        cordova.plugins.backgroundMode.enable()
-        cordova.plugins.backgroundMode.on('activate', function() {
-          cordova.plugins.backgroundMode.disableWebViewOptimizations()
-          cordova.plugins.backgroundMode.disableBatteryOptimizations()
-        })
+        // cordova.plugins.backgroundMode.enable()
+        // cordova.plugins.backgroundMode.on('activate', function() {
+        //   cordova.plugins.backgroundMode.disableWebViewOptimizations()
+        //   cordova.plugins.backgroundMode.disableBatteryOptimizations()
+        // })
         document.addEventListener("pause", function () {
             if(cordova.plugins.notification){
                 cordova.plugins.notification.foreground = false
