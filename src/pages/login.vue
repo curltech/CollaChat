@@ -38,8 +38,12 @@
         q-card-section(align="center" class="q-py-none")
           q-card(flat class="fixed-center background-color: transparent")
             q-card-section(align="center")
-              q-img(src="@/assets/colla.png" style="height: 120px; width: 137px")
+              q-img(src="@/assets/colla.png" style="height: 120px; width: 137px" @click="switchTestMode")
               div(class="text-center text-h6") {{$t('Secure Your Collaboration')}}
+              q-item-label(v-if="testMode" class="text-red") {{$t('(Test Mode)')}}
+              q-btn(v-if="testMode" :label="$t('Test-queryDB')" color="red" @click="testQueryDB" flat no-caps)
+              q-btn(v-if="testMode" :label="$t('Test-dropDB')" color="red" @click="testDropDB" flat no-caps)
+              q-btn(v-if="testMode" :label="$t('Test-recreateDB')" color="red" @click="testRecreateDB" flat no-caps)
             q-card-section(align="center")
               q-form(ref="frmLogin" @submit="login" class="q-pa-none")
                 q-select.c-field(style="width:280px;padding-bottom:5px" filled dense v-model="loginData.countryRegion_" :options="options" :label="$t('Country/Region')"
@@ -63,8 +67,8 @@
                 q-input.c-field(style="width:280px" type="password" filled dense clearable v-model="loginData.password_" lazy-rules :rules="[val => val && val.length > 0 || $t('Please input Password')]" :label="$t('Password')")
                 q-btn(style="width:280px;height:40px" type="submit" color="primary" unelevated :label="$t('Login')" no-caps)
             q-card-section(align="center")
-              q-btn(:label="$t('Register')"  @click="subKind = 'register'" flat no-caps)
-              q-btn(:label="$t('Import')"  @click="enterScan" flat no-caps)
+              q-btn(:label="$t('Register')" @click="subKind = 'register'" flat no-caps)
+              q-btn(:label="$t('Import')" @click="enterScan" flat no-caps)
               //q-uploader(style="display:none" ref="upload" @added="files => upload(files)" accept=".db")
               q-uploader(style="display:none" ref="upload" @added="(files) => upload(files)" accept=".jpg, image/*")
       q-card.grad(flat v-if="subKind==='register'" class="full-height fixed-center q-pa-none" :style="cardStyle")
