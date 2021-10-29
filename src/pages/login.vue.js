@@ -619,7 +619,7 @@ export default {
     upgradeVersion(flag) {
       let _that = this
       let store = _that.$store
-      store.currentVersion = '0.2.61'
+      store.currentVersion = '0.2.62'
       store.mandatory = false
       if (_that.versionHistory && _that.versionHistory.length > 0) {
         let no = 1
@@ -884,8 +884,8 @@ export default {
     async testQueryDB() {
       let _that = this
       let loginData = _that.loginData
-      let code_ = loginData.code
-      let mobile_ = loginData.credential
+      let code_ = loginData.code_
+      let mobile_ = loginData.mobile_
       let mobile = null
       if (code_ && mobile_) {
         let isPhoneNumberValid = false
