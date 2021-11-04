@@ -273,7 +273,75 @@ export default {
             console.log(i + '-pingLatency:' + _that.connectArray[i].address + ',' + responses[i].status + ':' + (responses[i].status === 'fulfilled' ? responses[i].value : responses[i].reason))
             _that.connectArray[i].connectTime = (responses[i].status === 'fulfilled' ? responses[i].value : 999999999)
           }
-          CollaUtil.sortByKey(_that.connectArray, 'connectTime', 'asc')
+          CollaUtil.sortByKey(_that.connectArray, 'connectTime', 'desc')
+          console.log(_that.connectArray)
+          // test STUN/TURN
+          for (let i = _that.connectArray.length - 1; i >= 0; i--) {
+            let connectAddress = _that.connectArray[i].address.match(/\/dns4\/(\S*)\/tcp/)[1]
+            console.log(i + ' test start: ' + connectAddress + ', ' + new Date())
+            let stunTurn = await new Promise((resolve, reject) => {
+              let stun = false
+              let turn = false
+              setTimeout(()=> {
+                console.log('timeout: ' + new Date())
+                resolve(stun && turn)
+              }, 10000)
+              let iceServer = [
+                {
+                  urls: `stun:${ connectAddress }:3478`
+                },
+                {
+                  urls: `turn:${ connectAddress }:3478`,
+                  username: myselfPeerClient.peerId,
+                  credential: myselfPeerClient.peerPublicKey
+                }
+              ]
+              let pc = new RTCPeerConnection({
+                iceServers: iceServer
+              })
+              pc.onicecandidate = (e) => {
+                if (!e.candidate) return
+                // Display candidate string e.g
+                // candidate:842163049 1 udp 1677729535 XXX.XXX.XX.XXXX 58481 typ srflx raddr 0.0.0.0 rport 0 generation 0 ufrag sXP5 network-cost 999
+                console.log('onicecandidate-candidate.type:' + e.candidate.type)
+                console.log('onicecandidate-candidate.candidate:' + e.candidate.candidate)
+                // If a srflx candidate was found, notify that the STUN server works!
+                if (e.candidate.type === 'srflx') {
+                  console.log('The STUN server is reachable!')
+                  console.log('Your Public IP Address is: ' + e.candidate.address)
+                  stun = true
+                  if (stun && turn) {
+                    resolve(true)
+                  }
+                }    
+                // If a relay candidate was found, notify that the TURN server works!
+                if (e.candidate.type === 'relay') {
+                  console.log('The TURN server is reachable !')
+                  turn = true
+                  if (stun && turn) {
+                    resolve(true)
+                  }
+                }
+              }
+              // Log errors:
+              // Remember that in most of the cases, even if its working, you will find a STUN host lookup received error
+              // Chrome tried to look up the IPv6 DNS record for server and got an error in that process. However, it may still be accessible through the IPv4 address
+              pc.onicecandidateerror = (e) => {
+                console.error('onicecandidateerror:' + e)
+              }
+              pc.createDataChannel('test')
+              pc.createOffer().then(offer => {
+                console.log('offer:' + offer)
+                pc.setLocalDescription(offer)
+              })
+            })
+            if (!stunTurn) {
+              console.log('stunTurn test failed:' + connectAddress)
+              _that.connectArray.splice(i, 1)
+            } else {
+              break
+            }
+          }
           console.log(_that.connectArray)
           await _that.buildSocket()
         }
@@ -284,8 +352,11 @@ export default {
     async buildSocket() {
       let _that = this
       let store = _that.$store
-      let connectAddress = _that.connectArray[0].address
-      /*let connectTime = _that.connectArray[0].connectTime
+      if (_that.connectArray.length === 0) {
+        return
+      }
+      let connectAddress = _that.connectArray[_that.connectArray.length - 1].address
+      /*let connectTime = _that.connectArray[_that.connectArray.length - 1].connectTime
       let heartbeatTimerInterval = 55
       if (connectTime === 999999999) {
         heartbeatTimerInterval = 5
@@ -4087,11 +4158,11 @@ export default {
         if(AudioToggle){
             AudioToggle.setAudioMode(AudioToggle.EARPIECE);
         }
-        // cordova.plugins.backgroundMode.enable()
-        // cordova.plugins.backgroundMode.on('activate', function() {
-        //   cordova.plugins.backgroundMode.disableWebViewOptimizations()
-        //   cordova.plugins.backgroundMode.disableBatteryOptimizations()
-        // })
+        cordova.plugins.backgroundMode.enable()
+        cordova.plugins.backgroundMode.on('activate', function() {
+          cordova.plugins.backgroundMode.disableWebViewOptimizations()
+          cordova.plugins.backgroundMode.disableBatteryOptimizations()
+        })
         document.addEventListener("pause", function () {
             if(cordova.plugins.notification){
                 cordova.plugins.notification.foreground = false
