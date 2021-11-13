@@ -2893,7 +2893,11 @@ export default {
         let myselfBasicInfo = {}
         myselfBasicInfo.peerId = myselfPeerClient.peerId
         myselfBasicInfo.name = myselfPeerClient.name
-        myselfBasicInfo.mobile = myselfPeerClient.mobile
+        if (myselfPeerClient.visibilitySetting && myselfPeerClient.visibilitySetting.substring(1, 2) === 'N') {
+          myselfBasicInfo.mobile = ''
+        } else {
+          myselfBasicInfo.mobile = myselfPeerClient.mobile
+        }
         myselfBasicInfo.avatar = myselfPeerClient.avatar
         myselfBasicInfo.publicKey = myselfPeerClient.publicKey
         myselfBasicInfo.signalPublicKey = myselfPeerClient.signalPublicKey

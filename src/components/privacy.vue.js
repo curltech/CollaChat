@@ -76,7 +76,15 @@ export default {
         myselfPeer = await myselfPeerService.update(myselfPeer)
         myself.myselfPeer = myselfPeer
 
+        let backupMobile = null
+        if (kind === 'mobileNumber' && value === 'N') {
+          backupMobile = myselfPeerClient.mobile
+          myselfPeerClient.mobile = ''
+        }
         let result = await peerClientService.putPeerClient(null, 'Up')
+        if (kind === 'mobileNumber' && value === 'N') {
+          myselfPeerClient.mobile = backupMobile
+        }
         console.log(result)
         if (result === 'OK') {
           this.$q.notify({

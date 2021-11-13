@@ -294,7 +294,11 @@ export default {
       payload.srcClientId = myselfPeerClient.clientId
       payload.srcPeerId = myselfPeerClient.peerId
       payload.srcName = myselfPeerClient.name
-      payload.srcMobile = myselfPeerClient.mobile
+      if (myselfPeerClient.visibilitySetting && myselfPeerClient.visibilitySetting.substring(1, 2) === 'N') {
+        payload.srcMobile = ''
+      } else {
+        payload.srcMobile = myselfPeerClient.mobile
+      }
       payload.srcAvatar = myselfPeerClient.avatar
       payload._id = linkmanRequest._id // 标识重复消息
       payload.message = message
