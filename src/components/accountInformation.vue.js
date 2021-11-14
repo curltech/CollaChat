@@ -216,7 +216,17 @@ export default {
           await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
           this.$store.state.linkmanMap[linkmanPeerId] = linkman
 
+          let backupMobile = null
+          if (myselfPeerClient.visibilitySetting && myselfPeerClient.visibilitySetting.substring(1, 2) === 'N') {
+            backupMobile = myselfPeerClient.mobile
+            myselfPeerClient.mobile = ''
+            myselfPeer.mobile = ''
+          }
           let result = await peerClientService.putPeerClient(null, 'Up')
+          if (myselfPeerClient.visibilitySetting && myselfPeerClient.visibilitySetting.substring(1, 2) === 'N') {
+            myselfPeerClient.mobile = backupMobile
+            myselfPeer.mobile = backupMobile
+          }
           console.log(result)
           if (result === 'OK') {
             this.$q.notify({
@@ -268,7 +278,17 @@ export default {
         await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
         this.$store.state.linkmanMap[linkmanPeerId] = linkman
 
+        let backupMobile = null
+        if (myselfPeerClient.visibilitySetting && myselfPeerClient.visibilitySetting.substring(1, 2) === 'N') {
+          backupMobile = myselfPeerClient.mobile
+          myselfPeerClient.mobile = ''
+          myselfPeer.mobile = ''
+        }
         let result = await peerClientService.putPeerClient(null, 'Up')
+        if (myselfPeerClient.visibilitySetting && myselfPeerClient.visibilitySetting.substring(1, 2) === 'N') {
+          myselfPeerClient.mobile = backupMobile
+          myselfPeer.mobile = backupMobile
+        }
         console.log(result)
         if (result === 'OK') {
           this.$q.notify({
@@ -325,7 +345,17 @@ export default {
           await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
           this.$store.state.linkmanMap[linkmanPeerId] = linkman
 
+          let backupMobile = null
+          if (myselfPeerClient.visibilitySetting && myselfPeerClient.visibilitySetting.substring(1, 2) === 'N') {
+            backupMobile = myselfPeerClient.mobile
+            myselfPeerClient.mobile = ''
+            myselfPeer.mobile = ''
+          }
           let result = await peerClientService.putPeerClient(null, 'Up')
+          if (myselfPeerClient.visibilitySetting && myselfPeerClient.visibilitySetting.substring(1, 2) === 'N') {
+            myselfPeerClient.mobile = backupMobile
+            myselfPeer.mobile = backupMobile
+          }
           console.log(result)
           if (result === 'OK') {
             this.$q.notify({

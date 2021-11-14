@@ -77,13 +77,15 @@ export default {
         myself.myselfPeer = myselfPeer
 
         let backupMobile = null
-        if (kind === 'mobileNumber' && value === 'N') {
+        if (kind === 'mobileNumber' && !value) {
           backupMobile = myselfPeerClient.mobile
           myselfPeerClient.mobile = ''
+          myselfPeer.mobile = ''
         }
         let result = await peerClientService.putPeerClient(null, 'Up')
-        if (kind === 'mobileNumber' && value === 'N') {
+        if (kind === 'mobileNumber' && !value) {
           myselfPeerClient.mobile = backupMobile
+          myselfPeer.mobile = backupMobile
         }
         console.log(result)
         if (result === 'OK') {

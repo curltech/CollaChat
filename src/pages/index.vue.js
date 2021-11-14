@@ -449,161 +449,169 @@ export default {
     async connect(connectAddress) {
       let _that = this
       let store = _that.$store
-        // 建立primaryEndPoint连接
-        let peers = await peerClientService.connect()
-        console.log(peers)
-        if (peers === 'mobileOccupied') {
-          // 校验手机号失败
-          /*_that.$q.notify({
-            message: _that.$i18n.t("Account already exists with same mobile number"),
-            timeout: 3000,
-            type: "warning",
-            color: "warning",
-          })*/
-          Dialog.create({
-            title: _that.$i18n.t('Alert'),
-            message: _that.$i18n.t('Account already exists with same mobile number'),
-            cancel: false,
-            ok: {"label":_that.$i18n.t('Ok'),"color":"primary","unelevated":true,"no-caps":true},
-            persistent: true
-          }).onOk(() => {
-          }).onCancel(() => {
-          })
-          return
-        } else if (peers && peers.length === 2 && peers[0] && peers[0].length > 0 && peers[1] && peers[1].length > 0) {
-          // 标志primaryEndPoint连接成功
-          store.peers = peers[0]
-          store.peerClients = peers[1]
-          console.log('primaryEndPoint connect success')
-          store.state.networkStatus = 'CONNECTED'
-          // 更新本地身份信息
-          let currentDate = new Date()
-          let myselfPeerClient = myself.myselfPeerClient
-          myselfPeerClient.connectPeerId = connectAddress
-          let myselfPeer = myself.myselfPeer
-          let linkmanPeerId = myselfPeerClient.peerId
-          let linkman = store.state.linkmanMap[linkmanPeerId]
-          let linkmanRecord = null
-          let i = 0
-          for (let peer of store.peerClients) {
-            if (peer.clientId === myselfPeerClient.clientId && peer.peerId === myselfPeerClient.peerId) {
-              myselfPeerClient.lastAccessTime = peer.lastAccessTime
-              if (Date.parse(peer.lastUpdateTime) > Date.parse(myselfPeerClient.lastUpdateTime)) {
-                //myselfPeerClient.mobile = peer.mobile
-                //myselfPeerClient.publicKey = peer.publicKey
-                //myselfPeerClient.privateKey = peer.privateKey
-                myselfPeerClient.visibilitySetting = peer.visibilitySetting
+      let myselfPeerClient = myself.myselfPeerClient
+      let myselfPeer = myself.myselfPeer
+      // 建立primaryEndPoint连接
+      let backupMobile = null
+      if (myselfPeerClient.visibilitySetting && myselfPeerClient.visibilitySetting.substring(1, 2) === 'N') {
+        backupMobile = myselfPeerClient.mobile
+        myselfPeerClient.mobile = ''
+        myselfPeer.mobile = ''
+      }
+      let peers = await peerClientService.connect()
+      if (myselfPeerClient.visibilitySetting && myselfPeerClient.visibilitySetting.substring(1, 2) === 'N') {
+        myselfPeerClient.mobile = backupMobile
+        myselfPeer.mobile = backupMobile
+      }
+      console.log(peers)
+      if (peers === 'mobileOccupied') {
+        // 校验手机号失败
+        /*_that.$q.notify({
+          message: _that.$i18n.t("Account already exists with same mobile number"),
+          timeout: 3000,
+          type: "warning",
+          color: "warning",
+        })*/
+        Dialog.create({
+          title: _that.$i18n.t('Alert'),
+          message: _that.$i18n.t('Account already exists with same mobile number'),
+          cancel: false,
+          ok: {"label":_that.$i18n.t('Ok'),"color":"primary","unelevated":true,"no-caps":true},
+          persistent: true
+        }).onOk(() => {
+        }).onCancel(() => {
+        })
+        return
+      } else if (peers && peers.length === 2 && peers[0] && peers[0].length > 0 && peers[1] && peers[1].length > 0) {
+        // 标志primaryEndPoint连接成功
+        store.peers = peers[0]
+        store.peerClients = peers[1]
+        console.log('primaryEndPoint connect success')
+        store.state.networkStatus = 'CONNECTED'
+        // 更新本地身份信息
+        let currentDate = new Date()
+        myselfPeerClient.connectPeerId = connectAddress
+        let linkmanPeerId = myselfPeerClient.peerId
+        let linkman = store.state.linkmanMap[linkmanPeerId]
+        let linkmanRecord = null
+        let i = 0
+        for (let peer of store.peerClients) {
+          if (peer.clientId === myselfPeerClient.clientId && peer.peerId === myselfPeerClient.peerId) {
+            myselfPeerClient.lastAccessTime = peer.lastAccessTime
+            if (Date.parse(peer.lastUpdateTime) > Date.parse(myselfPeerClient.lastUpdateTime)) {
+              //myselfPeerClient.mobile = peer.mobile
+              //myselfPeerClient.publicKey = peer.publicKey
+              //myselfPeerClient.privateKey = peer.privateKey
+              myselfPeerClient.visibilitySetting = peer.visibilitySetting
 
-                //myselfPeer.mobile = peer.mobile
-                //myselfPeer.publicKey = peer.publicKey
-                //myselfPeer.privateKey = peer.privateKey
-                myselfPeer.visibilitySetting = peer.visibilitySetting
+              //myselfPeer.mobile = peer.mobile
+              //myselfPeer.publicKey = peer.publicKey
+              //myselfPeer.privateKey = peer.privateKey
+              myselfPeer.visibilitySetting = peer.visibilitySetting
 
-                // 更新对应linkman
-                if (myselfPeerClient.avatar !== peer.avatar || myselfPeerClient.name !== peer.name) {
-                  myselfPeerClient.avatar = peer.avatar
-                  myselfPeerClient.name = peer.name
+              // 更新对应linkman
+              if (myselfPeerClient.avatar !== peer.avatar || myselfPeerClient.name !== peer.name) {
+                myselfPeerClient.avatar = peer.avatar
+                myselfPeerClient.name = peer.name
 
-                  myselfPeer.avatar = peer.avatar
-                  myselfPeer.name = peer.name
-                  
-                  linkman.avatar = peer.avatar
-                  linkman.name = peer.name
-                  linkman.pyName = pinyinUtil.getPinyin(peer.name)
+                myselfPeer.avatar = peer.avatar
+                myselfPeer.name = peer.name
+                
+                linkman.avatar = peer.avatar
+                linkman.name = peer.name
+                linkman.pyName = pinyinUtil.getPinyin(peer.name)
 
-                  linkmanRecord = await contactComponent.get(ContactDataType.LINKMAN, linkman._id)
-                  linkmanRecord.avatar = linkman.avatar
-                  linkmanRecord.name = linkman.name
-                  linkmanRecord.pyName = linkman.pyName
-                }
-              }
-              store.peerClients.splice(i, 1)
-              break
-            } else {
-              i++
-            }
-          }
-          store.state.myselfPeerClient = myselfPeerClient
-          myselfPeer.updateDate = currentDate
-          myselfPeer = await myselfPeerService.update(myselfPeer)
-          myself.myselfPeer = myselfPeer
-          if (linkmanRecord) {
-            store.state.linkmanMap[linkmanPeerId] = linkman
-            await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
-          }    
-          // 判断更新primaryEndPoint的公钥
-          let clientPeerId = myselfPeerClient.peerId
-          let condition = {}
-          condition['ownerPeerId'] = clientPeerId
-          condition['priority'] = { $gt: null }
-          let ret = await peerEndpointService.find(condition, [{ priority: 'asc' }], null, null, null)
-          let myPEPs = ret ? ret : []
-          // 重置MPEP
-          if (ret && ret.length > 0 && store.resetConnectAddress) {
-            await peerEndpointService.delete(ret)
-            myPEPs = []
-          }
-          let maxPriority = myPEPs.length
-          let increment = 1
-          let processedPriority1 = false
-          for (let peer of store.peers) {
-            let ifExists = false
-            for (let myPEP of myPEPs) {
-              if (peer.discoveryAddress === myPEP.address) {
-                ifExists = true
-                if (peer.discoveryAddress === myselfPeerClient.connectPeerId) {
-                  /*if (myPEP.priority !== 1) {
-                    throw new Error('myPEP.priority does not equal to 1!')
-                  }*/
-                  myPEP.lastConnectTime = new Date()
-                }
-                myPEP.peerId = peer.peerId
-                myPEP.publicKey = peer.publicKey
-                myPEP.creditScore = peer.creditScore
-                await peerEndpointService.update(myPEP)
+                linkmanRecord = await contactComponent.get(ContactDataType.LINKMAN, linkman._id)
+                linkmanRecord.avatar = linkman.avatar
+                linkmanRecord.name = linkman.name
+                linkmanRecord.pyName = linkman.pyName
               }
             }
-            if (!ifExists) {
-              let newPeer = new PeerEndpoint()
-              newPeer.ownerPeerId = clientPeerId
-              newPeer.peerId = peer.peerId
-              newPeer.publicKey = peer.publicKey
-              newPeer.address = peer.discoveryAddress
-              newPeer.creditScore = peer.creditScore
-              if (peer.discoveryAddress === myselfPeerClient.connectPeerId) {
-                if (maxPriority !== 0) {
-                  throw new Error('maxPriority does not equal to 0!')
-                }
-                newPeer.priority = 1
-                newPeer.lastConnectTime = new Date()
-                processedPriority1 = true
-              } else {
-                if (maxPriority === 0 && !processedPriority1) {
-                  newPeer.priority = maxPriority + increment + 1
-                } else {
-                  newPeer.priority = maxPriority + increment
-                }
-              }
-              await peerEndpointService.insert(newPeer)
-              increment++
-            }
+            store.peerClients.splice(i, 1)
+            break
+          } else {
+            i++
           }
-          condition = {}
-          condition['ownerPeerId'] = clientPeerId
-          condition['priority'] = { $gt: null }
-          ret = await peerEndpointService.find(condition, [{ priority: 'asc' }], null, null, null)
-          let result = ret ? ret : []
-          console.log(result)
-          await _that.webrtcInit()
-          await store.upgradeVersion('about')
-          await _that.cloudSyncP2pChat()
-          return peers[0]
-        } else {
-          console.log("primaryEndPoint connect failure")
-          return null
         }
-      /*}*/
-      //return null
+        store.state.myselfPeerClient = myselfPeerClient
+        myselfPeer.updateDate = currentDate
+        myselfPeer = await myselfPeerService.update(myselfPeer)
+        myself.myselfPeer = myselfPeer
+        if (linkmanRecord) {
+          store.state.linkmanMap[linkmanPeerId] = linkman
+          await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
+        }    
+        // 判断更新primaryEndPoint的公钥
+        let clientPeerId = myselfPeerClient.peerId
+        let condition = {}
+        condition['ownerPeerId'] = clientPeerId
+        condition['priority'] = { $gt: null }
+        let ret = await peerEndpointService.find(condition, [{ priority: 'asc' }], null, null, null)
+        let myPEPs = ret ? ret : []
+        // 重置MPEP
+        if (ret && ret.length > 0 && store.resetConnectAddress) {
+          await peerEndpointService.delete(ret)
+          myPEPs = []
+        }
+        let maxPriority = myPEPs.length
+        let increment = 1
+        let processedPriority1 = false
+        for (let peer of store.peers) {
+          let ifExists = false
+          for (let myPEP of myPEPs) {
+            if (peer.discoveryAddress === myPEP.address) {
+              ifExists = true
+              if (peer.discoveryAddress === myselfPeerClient.connectPeerId) {
+                /*if (myPEP.priority !== 1) {
+                  throw new Error('myPEP.priority does not equal to 1!')
+                }*/
+                myPEP.lastConnectTime = new Date()
+              }
+              myPEP.peerId = peer.peerId
+              myPEP.publicKey = peer.publicKey
+              myPEP.creditScore = peer.creditScore
+              await peerEndpointService.update(myPEP)
+            }
+          }
+          if (!ifExists) {
+            let newPeer = new PeerEndpoint()
+            newPeer.ownerPeerId = clientPeerId
+            newPeer.peerId = peer.peerId
+            newPeer.publicKey = peer.publicKey
+            newPeer.address = peer.discoveryAddress
+            newPeer.creditScore = peer.creditScore
+            if (peer.discoveryAddress === myselfPeerClient.connectPeerId) {
+              if (maxPriority !== 0) {
+                throw new Error('maxPriority does not equal to 0!')
+              }
+              newPeer.priority = 1
+              newPeer.lastConnectTime = new Date()
+              processedPriority1 = true
+            } else {
+              if (maxPriority === 0 && !processedPriority1) {
+                newPeer.priority = maxPriority + increment + 1
+              } else {
+                newPeer.priority = maxPriority + increment
+              }
+            }
+            await peerEndpointService.insert(newPeer)
+            increment++
+          }
+        }
+        condition = {}
+        condition['ownerPeerId'] = clientPeerId
+        condition['priority'] = { $gt: null }
+        ret = await peerEndpointService.find(condition, [{ priority: 'asc' }], null, null, null)
+        let result = ret ? ret : []
+        console.log(result)
+        await _that.webrtcInit()
+        await store.upgradeVersion('about')
+        await _that.cloudSyncP2pChat()
+        return peers[0]
+      } else {
+        console.log("primaryEndPoint connect failure")
+        return null
+      }
     },
     ifOnlySocketConnected(peerId){
       let webrtcPeers  = webrtcPeerPool.getConnected(peerId)
