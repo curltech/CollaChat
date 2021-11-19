@@ -3,7 +3,6 @@ import jsQR from 'jsqr'
 import jimp from 'jimp'
 import axios from 'axios'
 import https from 'https'
-
 import { CollaUtil, StringUtil, UUID } from 'libcolla'
 import { webrtcPeerPool } from 'libcolla'
 import { signalProtocol } from 'libcolla'
@@ -12,7 +11,6 @@ import { libp2pClientPool, config, peerClientService, p2pPeer, myself, myselfPee
 import { BlockType, MsgType, PayloadType, dataBlockService, DataBlockService, queryValueAction } from 'libcolla'
 import { EntityState } from 'libcolla'
 import { SecurityPayload } from 'libcolla'
-
 import {permissionHelper} from '@/libs/base/colla-mobile'
 import pinyinUtil from '@/libs/base/colla-pinyin'
 import * as CollaConstant from '@/libs/base/colla-constant'
@@ -649,6 +647,9 @@ export default {
       for (let linkman of store.state.linkmans) {
         if(linkman.peerId !== myselfPeerClient.peerId){
           let option = {}
+          option.config = {
+            "iceServers": iceServer
+          }
           if(store.state.currentCallChat && store.state.currentCallChat.streamMap && store.state.currentCallChat.streamMap[linkman.peerId] && store.state.currentCallChat.streamMap[linkman.peerId].pending){
               option.stream = store.state.currentCallChat.streamMap[myselfPeerClient.peerId].stream
               option.stream.getAudioTracks()[0].enable = true
@@ -979,7 +980,7 @@ export default {
         for (let groupMember of groupMembers) {
           let linkman = store.state.linkmanMap[groupMember.memberPeerId ? groupMember.memberPeerId : groupMember]
           if (!linkman || linkman.peerId !== linkman.ownerPeerId) { // 自己除外
-            await store.p2pSend(message,groupMember.memberPeerId ? groupMember.memberPeerId : groupMember)
+            store.p2pSend(message,groupMember.memberPeerId ? groupMember.memberPeerId : groupMember)
             let receive = {
               ownerPeerId: message.ownerPeerId,
               subjectType: message.subjectType,
@@ -4403,7 +4404,6 @@ export default {
     webrtcPeerPool.registEvent('stream', async function(evt) {
       _that.receiveRemoteStream(evt.stream, evt.source.targetPeerId)
     })
-
     // online status monitoring
     deviceComponent.registOnline(async function () {
       console.log('online')
