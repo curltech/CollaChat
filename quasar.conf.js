@@ -148,9 +148,9 @@ module.exports = function (ctx) {
       },
     },*/
     devServer: {
-      port: 8089,
+      port: 8090,
       open: true, // opens browser window automatically
-      host: "localhost",
+      host: "10.0.0.4",
       https: true,
       hotOnly: false
     },

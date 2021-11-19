@@ -284,7 +284,13 @@ export default {
               let turn = false
               setTimeout(()=> {
                 console.log('timeout: ' + new Date())
-                resolve(stun && turn)
+                if (!stun) {
+                  console.log('STUN test failed')
+                }
+                if (!turn) {
+                  console.log('TURN test failed')
+                }
+                resolve(stun/* && turn*/) // TODO: TURN test may fail in WEB mode but actually works
               }, 10000)
               let iceServer = [
                 {
@@ -316,7 +322,7 @@ export default {
                 }    
                 // If a relay candidate was found, notify that the TURN server works!
                 if (e.candidate.type === 'relay') {
-                  console.log('The TURN server is reachable !')
+                  console.log('The TURN server is reachable!')
                   turn = true
                   if (stun && turn) {
                     resolve(true)
@@ -336,7 +342,6 @@ export default {
               })
             })
             if (!stunTurn) {
-              console.log('stunTurn test failed:' + connectAddress)
               _that.connectArray.splice(i, 1)
             } else {
               break
