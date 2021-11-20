@@ -276,19 +276,19 @@ export default {
           // test STUN/TURN
           for (let i = _that.connectArray.length - 1; i >= 0; i--) {
             let connectAddress = _that.connectArray[i].address.match(/\/dns4\/(\S*)\/tcp/)[1]
-            console.log(i + ' test start: ' + connectAddress + ', ' + new Date())
+            console.log(i + ' STUNTURN test start: ' + connectAddress + ', ' + new Date())
             let stunTurn = await new Promise((resolve, reject) => {
               let stun = false
               let turn = false
-              setTimeout(()=> {
+              setTimeout(async ()=> {
                 console.log('timeout: ' + new Date())
                 if (!stun) {
-                  console.log('STUN test failed')
+                  await logService.log('STUN test failed: ' + connectAddress, 'STUNTURN test', 'error')
                 }
                 if (!turn) {
-                  console.log('TURN test failed')
+                  await logService.log('TURN test failed: ' + connectAddress, 'STUNTURN test', 'error')
                 }
-                resolve(stun/* && turn*/) // TODO: TURN test may fail in WEB mode but actually works
+                resolve(stun) // TODO: TURN test may fail but actually works
               }, 10000)
               let iceServer = [
                 {
@@ -4176,11 +4176,11 @@ export default {
         if(AudioToggle){
             AudioToggle.setAudioMode(AudioToggle.EARPIECE);
         }
-        cordova.plugins.backgroundMode.enable()
+        /*cordova.plugins.backgroundMode.enable()
         cordova.plugins.backgroundMode.on('activate', function() {
           cordova.plugins.backgroundMode.disableWebViewOptimizations()
           cordova.plugins.backgroundMode.disableBatteryOptimizations()
-        })
+        })*/
         document.addEventListener("pause", function () {
             if(cordova.plugins.notification){
                 cordova.plugins.notification.foreground = false
