@@ -349,7 +349,7 @@ export default {
           await _that.buildSocket()
         }
       } catch (e) {
-        await logService.log(e.stack, 'setupSocketError', 'error')
+        await logService.log(e, 'setupSocketError', 'error')
       }
     },
     async buildSocket() {
@@ -1985,7 +1985,7 @@ export default {
               await chatAction.chat(null, newPayload, clientPeerId)
             }
           } catch (e) {
-            await logService.log(e.stack, 'restorePostError', 'error')
+            await logService.log(e, 'restorePostError', 'error')
             Dialog.create({
               title: _that.$i18n.t('Alert'),
               message: _that.$i18n.t('This function uses self-signed ssl certificate, when you first time use it, a Not secure error page will be prompted, please click Advanced button and Proceed to ... link.'),
@@ -3038,7 +3038,7 @@ export default {
         dataBlock.payload = message // for webrtc send
         await p2pChatAction.chat(null, dataBlock, peerId)
       }catch(e){
-          await logService.log(e.stack, 'p2pSendError', 'error')
+          await logService.log(e, 'p2pSendError', 'error')
       }
     },
     async getSignalSession(peerId) {
@@ -3220,7 +3220,7 @@ export default {
               }
             }
           } catch (e) {
-            await logService.log(e.stack, 'acceptMigrateError', 'error')
+            await logService.log(e, 'acceptMigrateError', 'error')
             Dialog.create({
               title: _that.$i18n.t('Alert'),
               message: _that.$i18n.t('This function uses self-signed ssl certificate, when you first time use it, a Not secure error page will be prompted, please click Advanced button and Proceed to ... link.'),
@@ -3286,7 +3286,7 @@ export default {
           }
         }
       } catch (e) {
-        await logService.log(e.stack, 'acceptBackupError', 'error')
+        await logService.log(e, 'acceptBackupError', 'error')
         url = _that.backupUrl + '?language=' + _that.$i18n.locale
         if (store.ios === true) {
           let inAppBrowser = inAppBrowserComponent.open(url, '_system', 'location=no')

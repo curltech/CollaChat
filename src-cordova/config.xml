@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="io.curltech.colla" version="0.2.65" xmlns="http://www.w3.org/ns/widgets" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="io.curltech.colla" version="0.2.66" xmlns="http://www.w3.org/ns/widgets" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>Colla</name>
     <description>CollaChat</description>
     <author email="hujs@colla.cc" href="https://curltech.io">
@@ -107,13 +107,11 @@
     <allow-navigation href="about:*" />
     <preference name="KeepRunning" value="true" />
     <preference name="SplashMaintainAspectRatio" value="true" />
-    <plugin name="cordova-plugin-whitelist" spec="1" />
     <plugin name="cordova-plugin-media" spec="~5.0.3" />
     <plugin name="cordova-plugin-media-capture" spec="~3.0.3" />
     <plugin name="cordova-plugin-camera" spec="^4.1.0" />
     <plugin name="cordova-plugin-device" spec="~2.0.3" />
     <plugin name="cordova-plugin-contacts" spec="~3.0.1" />
-    <plugin name="cordova-plugin-geolocation" spec="~4.0.2" />
     <plugin name="cordova-plugin-dialogs" spec="~2.0.2" />
     <plugin name="cordova-plugin-battery-status" spec="~2.0.3" />
     <plugin name="cordova-plugin-network-information" spec="~2.0.2" />

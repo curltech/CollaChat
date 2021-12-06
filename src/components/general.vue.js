@@ -79,19 +79,54 @@ export default {
       this.restoreDialog = false
     },
     changeLanguage: async function () {
-      let currentDate = new Date()
-      let myselfPeerClient = myself.myselfPeerClient
-      myselfPeerClient.language = this.language
-      this.$store.state.myselfPeerClient = myselfPeerClient
+      this.$q.loading.show()
+      try {
+        let currentDate = new Date()
+        let myselfPeerClient = myself.myselfPeerClient
+        myselfPeerClient.language = this.language
+        this.$store.state.myselfPeerClient = myselfPeerClient
 
-      let peerProfile = myself.peerProfile
-      peerProfile.language = this.language
-      peerProfile.updateDate = currentDate
-      peerProfile = await peerProfileService.update(peerProfile)
-      myself.peerProfile = peerProfile
+        let peerProfile = myself.peerProfile
+        peerProfile.language = this.language
+        peerProfile.updateDate = currentDate
+        peerProfile = await peerProfileService.update(peerProfile)
+        myself.peerProfile = peerProfile
 
-      this.$i18n.locale = this.language
-      this.lightDarkModeOptions = CollaConstant.lightDarkModeOptionsISO[this.language]
+        this.$i18n.locale = this.language
+        this.lightDarkModeOptions = CollaConstant.lightDarkModeOptionsISO[this.language]
+
+        let backupMobile = null
+        if (myselfPeerClient.visibilitySetting && myselfPeerClient.visibilitySetting.substring(1, 2) === 'N') {
+          backupMobile = myselfPeerClient.mobile
+          myselfPeerClient.mobile = ''
+          myselfPeer.mobile = ''
+        }
+        let result = await peerClientService.putPeerClient(null, 'Up')
+        if (myselfPeerClient.visibilitySetting && myselfPeerClient.visibilitySetting.substring(1, 2) === 'N') {
+          myselfPeerClient.mobile = backupMobile
+          myselfPeer.mobile = backupMobile
+        }
+        console.log(result)
+        if (result === 'OK') {
+          this.$q.notify({
+            message: this.$i18n.t("Change language successfully"),
+            timeout: 3000,
+            type: "info",
+            color: "info"
+          })
+        } else {
+          this.$q.notify({
+            message: this.$i18n.t("Change language failed"),
+            timeout: 3000,
+            type: "warning",
+            color: "warning"
+          })
+        }
+      } catch (error) {
+        console.error(error)
+      } finally {
+        this.$q.loading.hide()
+      }
     },
     changeLightDarkMode: async function () {
       let currentDate = new Date()

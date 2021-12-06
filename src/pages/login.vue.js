@@ -201,8 +201,8 @@ export default {
             color: "warning",
           })
         } else {
-          alert(e.stack)
-          await logService.log(e.stack, 'loginError', 'error')
+          alert(e)
+          await logService.log(e, 'loginError', 'error')
         }
         return
       }
@@ -221,6 +221,7 @@ export default {
       store.state.myselfPeerClient = myself.myselfPeerClient
       // 登录后初始化设置
       if (myself.peerProfile) {
+        myself.peerProfile.deviceToken = store.deviceToken
         if (myself.peerProfile.language) {
           _that.language = myself.peerProfile.language
         }
@@ -341,8 +342,8 @@ export default {
             color: "warning",
           })
         } else {
-          alert(e.stack)
-          await logService.log(e.stack, 'importIDError', 'error')
+          alert(e)
+          await logService.log(e, 'importIDError', 'error')
         }
       }
     },
@@ -401,8 +402,8 @@ export default {
             color: "warning",
           })
         } else {
-          alert(e.stack)
-          await logService.log(e.stack, 'registerError', 'error')
+          alert(e)
+          await logService.log(e, 'registerError', 'error')
         }
         return
       }
@@ -471,7 +472,7 @@ export default {
           })
         }
       } catch (e) {
-        console.log("[Scan.toggleLight.error] " + JSON.stringify(e))
+        console.error("[Scan.toggleLight.error] " + JSON.stringify(e))
         return
       }
       this.light = !this.light
@@ -555,7 +556,7 @@ export default {
             }
           })
         } catch (e) {
-          console.log("[Scan.scanOn.error] " + JSON.stringify(e))
+          console.error("[Scan.scanOn.error] " + JSON.stringify(e))
         }
       } else {
         try {
@@ -566,7 +567,7 @@ export default {
             console.log("[Scan.destroy.status] " + JSON.stringify(status))
           })
         } catch (e) {
-          console.log("[Scan.scanOff.error] " + JSON.stringify(e))
+          console.error("[Scan.scanOff.error] " + JSON.stringify(e))
         }
       }
       store.state.ifScan = ifScan
@@ -619,7 +620,7 @@ export default {
     upgradeVersion(flag) {
       let _that = this
       let store = _that.$store
-      store.currentVersion = '0.2.65'
+      store.currentVersion = '0.2.66'
       store.mandatory = false
       if (_that.versionHistory && _that.versionHistory.length > 0) {
         let no = 1
@@ -696,16 +697,14 @@ export default {
       store.ifMobile = function () {
         return window.device && (window.device.platform === 'Android' || window.device.platform === 'iOS')
       }
-      // 查询本地身份记录
-      let condition = {}
-      condition['status'] = EntityStatus[EntityStatus.Effective]
-      condition['updateDate'] = { $gt: null }
-      let pcs = await myselfPeerService.find(condition, [{ updateDate: 'desc' }], null)
-      let myselfPeer = null
+      config.appParams.clientType = window.device ? deviceComponent.getDeviceProperty('manufacturer') + '(' + deviceComponent.getDeviceProperty('model') + ')' : 'PC'
+      config.appParams.clientDevice = store.ifMobile() ? ClientDevice.MOBILE : ClientDevice.DESKTOP
       store.chrome = _that.$q.platform.is.chrome
       store.safari = _that.$q.platform.is.safari
       if (window.device) {
         document.addEventListener('deviceready', async function () {
+          store.ios = _that.$q.platform.is.ios
+          store.android = _that.$q.platform.is.android
           // Just for iOS devices.
           if (window.device.platform === 'iOS') {
             let cordova = window.cordova
@@ -747,13 +746,17 @@ export default {
             }
           }
           if (simPermission) {
-            let sim = await simComponent.getSimInfo()
-            console.info(sim)
-            if (sim && sim.countryCode) {
-              countryCode = sim.countryCode
-              if (sim.phoneNumber) {
-                phoneNumber = sim.phoneNumber
+            try {
+              let sim = await simComponent.getSimInfo()
+              console.info(sim)
+              if (sim && sim.countryCode) {
+                countryCode = sim.countryCode
+                if (sim.phoneNumber) {
+                  phoneNumber = sim.phoneNumber
+                }
               }
+            } catch (e) {
+              await logService.log(e, 'getSimInfoError', 'error')
             }
           }
           if (countryCode) {
@@ -780,10 +783,91 @@ export default {
               }
             }
           }
+          
+          if (store.ios === true) {
+            // havesource/cordova-plugin-push
+            if (PushNotification) {
+              const push = PushNotification.init({
+                android: {
+                },
+                browser: {
+                    pushServiceURL: 'http://push.api.phonegap.com/v1/push'
+                },
+                ios: {
+                  alert: "true",
+                  badge: "true",
+                  sound: "true"
+                },
+                windows: {}
+              })
+              push.on('registration', (data) => {
+                // data.registrationId
+                console.log('push-registration:')
+                console.log(data)
+                if (data) {
+                  store.deviceToken = data.registrationId
+                }
+              })
+              push.on('notification', (data) => {
+                // data.message,
+                // data.title,
+                // data.count,
+                // data.sound,
+                // data.image,
+                // data.additionalData
+                console.log('push-notification:')
+                console.log(data)
+              })
+              push.on('error', (e) => {
+                // e.message
+                console.error('push-error:')
+                console.error(e)
+              })
+            }
+          } else if (store.android === true) {
+            let clientType = config.appParams.clientType
+            let prefixArr = []
+            if (clientType) {
+              prefixArr = clientType.split('(')
+            }
+            // cordova-plugin-hms-push
+            if (prefixArr[0] === 'HUAWEI') {
+              if (HmsPush) {
+                HmsPush.init()
+                HmsPush.getToken()
+                .then((result) => {
+                  console.log("hms getToken result", result)
+                  store.deviceToken = result
+                })
+                .catch((error) => {
+                  console.log("hms getToken error", error)
+                })
+                HmsPushEvent.onTokenReceived((ret) => {
+                  if (ret) {
+                    console.log('hms onTokenReceived', ret.token)
+                    store.deviceToken = ret.token
+                  }
+                })
+              }
+            } else if (prefixArr[0] === 'Xiaomi') {
+
+            } else if (prefixArr[0] === 'OPPO') {
+
+            } else if (prefixArr[0] === 'VIVO') {
+
+            } else {
+              // GCM
+              // URORA
+            }
+          }
         })
-        store.ios = _that.$q.platform.is.ios
-        store.android = _that.$q.platform.is.android
       }
+      // 查询本地身份记录
+      let myselfPeer = null
+      let condition = {}
+      condition['status'] = EntityStatus[EntityStatus.Effective]
+      condition['updateDate'] = { $gt: null }
+      let pcs = await myselfPeerService.find(condition, [{ updateDate: 'desc' }], null)
       if (!myselfPeer && pcs && pcs.length > 0) {
         myselfPeer = pcs[0]
       }
@@ -817,7 +901,7 @@ export default {
             _that.loginData.mobile_ = mobileObject.getNationalNumber() + ''
             console.log('mobile2:' + _that.loginData.mobile_)
           } catch (e) {
-            console.log(e)
+            console.error(e)
           }
         }
       }
@@ -836,6 +920,7 @@ export default {
       } else {
         _that.language = 'en-us'
       }
+      config.appParams.language = _that.language
       if (!store.defaultActiveAvatar) {
         //store.defaultActiveAvatar = defaultActiveAvatar // ios does not support well
         console.log('defaultActiveAvatar:' + defaultActiveAvatar)
@@ -855,9 +940,6 @@ export default {
       }
       store.connectAddressOptions = _that.connectAddressOptions
       store.getAddressLabel = _that.getAddressLabel
-      config.appParams.clientType = window.device ? deviceComponent.getDeviceProperty('manufacturer') + '(' + deviceComponent.getDeviceProperty('model') + ')' : 'PC'
-      config.appParams.clientDevice = store.ifMobile() ? ClientDevice.MOBILE : ClientDevice.DESKTOP
-      config.appParams.language = _that.language
       store.upgradeVersion = _that.upgradeVersion
       store.versionUpdate = _that.versionUpdate
       store.latestVersion = null
@@ -892,7 +974,7 @@ export default {
         try {
           isPhoneNumberValid = MobileNumberUtil.isPhoneNumberValid(mobile_, MobileNumberUtil.getRegionCodeForCountryCode(code_))
         } catch (e) {
-          alert(e.stack)
+          alert(e)
         }
         if (!isPhoneNumberValid) {
           alert('InvalidMobileNumber')
@@ -911,21 +993,21 @@ export default {
           alert(JSON.stringify(myselfPeer))
         }
       } catch (e) {
-        alert(e.stack)
+        alert(e)
       }
     },
     async testDropDB() {
       try {
         await pounchDb.drop('blc_myselfPeer')
       } catch (e) {
-        alert(e.stack)
+        alert(e)
       }
     },
     async testRecreateDB() {
       try {
         await pounchDb.create('blc_myselfPeer', ['endDate', 'peerId', 'mobile', 'status', 'updateDate'], null)
       } catch (e) {
-        alert(e.stack)
+        alert(e)
       }
     }
   },

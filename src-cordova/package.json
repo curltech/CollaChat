@@ -1,7 +1,7 @@
 {
   "name": "io.curltech.colla",
   "displayName": "Colla",
-  "version": "0.2.65",
+  "version": "0.2.66",
   "description": "CollaChat",
   "leadMaintainer": "hujs888 <hujs@colla.cc>",
   "contributors": [
@@ -16,15 +16,15 @@
   ],
   "license": "AGPL-3.0-or-later",
   "dependencies": {
+    "@havesource/cordova-plugin-push": "^3.0.0",
     "cordova-httpd-curltech": "^0.9.2-17",
     "cordova-plugin-add-swift-support": "^2.0.2",
     "cordova-plugin-audio-recorder-api-curltech": "^0.0.6",
     "cordova-plugin-audioinput-curltech": "^1.0.2",
+    "cordova-plugin-audiotoggle": "^1.0.3",
     "cordova-plugin-backbutton": "^0.3.0",
-    "cordova-plugin-background-mode": "^0.7.3",
     "cordova-plugin-badge": "^0.8.8",
     "cordova-plugin-battery-status": "~2.0.3",
-    "cordova-plugin-calendar": "^5.1.5",
     "cordova-plugin-camera": "^4.1.0",
     "cordova-plugin-canvas2image-updated": "^1.2.0",
     "cordova-plugin-compat": "^1.2.0",
@@ -32,11 +32,9 @@
     "cordova-plugin-device": "~2.0.3",
     "cordova-plugin-dialogs": "~2.0.2",
     "cordova-plugin-file": "^6.0.2",
-    "cordova-plugin-fingerprint-aio": "^3.0.1",
-    "cordova-plugin-geolocation": "~4.0.2",
     "cordova-plugin-inappbrowser": "~4.1.0",
     "cordova-plugin-ionic-webview-curltech": "^5.0.0",
-    "cordova-plugin-iosrtc": "^6.0.21",
+    "cordova-plugin-iosrtc": "^8.0.0",
     "cordova-plugin-local-notification": "^0.9.0-beta.2",
     "cordova-plugin-media": "^5.0.3",
     "cordova-plugin-media-capture": "^3.0.3",
@@ -47,27 +45,23 @@
     "cordova-plugin-qrscanner": "^3.0.1",
     "cordova-plugin-screen-orientation": "~3.0.2",
     "cordova-plugin-sim": "^1.3.3",
-    "cordova-plugin-sms": "~1.0.5",
-    "cordova-plugin-sms-receive": "^1.0.2",
     "cordova-plugin-splashscreen": "~5.0.3",
     "cordova-plugin-statusbar": "~2.4.3",
     "cordova-plugin-vibration": "~3.1.1",
-    "cordova-plugin-whitelist": "^1.3.4",
     "es6-promise-plugin": "^4.2.2",
     "pouchdb-adapter-cordova-sqlite": "^2.0.7",
-    "sqli-cordova-disk-space-plugin": "^1.0.3",
-    "cordova-plugin-audiotoggle": "^1.0.3"
+    "sqli-cordova-disk-space-plugin": "^1.0.3"
   },
   "devDependencies": {
-    "cordova-android": "^8.1.0",
-    "cordova-ios": "^6.1.1",
+    "@hmscore/cordova-plugin-hms-push": "^5.3.0-305",
+    "cordova-android": "^10.1.1",
+    "cordova-ios": "^6.2.0",
     "cordova-plugin-android-permissions": "^1.1.2",
-    "cordova-sms-plugin": "^1.0.0",
+    "cordova-plugin-androidx": "^3.0.0",
     "cordova-sqlite-storage": "^5.1.0"
   },
   "cordova": {
     "plugins": {
-      "cordova-plugin-whitelist": {},
       "cordova-plugin-media": {
         "KEEP_AVAUDIOSESSION_ALWAYS_ACTIVE": "NO"
       },
@@ -77,8 +71,6 @@
       },
       "cordova-plugin-device": {},
       "cordova-plugin-contacts": {},
-      "cordova-plugin-geolocation": {},
-      "cordova-plugin-sms": {},
       "cordova-plugin-dialogs": {},
       "cordova-plugin-battery-status": {},
       "cordova-plugin-inappbrowser": {},
@@ -88,26 +80,17 @@
       "cordova-plugin-statusbar": {},
       "cordova-plugin-vibration": {},
       "cordova-plugin-qrscanner": {},
-      "cordova-plugin-sms-receive": {},
       "cordova-plugin-add-swift-support": {},
-      "cordova-plugin-fingerprint-aio": {
-        "FACEID_USAGE_DESCRIPTION": " "
-      },
       "cordova-plugin-canvas2image-updated": {
         "PHOTOLIBRARY_USAGE_DESCRIPTION": " ",
         "PHOTOLIBRARY_ADD_USAGE_DESCRIPTION": " "
       },
       "cordova-plugin-sim": {},
-      "cordova-sms-plugin": {},
       "cordova-plugin-audio-recorder-api-curltech": {
         "MICROPHONE_USAGE_DESCRIPTION": " "
       },
       "cordova-plugin-audioinput-curltech": {},
       "cordova-plugin-local-notification": {},
-      "cordova-plugin-calendar": {
-        "CALENDAR_USAGE_DESCRIPTION": " ",
-        "CONTACTS_USAGE_DESCRIPTION": " "
-      },
       "cordova-sqlite-storage": {},
       "cordova-plugin-file": {},
       "cordova-plugin-photo-library-wkwebview-curltech": {
@@ -122,17 +105,20 @@
       "sqli-cordova-disk-space-plugin": {},
       "cordova-plugin-photokandy-video-thumbnail": {},
       "cordova-plugin-badge": {},
-      "cordova-plugin-background-mode": {},
       "cordova-plugin-backbutton": {},
       "cordova-plugin-android-permissions": {},
       "cordova-plugin-compat": {},
       "com.rjfun.cordova.httpd-curltech": {},
       "cordova-plugin-ionic-webview-curltech": {},
-      "cordova-plugin-audiotoggle": {}
+      "cordova-plugin-audiotoggle": {},
+      "@havesource/cordova-plugin-push": {
+        "ANDROIDX_CORE_VERSION": "1.6.+",
+        "FCM_VERSION": "18.+"
+      },
+      "cordova-plugin-hms-push": {}
     },
     "platforms": [
       "ios",
-      "android",
       "electron"
     ]
   }
