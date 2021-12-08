@@ -274,6 +274,7 @@ export default {
           CollaUtil.sortByKey(_that.connectArray, 'connectTime', 'desc')
           console.log(_that.connectArray)
           // test STUN/TURN
+          let connectArrayBackup = CollaUtil.clone(_that.connectArray)
           for (let i = _that.connectArray.length - 1; i >= 0; i--) {
             let connectAddress = _that.connectArray[i].address.match(/\/dns4\/(\S*)\/tcp/)[1]
             console.log(i + ' STUNTURN test start: ' + connectAddress + ', ' + new Date())
@@ -344,6 +345,10 @@ export default {
             } else {
               break
             }
+          }
+          if (_that.connectArray.length === 0) {
+            console.warn('STUN/TURN test all failed, restore connectArray')
+            _that.connectArray = connectArrayBackup
           }
           console.log(_that.connectArray)
           await _that.buildSocket()

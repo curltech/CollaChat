@@ -1,7 +1,7 @@
 {
   "name": "io.curltech.colla",
   "displayName": "Colla",
-  "version": "0.2.66",
+  "version": "0.2.67",
   "description": "CollaChat",
   "leadMaintainer": "hujs888 <hujs@colla.cc>",
   "contributors": [
@@ -58,6 +58,8 @@
     "cordova-ios": "^6.2.0",
     "cordova-plugin-android-permissions": "^1.1.2",
     "cordova-plugin-androidx": "^3.0.0",
+    "cordova-plugin-oppo-push": "^1.0.0",
+    "cordova-plugin-xiaomi-push": "^1.0.0",
     "cordova-sqlite-storage": "^5.1.0"
   },
   "cordova": {
@@ -115,10 +117,19 @@
         "ANDROIDX_CORE_VERSION": "1.6.+",
         "FCM_VERSION": "18.+"
       },
-      "cordova-plugin-hms-push": {}
+      "cordova-plugin-hms-push": {},
+      "cordova-plugin-xiaomi-push": {
+        "APP_KEY": "5262011854084",
+        "APP_ID": "2882303761520118084"
+      },
+      "cordova-plugin-oppo-push": {
+        "APP_KEY": "ef7f033bed5347ee98222743d0247394",
+        "APP_SECRET": "b2e6ccf1ccca4f909c1c50bad1447dd3"
+      }
     },
     "platforms": [
       "ios",
+      "android",
       "electron"
     ]
   }

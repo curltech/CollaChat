@@ -620,7 +620,7 @@ export default {
     upgradeVersion(flag) {
       let _that = this
       let store = _that.$store
-      store.currentVersion = '0.2.66'
+      store.currentVersion = '0.2.67'
       store.mandatory = false
       if (_that.versionHistory && _that.versionHistory.length > 0) {
         let no = 1
@@ -795,15 +795,14 @@ export default {
                 },
                 ios: {
                   alert: "true",
-                  badge: "true",
+                  badge: "false",
                   sound: "true"
                 },
                 windows: {}
               })
               push.on('registration', (data) => {
                 // data.registrationId
-                console.log('push-registration:')
-                console.log(data)
+                console.log('push-registration', data)
                 if (data) {
                   store.deviceToken = data.registrationId
                 }
@@ -815,13 +814,11 @@ export default {
                 // data.sound,
                 // data.image,
                 // data.additionalData
-                console.log('push-notification:')
-                console.log(data)
+                console.log('push-notification', data)
               })
               push.on('error', (e) => {
                 // e.message
-                console.error('push-error:')
-                console.error(e)
+                console.error('push-error', e)
               })
             }
           } else if (store.android === true) {
@@ -840,7 +837,7 @@ export default {
                   store.deviceToken = result
                 })
                 .catch((error) => {
-                  console.log("hms getToken error", error)
+                  console.error("hms getToken error", error)
                 })
                 HmsPushEvent.onTokenReceived((ret) => {
                   if (ret) {
@@ -850,9 +847,33 @@ export default {
                 })
               }
             } else if (prefixArr[0] === 'Xiaomi') {
-
+              xiaomiPush.register(function(token) {
+                console.log('Xiaomi push register token', token)
+                store.deviceToken = token
+              }, function(err) {
+                console.error('Xiaomi push register error', err)
+              }, [])
+              xiaomiPush.onNewToken(function(token) {
+                console.log('Xiaomi push onNewToken token', token) // 会多次接收到token
+                store.deviceToken = token
+              })
+              document.addEventListener("messageReceived", function(result) {
+                console.log('Xiaomi push messageReceived', result)
+              }, false)
             } else if (prefixArr[0] === 'OPPO') {
-
+              oppoPush.register(function(token) {
+                console.log('OPPO push register token', token)
+                store.deviceToken = token
+              }, function(err) {
+                console.error('OPPO push register error', err)
+              }, [])
+              oppoPush.onNewToken(function(token) {
+                console.log('OPPO push onNewToken token', token) // 会多次接收到token
+                store.deviceToken = token
+              })
+              document.addEventListener("messageReceived", function(result) {
+                console.log('OPPO push messageReceived', result)
+              }, false)
             } else if (prefixArr[0] === 'VIVO') {
 
             } else {
