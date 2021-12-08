@@ -83,7 +83,6 @@ export default {
       selectFocusMemberFilter: null,
       focusGroupMemberDialog: false,
       emojiShow: false,
-      textVal: "",
       slide: 'slide1',
       keyboardMode: true,
       //auidoTouch
@@ -441,16 +440,17 @@ export default {
     },
     selectEmoji(emoji) {
       let _that = this
+      let store = _that.$store
       let editor = _that.$refs.editor
       let emojiVal = emoji.data
       let selectionStart = editor.selectionStart
       if (selectionStart == null) {
         selectionStart = 0
       }
-      if (selectionStart == _that.textVal.length - 1) {
-        _that.textVal = _that.textVal.slice(0, selectionStart) + emojiVal
+      if (selectionStart == store.state.currentChat.tempText.length - 1) {
+        store.state.currentChat.tempText = store.state.currentChat.tempText.slice(0, selectionStart) + emojiVal
       } else {
-        _that.textVal = _that.textVal.slice(0, selectionStart) + emojiVal + _that.textVal.slice(selectionStart, _that.textVal.length - 1)
+        store.state.currentChat.tempText = store.state.currentChat.tempText.slice(0, selectionStart) + emojiVal + store.state.currentChat.tempText.slice(selectionStart, store.state.currentChat.tempText.length - 1)
       }
       _that.emojiShow = false
     },
@@ -463,10 +463,10 @@ export default {
       if (selectionStart == null) {
         selectionStart = 0
       }
-      if (selectionStart == _that.textVal.length - 1) {
-        _that.textVal = _that.textVal.slice(0, selectionStart) + '@' + alias + " "
+      if (selectionStart == store.state.currentChat.tempText.length - 1) {
+        store.state.currentChat.tempText = store.state.currentChat.tempText.slice(0, selectionStart) + '@' + alias + " "
       } else {
-        _that.textVal = _that.textVal.slice(0, selectionStart) + '@' + alias + " " + _that.textVal.slice(selectionStart, _that.textVal.length - 1)
+        store.state.currentChat.tempText = store.state.currentChat.tempText.slice(0, selectionStart) + '@' + alias + " " + store.state.currentChat.tempText.slice(selectionStart, store.state.currentChat.tempText.length - 1)
       }
       _that.focusGroupMemberDialog = false
     },
@@ -972,9 +972,9 @@ export default {
       let _that = this
       let store = _that.$store
       let editor = _that.$refs.editor
-      let editorContent = _that.textVal
+      let editorContent = store.state.currentChat.tempText
       if (!editorContent || _that.sending) {
-        _that.textVal = ''
+        store.state.currentChat.tempText = ''
         setTimeout(function () {
           _that.sending = false
         },100)
@@ -983,7 +983,7 @@ export default {
       _that.sending = true
       editorContent = editorContent.replace(/^\s*|\s*$/g, "");
       if (!editorContent) {
-        _that.textVal = ''
+        store.state.currentChat.tempText = ''
         return;
       }
       let message = {
@@ -992,8 +992,8 @@ export default {
         messageType: P2pChatMessageType.CHAT_LINKMAN
       }
 
-      await store.sendChatMessage(store.state.currentChat, message)
-      _that.textVal = ''
+      store.sendChatMessage(store.state.currentChat, message)
+      store.state.currentChat.tempText = ''
       _that.sending = false
       editor.focus();
       _that.$nextTick(() => {
@@ -1353,7 +1353,7 @@ export default {
       let _that = this
       let store = _that.$store
       let messageText = `「 ${store.state.linkmanMap[message.senderPeerId].name}:${message.content} 」 - - - - - - - - - - - - - -\n`
-      _that.textVal = messageText
+      store.state.currentChat.tempText = messageText
       _that.$refs.editor.focus()
     },
       //已不在接收已读回执

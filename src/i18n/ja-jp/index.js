@@ -209,6 +209,7 @@
   "Recall Time Limit":"制限時間を思い出してください",
   "Recall Alert":"リコールアラート",
   "This message has been recalled":"このメッセージはリコールされました",
+  "You were mentioned":"あなたは言及されました",
 
   //Developer
   "Developer": "開発者",

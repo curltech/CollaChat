@@ -209,7 +209,7 @@
   "Recall Time Limit":"召回時間限制",
   "Recall Alert":"召回警報",
   "This message has been recalled":"此消息已被撤回",
-
+  "You were mentioned":"有人@你",
   // Developer
   "Developer": "開發者",
   // Call

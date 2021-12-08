@@ -209,6 +209,7 @@
   "Recall Time Limit":"리콜 시간 제한",
   "Recall Alert":"리콜 경고",
   "This message has been recalled":"이 메시지는 회수되었습니다.",
+  "You were mentioned":"당신이 언급되었습니다",
 
   // Developer
   "Developer": "개발 자",

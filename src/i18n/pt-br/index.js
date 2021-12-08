@@ -78,6 +78,7 @@ export default {
   "Recall Time Limit":"Limite de tempo de rechamada",
   "Recall Alert":"Alerta de Rechamada",
   "This message has been recalled":"Esta mensagem foi recuperada",
+  "You were mentioned":"Você foi mencionado",
   // Outros
   Other: "Outro",
   System: "Sistema",
