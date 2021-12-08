@@ -657,6 +657,7 @@ export default {
               console.log('index.vue -add stream')
           }
           webrtcPeerPool.create(linkman.peerId, option)
+          linkman.lastWebrtcRequestTime = new Date().getTime()
         }
       }
     },
@@ -3023,10 +3024,10 @@ export default {
         } else if (message.messageType === P2pChatMessageType.SYNC_LINKMAN_INFO) {
 
         }
-        message = JSON.stringify(message)
+        let messageString = JSON.stringify(message)
         let createTimestamp = new Date().getTime()
         let expireDate = new Date().getTime() + 3600*24*10 // 10 days
-        let payload = { payload: message, metadata: null, expireDate: expireDate }
+        let payload = { payload: messageString, metadata: null, expireDate: expireDate }
         let dataBlock = DataBlockService.create(blockId, null, peerId, BlockType.P2pChat, createTimestamp, payload, [])
         await dataBlockService.encrypt(dataBlock)
         let dataBlocks = await DataBlockService.slice(dataBlock)
@@ -3035,8 +3036,18 @@ export default {
           return
         }
         dataBlock = dataBlocks[0]
-        dataBlock.payload = message // for webrtc send
+        dataBlock.payload = messageString // for webrtc send
         await p2pChatAction.chat(null, dataBlock, peerId)
+        //socket已连接，webrtc未连接且最后连接时间超过1分钟
+        let linkman = store.state.linkmanMap[peerId]
+        if( linkman && store.state.networkStatus === 'CONNECTED' && linkman.activeStatus === ActiveStatus.DOWN && (!linkman.lastWebrtcRequestTime || (linkman.lastWebrtcRequestTime &&(createTimestamp - linkman.lastWebrtcRequestTime)/1000 > 60))&& message.messageType !== P2pChatMessageType.CALL_REQUEST){
+          let option = {}
+          option.config = {
+            "iceServers": config.appParams.iceServer[0]
+          }
+          webrtcPeerPool.create(linkman.peerId, option)
+          linkman.lastWebrtcRequestTime = createTimestamp
+        }
       }catch(e){
           await logService.log(e, 'p2pSendError', 'error')
       }
@@ -4273,7 +4284,7 @@ export default {
       store.collectionWorkerEnabler = false
     }
     store.useNativeAndroid = false // 是否使用Android原生拍照、拍摄、相册等功能
-
+    store.displayConnected = true //是否展示好友在线状态
     let linkmanRequestDBItems = await contactComponent.loadLinkmanRequest({
       ownerPeerId: myself.myselfPeerClient.peerId,
       requestType: RequestType.ADD_LINKMAN_INDIVIDUAL,

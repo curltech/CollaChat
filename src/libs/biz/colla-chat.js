@@ -513,7 +513,7 @@ export let ChatMessageStatus = {
        }
        await this._save('message', entities, ['mediaProperty','mergeMessages'], parent)
      } else if (ChatDataType.CHAT == dataType) {
-       await this._save('chat', entities, ['messages', 'stream', 'streamMap', 'audio','focusedMessage'], parent)
+       await this._save('chat', entities, ['messages', 'stream', 'streamMap', 'audio','focusedMessage','tempText'], parent)
      } else if (ChatDataType.RECEIVE == dataType) {
        await this._save('receive', entities, null, parent)
      } else if (ChatDataType.ATTACH == dataType) {
