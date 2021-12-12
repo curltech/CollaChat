@@ -59,6 +59,14 @@ export default {
         try {
           await myselfPeerService.changePassword(_that.changePasswordData.oldPassword, _that.changePasswordData.newPassword)
           store.state.myselfPeerClient = myself.myselfPeerClient
+          // update password for mobile device
+          if (this.$store.ifMobile()) {
+            if (myself.myselfPeer.loginStatus === 'Y') {
+              myself.myselfPeer.updateDate = new Date().getTime()
+              myself.myselfPeer.password = openpgp.encodeBase64(myself.password)
+              await myselfPeerService.update(myself.myselfPeer)
+            }
+          }          
         } catch (e) {
           console.error(e)
           if (e.message === 'WrongPassword') {

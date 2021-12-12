@@ -23,7 +23,7 @@ export default {
       secondaryColorSelected: true,
       downloadSwitchSelected: true,
       localDataCryptoSwitchSelected: true,
-      fullTextSearchSwitchSelected: true,
+      autoLoginSwitchSelected: true,
       language: myself.myselfPeerClient && myself.myselfPeerClient.language ? myself.myselfPeerClient.language : this.$i18n.locale,
       lightDarkMode: myself.myselfPeerClient && myself.myselfPeerClient.lightDarkMode ? myself.myselfPeerClient.lightDarkMode : this.$q.dark.mode + '',
       primaryColor: myself.myselfPeerClient && myself.myselfPeerClient.primaryColor ? myself.myselfPeerClient.primaryColor : colors.getBrand('primary'),
@@ -32,7 +32,7 @@ export default {
       lightDarkModeOptions: CollaConstant.lightDarkModeOptionsISO[myself.myselfPeerClient && myself.myselfPeerClient.language ? myself.myselfPeerClient.language : this.$i18n.locale],
       downloadSwitch: myself.myselfPeerClient.downloadSwitch,
       localDataCryptoSwitch: myself.myselfPeerClient.localDataCryptoSwitch,
-      fullTextSearchSwitch: myself.myselfPeerClient.fullTextSearchSwitch,
+      autoLoginSwitch: myself.myselfPeerClient.autoLoginSwitch,
       restoreDialog: false
     }
   },
@@ -72,9 +72,9 @@ export default {
         this.localDataCryptoSwitch = false
         await this.changeLocalDataCryptoSwitch(this.localDataCryptoSwitch)
       }
-      if (this.fullTextSearchSwitchSelected) {
-        this.fullTextSearchSwitch = false
-        await this.changeFullTextSearchSwitch(this.fullTextSearchSwitch)
+      if (this.autoLoginSwitchSelected) {
+        this.autoLoginSwitch = true
+        await this.changeAutoLoginSwitch(this.autoLoginSwitch)
       }
       this.restoreDialog = false
     },
@@ -207,17 +207,30 @@ export default {
       peerProfile = await peerProfileService.update(peerProfile)
       myself.peerProfile = peerProfile
     },
-    changeFullTextSearchSwitch: async function (value) {
+    changeAutoLoginSwitch: async function (value) {
       let currentDate = new Date()
       let myselfPeerClient = myself.myselfPeerClient
-      myselfPeerClient.fullTextSearchSwitch = value
+      myselfPeerClient.autoLoginSwitch = value
       this.$store.state.myselfPeerClient = myselfPeerClient
 
       let peerProfile = myself.peerProfile
-      peerProfile.fullTextSearchSwitch = value
+      peerProfile.autoLoginSwitch = value
       peerProfile.updateDate = currentDate
       peerProfile = await peerProfileService.update(peerProfile)
       myself.peerProfile = peerProfile
+
+      // update loginStatus and password for mobile device
+      if (this.$store.ifMobile()) {
+        myself.myselfPeer.updateDate = currentDate
+        if (value === true) {
+          myself.myselfPeer.loginStatus = 'Y'
+          myself.myselfPeer.password = openpgp.encodeBase64(myself.password)
+        } else {
+          myself.myselfPeer.loginStatus = null
+          myself.myselfPeer.password = null
+        }
+        await myselfPeerService.update(myself.myselfPeer)
+      }
     }
   },
   mounted() {

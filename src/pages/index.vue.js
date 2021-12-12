@@ -14,7 +14,8 @@ import { SecurityPayload } from 'libcolla'
 import {permissionHelper} from '@/libs/base/colla-mobile'
 import pinyinUtil from '@/libs/base/colla-pinyin'
 import * as CollaConstant from '@/libs/base/colla-constant'
-import { statusBarComponent, deviceComponent, localNotificationComponent, inAppBrowserComponent } from '@/libs/base/colla-cordova'
+import { statusBarComponent, deviceComponent, inAppBrowserComponent } from '@/libs/base/colla-cordova'
+//import { localNotificationComponent } from '@/libs/base/colla-cordova'
 import { cameraComponent, systemAudioComponent, mediaComponent } from '@/libs/base/colla-media'
 import { fileComponent } from '@/libs/base/colla-cordova'
 import { CollectionType, collectionComponent } from '@/libs/biz/colla-collection'
@@ -814,11 +815,11 @@ export default {
       db_chat.content = currentChat.content
       db_chat.updateTime = currentChat.updateTime
       await chatComponent.update(ChatDataType.CHAT, db_chat)
-      localNotificationComponent.sendNotification(
+      /*localNotificationComponent.sendNotification(
         store.getChatName(currentChat.subjectType, currentChat.subjectId),
         currentChat.content,
         {type:'chat',subjectId:currentChat.subjectId}
-      )
+      )*/
       let messages = currentChat.messages
       // Read/UnRead
       if (store.state.chatMap[subjectId] == store.state.currentChat) {
@@ -1632,6 +1633,14 @@ export default {
     async logout(data) {
       let _that = this
       let store = _that.$store
+      // save logout time
+      myself.myselfPeer.updateDate = new Date().getTime()
+      // remove loginStatus and password
+      if (myself.myselfPeer.loginStatus === 'Y') {
+        myself.myselfPeer.loginStatus = null
+        myself.myselfPeer.password = null
+      }
+      await myselfPeerService.update(myself.myselfPeer)
       _that.logoutFlag = true
       store.peers = null
       if (store.state.linkmans && store.state.linkmans.length > 0) {
@@ -2116,7 +2125,7 @@ export default {
           signalProtocol.signalPublicKeys.set(linkmanPeerId,linkman.signalPublicKey)
           linkman.downloadSwitch = content.downloadSwitch
           //linkman.localDataCryptoSwitch = content.localDataCryptoSwitch
-          //linkman.fullTextSearchSwitch = content.fullTextSearchSwitch
+          linkman.autoLoginSwitch = content.autoLoginSwitch
           if(content.recallTimeLimit !==linkman.recallTimeLimit || linkman.recallAlert !== content.recallAlert){
               let _sysMessageContent
                   let _type
@@ -2157,8 +2166,8 @@ export default {
                 _linkman.publicKey = content.publicKey
                 _linkman.downloadSwitch = content.downloadSwitch
                 _linkman.signalPublicKey = content.signalPublicKey
-              //linkman.localDataCryptoSwitch = content.localDataCryptoSwitch
-              //linkman.fullTextSearchSwitch = content.fullTextSearchSwitch
+                //_linkman.localDataCryptoSwitch = content.localDataCryptoSwitch
+                _linkman.autoLoginSwitch = content.autoLoginSwitch
                 _linkman.recallTimeLimit = content.recallTimeLimit
                 _linkman.recallAlert = content.recallAlert
                 _linkman.udpSwitch = content.udpSwitch
@@ -4165,10 +4174,10 @@ export default {
                     'android.permission.READ_PHONE_STATE',
                     'android.permission.WRITE_EXTERNAL_STORAGE',
                     'android.permission.READ_CONTACTS',
-                    'android.permission.WRITE_CONTACTS',
-                    'android.permission.GET_ACCOUNTS',
-                    'android.permission.USE_BIOMETRIC',
-                    'android.permission.ACCESS_COARSE_LOCATION',
+                    //'android.permission.WRITE_CONTACTS',
+                    //'android.permission.GET_ACCOUNTS',
+                    //'android.permission.USE_BIOMETRIC',
+                    //'android.permission.ACCESS_COARSE_LOCATION',
                     'android.permission.RECORD_VIDEO',
                     'android.permission.RECORD_AUDIO',
                     'android.permission.READ_EXTERNAL_STORAGE',
@@ -4266,7 +4275,7 @@ export default {
         console.log('device.serial:' + deviceComponent.getDeviceProperty('serial'))
         console.log('window.device.platform:' + window.device.platform)
         console.log('currentScreen:' + deviceComponent.currentScreen())
-      if (localNotificationComponent && JSON.stringify(localNotificationComponent) !== '{}') {
+      /*if (localNotificationComponent && JSON.stringify(localNotificationComponent) !== '{}') {
         let granted = await localNotificationComponent.requestPermission()
         if (granted) {
           localNotificationComponent.initialize(function (arg,event) {
@@ -4282,7 +4291,7 @@ export default {
             }
           })
         }
-      }
+      }*/
     }
     store.collectionWorkerEnabler = false // collection中是否使用service worker
     if (store.ios === true || store.safari === true) {

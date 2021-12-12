@@ -23,7 +23,6 @@
     "cordova-plugin-audioinput-curltech": "^1.0.2",
     "cordova-plugin-audiotoggle": "^1.0.3",
     "cordova-plugin-backbutton": "^0.3.0",
-    "cordova-plugin-badge": "^0.8.8",
     "cordova-plugin-battery-status": "~2.0.3",
     "cordova-plugin-camera": "^4.1.0",
     "cordova-plugin-canvas2image-updated": "^1.2.0",
@@ -35,7 +34,6 @@
     "cordova-plugin-inappbrowser": "~4.1.0",
     "cordova-plugin-ionic-webview-curltech": "^5.0.0",
     "cordova-plugin-iosrtc": "^8.0.0",
-    "cordova-plugin-local-notification": "^0.9.0-beta.2",
     "cordova-plugin-media": "^5.0.3",
     "cordova-plugin-media-capture": "^3.0.3",
     "cordova-plugin-mediapicker-dmcsdk-curltech": "^2.4.7",
@@ -92,7 +90,6 @@
         "MICROPHONE_USAGE_DESCRIPTION": " "
       },
       "cordova-plugin-audioinput-curltech": {},
-      "cordova-plugin-local-notification": {},
       "cordova-sqlite-storage": {},
       "cordova-plugin-file": {},
       "cordova-plugin-photo-library-wkwebview-curltech": {
@@ -106,7 +103,6 @@
       },
       "sqli-cordova-disk-space-plugin": {},
       "cordova-plugin-photokandy-video-thumbnail": {},
-      "cordova-plugin-badge": {},
       "cordova-plugin-backbutton": {},
       "cordova-plugin-android-permissions": {},
       "cordova-plugin-compat": {},
@@ -119,12 +115,12 @@
       },
       "cordova-plugin-hms-push": {},
       "cordova-plugin-xiaomi-push": {
-        "APP_KEY": "",
-        "APP_ID": ""
+        "APP_KEY": "5262011854084",
+        "APP_ID": "2882303761520118084"
       },
       "cordova-plugin-oppo-push": {
-        "APP_KEY": "",
-        "APP_SECRET": ""
+        "APP_KEY": "ef7f033bed5347ee98222743d0247394",
+        "APP_SECRET": "b2e6ccf1ccca4f909c1c50bad1447dd3"
       }
     },
     "platforms": [

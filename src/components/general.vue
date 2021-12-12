@@ -50,12 +50,12 @@
               q-item-label {{$t('Local Data Crypto')}}
             q-item-section(side)
               q-toggle(v-model="localDataCryptoSwitch" @input="changeLocalDataCryptoSwitch")
-          //q-separator.c-separator(style="margin-left:16px;width:calc(100% - 16px)")
-          //q-item(dense)
+          q-separator.c-separator(v-if="$store.ifMobile()" style="margin-left:16px;width:calc(100% - 16px)")
+          q-item(v-if="$store.ifMobile()" dense)
             q-item-section
               q-item-label {{$t('Full Text Search')}}
             q-item-section(side)
-              q-toggle(v-model="fullTextSearchSwitch" @input="changeFullTextSearchSwitch")
+              q-toggle(v-model="autoLoginSwitch" @input="changeautoLoginSwitch")
           q-separator.c-separator(style="height:8px;margin-left:0px;margin-right:0px")
           q-item(clickable v-ripple @click="subKind= 'backupMigration'")
             q-item-section
@@ -109,11 +109,11 @@
               q-item-label {{$t('Local Data Crypto')}}
             q-item-section(side)
               q-checkbox(dense v-model="localDataCryptoSwitchSelected" color="primary")
-          //q-item
+          q-item(v-if="$store.ifMobile()")
             q-item-section
               q-item-label {{$t('Full Text Search')}}
             q-item-section(side)
-              q-checkbox(dense v-model="fullTextSearchSwitchSelected" color="primary")
+              q-checkbox(dense v-model="autoLoginSwitchSelected" color="primary")
         q-card-actions(align="right")
           q-btn(color="primary" round icon="check" unelevated  @click="restore")
 </template>

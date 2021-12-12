@@ -5,7 +5,7 @@ import { webrtcPeerPool } from 'libcolla'
 import { CollaUtil } from 'libcolla'
 
 import { systemAudioComponent, mediaStreamComponent } from '@/libs/base/colla-media'
-import { localNotificationComponent } from '@/libs/base/colla-cordova'
+//import { localNotificationComponent } from '@/libs/base/colla-cordova'
 import { ActiveStatus } from '@/libs/biz/colla-contact'
 import { ChatContentType, P2pChatMessageType, SubjectType } from '@/libs/biz/colla-chat'
 
@@ -337,7 +337,7 @@ export default {
           //name = srcName
           //todo
         }
-        localNotificationComponent.sendNotification(name, "CALL", {subjectId:subjectId,type:'call'}
+        //localNotificationComponent.sendNotification(name, "CALL", {subjectId:subjectId,type:'call'}
         )
         if (message.contentType === ChatContentType.VIDEO_INVITATION) {
           store.state.currentCallChat.callType = "video"
