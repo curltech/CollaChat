@@ -26,9 +26,6 @@ export default {
   "USA-Virginia": "美国-弗吉尼亚",
   "Code": "区号",
   "Node Address": "定位器地址",
-  "Node Host": "定位器主机",
-  "Node Port": "定位器端口",
-  "Node PeerId": "定位器PeerId",
   "Use Custom Node": "自定义定位器",
   "Default": "默认",
   "Custom": "自定义",
@@ -149,6 +146,8 @@ export default {
   "Add into blacklist (you will not receive his/her messages)?": "加入黑名单（你将不再收到对方的消息）？",
   "Clean chat history?": "清空聊天记录？",
   "tag name already exists": "标签名已存在",
+  "Please input PeerId": "请输入身份编号",
+  "Please input ConferenceId": "请输入会议ID",
 
   // Chat
   "no internet connection, please check network settings": "当前网络不可用，请检查网络设置",
@@ -375,16 +374,12 @@ export default {
   "There should be at least one Node!": "最少要有1个定位器！",
   "Remove selected Node?": "确定删除选择的定位器？",
   "No": "次序",
-  "NodePeerId": "定位器编号",
+  "Node PeerId": "定位器编号",
   "Address": "地址",
   "PublicKey": "公钥",
   "Credit": "信用",
   "LastConnectTime": "最近连接时间",
   "LastUpdateTime": "最近更新时间",
-  "Please input No": "请输入定位器次序",
-  "Please input PeerId": "请输入定位器编号",
-  "Please input Address": "请输入定位器地址",
-  "Please input PublicKey": "请输入定位器公钥",
   "Restore initial settings?": "恢复初始设置？",
 
   // About

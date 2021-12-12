@@ -116,21 +116,10 @@
                 q-select.c-field(style="width: 280px !important;padding-bottom:5px" :label="$t('MyNodes')" filled dense clearable v-model="connectAddress" emit-value map-options :options="connectAddressOptions")
                 p
                 div(:class="connectAddress === 'custom' ? '' : 'hidden'")
-                  div(style="width:280px" class="row justify-between")
-                    div(class="col-8")
-                      q-input.c-field(style="!important"
-                        filled dense clearable v-model="customConnectHost"
-                        lazy-rules :rules="[val => (connectAddress !== 'custom' || (connectAddress === 'custom' && val && val.length > 0)) || $t('Please input Node Address')]"
-                        :label="$t('Node Host')")
-                    div :
-                    div(class="col-3")
-                      q-input.c-field(style="!important"
-                        filled dense clearable v-model="customConnectPort"
-                        lazy-rules :rules="[val => (connectAddress !== 'custom' || (connectAddress === 'custom' && val && val.length > 0)) || $t('')]")
                   q-input.c-field(style="width:280px !important"
-                    filled dense clearable v-model="customConnectPeerId"
+                    filled dense clearable v-model="customConnectAddress"
                     lazy-rules :rules="[val => (connectAddress !== 'custom' || (connectAddress === 'custom' && val && val.length > 0)) || $t('Please input Node Address')]"
-                    :label="$t('Node PeerId')")
+                    :label="$t('Node Address')")
 </template>
 <script src="./login.vue.js" />
 <style lang="stylus" src="../css/login.styl"/>

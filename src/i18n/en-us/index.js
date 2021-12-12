@@ -146,6 +146,8 @@ export default {
   "Add into blacklist (you will not receive his/her messages)?": "Add into blacklist (you will not receive his/her messages)?",
   "Clean chat history?": "Clean chat history?",
   "Tag name already exists": "Tag name already exists",
+  "Please input PeerId": "Please input PeerId",
+  "Please input ConferenceId": "Please input ConferenceId",
 
   // Chat
   "no internet connection, please check network settings": "internet connection unavailable, check network settings",
@@ -264,7 +266,6 @@ export default {
   "NewPassword": "NewPassword",
   "NewRepeatPassword": "NewRepeatPassword",
   "SERIOUS WARNING: This operation will remove all information related to this ID from this device forever, please be cautious!!!": "SERIOUS WARNING: This operation will remove all information related to this ID from this device forever, please be cautious!!!",
-  "Please input Password": "Please input Password",
   "Please input OldPassword": "Please input OldPassword",
   "Please input NewPassword": "Please input NewPassword",
   "Please input NewRepeatPassword": "Please input NewRepeatPassword",
@@ -363,16 +364,12 @@ export default {
   "There should be at least one Node!": "There should be at least one Node!",
   "Remove selected Node?": "Remove selected Node?",
   "No": "No",
-  "NodePeerId": "NodePeerId",
+  "Node PeerId": "Node PeerId",
   "Address": "Address",
   "PublicKey": "PublicKey",
   "Credit": "Credit",
   "LastConnectTime": "LastConnectTime",
   "LastUpdateTime": "LastUpdateTime",
-  "Please input No": "Please input No",
-  "Please input PeerId": "Please input PeerId",
-  "Please input Address": "Please input Address",
-  "Please input PublicKey": "Please input PublicKey",
   "Restore initial settings?": "Restore initial settings?",
 
   // About

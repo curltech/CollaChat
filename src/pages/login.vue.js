@@ -19,9 +19,9 @@ import { ContactDataType, LinkmanStatus, ActiveStatus, contactComponent } from '
 import GetConfigWorker from '@/worker/getConfig.worker.js'
 
 import defaultActiveAvatar from '@/assets/colla-o1.png'
-import defaultDisabledAvatar from '@/assets/colla-o-disabled.png'
-import defaultChannelAvatar from '@/assets/colla-o2.png'
-import defaultChannelArticleCover from '@/assets/cover.png'
+//import defaultDisabledAvatar from '@/assets/colla-o-disabled.png'
+//import defaultChannelAvatar from '@/assets/colla-o2.png'
+//import defaultChannelArticleCover from '@/assets/cover.png'
 
 export default {
   name: 'Login',
@@ -91,9 +91,6 @@ export default {
       versionHistory: [],
       connectAddress: null,
       customConnectAddress: null,
-      customConnectHost: null,
-      customConnectPort: null,
-      customConnectPeerId: null,
       light: false,
       bgNo: 11,
       testMode: false
@@ -160,10 +157,8 @@ export default {
           return
         }
       }
-      if (!_that.connectAddress) {
-        store.connectAddress = null
-      } else if (_that.connectAddress === 'custom') {
-        store.connectAddress = '/dns4/'+_that.customConnectHost+'/tcp/'+_that.customConnectPort+'/wss/p2p/'+_that.customConnectPeerId
+      if (_that.connectAddress === 'custom') {
+        store.connectAddress = _that.customConnectAddress
       } else {
         store.connectAddress = _that.connectAddress
       }

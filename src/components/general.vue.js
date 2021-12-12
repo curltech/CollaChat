@@ -1,6 +1,6 @@
 import { colors } from 'quasar'
 
-import { myself, myselfPeerService, peerProfileService } from 'libcolla'
+import { myself, myselfPeerService, peerClientService, peerProfileService } from 'libcolla'
 import { openpgp } from 'libcolla'
 
 import * as CollaConstant from '@/libs/base/colla-constant'

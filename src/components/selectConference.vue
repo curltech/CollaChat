@@ -183,7 +183,7 @@ div
           @submit="join",
           class="q-pa-sm")
           q-input.c-field(
-            :label="$t('Please input peerId')",
+            :label="$t('Please input PeerId')",
             autofocus,
             clearable,
             filled,
@@ -192,7 +192,7 @@ div
             :rules="[]"
           )
           q-input.c-field(
-            :label="$t('Please input conferenceId')",
+            :label="$t('Please input ConferenceId')",
             clearable,
             filled,
             v-model="joinData.conferenceId",

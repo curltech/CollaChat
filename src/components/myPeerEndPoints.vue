@@ -26,11 +26,11 @@
         q-form(ref="formModify" @submit="modify" class="q-pa-sm")
           q-select.c-field(filled :label="$t('No')" v-model="mpepData.priority" :options="options")
           p
-          q-input.c-field(filled :label="$t('Address')" clearable v-model="mpepData.address" lazy-rules :rules="[val => val && val.length > 0 || $t('Please input Address')]")
-          p
-          q-input.c-field(readonly filled :label="$t('NodePeerId')" clearable v-model="mpepData.peerId")
-          p
-          q-input.c-field(autogrow readonly filled :label="$t('PublicKey')" clearable v-model="mpepData.publicKey")
+          q-input.c-field(filled :label="$t('Node Address')" clearable v-model="mpepData.address" lazy-rules :rules="[val => val && val.length > 0 || $t('Please input Node Address')]")
+          //p
+          //q-input.c-field(readonly filled :label="$t('Node PeerId')" clearable v-model="mpepData.peerId")
+          //p
+          //q-input.c-field(autogrow readonly filled :label="$t('PublicKey')" clearable v-model="mpepData.publicKey")
         q-list(class="q-pt-sm")
           q-item
             q-item-section(align="center")
@@ -43,6 +43,6 @@
         q-form(ref="formAdd" @submit="add" class="q-pa-sm")
           q-select.c-field(filled :label="$t('No')" v-model="mpepData.priority" :options="options")
           p
-          q-input.c-field(autofocus filled :label="$t('Address')" clearable v-model="mpepData.address" lazy-rules :rules="[val => val && val.length > 0 || $t('Please input Address')]")
+          q-input.c-field(autofocus filled :label="$t('Node Address')" clearable v-model="mpepData.address" lazy-rules :rules="[val => val && val.length > 0 || $t('Please input Node Address')]")
 </template>
 <script src="./myPeerEndPoints.vue.js" />

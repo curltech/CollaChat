@@ -146,6 +146,8 @@
   "Add into blacklist (you will not receive his/her messages)?": "加入黑名單（妳將不再收到對方的消息）？",
   "Clean chat history?": "清空聊天記錄？",
   "tag name already exists": "標簽名已存在",
+  "Please input PeerId": "請輸入身份編號",
+  "Please input ConferenceId": "請輸入會議ID",
 
   // Chat
   "no internet connection, please check network settings": "當前網絡不可用，請檢查網絡設置",
@@ -370,16 +372,12 @@
   "There should be at least one Node!": "最少要有1個定位器！",
   "Remove selected PeerEndPoint?": "確定刪除選擇的定位器？",
   "No": "次序",
-  "NodePeerId": "定位器編號",
+  "Node PeerId": "定位器編號",
   "Address": "地址",
   "PublicKey": "公鑰",
   "Credit": "信用",
   "LastConnectTime": "最近連接時間",
   "LastUpdateTime": "最近更新時間",
-  "Please input No": "請輸入定位器次序",
-  "Please input PeerId": "請輸入定位器編號",
-  "Please input Address": "請輸入定位器地址",
-  "Please input PublicKey": "請輸入定位器公鑰",
   "Restore initial settings?": "恢復初始設置？",
 
   // About

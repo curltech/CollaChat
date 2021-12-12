@@ -22,8 +22,8 @@ export default {
           //headerStyle: 'width: 25px',
           //headerClasses: 'my-special-class'
         },
-        //{ name: 'peerId', label: this.$i18n.t('NodePeerId'), field: 'peerId', align: 'center', sortable: true },
-        { name: 'address', label: this.$i18n.t('Address'), field: 'address', align: 'center', sortable: true, style: 'padding:0px 0px' },
+        //{ name: 'peerId', label: this.$i18n.t('Node PeerId'), field: 'peerId', align: 'center', sortable: true },
+        { name: 'address', label: this.$i18n.t('Node Address'), field: 'address', align: 'center', sortable: true, style: 'padding:0px 0px' },
         //{ name: 'publicKey', label: this.$i18n.t('PublicKey'), field: 'publicKey', align: 'center', sortable: true },
         //{ name: 'creditScore', label: this.$i18n.t('Credit'), field: 'creditScore', align: 'center', sortable: true, style: 'padding:0px 0px' },
         { name: 'lastConnectTime', label: this.$i18n.t('LastConnectTime'), field: 'lastConnectTime', align: 'center', sortable: true, style: 'padding:0px 0px' }

@@ -146,6 +146,8 @@
   "Add into blacklist (you will not receive his/her messages)?": "블랙리스트 에 올 라（당신 은 더 이상 상대방 의 소식 을 받 지 않 을 것 이다）？",
   "Clean chat history?": "채 팅 기록 비우 기？",
   "tag name already exists": "태그 이름 이 이미 존재 합 니 다",
+  "Please input PeerId": "주민등록번호를 입력해주세요",
+  "Please input ConferenceId": "회의 ID를 입력하세요",
 
   // Chat
   "no internet connection, please check network settings": "현재 네트워크 가 사용 할 수 없습니다. 네트워크 설정 을 확인 하 세 요",
@@ -371,16 +373,12 @@
   "There should be at least one Node!": "최소 1 개의 좌석 이 있어 야 합 니 다！",
   "Remove selected Node?": "선택 한 위치 기 를 삭제 하 시 겠 습 니까？",
   "No": "순서",
-  "NodePeerId": "자리 지정 기 번호",
+  "Node PeerId": "자리 지정 기 번호",
   "Address": "주소",
   "PublicKey": "공개 키",
   "Credit": "신용",
   "LastConnectTime": "최근 접속 시간",
   "LastUpdateTime": "최근 갱신 시간",
-  "Please input No": "좌석 순 서 를 입력 하 세 요",
-  "Please input Peerrid": "좌석 번호 입력 하 세 요",
-  "Please input Address": "위치 지정 기 주 소 를 입력 하 세 요",
-  "Please input PublicKey": "좌석 키 입력 하 세 요",
   "Restore initial settings?": "초기 설정 복원？",
 
   // About

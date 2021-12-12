@@ -146,6 +146,8 @@
   "Add into blacklist (you will not receive his/her messages)?": "ブラックリストに入る（相手からのメッセージはもう受け取らない）？",
   "Clean chat history?": "チャットの記録をクリアしますか？",
   "tag name already exists": "タグ名は既に存在します",
+  "Please input PeerId": "ID番号を入力してください",
+  "Please input ConferenceId": "会議IDを入力してください",
 
   // Chat
   "no internet connection, please check network settings": "現在のネットワークは利用できません，ネットワーク設定を確認してください",
@@ -371,16 +373,12 @@
   "There should be at least one Node!": "少なくとも1つのポジショナが必要です！",
   "Remove selected Node?": "選択したポジショナを削除しますか？",
   "No": "順番",
-  "NodePeerId": "ポジショナ番号",
+  "Node PeerId": "ポジショナ番号",
   "Address": "住所",
   "PublicKey": "公開鍵",
   "Credit": "信用",
   "LastConnectTime": "最近の接続時間",
   "LastUpdateTime": "最近の更新時間",
-  "Please input No": "ポジショナの順序を入力してください",
-  "Please input PeerId": "ポジショナ番号を入力してください",
-  "Please input Address": "ポジショナアドレスを入力してください",
-  "Please input PublicKey": "ポジショナ公開鍵を入力してください",
   "Restore initial settings?": "初期設定を再開しますか？",
 
   // About
