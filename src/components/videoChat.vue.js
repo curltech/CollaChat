@@ -337,8 +337,7 @@ export default {
           //name = srcName
           //todo
         }
-        //localNotificationComponent.sendNotification(name, "CALL", {subjectId:subjectId,type:'call'}
-        )
+        //localNotificationComponent.sendNotification(name, "CALL", {subjectId:subjectId,type:'call'})
         if (message.contentType === ChatContentType.VIDEO_INVITATION) {
           store.state.currentCallChat.callType = "video"
         }else{
