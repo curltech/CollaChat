@@ -315,7 +315,7 @@
   "This function uses self-signed ssl certificate, when you first time use it, a Not secure error page will be prompted, please click Advanced button and Proceed to ... link.": "이 기능은 자체 서명 된 SSL 인증서를 사용합니다，처음 사용할 때 안전하지 않다는 오류 페이지가 나타납니다，고급 버튼을 클릭하고...링크로 계속 진행하세요。",
   "Storage": "저장 공간",
   "Local Data Crypto": "로 컬 데이터 암호 화",
-  "Full Text Search": "전체 텍스트 검색",
+  "Auto Login": "자동 로그인",
   "Colla Data": "Colla데이터",
   "Others": "다른",
   "Free Space": "사용 가능한 공간",

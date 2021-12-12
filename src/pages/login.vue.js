@@ -136,7 +136,7 @@ export default {
     abortFilterFn() {
       // console.log('delayed filter aborted')
     },
-    async login() {
+    async login(autoLogin) {
       let _that = this
       let store = _that.$store
       while (!store.latestVersion) {
@@ -147,16 +147,18 @@ export default {
       if (store.latestVersion !== store.currentVersion && store.mandatory) {
         return
       }
-      let success = await _that.$refs['frmLogin'].validate()
-      if (success === false) {
-        console.error('validation failure')
-        _that.$q.notify({
-          message: _that.$i18n.t("Validation failed"),
-          timeout: 3000,
-          type: "warning",
-          color: "warning",
-        })
-        return
+      if (!autoLogin) {
+        let success = await _that.$refs['frmLogin'].validate()
+        if (success === false) {
+          console.error('validation failure')
+          _that.$q.notify({
+            message: _that.$i18n.t("Validation failed"),
+            timeout: 3000,
+            type: "warning",
+            color: "warning",
+          })
+          return
+        }
       }
       if (!_that.connectAddress) {
         store.connectAddress = null
@@ -993,8 +995,8 @@ export default {
       // auto login for mobile device
       if (store.ifMobile()) {
         if (myselfPeer && myselfPeer.loginStatus === 'Y' && myselfPeer.password) {
-          _that.loginData.password_ = openpgp.decodeBase64(myselfPeer.password)
-          await _that.login()
+          _that.loginData.password_ = openpgp.uint8ArrayToStr(openpgp.decodeBase64(myselfPeer.password))
+          await _that.login(true)
         }
       }
     },

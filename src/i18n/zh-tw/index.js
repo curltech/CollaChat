@@ -314,7 +314,7 @@
   "This function uses self-signed ssl certificate, when you first time use it, a Not secure error page will be prompted, please click Advanced button and Proceed to ... link.": "此功能使用了自簽名ssl證書，第一次使用時會彈出報錯頁面提示不安全，請點擊高級按鈕和繼續前往...鏈接。",
   "Storage": "存儲空間",
   "Local Data Crypto": "本地數據加密",
-  "Full Text Search": "全文檢索",
+  "Auto Login": "自動登錄",
   "Colla Data": "Colla數據",
   "Others": "其它",
   "Free Space": "可用空間",

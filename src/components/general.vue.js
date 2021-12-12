@@ -1,6 +1,7 @@
 import { colors } from 'quasar'
 
-import { myself, peerProfileService } from 'libcolla'
+import { myself, myselfPeerService, peerProfileService } from 'libcolla'
+import { openpgp } from 'libcolla'
 
 import * as CollaConstant from '@/libs/base/colla-constant'
 import { statusBarComponent } from '@/libs/base/colla-cordova'
@@ -226,7 +227,7 @@ export default {
           myself.myselfPeer.loginStatus = 'Y'
           myself.myselfPeer.password = openpgp.encodeBase64(myself.password)
         } else {
-          myself.myselfPeer.loginStatus = null
+          myself.myselfPeer.loginStatus = 'N'
           myself.myselfPeer.password = null
         }
         await myselfPeerService.update(myself.myselfPeer)

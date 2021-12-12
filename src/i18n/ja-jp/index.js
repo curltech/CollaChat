@@ -315,7 +315,7 @@
   "This function uses self-signed ssl certificate, when you first time use it, a Not secure error page will be prompted, please click Advanced button and Proceed to ... link.": "この関数は自己署名SSL証明書を使用します，初めて使用する場合は，安全でないことを示すエラーページがポップアップ表示されます，[高度な]ボタンをクリックして、[訪問を続ける...]リンクをクリックしてください。",
   "Storage": "格納空間",
   "Local Data Crypto": "ローカルデータ暗号化",
-  "Full Text Search": "全文検索",
+  "Auto Login": "自動ログイン",
   "Colla Data": "Collaデータ",
   "Others": "その他",
   "Free Space": "利用可能なスペース",

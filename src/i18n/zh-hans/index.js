@@ -319,7 +319,7 @@ export default {
   "This function uses self-signed ssl certificate, when you first time use it, a Not secure error page will be prompted, please click Advanced button and Proceed to ... link.": "此功能使用了自签名ssl证书，第一次使用时会弹出报错页面提示不安全，请点击高级按钮和继续前往...链接。",
   "Storage": "存储空间",
   "Local Data Crypto": "本地数据加密",
-  "Full Text Search": "全文检索",
+  "Auto Login": "自动登录",
   "Colla Data": "Colla数据",
   "Others": "其它",
   "Free Space": "可用空间",

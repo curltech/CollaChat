@@ -1,5 +1,6 @@
 import { myself, myselfPeerService, config } from 'libcolla'
 import { StringUtil } from 'libcolla'
+import { openpgp } from 'libcolla'
 
 import VanillaQR from '@/libs/base/colla-vanillaQR'
 import { mediaComponent } from '@/libs/base/colla-media'

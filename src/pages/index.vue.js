@@ -278,20 +278,23 @@ export default {
           let connectArrayBackup = CollaUtil.clone(_that.connectArray)
           for (let i = _that.connectArray.length - 1; i >= 0; i--) {
             let connectAddress = _that.connectArray[i].address.match(/\/dns4\/(\S*)\/tcp/)[1]
-            console.log(i + ' STUNTURN test start: ' + connectAddress + ', ' + new Date())
+            let start = new Date()
+            console.log(i + ' STUNTURN test start: ' + connectAddress + ', ' + start)
             let stunTurn = await new Promise((resolve, reject) => {
               let stun = false
               let turn = false
               setTimeout(async ()=> {
-                console.log('timeout: ' + new Date())
                 if (!stun) {
                   await logService.log('STUN test failed: ' + connectAddress, 'STUNTURN test', 'error')
                 }
                 if (!turn) {
                   await logService.log('TURN test failed: ' + connectAddress, 'STUNTURN test', 'error')
                 }
-                resolve(stun) // TODO: TURN test may fail but actually works
-              }, 10000)
+                if (!(stun && turn)) {
+                  console.log('timeout: ' + (new Date().getTime() - start.getTime()))
+                  resolve(stun) // TODO: TURN test may fail but actually works
+                }
+              }, 1000)
               let iceServer = [
                 {
                   urls: `stun:${ connectAddress }:3478`
@@ -313,7 +316,7 @@ export default {
                 console.log('onicecandidate-candidate.candidate:' + e.candidate.candidate)
                 // If a srflx candidate was found, notify that the STUN server works!
                 if (e.candidate.type === 'srflx') {
-                  console.log('The STUN server is reachable!')
+                  console.log('The STUN server is reachable!' + (new Date().getTime() - start.getTime()))
                   console.log('Your Public IP Address is: ' + e.candidate.address)
                   stun = true
                   if (stun && turn) {
@@ -322,7 +325,7 @@ export default {
                 }    
                 // If a relay candidate was found, notify that the TURN server works!
                 if (e.candidate.type === 'relay') {
-                  console.log('The TURN server is reachable!')
+                  console.log('The TURN server is reachable!' + (new Date().getTime() - start.getTime()))
                   turn = true
                   if (stun && turn) {
                     resolve(true)
@@ -1637,7 +1640,7 @@ export default {
       myself.myselfPeer.updateDate = new Date().getTime()
       // remove loginStatus and password
       if (myself.myselfPeer.loginStatus === 'Y') {
-        myself.myselfPeer.loginStatus = null
+        myself.myselfPeer.loginStatus = 'N'
         myself.myselfPeer.password = null
       }
       await myselfPeerService.update(myself.myselfPeer)

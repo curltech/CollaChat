@@ -53,9 +53,9 @@
           q-separator.c-separator(v-if="$store.ifMobile()" style="margin-left:16px;width:calc(100% - 16px)")
           q-item(v-if="$store.ifMobile()" dense)
             q-item-section
-              q-item-label {{$t('Full Text Search')}}
+              q-item-label {{$t('Auto Login')}}
             q-item-section(side)
-              q-toggle(v-model="autoLoginSwitch" @input="changeautoLoginSwitch")
+              q-toggle(v-model="autoLoginSwitch" @input="changeAutoLoginSwitch")
           q-separator.c-separator(style="height:8px;margin-left:0px;margin-right:0px")
           q-item(clickable v-ripple @click="subKind= 'backupMigration'")
             q-item-section
@@ -111,7 +111,7 @@
               q-checkbox(dense v-model="localDataCryptoSwitchSelected" color="primary")
           q-item(v-if="$store.ifMobile()")
             q-item-section
-              q-item-label {{$t('Full Text Search')}}
+              q-item-label {{$t('Auto Login')}}
             q-item-section(side)
               q-checkbox(dense v-model="autoLoginSwitchSelected" color="primary")
         q-card-actions(align="right")

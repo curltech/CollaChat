@@ -307,7 +307,7 @@ export default {
   "This function uses self-signed ssl certificate, when you first time use it, a Not secure error page will be prompted, please click Advanced button and Proceed to ... link.": "This function uses self-signed ssl certificate, when you first time use it, a Not secure error page will be prompted, please click Advanced button and Proceed to ... link.",
   "Storage": "Storage",
   "Local Data Crypto": "Local Data Crypto",
-  "Full Text Search": "Full Text Search",
+  "Auto Login": "Auto Login",
   "Colla Data": "Colla Data",
   "Others": "Others",
   "Free Space": "Free Space",
