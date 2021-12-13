@@ -35,13 +35,13 @@
             q-item-section
               q-item-label(caption lines="3" style="word-break:break-all") {{ $store.state.myselfPeerClient ? $store.state.myselfPeerClient.peerId : '' }}
             q-item-section(side)
-              q-btn.btnIcon(flat dense round icon="content_copy" v-clipboard:copy="$store.state.myselfPeerClient ? $store.state.myselfPeerClient.peerId : ''" v-clipboard:success="onCopySuccess" v-clipboard:error="onCopyFailure")
+              q-btn.text-primary(flat dense round icon="content_copy" v-clipboard:copy="$store.state.myselfPeerClient ? $store.state.myselfPeerClient.peerId : ''" v-clipboard:success="onCopySuccess" v-clipboard:error="onCopyFailure")
           q-separator.c-separator(style="margin-left:16px;width:calc(100% - 16px)")
           q-item(clickable v-ripple @click="enterQRCode")
             q-item-section
               q-item-label {{$t('QR Code')}}
             q-item-section(avatar)
-              q-icon.btnIcon(name="qr_code")
+              q-icon.text-primary(name="qr_code")
             q-item-section(avatar)
               q-icon(name="keyboard_arrow_right")
           q-separator.c-separator(style="height:8px;margin-left:0px;margin-right:0px")
@@ -72,16 +72,16 @@
             //q-separator.c-separator(v-if="$store.peerClients && index === $store.peerClients.length - 1")
       q-tab-panel#avatarContainer(:style="heightStyle" name="avatar" style="padding:0px 0px" align="center")
         q-toolbar(style="z-index: 999")
-          q-btn(flat round dense icon="keyboard_arrow_left" @click="subKind = 'default'")
+          q-btn(flat round icon="keyboard_arrow_left" @click="subKind = 'default'")
           q-toolbar-title(align="center" class="text-c-grey-10") {{$t('Avatar')}}
-          q-btn(flat round dense icon="more_horiz" color="primary" @click="operateAvatar")
+          q-btn(flat round icon="more_horiz" color="primary" @click="operateAvatar")
         img#avatarImg
         canvas#avatar(class="hidden")
       q-tab-panel#alloycropContainer(:style="heightStyle" name="showPhoto" style="padding:0px 0px" align="center")
         q-toolbar
           q-btn(flat round icon="keyboard_arrow_left" @click="showPhotoBack")
           q-toolbar-title(align="center") {{ $t('Change Avatar') }}
-          q-btn.btnIcon(flat round icon="check" @click="changeAvatar")
+          q-btn.text-primary(flat round icon="check" @click="changeAvatar")
         div.fixed-center#crop_result(v-if="$store.ifMobile()" :class="showCrop ? '' : 'hidden'")
         q-img(v-if="$store.ifMobile()" :class="showCrop ? 'hidden' : ''" style="width:100%;max-height:calc(100% - 50px)" :src="avatarSrc")
         img#photoImg(v-if="!$store.ifMobile()")
@@ -90,7 +90,7 @@
           q-btn(flat round icon="keyboard_arrow_left" @click="subKind = 'default'")
           //q-toolbar-title(align="center") {{$t('QR Code')}}
           q-space
-          q-btn.btnIcon(flat round icon="more_horiz" @click="operateQRCode")
+          q-btn.text-primary(flat round icon="more_horiz" @click="operateQRCode")
         q-card(flat class="fixed-center q-pa-none")
           q-card-section#qrCodeCard(class="q-pa-xs")
             q-card(flat class="q-pa-sm")
@@ -108,14 +108,14 @@
         q-toolbar
           q-btn(flat round icon="keyboard_arrow_left" @click="subKind = 'default'")
           q-toolbar-title(align="center") {{ $t('Change Name') }}
-          q-btn.btnIcon(flat round icon="check" @click="changeName")
+          q-btn(flat round icon="check" @click="changeName" :disable="!name" :class="name?'text-primary':'c-grey-0'")
         q-form(ref="formChangeName" @submit="changeName" class="q-pa-sm")
           q-input.c-field(autofocus filled :label="$t('UserName')" clearable v-model="name" lazy-rules :rules="[ val => val && val.length > 0 || $t('Please input Name')]")
       q-tab-panel(:style="heightStyle" name="mobile" style="padding:0px 0px")
         q-toolbar
           q-btn(flat round icon="keyboard_arrow_left" @click="subKind = 'default'")
           q-toolbar-title(align="center") {{ $t('Change Mobile') }}
-          q-btn.btnIcon(flat round icon="check" @click="changeMobile")
+          q-btn.text-primary(flat round icon="check" @click="changeMobile")
         q-form(ref="formChangeMobile" @submit="changeMobile" class="q-pa-sm")
           q-select.c-field(:label="$t('Country/Region')" filled flat v-model="countryRegion_" :options="options"
             clearable

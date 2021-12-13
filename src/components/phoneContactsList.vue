@@ -126,7 +126,7 @@
           q-item-section
             q-item-label(caption, lines="3", style="word-break:break-all") {{ currentPeerContact.peerId }}
           q-item-section(side)
-            q-btn.btnIcon(
+            q-btn.text-primary(
               flat,
               dense,
               round,
@@ -152,7 +152,7 @@
           q-item-section
             q-item-label {{ $t('isLinkman') }}
           q-item-section(side, v-if="!currentPeerContact.isLinkman === true")
-            q-btn.btnIcon(
+            q-btn.text-primary(
               flat,
               dense,
               round,

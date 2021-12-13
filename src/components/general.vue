@@ -5,7 +5,7 @@
         q-toolbar
           q-btn(flat round icon="keyboard_arrow_left" @click="$store.changeSettingSubKind('default')")
           q-toolbar-title(align="center") {{$t('General')}}
-          q-btn.btnIcon(flat round icon="settings_backup_restore" @click="showRestoreDialog")
+          q-btn.text-primary(flat round icon="settings_backup_restore" @click="showRestoreDialog")
         q-list
           q-item(dense)
             q-item-section

@@ -31,7 +31,7 @@
           lazy-rules :rules="[val => val && val.length > 0 && validate(val) || $t('Invalid PeerId or Mobile')]"
         )
           template(v-slot:after)
-            q-btn.btnIcon(
+            q-btn.text-primary(
               flat,
               round,
               dense,
@@ -237,7 +237,7 @@
           @click="$store.state.findContactsSubKind = 'result'"
         )
         q-toolbar-title(align="center") {{ $t('Accept Contacts') }}
-        q-btn.btnIcon(
+        q-btn.text-primary(
           flat,
           round,
           dense,

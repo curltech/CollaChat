@@ -125,6 +125,7 @@ export default {
   "MemberAlias: ": "群昵称：",
   "Name: ": "名称：",
   "Description: ": "描述：",
+  "Description": "描述",
   "HeadCount: ": "人数：",
   "Chat Details": "聊天详情",
   "Remove Chat": "删除",
@@ -519,6 +520,8 @@ export default {
   "More Articles": "更多文章",
   "Remove this channel (together with all channel articles)?": "删除此频道（包括所有文章）？",
   "Article": "文章",
+  "Please input Description": "请输入描述",
+  "Please input Title": "请输入标题",
 
   // Others
   "Migrate successfully": "迁移成功",
@@ -590,6 +593,10 @@ export default {
   Permission: "权限",
   Name: "名称",
   Title: "标题",
+  Subtitle: "副标题",
+  Author: "作者",
+  Body: "正文",
+  Cover: "封面",
   Phone: "电话",
   Mobile: "手机号",
   Draft: "草稿",

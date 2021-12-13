@@ -44,7 +44,7 @@ export default {
         let clientPeerId = myself.myselfPeerClient.peerId
         let currentTime = new Date().getTime()
         let content = store.state.articleData.content
-        let plainContent = content.replace(/<[^>]+>/g, '').replace(/^\s*/g, '')
+        let plainContent = content ? content.replace(/<[^>]+>/g, '').replace(/^\s*/g, '') : ''
         let pyPlainContent = pinyinUtil.getPinyin(plainContent)
         let current
         let blockType = BlockType.ChannelArticle
@@ -69,11 +69,11 @@ export default {
             updateDate: currentTime
           }
         } else if (store.newArticleEntry === 'editArticle') {
+          current = store.state.currentArticle
           // 云端删除old
           let old = CollaUtil.clone(current)
           await collectionUtil.deleteBlock(old, true, blockType)
           // current
-          current = store.state.currentArticle
           current.cover = store.state.articleData.cover
           current.author = store.state.articleData.author
           current.title = store.state.articleData.title

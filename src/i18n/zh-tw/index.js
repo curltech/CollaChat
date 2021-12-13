@@ -125,6 +125,7 @@
   "MemberAlias: ": "群昵稱：",
   "Name: ": "名稱：",
   "Description: ": "描述：",
+  "Description": "描述",
   "HeadCount: ": "人數：",
   "Chat Details": "聊天詳情",
   "Remove Chat": "刪除",
@@ -516,6 +517,9 @@
   "More Channels": "更多頻道",
   "More Articles": "更多文章",
   "Remove this channel (together with all channel articles)?": "刪除此頻道（包括所有文章）？",
+  "Article": "文章",
+  "Please input Description": "請輸入描述",
+  "Please input Title": "請輸入標題",
 
   // Others
   "Migrate successfully": "遷移成功",
@@ -587,6 +591,10 @@
   Permission: "權限",
   Name: "名稱",
   Title: "標題",
+  Subtitle: "副標題",
+  Author: "作者",
+  Body: "正文",
+  Cover: "封面",
   Phone: "電話",
   Mobile: "手機號",
   Draft: "草稿",

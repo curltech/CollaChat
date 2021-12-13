@@ -5,7 +5,7 @@
         q-toolbar
           q-btn(:class="ifMobileSize || $store.state.ifMobileStyle ? '' : 'hidden'" flat round icon="keyboard_arrow_left" @click="$store.toggleDrawer(false)")
           q-toolbar-title(align="center" :style="ifMobileSize || $store.state.ifMobileStyle ? '' : 'padding-left:54px'") {{$t('Contacts Requests')}}
-          q-btn.btnIcon(flat round icon="send" @click="subKind = 'sentList'")
+          q-btn.text-primary(flat round icon="send" @click="subKind = 'sentList'")
         q-list
           div(v-for="(linkmanRequest, index) in $store.state.linkmanRequests" v-if="linkmanRequest.receiverPeerId === $store.state.myselfPeerClient.peerId" :key="linkmanRequest._id")
             q-item(class="q-px-xs")
@@ -23,7 +23,7 @@
               q-item-section(side :class="linkmanRequest.status === RequestStatus.RECEIVED ? '' : 'hidden'")
                 q-btn(color="primary" dense round flat icon="person_add" @click="acceptRequest(linkmanRequest)")
               q-item-section(side :class="linkmanRequest.status === RequestStatus.RECEIVED ? '' : 'hidden'")
-                q-btn.btnIcon(dense round flat icon="person_add_disabled" @click="ignoreRequest(linkmanRequest)")
+                q-btn.text-primary(dense round flat icon="person_add_disabled" @click="ignoreRequest(linkmanRequest)")
             q-separator.c-separator(inset="item" v-if="index < $store.state.linkmanRequests.length - 1")
             q-separator.c-separator(v-if="index === $store.state.linkmanRequests.length - 1")
       q-tab-panel(name="sentList" style="padding:0px 0px")

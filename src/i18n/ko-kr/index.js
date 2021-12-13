@@ -125,6 +125,7 @@
   "MemberAlias: ": "그룹 닉네임：",
   "Name: ": "이름：",
   "Description: ": "설명：",
+  "Description": "설명",
   "HeadCount: ": "인원수：",
   "Chat Details": "자세 한 이야기 하기",
   "Remove Chat": "삭제",
@@ -518,6 +519,8 @@
   "More Articles": "더 많은 기사",
   "Remove this channel (together with all channel articles)?": "이 채널（모든 기사 포함）을 삭제하시겠습니까？",
   "Article": "기사",
+  "Please input Description": "설명을 입력하세요",
+  "Please input Title": "제목을 입력하세요",
 
   // Others
   "Migrate successfully": "성공적으로 마이그레이션",
@@ -589,6 +592,10 @@
   Permission: "권한",
   Name: "이름",
   Title: "제목",
+  Subtitle: "부제목",
+  Author: "저자",
+  Body: "본문",
+  Cover: "표지",
   Phone: "전화기",
   Mobile: "핸드폰 번호",
   Draft: "초고",

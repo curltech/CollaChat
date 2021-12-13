@@ -5,7 +5,7 @@
         q-toolbar
           q-btn(:class="ifMobileSize || $store.state.ifMobileStyle ? '' : 'hidden'" flat round icon="keyboard_arrow_left" @click="$store.toggleDrawer(false)")
           q-toolbar-title(align="center" :style="ifMobileSize || $store.state.ifMobileStyle ? '' : 'padding-left:54px'") {{ loading ? $t('Updating...') : $t('Wallet') }}
-          q-btn.btnIcon(flat round icon="receipt" @click="subKind = 'transaction'" no-caps)
+          q-btn.text-primary(flat round icon="receipt" @click="subKind = 'transaction'" no-caps)
         q-list
           q-item(style="padding-top:30px")
             q-space
@@ -24,7 +24,7 @@
         q-toolbar
           q-btn(flat round icon="keyboard_arrow_left" @click="subKind = 'default'")
           q-toolbar-title(align="center") {{$t('Transactions') + '(' + peerTrans.length + ')'}}
-          q-btn.btnIcon(flat round icon="save_alt" no-caps :disable="!peerTrans.length" @click="showExportDialog")
+          q-btn.text-primary(flat round icon="save_alt" no-caps :disable="!peerTrans.length" @click="showExportDialog")
         q-list
           q-item(class="q-px-none")
             q-item-section(class="q-px-xs")

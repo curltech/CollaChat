@@ -1,10 +1,10 @@
 <template lang="pug">
   div.bg-c-grey-0
     q-tab-panels(v-model="subKind" animated transition-prev="slide-right" transition-next="slide-left")
-      q-tab-panel(name="default" style="padding:0px 0px")
-        q-card(flat :style="heightStyle")
-          q-card-section
-            q-btn(flat round dense icon="keyboard_arrow_left" @click="$store.changeSettingSubKind('default')")
+      q-tab-panel(:style="heightStyle" name="default" style="padding:0px 0px")
+        q-toolbar
+          q-btn(flat round icon="keyboard_arrow_left" @click="$store.changeSettingSubKind('default')")
+        q-card(flat)
           q-card-section(align="center" class="q-pa-none")
             q-img(src="@/assets/colla.png" style="height: 120px; width: 137px")
           q-card-section
@@ -78,7 +78,7 @@
           q-btn(flat round icon="keyboard_arrow_left" @click="subKind = 'default'")
           //q-toolbar-title(align="center") {{$t('QR Code')}}
           q-space
-          q-btn.btnIcon(flat round icon="more_horiz" @click="operateQRCode")
+          q-btn.text-primary(flat round icon="more_horiz" @click="operateQRCode")
         q-card(flat class="fixed-center q-pa-none")
           q-card-section#qrCodeCard(class="q-pa-xs")
             q-card(flat class="q-pa-sm")

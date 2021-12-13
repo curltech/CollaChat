@@ -2,7 +2,7 @@
   div.bg-c-grey-0#videoContainer(:style="heightStyle" align="center")
     q-toolbar(v-if="$store.captureType === 'image' || $store.captureType === 'video'")
       q-space
-      q-btn.btnIcon(v-if="!imageUrl && !videoUrl && captureStatus===false" flat round icon="flip_camera_ios" @click="reverseCamera")
+      q-btn.text-primary(v-if="!imageUrl && !videoUrl && captureStatus===false" flat round icon="flip_camera_ios" @click="reverseCamera")
     q-carousel#videoCarousel(v-if="$store.captureType === 'image' || $store.captureType === 'video'" v-model="captureSlide")
       q-carousel-slide(name="1" class="q-pa-none")
         video(ref="srcVideo" id="srcVideo" :srcObject="srcStream" muted webkit-playsinline playsinline x5-playsinline x-webkit-airplay="allow")

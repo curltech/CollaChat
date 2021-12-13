@@ -5,7 +5,7 @@
         q-toolbar.bg-c-grey-0
           q-btn(:class="ifMobileSize || $store.state.ifMobileStyle || $store.channelDetailsChannelEntry === 'article' ? '' : 'hidden'" flat round icon="keyboard_arrow_left" @click="channelBack()")
           q-toolbar-title(align="center" :style="ifMobileSize || $store.state.ifMobileStyle ? '' : 'padding-left:54px'") {{$t('Channel')}}
-          q-btn.btnIcon(flat round icon="more_horiz" @click="channelCommand()")
+          q-btn.text-primary(flat round icon="more_horiz" @click="channelCommand()")
         q-list.bg-c-grey-0(flat)
           q-item
             q-item-section(avatar)
@@ -15,7 +15,7 @@
               q-item-label(class="text-h5") {{ $store.state.currentChannel ? $store.state.currentChannel.name : '' }}
                 q-icon(:name="$store.state.currentChannel && $store.state.currentChannel.top ? 'star' : ''" color="primary")
             q-item-section(v-if="$store.state.currentChannel && $store.state.currentChannel.creator !== $store.state.myselfPeerClient.peerId" side)
-              q-btn.btnIcon.bg-c-grey-message(flat @click="follow()" :label="$store.state.currentChannel && $store.state.currentChannel.markDate ? $t('Unfollow') : $t('Follow')" no-caps)
+              q-btn.text-primary.bg-c-grey-message(flat @click="follow()" :label="$store.state.currentChannel && $store.state.currentChannel.markDate ? $t('Unfollow') : $t('Follow')" no-caps)
           q-item
             q-item-section
               q-item-label(caption) {{ $store.state.currentChannel ? $store.state.currentChannel.description : '' }}
@@ -32,7 +32,7 @@
         q-toolbar.header-toolbar
           q-btn(flat round icon="keyboard_arrow_left" @click="articleBack()")
           q-space
-          q-btn.btnIcon(flat round icon="more_horiz" @click="viewCommand()")
+          q-btn.text-primary(flat round icon="more_horiz" @click="viewCommand()")
         div.scroll.header-mar-top.bg-c-white(v-if="$store.state.currentArticle" class="q-pl-md" id="scroll-target-view" :class="ifMobileSize || $store.state.ifMobileStyle ? (ifMobileSize ? 'scrollHeightMobileSize-editor' : 'scrollHeightMobileStyle-editor') : 'scrollHeightStyle'")
           div(class="q-py-md text-h5") {{ $store.state.currentArticle.title }}
           div(class="q-pb-lg")
@@ -48,7 +48,7 @@
         q-toolbar
           q-btn(flat round icon="keyboard_arrow_left" @click="subKind='default'")
           q-toolbar-title(align="center") {{$t('Edit Channel')}}
-          q-btn.btnIcon(flat round icon="check" @click="editChannel")
+          q-btn(flat round icon="check" @click="editChannel" :disable="!channelData.name || !channelData.description" :class="channelData.name && channelData.description?'text-primary':'c-grey-0'")
         q-card(flat)
           q-card-section(align="center")
             q-item-label(class="q-field__label q-py-sm" :style="$q.dark.isActive ? 'color: rgba(255,255,255,0.7)' : ''") {{$t('Channel Avatar')}}
@@ -57,9 +57,9 @@
               img(:src="channelData.avatar ? channelData.avatar : $store.defaultChannelAvatar")
           q-card-section(class="q-pt-none")
             q-form(ref="formCreateChannel" @submit="editChannel" class="q-pa-sm")
-              q-input.c-field(autofocus :label="$t('Channel Name')" filled clearable v-model="channelData.name" lazy-rules :rules="[]")
+              q-input.c-field(autofocus :label="$t('Name')" filled clearable v-model="channelData.name" lazy-rules :rules="[val => val && val.length > 0 || $t('Please input Name')]")
               p
-              q-input.c-field(:label="$t('Channel Description')" filled clearable v-model="channelData.description" lazy-rules :rules="[]")
+              q-input.c-field(:label="$t('Description')" filled clearable v-model="channelData.description" lazy-rules :rules="[val => val && val.length > 0 || $t('Please input Description')]")
       q-tab-panel(name="selectChat" style="padding:0px 0px")
         selectChat.drawcontent
     q-uploader(style="display:none" ref="channelUpload" @added="files => channelUpload(files)" accept=".jpg, image/*")

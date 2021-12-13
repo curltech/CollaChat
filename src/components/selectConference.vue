@@ -10,14 +10,14 @@ div
       q-toolbar
         q-btn(flat, round, icon="keyboard_arrow_left", @click="back")
         q-toolbar-title(align="center", style="padding-left:84px") {{ $t('Conference') }}
-        q-btn.btnIcon(flat, round, icon="alarm_add", @click="add")
-        q-btn.btnIcon(
+        q-btn.text-primary(flat, round, icon="alarm_add", @click="add")
+        q-btn.text-primary(
           flat,
           round,
           icon="addchart",
           @click="showJoinDialog"
         )
-        q-btn.btnIcon(
+        q-btn.text-primary(
           flat,
           round,
           icon="history",
@@ -150,7 +150,7 @@ div
             @click="reset"
           )
           q-space
-          q-btn.btnIcon(
+          q-btn.text-primary(
             flat,
             round,
             icon="schedule",

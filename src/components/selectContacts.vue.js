@@ -120,17 +120,19 @@ export default {
       } else if (store.selectContactsEntry === 'linkmanCard') {
         await store.selectedLinkmanCard()
         store.changeKind('message')
-      }else if(store.selectContactsEntry === 'selectChat'){
-        for(let linkman of store.state.includedLinkmans){
+      } else if (store.selectContactsEntry === 'selectChat') {
+        for (let linkman of store.state.includedLinkmans) {
           let chatRecord =  await store.getChat(linkman.peerId)
-          if(store.selectChatEntry === 'collectionForward'){
+          if (store.selectChatEntry === 'collectionForward') {
             let currentCollection = store.state.currentCollection
             await store.collectionForwardToChat(currentCollection,chatRecord)
-          }else if(store.selectChatEntry === 'messageForward'){
+          } else if (store.selectChatEntry === 'messageForward') {
             await store.forwardToChat(chatRecord)
-          }else if(store.selectChatEntry === 'channelForward'){
+          } else if (store.selectChatEntry === 'accountInformationQrCode') {
+            // TODO
+          } else if (store.selectChatEntry === 'channelForward') {
             await store.channelForwardToChat(store.state.currentChannel,chatRecord)
-          }else if(store.selectChatEntry === 'articleForward'){
+          } else if (store.selectChatEntry === 'articleForward') {
             await store.articleForwardToChat(store.state.currentArticle,chatRecord)
           }
         }

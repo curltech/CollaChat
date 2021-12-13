@@ -107,17 +107,19 @@ export default {
     async doneSelectGroupChat() {
       let _that = this
       let store = _that.$store
-      if(store.selectGroupChatEntry === 'selectChat'){
-        for(let group of _that.includedGroupChat){
+      if (store.selectGroupChatEntry === 'selectChat') {
+        for (let group of _that.includedGroupChat) {
           let chatRecord =  await store.getChat(group.groupId)
-          if(store.selectChatEntry === 'collectionForward'){
+          if (store.selectChatEntry === 'collectionForward') {
             let currentCollection = store.state.currentCollection
             await store.collectionForwardToChat(currentCollection,chatRecord)
-          }else if(store.selectChatEntry === 'messageForward'){
-           await store.forwardToChat(chatRecord)
-          }else if(store.selectChatEntry === 'channelForward'){
+          } else if (store.selectChatEntry === 'messageForward') {
+            await store.forwardToChat(chatRecord)
+          } else if (store.selectChatEntry === 'accountInformationQrCode') {
+            // TODO
+          } else if (store.selectChatEntry === 'channelForward') {
             await store.channelForwardToChat(store.state.currentChannel,chatRecord)
-          }else if(store.selectChatEntry === 'articleForward'){
+          } else if (store.selectChatEntry === 'articleForward') {
             await store.articleForwardToChat(store.state.currentArticle,chatRecord)
           }
         }

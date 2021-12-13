@@ -125,6 +125,7 @@ export default {
   "MemberAlias: ": "MemberAlias: ",
   "Name: ": "Name: ",
   "Description: ": "Description: ",
+  "Description": "Description",
   "HeadCount: ": "HeadCount: ",
   "Chat Details": "Chat Details",
   "Remove Chat": "Remove Chat",
@@ -508,6 +509,8 @@ export default {
   "More Articles": "More Articles",
   "Remove this channel (together with all channel articles)?": "Remove this channel (together with all channel articles)?",
   "Article": "Article",
+  "Please input Description": "Please input Description",
+  "Please input Title": "Please input Title",
 
   // Others
   "Migrate successfully": "Migrate successfully",
@@ -579,6 +582,10 @@ export default {
   Permission: "Permission",
   Name: "Name",
   Title: "Title",
+  Subtitle: "Subtitle",
+  Author: "Author",
+  Body: "Body",
+  Cover: "Cover",
   Phone: "Phone",
   Mobile:"Mobile",
   Draft: "Draft",

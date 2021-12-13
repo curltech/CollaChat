@@ -19,7 +19,7 @@
             )
           q-space
           q-item-section(v-if="$store.state.currentLinkman && $store.state.currentLinkman.peerId !== $store.state.myselfPeerClient.peerId" side)
-            q-btn.btnIcon(
+            q-btn.text-primary(
               flat,
               round,
               dense,
@@ -113,9 +113,9 @@
       align="center"
     )
       q-toolbar(v-if="!$store.ifMobile()" style="z-index: 999")
-        q-btn.btnIcon(flat round icon="close" @click="fullscreenBack")
+        q-btn.text-primary(flat round icon="close" @click="fullscreenBack")
         q-space
-        q-btn.btnIcon(flat round icon="more_horiz" @click="operateAvatar")
+        q-btn.text-primary(flat round icon="more_horiz" @click="operateAvatar")
       img#avatarImg(
         :src="$store.state.currentLinkman ? ($store.state.currentLinkman.avatar ? $store.state.currentLinkman.avatar : $store.defaultActiveAvatar) : null"
       )

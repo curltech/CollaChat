@@ -23,7 +23,7 @@
               q-item-section(avatar)
                 q-icon(color="c-grey-7" :name="linkman.locked ? 'lock' : ''")
               //q-item-section(side)
-                q-btn.btnIcon(dense round flat icon="remove_circle" @click="unlock(linkman)")
+                q-btn.text-primary(dense round flat icon="remove_circle" @click="unlock(linkman)")
               
             q-separator.c-separator(inset="item" v-if="index < LockList.length - 1")
             q-separator.c-separator(v-if="index === LockList.length - 1")

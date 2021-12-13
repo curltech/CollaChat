@@ -18,7 +18,7 @@
           q-item-section(side :class="(linkmanRequest.status === RequestStatus.SENT || linkmanRequest.status === RequestStatus.RECEIVED) ? 'hidden' : ''")
             q-item-label(caption lines="1") {{ $t(linkmanRequest.status) }}
           q-item-section(side :class="(linkmanRequest.status === RequestStatus.SENT || linkmanRequest.status === RequestStatus.RECEIVED) ? '' : 'hidden'")
-            q-btn.btnIcon(dense round flat icon="person_add_disabled" @click="ignoreRequest(linkmanRequest)")
+            q-btn.text-primary(dense round flat icon="person_add_disabled" @click="ignoreRequest(linkmanRequest)")
         q-separator.c-separator(inset="item" v-if="index < $store.state.linkmanRequests.length - 1")
         q-separator.c-separator(v-if="index === $store.state.linkmanRequests.length - 1")
 </template>

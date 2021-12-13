@@ -35,7 +35,9 @@ export default {
     back() {
       let _that = this
       let store = _that.$store
-      if (store.selectChatEntry === 'messageForward') {
+      if (store.selectChatEntry === 'collectionForward') {
+        store.changeCollectionSubKind('view')
+      } else if (store.selectChatEntry === 'messageForward') {
         store.changeMessageSubKind('default')
       } else if (store.selectChatEntry === 'accountInformationQrCode') {
         store.accountInformationEnterQRCode()

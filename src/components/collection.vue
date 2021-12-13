@@ -5,8 +5,8 @@
         q-toolbar.header-toolbar
           q-btn(v-if="ifMobileSize || $store.state.ifMobileStyle || $store.collectionEntry === 'message'" flat round icon="keyboard_arrow_left" @click="back()")
           q-toolbar-title(align="center" :style="ifMobileSize || $store.state.ifMobileStyle ? ($store.collectionEntry === 'message' ? '' : (collectionTypeIndex === 0 || collectionTypeIndex === 1 ? 'padding-left:54px' : '')) : ($store.collectionEntry === 'message' ? 'padding-right:54px' : (collectionTypeIndex === 0 || collectionTypeIndex === 1 ? 'padding-left:96px' : 'padding-left:54px'))") {{ cloudSyncing ? $t('Updating...') : $t('Collection') + '-' + $t(collectionTypes[collectionTypeIndex].value) + '(' + myCollections.length + ')' }}
-          q-btn.btnIcon(v-if="$store.collectionEntry !== 'message'" flat round icon="sync" @click="cloudSync()")
-          q-btn.btnIcon(v-if="$store.collectionEntry !== 'message' && (collectionTypeIndex === 0 || collectionTypeIndex === 1)" flat round icon="add_circle_outline" @click="insert")
+          q-btn.text-primary(v-if="$store.collectionEntry !== 'message'" flat round icon="sync" @click="cloudSync()")
+          q-btn.text-primary(v-if="$store.collectionEntry !== 'message' && (collectionTypeIndex === 0 || collectionTypeIndex === 1)" flat round icon="add_circle_outline" @click="insert")
           q-btn(v-if="$store.collectionEntry === 'message'" flat round icon="check" :disable="$store.state.selectedCollectionItems.length < 1" :label="($store.state.selectedCollectionItems.length > 0 ? '(' + $store.state.selectedCollectionItems.length + ')' : '')" :class="$store.state.selectedCollectionItems.length > 0 ? 'text-primary' : 'c-grey-0'" @click="doneSelectCollectionItem")
         div.scroll.header-mar-top(id="scroll-target-default" :class="ifMobileSize || $store.state.ifMobileStyle ? (ifMobileSize ? 'scrollHeightMobileSize-editor' : 'scrollHeightMobileStyle-editor') : 'scrollHeightStyle'")
           q-pull-to-refresh(@refresh="cloudSync" color="primary" bg-color="c-grey-0" icon="sync")
@@ -32,7 +32,7 @@
           q-input.c-field(:disable="$store.state.myselfPeerClient.localDataCryptoSwitch===true" debounce="100" filled dense v-model="searchText" :placeholder="placeholder2" input-class="iconfont" style="width: 86%" autofocus :prefix="collectionType && collectionType !== CollectionType.ALL ? $t(collectionType) : ''" @keyup="searchKeyup" @focus="searchTextFocus")
             template(slot="append")
               q-icon(v-if="searchText" name="cancel" class="cursor-pointer" @click.stop="searchText = null")
-          q-btn.btnIcon(flat round icon="close" @click="searchBack()")
+          q-btn.text-primary(flat round icon="close" @click="searchBack()")
         div.scroll.header-mar-top(v-if="search===false")
           q-list
             q-item
@@ -67,7 +67,7 @@
         q-toolbar.header-toolbar
           q-btn(flat round icon="keyboard_arrow_left" @click="subKind='default'")
           q-space
-          q-btn.btnIcon(v-if="$store.collectionEntry !== 'message'" flat round icon="more_horiz" @click="viewCommand()")
+          q-btn.text-primary(v-if="$store.collectionEntry !== 'message'" flat round icon="more_horiz" @click="viewCommand()")
         div.scroll.header-mar-top.bg-c-white(id="scroll-target-view" :class="ifMobileSize || $store.state.ifMobileStyle ? (ifMobileSize ? 'scrollHeightMobileSize-editor' : 'scrollHeightMobileStyle-editor') : 'scrollHeightStyle'")
           iframe(v-if="myCollections.c_meta.current && myCollections.c_meta.current.content && myCollections.c_meta.current.content.substr(0,4)==='http'" id="iframeContent"
             :src="myCollections.c_meta.current.content" frameborder="no" border="0" marginwidth="0" marginheight="0" allowtransparency="yes" scrolling="yes")
@@ -83,16 +83,16 @@
           q-btn(flat round icon="keyboard_arrow_left" @click="editBack()")
           q-space
           //q-toolbar-title(align="center") {{ $t('Note') }}
-          //q-btn.btnIcon(flat round icon="attach_file" @click="subKind='attachment'")
+          //q-btn.text-primary(flat round icon="attach_file" @click="subKind='attachment'")
             q-badge(v-if="myCollections.c_meta.current && myCollections.c_meta.current.attachAmount > 0" floating) {{ myCollections.c_meta.current.attachAmount }}
-          q-btn.btnIcon(flat round icon="more_horiz" @click="editCommand()")
+          q-btn.text-primary(flat round icon="more_horiz" @click="editCommand()")
         div.wangEditorToolbarMobileStyle(ref="editorToolbar")
         div.bg-c-white(ref="editorContainer" :class="ifMobileSize || $store.state.ifMobileStyle ? (ifMobileSize ? 'scrollHeightMobileSize-wangEditor' : 'scrollHeightMobileStyle-wangEditor') : 'scrollHeightStyle'")
       q-tab-panel(:style="heightStyle" name="tag" class="q-pa-none")
         q-toolbar
           q-btn(flat round icon="keyboard_arrow_left" @click="subKind=tagEntry")
           q-toolbar-title(align="center") {{ $t('Edit Tags') }}
-          q-btn.btnIcon(flat round icon="check" @click="saveTag()")
+          q-btn.text-primary(flat round icon="check" @click="saveTag()")
         q-form(ref="formEditTags" @submit="saveTag()")
           div(style="margin-left:12px" class="text-c-grey-10 q-my-sm") {{ $t('Tags') + $t(' (please input Return after input new tags)') }}
           q-select.c-field(v-if="myCollections.c_meta.current" bg-color="c-white" color="c-grey-7" square standout hide-bottom-space clearable v-model="collectionData.tags"
@@ -107,13 +107,13 @@
           q-input.c-field(bg-color="c-white" color="c-grey-3" square outlined hide-bottom-space clearable autofocus v-model="tagName" lazy-rules :rules="[ val => val && val.length > 0 || $t('Please input Name'), val => !tagExceedsLengthLimit(val) || $t('Tag name exceeds length limit'), val=> !tagAlreadyExists(val) || $t('Tag name already exists') ]")
       q-tab-panel.bg-black#selectedContainer(:style="heightStyle" name="fullscreen" class="q-pa-none" align="center")
         q-toolbar(v-if="selected && selected.nodeName === 'VIDEO'" style="z-index: 999")
-          q-btn.btnIcon(flat round icon="close" @click="fullscreenBack")
+          q-btn.text-primary(flat round icon="close" @click="fullscreenBack")
           q-space
-          q-btn.btnIcon(flat round icon="more_horiz" @click="videoCommand()")
+          q-btn.text-primary(flat round icon="more_horiz" @click="videoCommand()")
         q-toolbar(v-if="selected && selected.nodeName === 'IMG' && !$store.ifMobile()" style="z-index: 999")
-          q-btn.btnIcon(flat round icon="close" @click="fullscreenBack")
+          q-btn.text-primary(flat round icon="close" @click="fullscreenBack")
           q-space
-          q-btn.btnIcon(flat round icon="more_horiz" @click="imageCommand()")
+          q-btn.text-primary(flat round icon="more_horiz" @click="imageCommand()")
         img#selectedImg(v-if="selected && selected.nodeName === 'IMG'" :src="selected.src")
         canvas#selectedCanvas(v-if="selected && selected.nodeName === 'IMG'" class="hidden")
         video#selectedVideo(v-if="selected && selected.nodeName === 'VIDEO'" :src="selected.src" controls webkit-playsinline playsinline x5-playsinline x-webkit-airplay="allow" autoplay)

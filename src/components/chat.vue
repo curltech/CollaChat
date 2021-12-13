@@ -3,9 +3,9 @@
     q-tab-panels.bg-c-grey-1(v-model="subKind" animated transition-prev="slide-right" transition-next="slide-left")
       q-tab-panel(name="default" class="q-pa-none")
         q-toolbar.header-toolbar(:class="ifMobileSize || $store.state.ifMobileStyle ? 'bg-c-grey-1' : 'bg-c-grey-1'")
-          q-btn.btnIcon(flat round :icon="$store.state.lockContactsSwitch ? 'visibility_off' : 'visibility'" @click="showLockContactsSwitchDialog")
+          q-btn.text-primary(flat round :icon="$store.state.lockContactsSwitch ? 'visibility_off' : 'visibility'" @click="showLockContactsSwitchDialog")
           q-toolbar-title(align="center" class="text-c-grey-10") {{ $store.state.networkStatus === 'CONNECTING' ? $t('Chat') + '(' + $t('CONNECTING') + ')' : ($store.state.networkStatus === 'CONNECTED' ? $t('Chat') : $t('Chat') + '(' + $t('DISCONNECTED') + ')') }}
-          q-btn.btnIcon(flat round icon="add_circle_outline")
+          q-btn.text-primary(flat round icon="add_circle_outline")
             q-menu(auto-close)
               q-list
                 q-item(clickable v-ripple @click="showSelectGroupChatLinkman" v-close-popup)
@@ -69,7 +69,7 @@
           q-input.c-field(:disable="$store.state.myselfPeerClient.localDataCryptoSwitch===true" debounce="100" filled dense v-model="searchText" :placeholder="placeholder2" input-class="iconfont" style="width: 86%" autofocus @keyup="searchKeyup" @input="searchInput")
             template(slot="append")
               q-icon(v-if="searchText" name="cancel" class="cursor-pointer" @click.stop="searchText = null;searching = false")
-          q-btn.btnIcon(flat round icon="close" @click="searchBack()")
+          q-btn.text-primary(flat round icon="close" @click="searchBack()")
         div.scroll.header-mar-top(:class="ifMobileSize || $store.state.ifMobileStyle ? (ifMobileSize ? 'scrollHeightMobileSize-editor' : 'scrollHeightMobileStyle-editor') : 'scrollHeightStyle'")
           q-list(v-if="searching===true")
             q-item(v-if="searchResult === 'allResult' || searchResult === 'linkmanResult'" class="text-c-grey-10")
@@ -148,7 +148,7 @@
           q-form(ref="formUnlockContacts" @submit="updateLockContactsSwitch")
             q-input.c-field(:label="$t('Please input Password')" autofocus filled hide-bottom-space clearable v-model="password" type="password" lazy-rules :rules="[]")
         q-card-actions(align="right")
-          q-btn.btnIcon(round dense unelevated icon="check" v-close-popup @click="updateLockContactsSwitch")
+          q-btn.text-primary(round dense unelevated icon="check" v-close-popup @click="updateLockContactsSwitch")
     q-uploader(style="display:none" ref="upload" @added="files => upload(files)" accept=".jpg, image/*")
  </template>
 <script src="./chat.vue.js" />

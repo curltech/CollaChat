@@ -221,7 +221,7 @@ q-layout
           q-card-section(class="q-pt-none")
             div(class="text-center text-c-grey-10 text-caption") {{$t('Please scan the QR code using another mobile to start the migration')}}
       q-card-actions(align="center")
-        q-btn.btnIcon(unelevated :label="$t('Cancel')" v-close-popup @click="cancelInitMigrate")
+        q-btn.text-primary(unelevated :label="$t('Cancel')" v-close-popup @click="cancelInitMigrate")
   q-dialog(v-model="migrateDialog" persistent)
     q-card(style="width: 250px")
       q-bar(class="bg-primary text-c-grey-0")
@@ -231,8 +231,8 @@ q-layout
       q-card-section(class="q-pa-lg")
         q-item-label {{$t('Please confirm to receive the migration from another mobile')}}
       q-card-actions(align="center")
-        q-btn.btnIcon(unelevated :label="$t('Confirm')" @click="acceptMigrate")
-        q-btn.btnIcon(unelevated :label="$t('Cancel')" @click="closeMigrate")
+        q-btn.text-primary(unelevated :label="$t('Confirm')" @click="acceptMigrate")
+        q-btn.text-primary(unelevated :label="$t('Cancel')" @click="closeMigrate")
   q-dialog(v-model="initBackupDialog" persistent)
     q-card(style="width: 250px")
       q-bar(class="bg-primary text-c-grey-0")
@@ -242,7 +242,7 @@ q-layout
       q-card-section(class="q-pa-lg")
         q-item-label {{$t('Please confirm on your computer to start the backup')}}
       q-card-actions(align="center")
-        q-btn.btnIcon(unelevated :label="$t('Cancel')" v-close-popup @click="cancelInitBackup")
+        q-btn.text-primary(unelevated :label="$t('Cancel')" v-close-popup @click="cancelInitBackup")
   q-dialog(v-model="backupDialog" persistent)
     q-card(style="width: 250px")
       q-bar(class="bg-primary text-c-grey-0")
@@ -254,8 +254,8 @@ q-layout
       q-card-section(class="q-pb-lg")
         q-item-label(class="text-primary") {{$t('TIP: ') + $t('This function uses self-signed ssl certificate, when you first time use it, a Not secure error page will be prompted, please click Advanced button and Proceed to ... link.')}}
       q-card-actions(align="center")
-        q-btn.btnIcon(unelevated :label="$t('Confirm')" @click="acceptBackup")
-        q-btn.btnIcon(unelevated :label="$t('Cancel')" @click="closeBackup('Cancel')")
+        q-btn.text-primary(unelevated :label="$t('Confirm')" @click="acceptBackup")
+        q-btn.text-primary(unelevated :label="$t('Cancel')" @click="closeBackup('Cancel')")
   q-dialog(v-model="restoreDialog" persistent)
     q-card(style="width: 250px")
       q-bar(class="bg-primary text-c-grey-0")
@@ -265,8 +265,8 @@ q-layout
       q-card-section(class="q-pa-lg")
         q-item-label {{$t('Please confirm to restore using the backup from your PC')}}
       q-card-actions(align="center")
-        q-btn.btnIcon(unelevated :label="$t('Confirm')" @click="acceptRestore")
-        q-btn.btnIcon(unelevated :label="$t('Cancel')" @click="closeRestore")
+        q-btn.text-primary(unelevated :label="$t('Confirm')" @click="acceptRestore")
+        q-btn.text-primary(unelevated :label="$t('Cancel')" @click="closeRestore")
 </template>
 <script src="./index.vue.js" />
 <style lang="stylus" src="../css/index.styl"/>

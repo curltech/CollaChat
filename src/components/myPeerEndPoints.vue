@@ -5,7 +5,7 @@
         q-toolbar
           q-btn(flat round icon="keyboard_arrow_left" @click="$store.changeAdvanceSettingSubKind('default')")
           q-toolbar-title(align="center") {{$t('MyNodes') + '(' + data.length + ')'}}
-          q-btn.btnIcon(flat round icon="add_circle_outline" @click="showAddItem")
+          q-btn.text-primary(flat round icon="add_circle_outline" @click="showAddItem")
         q-toolbar(insert class="q-px-xs")
           q-input.c-field(debounce="100" filled dense v-model="filter" :placeholder="placeholder" input-class="text-center iconfont")
             template(slot="append")
@@ -22,7 +22,7 @@
         q-toolbar
           q-btn(flat round icon="keyboard_arrow_left" @click="subKind = 'default'")
           q-toolbar-title(align="center") {{ $t('Edit Node') }}
-          q-btn.btnIcon(flat round icon="check" @click="modify")
+          q-btn(flat round icon="check" @click="modify" :disable="!mpepData.address" :class="mpepData.address?'text-primary':'c-grey-0'")
         q-form(ref="formModify" @submit="modify" class="q-pa-sm")
           q-select.c-field(filled :label="$t('No')" v-model="mpepData.priority" :options="options")
           p
@@ -39,7 +39,7 @@
         q-toolbar
           q-btn(flat round icon="keyboard_arrow_left" @click="subKind = 'default'")
           q-toolbar-title(align="center") {{ $t('Add Node') }}
-          q-btn.btnIcon(flat round icon="check" @click="add")
+          q-btn(flat round icon="check" @click="add" :disable="!mpepData.address" :class="mpepData.address?'text-primary':'c-grey-0'")
         q-form(ref="formAdd" @submit="add" class="q-pa-sm")
           q-select.c-field(filled :label="$t('No')" v-model="mpepData.priority" :options="options")
           p

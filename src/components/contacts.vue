@@ -1,9 +1,9 @@
 <template lang="pug">
   div(:class="ifMobileSize || $store.state.ifMobileStyle ? (ifMobileSize ? 'bg-c-grey-1 heightMobileSize' : 'bg-c-grey-1 heightMobileStyle') : 'bg-c-grey-1 heightStyle'")
     q-toolbar.header-toolbar(:class="ifMobileSize || $store.state.ifMobileStyle ? 'bg-c-grey-1' : 'bg-c-grey-1'")
-      q-btn.btnIcon(flat round :icon="$store.state.lockContactsSwitch ? 'visibility_off' : 'visibility'" @click="showLockContactsSwitchDialog")
+      q-btn.text-primary(flat round :icon="$store.state.lockContactsSwitch ? 'visibility_off' : 'visibility'" @click="showLockContactsSwitchDialog")
       q-toolbar-title(align="center" class="text-c-grey-10") {{$t('Contacts')}}
-      q-btn.btnIcon(flat round icon="person_add" @click="findContacts")
+      q-btn.text-primary(flat round icon="person_add" @click="findContacts")
     div.scroll.header-mar-top(:class="ifMobileSize || $store.state.ifMobileStyle ? (ifMobileSize ? 'scrollHeightMobileSize' : 'scrollHeightMobileStyle') : 'scrollHeightStyle'")
       q-toolbar(insert :class="ifMobileSize || $store.state.ifMobileStyle ? 'bg-c-grey-1' : 'bg-c-grey-1'" class="q-px-xs")
         q-input.c-field(debounce="100" filled dense v-model="contactsfilter" :placeholder="placeholder" input-class="text-center iconfont")

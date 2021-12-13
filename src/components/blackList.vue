@@ -5,7 +5,7 @@
         q-toolbar
           q-btn(flat round icon="keyboard_arrow_left" @click="$store.changePrivacySubKind('default')")
           q-toolbar-title(align="center") {{$t('Blacklist') + '(' + BlackList.length + ')'}}
-          q-btn.btnIcon(flat round :icon="$store.state.lockContactsSwitch ? 'visibility_off' : 'visibility'" @click="showLockContactsSwitchDialog")
+          q-btn.text-primary(flat round :icon="$store.state.lockContactsSwitch ? 'visibility_off' : 'visibility'" @click="showLockContactsSwitchDialog")
         q-toolbar(insert class="q-px-xs")
           q-input.c-field(autofocus debounce="100" filled dense v-model="filter" :placeholder="placeholder" input-class="text-center iconfont")
             template(slot="append")
@@ -24,7 +24,7 @@
               //q-item-section
                 q-item-label(caption lines="1") {{ $t('JoinTime: ') + date.formatDate(linkman.statusDate, 'YYYY-MM-DD HH:mm:ss') }}
               //q-item-section(side)
-                q-btn.btnIcon(dense round flat icon="remove_circle" @click="unblock(linkman)")
+                q-btn.text-primary(dense round flat icon="remove_circle" @click="unblock(linkman)")
               q-item-section(avatar)
                 q-icon(color="c-grey-10" :name="linkman.locked ? 'lock' : ''")
             q-separator.c-separator(inset="item" v-if="index < BlackList.length - 1")

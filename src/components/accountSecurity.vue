@@ -33,7 +33,7 @@
         q-toolbar
           q-btn(flat round icon="keyboard_arrow_left" @click="subKind = 'default'")
           q-toolbar-title(align="center") {{$t('Change Password')}}
-          q-btn.btnIcon(flat round icon="check" @click="changePassword")
+          q-btn.text-primary(flat round icon="check" @click="changePassword")
         q-form(ref="formChangePassword" @submit="changePassword" class="q-pa-sm")
           //div(style="margin-left:12px" class="text-c-grey-10 q-my-sm") {{ $t('OldPassword') }}
           q-input.c-field(autofocus :label="$t('OldPassword')" filled clearable v-model="changePasswordData.oldPassword" type="password" lazy-rules :rules="[ val => val && val.length > 0 || $t('Please input OldPassword')]")
@@ -46,7 +46,7 @@
           q-btn(flat round icon="keyboard_arrow_left" @click="subKind = 'default'")
           //q-toolbar-title(align="center") {{$t('QR Code')}}
           q-space
-          q-btn.btnIcon(flat round icon="more_horiz" @click="operateQRCode")
+          q-btn.text-primary(flat round icon="more_horiz" @click="operateQRCode")
         q-card(flat class="fixed-center q-pa-none")
           q-card-section#qrCodeCard(class="q-pa-xs")
             q-card(flat class="q-pa-sm")
@@ -83,7 +83,7 @@
           q-form(ref="formExportKey" @submit="exportID")
             q-input.c-field(:label="$t('Please input Password')" autofocus filled clearable v-model="password" type="password" lazy-rules :rules="[]")
         q-card-actions(align="right")
-          q-btn.btnIcon(round unelevated icon="check" v-close-popup @click="exportID")
+          q-btn.text-primary(round unelevated icon="check" v-close-popup @click="exportID")
     q-dialog(v-model="destroyIDDialog" persistent)
       q-card
         q-bar(class="bg-primary text-c-grey-0")
@@ -95,6 +95,6 @@
         q-card-section
           q-item-label(class="text-red") {{$t('SERIOUS WARNING: This operation will remove all information related to this ID from this device forever, please be cautious!!!')}}
         q-card-actions(align="right")
-          q-btn.btnIcon(round unelevated icon="check" v-close-popup @click="destroyID")
+          q-btn.text-primary(round unelevated icon="check" v-close-popup @click="destroyID")
 </template>
 <script src="./accountSecurity.vue.js" />

@@ -23,7 +23,7 @@
                   q-item-label(caption lines="1") {{ $t('HeadCount: ') + (groupChat.groupMembers ? groupChat.groupMembers.length : '') }}
                   q-item-label(caption lines="1") {{ $t('CreateDate: ') + date.formatDate(groupChat.createDate, 'YYYY-MM-DD HH:mm:ss') }}
               //q-item-section(side)
-              //  q-btn.btnIcon(dense round flat icon="more" @click="groupChatDetails(groupChat)")
+              //  q-btn.text-primary(dense round flat icon="more" @click="groupChatDetails(groupChat)")
               q-item-section(side)
                 q-btn(dense round flat icon="chat" :color="groupChat && groupChat.activeStatus === ActiveStatus.UP ? 'primary' : 'c-grey'")
             q-separator.c-separator(inset="item" v-if="index < $store.state.groupChats.length - 1")
@@ -43,7 +43,7 @@
                   q-item-label(caption lines="1") {{ $t('HeadCount: ') + (groupChat.groupMembers ? groupChat.groupMembers.length : '') }}
                   q-item-label(caption lines="1") {{ $t('CreateDate: ') + date.formatDate(groupChat.createDate, 'YYYY-MM-DD HH:mm:ss') }}
               //q-item-section(side)
-              //  q-btn.btnIcon(dense round flat icon="more" @click="groupChatDetails(groupChat)")
+              //  q-btn.text-primary(dense round flat icon="more" @click="groupChatDetails(groupChat)")
               q-item-section(side)
                 q-btn(dense round flat icon="chat" :color="groupChat && groupChat.activeStatus === ActiveStatus.UP ? 'primary' : 'c-grey'")
             q-separator.c-separator(inset="item" v-if="index < $store.state.groupChats.length - 1")
