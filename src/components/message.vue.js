@@ -3065,22 +3065,22 @@ export default {
           if (group.groupOwnerPeerId === store.state.myselfPeerClient.peerId) {
             groupChatOwnerName = store.state.myselfPeerClient.name
           } else {
-            let linkman = store.state.linkmanMap[group.groupOwnerPeerId]
-            if (linkman) {
-              groupChatOwnerName = linkman.name
-            } else {
-              let groupChatMembers = group.groupMembers
-              if (groupChatMembers && groupChatMembers.length > 0) {
-                for (let groupChatMember of groupChatMembers) {
-                  if (groupChatMember.peerId === group.groupOwnerPeerId) {
-                    if (groupChatMember.memberAlias) {
-                      groupChatOwnerName = groupChatMember.memberAlias
-                    }
-                    break
+            let groupChatMembers = group.groupMembers
+            if (groupChatMembers && groupChatMembers.length > 0) {
+              for (let groupChatMember of groupChatMembers) {
+                if (groupChatMember.memberPeerId === group.groupOwnerPeerId) {
+                  if (groupChatMember.memberAlias) {
+                    groupChatOwnerName = groupChatMember.memberAlias
                   }
+                  break
                 }
               }
-              if (!groupChatOwnerName) {
+            }
+            if (!groupChatOwnerName) {
+              let linkman = store.state.linkmanMap[group.groupOwnerPeerId]
+              if (linkman) {
+                groupChatOwnerName = linkman.givenName ? linkman.givenName : linkman.name
+              } else {
                 let peerClient = peerClientService.getPeerClientFromCache(group.groupOwnerPeerId)
                 if (peerClient && peerClient.name) {
                   groupChatOwnerName = peerClient.name

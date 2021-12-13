@@ -80,29 +80,29 @@ export default {
         if (message.senderPeerId === state.myselfPeerClient.peerId) {
           name = state.myselfPeerClient.name
         } else {
-          let senderPeer = state.linkmanMap[message.senderPeerId]
-          if (senderPeer) {
-            name = senderPeer.givenName ? senderPeer.givenName : senderPeer.name
-          } else {
-            //name = this.$i18n.t("NonContacts")
-            if (message.subjectType === SubjectType.GROUP_CHAT) {
-              let group = state.groupChatMap[message.subjectId]
-              let groupChatMembers = group.groupMembers
-              if (groupChatMembers && groupChatMembers.length > 0) {
-                for (let groupChatMember of groupChatMembers) {
-                  if (groupChatMember.peerId === message.senderPeerId) {
-                    if (groupChatMember.memberAlias) {
-                      name = groupChatMember.memberAlias
-                    }
-                    break
+          //name = this.$i18n.t("NonContacts")
+          if (message.subjectType === SubjectType.GROUP_CHAT) {
+            let group = state.groupChatMap[message.subjectId]
+            let groupChatMembers = group.groupMembers
+            if (groupChatMembers && groupChatMembers.length > 0) {
+              for (let groupChatMember of groupChatMembers) {
+                if (groupChatMember.memberPeerId === message.senderPeerId) {
+                  if (groupChatMember.memberAlias) {
+                    name = groupChatMember.memberAlias
                   }
+                  break
                 }
               }
-              if (!name) {
-                let peerClient = peerClientService.getPeerClientFromCache(message.senderPeerId)
-                if (peerClient && peerClient.name) {
-                  name = peerClient.name
-                }
+            }
+          }
+          if (!name) {
+            let senderPeer = state.linkmanMap[message.senderPeerId]
+            if (senderPeer) {
+              name = senderPeer.givenName ? senderPeer.givenName : senderPeer.name
+            } else {
+              let peerClient = peerClientService.getPeerClientFromCache(message.senderPeerId)
+              if (peerClient && peerClient.name) {
+                name = peerClient.name
               }
             }
           }
