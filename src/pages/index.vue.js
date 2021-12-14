@@ -11,7 +11,7 @@ import { libp2pClientPool, config, peerClientService, p2pPeer, myself, myselfPee
 import { BlockType, MsgType, PayloadType, dataBlockService, DataBlockService, queryValueAction } from 'libcolla'
 import { EntityState } from 'libcolla'
 import { SecurityPayload } from 'libcolla'
-import {permissionHelper} from '@/libs/base/colla-mobile'
+import { permissionHelper } from '@/libs/base/colla-mobile'
 import pinyinUtil from '@/libs/base/colla-pinyin'
 import * as CollaConstant from '@/libs/base/colla-constant'
 import { statusBarComponent, deviceComponent, inAppBrowserComponent } from '@/libs/base/colla-cordova'
@@ -19,7 +19,7 @@ import { statusBarComponent, deviceComponent, inAppBrowserComponent } from '@/li
 import { cameraComponent, systemAudioComponent, mediaComponent } from '@/libs/base/colla-media'
 import { fileComponent } from '@/libs/base/colla-cordova'
 import { CollectionType, collectionComponent } from '@/libs/biz/colla-collection'
-import { ChatDataType, ChatContentType, ChatMessageStatus, P2pChatMessageType, SubjectType, chatComponent, chatBlockComponent} from '@/libs/biz/colla-chat'
+import { ChatDataType, ChatContentType, ChatMessageStatus, P2pChatMessageType, SubjectType, chatComponent, chatBlockComponent } from '@/libs/biz/colla-chat'
 import { ContactDataType, RequestType, RequestStatus, LinkmanStatus, ActiveStatus, contactComponent, MemberType } from '@/libs/biz/colla-contact'
 import { channelComponent, ChannelDataType, ChannelType, EntityType } from '@/libs/biz/colla-channel'
 import { collectionUtil, blockLogComponent } from '@/libs/biz/colla-collection-util'
@@ -248,7 +248,7 @@ export default {
             }
           }
         }
-        await p2pPeer.start([_that.connectArray[0].address], { WebSockets: { debug: false, timeoutInterval: 5000, binaryType: 'arraybuffer' }})
+        await p2pPeer.start([_that.connectArray[0].address], { WebSockets: { debug: false, timeoutInterval: 5000, binaryType: 'arraybuffer' } })
         console.info('p2pPeer:' + clientPeerId + ' is started! enjoy it')
         // 选择连接速度最快的定位器
         /*for (let j = 0; j < _that.connectArray.length; j++) {
@@ -263,7 +263,7 @@ export default {
         let ps = []
         for (let i = 0; i < _that.connectArray.length; i++) {
           //let promise = p2pPeer.ping(_that.connectArray[i].address, 6000)
-          let promise = p2pPeer.host.ping(_that.connectArray[i].address)
+          let promise = p2pPeer.host.ping(_that.connectArray[i].address, 1000)
           ps.push(promise)
         }
         let responses = await Promise.allSettled(ps)
@@ -283,7 +283,7 @@ export default {
             let stunTurn = await new Promise((resolve, reject) => {
               let stun = false
               let turn = false
-              setTimeout(async ()=> {
+              setTimeout(async () => {
                 if (!stun) {
                   await logService.log('STUN test failed: ' + connectAddress, 'STUNTURN test', 'error')
                 }
@@ -297,10 +297,10 @@ export default {
               }, 1000)
               let iceServer = [
                 {
-                  urls: `stun:${ connectAddress }:3478`
+                  urls: `stun:${connectAddress}:3478`
                 },
                 {
-                  urls: `turn:${ connectAddress }:3478`,
+                  urls: `turn:${connectAddress}:3478`,
                   username: myselfPeerClient.peerId,
                   credential: myselfPeerClient.peerPublicKey
                 }
@@ -322,7 +322,7 @@ export default {
                   if (stun && turn) {
                     resolve(true)
                   }
-                }    
+                }
                 // If a relay candidate was found, notify that the TURN server works!
                 if (e.candidate.type === 'relay') {
                   console.log('The TURN server is reachable!' + (new Date().getTime() - start.getTime()))
@@ -377,7 +377,7 @@ export default {
       let myselfPeerClient = myself.myselfPeerClient
       let clientPeerId = myselfPeerClient.peerId
       config.appParams.connectPeerId = [connectAddress]
-      await p2pPeer.start(null, { WebSockets: { debug: false, timeoutInterval: 5000, binaryType: 'arraybuffer' }})
+      await p2pPeer.start(null, { WebSockets: { debug: false, timeoutInterval: 5000, binaryType: 'arraybuffer' } })
       console.info('p2pPeer:' + clientPeerId + ' is started! enjoy it')
       libp2pClientPool.closeAll()
 
@@ -488,7 +488,7 @@ export default {
           title: _that.$i18n.t('Alert'),
           message: _that.$i18n.t('Account already exists with same mobile number'),
           cancel: false,
-          ok: {"label":_that.$i18n.t('Ok'),"color":"primary","unelevated":true,"no-caps":true},
+          ok: { "label": _that.$i18n.t('Ok'), "color": "primary", "unelevated": true, "no-caps": true },
           persistent: true
         }).onOk(() => {
         }).onCancel(() => {
@@ -528,7 +528,7 @@ export default {
 
                 myselfPeer.avatar = peer.avatar
                 myselfPeer.name = peer.name
-                
+
                 linkman.avatar = peer.avatar
                 linkman.name = peer.name
                 linkman.pyName = pinyinUtil.getPinyin(peer.name)
@@ -552,7 +552,7 @@ export default {
         if (linkmanRecord) {
           store.state.linkmanMap[linkmanPeerId] = linkman
           await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
-        }    
+        }
         // 判断更新primaryEndPoint的公钥
         let clientPeerId = myselfPeerClient.peerId
         let condition = {}
@@ -625,12 +625,12 @@ export default {
         return null
       }
     },
-    ifOnlySocketConnected(peerId){
-      let webrtcPeers  = webrtcPeerPool.getConnected(peerId)
+    ifOnlySocketConnected(peerId) {
+      let webrtcPeers = webrtcPeerPool.getConnected(peerId)
       let webSocket = p2pPeer.host.transportManager._transports.get('WebSockets')
-      if(webSocket.ws && webSocket.ws.readyState === 1 && (!webrtcPeers || webrtcPeers.length === 0)){
+      if (webSocket.ws && webSocket.ws.readyState === 1 && (!webrtcPeers || webrtcPeers.length === 0)) {
         return true
-      }else{
+      } else {
         return false
       }
     },
@@ -643,27 +643,27 @@ export default {
       store.webrtcPeerPool = webrtcPeerPool
       let _connectAddress = myselfPeerClient.connectPeerId.match(/\/dns4\/(\S*)\/tcp/)[1]
       let iceServer = [
-          {
-            urls: `stun:${ _connectAddress }:3478`
-          },
-          {
-            urls: `turn:${ _connectAddress }:3478`,
-            username: myselfPeerClient.peerId,
-            credential: myselfPeerClient.peerPublicKey
-          }
+        {
+          urls: `stun:${_connectAddress}:3478`
+        },
+        {
+          urls: `turn:${_connectAddress}:3478`,
+          username: myselfPeerClient.peerId,
+          credential: myselfPeerClient.peerPublicKey
+        }
       ]
       config.appParams.iceServer = [iceServer]
       for (let linkman of store.state.linkmans) {
-        if(linkman.peerId !== myselfPeerClient.peerId){
+        if (linkman.peerId !== myselfPeerClient.peerId) {
           let option = {}
           option.config = {
             "iceServers": iceServer
           }
-          if(store.state.currentCallChat && store.state.currentCallChat.streamMap && store.state.currentCallChat.streamMap[linkman.peerId] && store.state.currentCallChat.streamMap[linkman.peerId].pending){
-              option.stream = store.state.currentCallChat.streamMap[myselfPeerClient.peerId].stream
-              option.stream.getAudioTracks()[0].enable = true
-              store.state.currentCallChat.streamMap[linkman.peerId].pending = false
-              console.log('index.vue -add stream')
+          if (store.state.currentCallChat && store.state.currentCallChat.streamMap && store.state.currentCallChat.streamMap[linkman.peerId] && store.state.currentCallChat.streamMap[linkman.peerId].pending) {
+            option.stream = store.state.currentCallChat.streamMap[myselfPeerClient.peerId].stream
+            option.stream.getAudioTracks()[0].enable = true
+            store.state.currentCallChat.streamMap[linkman.peerId].pending = false
+            console.log('index.vue -add stream')
           }
           webrtcPeerPool.create(linkman.peerId, option)
           linkman.lastWebrtcRequestTime = new Date().getTime()
@@ -674,75 +674,75 @@ export default {
       let _that = this
       let store = _that.$store
       //receipt
-        let receiptTypes = [
-            P2pChatMessageType.ADD_GROUPCHAT_MEMBER_RECEIPT,
-            P2pChatMessageType.CHAT_RECEIVE_RECEIPT,
-            P2pChatMessageType.MODIFY_GROUPCHAT_OWNER_RECEIPT,
-            P2pChatMessageType.MODIFY_GROUPCHAT_RECEIPT,
-            P2pChatMessageType.REMOVE_GROUPCHAT_MEMBER_RECEIPT,
-            P2pChatMessageType.ADD_GROUPCHAT_RECEIPT
-        ]
+      let receiptTypes = [
+        P2pChatMessageType.ADD_GROUPCHAT_MEMBER_RECEIPT,
+        P2pChatMessageType.CHAT_RECEIVE_RECEIPT,
+        P2pChatMessageType.MODIFY_GROUPCHAT_OWNER_RECEIPT,
+        P2pChatMessageType.MODIFY_GROUPCHAT_RECEIPT,
+        P2pChatMessageType.REMOVE_GROUPCHAT_MEMBER_RECEIPT,
+        P2pChatMessageType.ADD_GROUPCHAT_RECEIPT
+      ]
       let receiptMessages = await chatComponent.loadMessage({
-          ownerPeerId: myself.myselfPeerClient.peerId,
-          subjectId: linkmanPeerId,
-          messageType: {$in : receiptTypes}
+        ownerPeerId: myself.myselfPeerClient.peerId,
+        subjectId: linkmanPeerId,
+        messageType: { $in: receiptTypes }
       })
       if (receiptMessages && receiptMessages.length > 0) {
-          for (let receiptMessage of receiptMessages) {
-              await store.p2pSend(receiptMessage,linkmanPeerId)
-              await chatComponent.remove(ChatDataType.MESSAGE, receiptMessage)
-          }
+        for (let receiptMessage of receiptMessages) {
+          await store.p2pSend(receiptMessage, linkmanPeerId)
+          await chatComponent.remove(ChatDataType.MESSAGE, receiptMessage)
+        }
       }
-      setTimeout(async function(){//等待1s的回执
-          //linkman
-          let unSentIndividualMessages = await chatComponent.loadMessage({
-              ownerPeerId: myself.myselfPeerClient.peerId,
-              senderPeerId : myself.myselfPeerClient.peerId,
-              subjectId: linkmanPeerId,
-              subjectType: SubjectType.CHAT,
-              actualReceiveTime: { $eq: null }
-          })
-          if (unSentIndividualMessages && unSentIndividualMessages.length > 0) {
-              for (let unSentIndividualMessage of unSentIndividualMessages) {
-                  await store.p2pSend(unSentIndividualMessage,linkmanPeerId)
-              }
+      setTimeout(async function () {//等待1s的回执
+        //linkman
+        let unSentIndividualMessages = await chatComponent.loadMessage({
+          ownerPeerId: myself.myselfPeerClient.peerId,
+          senderPeerId: myself.myselfPeerClient.peerId,
+          subjectId: linkmanPeerId,
+          subjectType: SubjectType.CHAT,
+          actualReceiveTime: { $eq: null }
+        })
+        if (unSentIndividualMessages && unSentIndividualMessages.length > 0) {
+          for (let unSentIndividualMessage of unSentIndividualMessages) {
+            await store.p2pSend(unSentIndividualMessage, linkmanPeerId)
           }
-          //group
-          let unSentReceives = await chatComponent.loadReceive({
-              ownerPeerId: myself.myselfPeerClient.peerId,
-              receiverPeerId: linkmanPeerId,
-              receiveTime: { $eq: null }
-          })
-          if (unSentReceives && unSentReceives.length > 0) {
-              for (let unSentReceive of unSentReceives) {
-                  if (unSentReceive.subjectType === SubjectType.LINKMAN_REQUEST) {
-                      let linkmanRequest = await contactComponent.get(ContactDataType.LINKMAN_REQUEST, unSentReceive.messageId)
-                      if (linkmanRequest.data) {
-                          try {
-                              linkmanRequest.data = JSON.parse(linkmanRequest.data)
-                          } catch (e) {
-                              console.log('JSON parse error, string:' + linkmanRequest.data + '; error:' + e)
-                          }
-                      }
-                      let message = {
-                          messageType: unSentReceive.messageType,
-                          content: linkmanRequest
-                      }
-                      await store.p2pSend(message,linkmanPeerId)
-                  } else {
-                      let unSentGroupMessages = await chatComponent.loadMessage({
-                          ownerPeerId: myself.myselfPeerClient.peerId,
-                          messageId: unSentReceive.messageId
-                      })
-                      if (unSentGroupMessages && unSentGroupMessages.length > 0) {
-                          for (let unSentGroupMessage of unSentGroupMessages) {
-                              await store.p2pSend(unSentGroupMessage,linkmanPeerId)
-                          }
-                      }
-                  }
+        }
+        //group
+        let unSentReceives = await chatComponent.loadReceive({
+          ownerPeerId: myself.myselfPeerClient.peerId,
+          receiverPeerId: linkmanPeerId,
+          receiveTime: { $eq: null }
+        })
+        if (unSentReceives && unSentReceives.length > 0) {
+          for (let unSentReceive of unSentReceives) {
+            if (unSentReceive.subjectType === SubjectType.LINKMAN_REQUEST) {
+              let linkmanRequest = await contactComponent.get(ContactDataType.LINKMAN_REQUEST, unSentReceive.messageId)
+              if (linkmanRequest.data) {
+                try {
+                  linkmanRequest.data = JSON.parse(linkmanRequest.data)
+                } catch (e) {
+                  console.log('JSON parse error, string:' + linkmanRequest.data + '; error:' + e)
+                }
               }
+              let message = {
+                messageType: unSentReceive.messageType,
+                content: linkmanRequest
+              }
+              await store.p2pSend(message, linkmanPeerId)
+            } else {
+              let unSentGroupMessages = await chatComponent.loadMessage({
+                ownerPeerId: myself.myselfPeerClient.peerId,
+                messageId: unSentReceive.messageId
+              })
+              if (unSentGroupMessages && unSentGroupMessages.length > 0) {
+                for (let unSentGroupMessage of unSentGroupMessages) {
+                  await store.p2pSend(unSentGroupMessage, linkmanPeerId)
+                }
+              }
+            }
           }
-      },1000)
+        }
+      }, 1000)
 
     },
     async insertReceivedMessage(message) {
@@ -752,30 +752,30 @@ export default {
         await _that.insertReceivedChatMessage(message)
       }
     },
-    async sendChatReceipt(message){
-        let _that = this
-        let store = _that.$store
-        let currentDate = new Date().getTime()
-        let _message = {
-            messageType: P2pChatMessageType.CHAT_RECEIVE_RECEIPT,
-            preSubjectType: message.subjectType,
-            preSubjectId: message.subjectId,
-            subjectType: message.subjectType,
-            subjectId: message.senderPeerId,//不管群聊还是单聊，都为linkman的peerId
-            ownerPeerId: myself.myselfPeerClient.peerId,
-            senderPeerId: myself.myselfPeerClient.peerId,
-            preMessageId: message.messageId,
-            receiveTime: currentDate,
-            actualReceiveTime:currentDate
-        }
-        await _that.sendOrSaveReceipt(_message)
+    async sendChatReceipt(message) {
+      let _that = this
+      let store = _that.$store
+      let currentDate = new Date().getTime()
+      let _message = {
+        messageType: P2pChatMessageType.CHAT_RECEIVE_RECEIPT,
+        preSubjectType: message.subjectType,
+        preSubjectId: message.subjectId,
+        subjectType: message.subjectType,
+        subjectId: message.senderPeerId,//不管群聊还是单聊，都为linkman的peerId
+        ownerPeerId: myself.myselfPeerClient.peerId,
+        senderPeerId: myself.myselfPeerClient.peerId,
+        preMessageId: message.messageId,
+        receiveTime: currentDate,
+        actualReceiveTime: currentDate
+      }
+      await _that.sendOrSaveReceipt(_message)
     },
     async insertReceivedChatMessage(message) {
       let _that = this
       let store = _that.$store
       let currentDate = new Date().getTime()
-      if(!message.actualReceiveTime){
-         await _that.sendChatReceipt(message)
+      if (!message.actualReceiveTime) {
+        await _that.sendChatReceipt(message)
       }
       let receivedMessages = await chatComponent.loadMessage({
         ownerPeerId: myself.myselfPeerClient.peerId,
@@ -788,8 +788,8 @@ export default {
         let ownerPeerId = message.ownerPeerId
         message.ownerPeerId = message.subjectId
         message.subjectId = ownerPeerId
-      } else if(message.subjectType === SubjectType.GROUP_CHAT){
-        if(!store.state.groupChatMap[message.subjectId]){
+      } else if (message.subjectType === SubjectType.GROUP_CHAT) {
+        if (!store.state.groupChatMap[message.subjectId]) {
           return
         }
         message.ownerPeerId = myself.myselfPeerClient.peerId
@@ -809,8 +809,8 @@ export default {
       let content = message.content
       if (message.subjectType === SubjectType.GROUP_CHAT && message.contentType == ChatContentType.TEXT && content.indexOf('@') > -1) {
         let groupChat = store.state.groupChatMap[subjectId]
-        let name = groupChat.myAlias?groupChat.myAlias:myself.myselfPeerClient.name
-        if(content.indexOf(`@${name} `) > -1){
+        let name = groupChat.myAlias ? groupChat.myAlias : myself.myselfPeerClient.name
+        if (content.indexOf(`@${name} `) > -1) {
           currentChat.focusedMessage = message
         }
       }
@@ -828,7 +828,7 @@ export default {
       if (store.state.chatMap[subjectId] == store.state.currentChat) {
         message.readTime = new Date()
         if (message.destroyTime) {
-            message.opened = false
+          message.opened = false
         }
       } else {
         store.state.chatMap[subjectId].unReadCount = store.state.chatMap[subjectId].unReadCount != undefined ? store.state.chatMap[subjectId].unReadCount + 1 : 0
@@ -927,8 +927,8 @@ export default {
         chat.unReadCount = 0
         chat.destroyTime = 0
         chat.mediaProperty = null
-        if(!chat.content){
-            chat.content = ""
+        if (!chat.content) {
+          chat.content = ""
         }
         chat.noMoreMessageTag = false
         chat.subjectType = store.state.linkmanMap[subjectId] ? SubjectType.CHAT : SubjectType.GROUP_CHAT
@@ -965,21 +965,21 @@ export default {
       message.status = ChatMessageStatus.NORMAL
       message.countDown = 0
       message.receiveTime = message.createDate
-      if(subjectId !== myselfPeerId && (message.messageType !== P2pChatMessageType.CALL_REQUEST)){
-      message.actualReceiveTime = null
-      }else{
+      if (subjectId !== myselfPeerId && (message.messageType !== P2pChatMessageType.CALL_REQUEST)) {
+        message.actualReceiveTime = null
+      } else {
         message.actualReceiveTime = message.createDate
       }
       if (subjectType === SubjectType.CHAT && subjectId !== myselfPeerId) {
-        if(store.state.linkmanMap[subjectId].activeStatus === ActiveStatus.UP){
+        if (store.state.linkmanMap[subjectId].activeStatus === ActiveStatus.UP) {
           message.destroyTime = chat.destroyTime
-        }else{
+        } else {
           chat.destroyTime = 0
         }
         //if(_that.ifOnlySocketConnected(subjectId)){
         //    message.actualReceiveTime = message.createDate
         //}
-        await store.p2pSend(message,subjectId)
+        await store.p2pSend(message, subjectId)
       } else if (subjectType === SubjectType.GROUP_CHAT) {
         let groupMembers
         if (message.contentType === ChatContentType.VIDEO_INVITATION || message.contentType === ChatContentType.AUDIO_INVITATION || message.messageType === P2pChatMessageType.CALL_CLOSE) {
@@ -990,7 +990,7 @@ export default {
         for (let groupMember of groupMembers) {
           let linkman = store.state.linkmanMap[groupMember.memberPeerId ? groupMember.memberPeerId : groupMember]
           if (!linkman || linkman.peerId !== linkman.ownerPeerId) { // 自己除外
-            store.p2pSend(message,groupMember.memberPeerId ? groupMember.memberPeerId : groupMember)
+            store.p2pSend(message, groupMember.memberPeerId ? groupMember.memberPeerId : groupMember)
             let receive = {
               ownerPeerId: message.ownerPeerId,
               subjectType: message.subjectType,
@@ -1002,7 +1002,7 @@ export default {
               receiveTime: null
               //receiveTime: _that.ifOnlySocketConnected(subjectId) ? message.createDate : null
             }
-            if(message.messageType !== P2pChatMessageType.CALL_CLOSE){
+            if (message.messageType !== P2pChatMessageType.CALL_CLOSE) {
               await chatComponent.insert(ChatDataType.RECEIVE, receive, null)
             }
           }
@@ -1012,19 +1012,19 @@ export default {
         return
       }
       if (message.messageType === P2pChatMessageType.CHAT_LINKMAN) {
-          await store.handleChatTime(message, chat)
-          chat.content = store.getChatContent(message.contentType, message.content)
-          chat.updateTime = message.createDate
-          let db_chat = await chatComponent.get(ChatDataType.CHAT, chat._id)
-          db_chat.content = chat.content
-          db_chat.updateTime = chat.updateTime
-          await chatComponent.update(ChatDataType.CHAT, db_chat)
-          _that.$nextTick(() => {
-              let container = _that.$el.querySelector('#talk')
-              if (container) {
-                  container.scrollTop = container.scrollHeight
-              }
-          })
+        await store.handleChatTime(message, chat)
+        chat.content = store.getChatContent(message.contentType, message.content)
+        chat.updateTime = message.createDate
+        let db_chat = await chatComponent.get(ChatDataType.CHAT, chat._id)
+        db_chat.content = chat.content
+        db_chat.updateTime = chat.updateTime
+        await chatComponent.update(ChatDataType.CHAT, db_chat)
+        _that.$nextTick(() => {
+          let container = _that.$el.querySelector('#talk')
+          if (container) {
+            container.scrollTop = container.scrollHeight
+          }
+        })
       }
       await chatComponent.insert(ChatDataType.MESSAGE, message, chat.messages)
     },
@@ -1106,7 +1106,7 @@ export default {
       if (item.collectionType === CollectionType.FILE || item.collectionType === CollectionType.VIDEO || item.collectionType === CollectionType.AUDIO || item.collectionType === CollectionType.IMAGE) {
         let _content = item.content
         let name
-        if (item.collectionType !== CollectionType.FILE ) {
+        if (item.collectionType !== CollectionType.FILE) {
           let pat = /\bsrc\b\s*=\s*[\'\"]?([^\'\"]*)[\'\"]?/i
           let res = _content.match(pat)
           if (res && res.length > 1) {
@@ -1157,7 +1157,7 @@ export default {
         await store.sendChatMessage(chat, message)
         _that.setCurrentChat(chat.subjectId)
       }
-      if(_that.tab !== 'chat'){
+      if (_that.tab !== 'chat') {
         store.changeTab('chat')
       }
       store.changeKind('message')
@@ -1279,7 +1279,7 @@ export default {
       }
       message.contentType = type
     },
-    async saveFileAndSendMessage(chat,fileData, type, name) {
+    async saveFileAndSendMessage(chat, fileData, type, name) {
       let _that = this
       let store = _that.$store
       let message = {}
@@ -1309,7 +1309,7 @@ export default {
         messageType: message.messageType,
         content: message.content
       }
-      await store.p2pSend( rtcMessage, groupChatLinkman.peerId)
+      await store.p2pSend(rtcMessage, groupChatLinkman.peerId)
     },
     async findContacts(findType, peerId) {
       let _that = this
@@ -1676,7 +1676,7 @@ export default {
           title: _that.$i18n.t('Alert'),
           message: _that.$i18n.t('Your another Colla account instance logined') + _that.$i18n.t(' (') + _that.$i18n.t('Id: ') + _that.logoutData.srcClientId + _that.$i18n.t(', ') + _that.$i18n.t('Device: ') + _that.logoutData.srcClientType + _that.$i18n.t(', ') + _that.$i18n.t('Time: ') + date.formatDate(_that.logoutData.createDate, 'YYYY-MM-DD HH:mm:ss') + _that.$i18n.t(') '),
           cancel: false,
-          ok: {"label":_that.$i18n.t('Ok'),"color":"primary","unelevated":true,"no-caps":true},
+          ok: { "label": _that.$i18n.t('Ok'), "color": "primary", "unelevated": true, "no-caps": true },
           persistent: true
         }).onOk(() => {
         }).onCancel(() => {
@@ -1960,7 +1960,7 @@ export default {
         }
       } else if (type === ChatMessageType.LOGOUT) {
         await store.logout(data)
-      }  else if (type === ChatMessageType.MIGRATE) { // unreachable
+      } else if (type === ChatMessageType.MIGRATE) { // unreachable
         console.log('MIGRATE')
         _that.initMigrateDialog = false
       } else if (type === ChatMessageType.BACKUP) {
@@ -1973,12 +1973,12 @@ export default {
           _that.initBackupDialog = false
           if (data.operation !== 'Cancel') {
             _that.closeRestore()
-          _that.$q.notify({
-            message: _that.$i18n.t("Backup successfully"),
-            timeout: 3000,
-            type: "info",
-            color: "info",
-          })
+            _that.$q.notify({
+              message: _that.$i18n.t("Backup successfully"),
+              timeout: 3000,
+              type: "info",
+              color: "info",
+            })
           }
         }
       } else if (type === ChatMessageType.RESTORE) {
@@ -1991,7 +1991,7 @@ export default {
               formdata.append('file', store.restoreFile)
               //formdata.append('name', store.restoreFile.name)
               let result = await _client.post(data.url, formdata, {
-                headers: {"Content-Type" : "multipart/form-data"}
+                headers: { "Content-Type": "multipart/form-data" }
               })
               console.log('post result:' + JSON.stringify(result))
               let clientPeerId = myself.myselfPeerClient.peerId
@@ -2008,7 +2008,7 @@ export default {
               title: _that.$i18n.t('Alert'),
               message: _that.$i18n.t('This function uses self-signed ssl certificate, when you first time use it, a Not secure error page will be prompted, please click Advanced button and Proceed to ... link.'),
               cancel: false,
-              ok: {"label":_that.$i18n.t('Ok'),"color":"primary","unelevated":true,"no-caps":true},
+              ok: { "label": _that.$i18n.t('Ok'), "color": "primary", "unelevated": true, "no-caps": true },
               persistent: true
             }).onOk(() => {
               let url = data.url + '?language=' + _that.$i18n.locale
@@ -2037,20 +2037,20 @@ export default {
       let store = _that.$store
       let myselfPeerClient = myself.myselfPeerClient
       message = JSON.parse(message)
-      if(!message.messageType){
+      if (!message.messageType) {
         let signalSession = await _that.getSignalSession(peerId)
-        if(!signalSession){
+        if (!signalSession) {
           await logService.log({}, 'signalSessionDoesNotExistError', 'error')
           return
         }
         let messageString
-        try{
-          messageString = await signalSession.decrypt(message,'string')
-        }catch(e){
+        try {
+          messageString = await signalSession.decrypt(message, 'string')
+        } catch (e) {
           console.log(message)
           console.log(e)
         }
-        if(!messageString){
+        if (!messageString) {
           console.log("signal deceypt failed")
           return
         }
@@ -2058,32 +2058,32 @@ export default {
       }
       let messageType = message.messageType
       let content = message.content
-      if(messageType === P2pChatMessageType.CHAT_RECEIVE_RECEIPT) {
+      if (messageType === P2pChatMessageType.CHAT_RECEIVE_RECEIPT) {
         console.log('receive CHAT_RECEIVE_RECEIPT')
         console.log(message)
-        if(message.preSubjectType === SubjectType.CHAT) {
+        if (message.preSubjectType === SubjectType.CHAT) {
           let currentMes
           let chatMessages = store.state.chatMap[message.senderPeerId].messages
           if (chatMessages && chatMessages.length > 0) {
-              for (let i = chatMessages.length; i--; i > -1) {
-                  let _currentMes = chatMessages[i]
-                  if (_currentMes.messageId === message.preMessageId) {
-                      currentMes = _currentMes
-                  }
+            for (let i = chatMessages.length; i--; i > -1) {
+              let _currentMes = chatMessages[i]
+              if (_currentMes.messageId === message.preMessageId) {
+                currentMes = _currentMes
               }
+            }
           }
-          if(!currentMes){
-              let messages = await chatComponent.loadMessage(
-                  {
-                      ownerPeerId: myselfPeerClient.peerId,
-                      messageId: message.preMessageId,
-                  })
-            if(messages && messages.length > 0) {
+          if (!currentMes) {
+            let messages = await chatComponent.loadMessage(
+              {
+                ownerPeerId: myselfPeerClient.peerId,
+                messageId: message.preMessageId,
+              })
+            if (messages && messages.length > 0) {
               currentMes = messages[0]
             }
-          }else{
-              currentMes.actualReceiveTime = message.receiveTime
-              currentMes = await chatComponent.get(ChatDataType.MESSAGE, currentMes._id)
+          } else {
+            currentMes.actualReceiveTime = message.receiveTime
+            currentMes = await chatComponent.get(ChatDataType.MESSAGE, currentMes._id)
           }
           currentMes.actualReceiveTime = message.receiveTime
           await chatComponent.update(ChatDataType.MESSAGE, currentMes, null)
@@ -2118,38 +2118,38 @@ export default {
           linkman.mobile = content.mobile
           linkman.avatar = content.avatar
           linkman.publicKey = content.publicKey
-          if(message.syncType === `init`){
-              let signalSession = await _that.getSignalSession(linkmanPeerId)
-              if(signalSession){
-                  await signalSession.close()
-              }
+          if (message.syncType === `init`) {
+            let signalSession = await _that.getSignalSession(linkmanPeerId)
+            if (signalSession) {
+              await signalSession.close()
+            }
           }
           linkman.signalPublicKey = content.signalPublicKey
-          signalProtocol.signalPublicKeys.set(linkmanPeerId,linkman.signalPublicKey)
+          signalProtocol.signalPublicKeys.set(linkmanPeerId, linkman.signalPublicKey)
           linkman.downloadSwitch = content.downloadSwitch
           //linkman.localDataCryptoSwitch = content.localDataCryptoSwitch
           linkman.autoLoginSwitch = content.autoLoginSwitch
-          if(content.recallTimeLimit !==linkman.recallTimeLimit || linkman.recallAlert !== content.recallAlert){
-              let _sysMessageContent
-                  let _type
-                  let _value
-                  if(content.recallTimeLimit !==linkman.recallTimeLimit){
-                      _type = _that.$i18n.t("Recall Time Limit")
-                      _value = content.recallTimeLimit
-                  }else{
-                      _type = _that.$i18n.t("Recall Alert")
-                      _value = content.recallAlert
-                      _that.$forceUpdate()
-                  }
-              _sysMessageContent = `${(linkman.givenName?linkman.givenName:linkman.name)}${(_value? _that.$i18n.t("Add") : _that.$i18n.t("Cancel")) }${_type}`
+          if (content.recallTimeLimit !== linkman.recallTimeLimit || linkman.recallAlert !== content.recallAlert) {
+            let _sysMessageContent
+            let _type
+            let _value
+            if (content.recallTimeLimit !== linkman.recallTimeLimit) {
+              _type = _that.$i18n.t("Recall Time Limit")
+              _value = content.recallTimeLimit
+            } else {
+              _type = _that.$i18n.t("Recall Alert")
+              _value = content.recallAlert
+              _that.$forceUpdate()
+            }
+            _sysMessageContent = `${(linkman.givenName ? linkman.givenName : linkman.name)}${(_value ? _that.$i18n.t("Add") : _that.$i18n.t("Cancel"))}${_type}`
 
-                  let chat = await store.getChat(linkmanPeerId)
-                  let chatMessage = {
-                      messageType: P2pChatMessageType.CHAT_SYS,
-                      contentType: ChatContentType.EVENT,
-                      content: _sysMessageContent
-                  }
-                  await store.addCHATSYSMessage(chat, chatMessage)
+            let chat = await store.getChat(linkmanPeerId)
+            let chatMessage = {
+              messageType: P2pChatMessageType.CHAT_SYS,
+              contentType: ChatContentType.EVENT,
+              content: _sysMessageContent
+            }
+            await store.addCHATSYSMessage(chat, chatMessage)
 
           }
           linkman.recallTimeLimit = content.recallTimeLimit
@@ -2271,7 +2271,7 @@ export default {
         let message = {
           messageType: P2pChatMessageType.ADD_GROUPCHAT_RECEIPT,
           ownerPeerId: myselfPeerClient.peerId,
-          subjectId:content.senderPeerId,
+          subjectId: content.senderPeerId,
           content: linkmanRequest
         }
         await _that.sendOrSaveReceipt(message)
@@ -2298,12 +2298,12 @@ export default {
             groupChat.pyDescription = pinyinUtil.getPinyin(content.groupDescription)
           }
           if (groupChat.recallTimeLimit !== content.recallTimeLimit) {
-              recallTimeLimitChanged = true
-              groupChat.recallTimeLimit = content.recallTimeLimit
+            recallTimeLimitChanged = true
+            groupChat.recallTimeLimit = content.recallTimeLimit
           }
           if (groupChat.recallAlert !== content.recallAlert) {
-              recallAlertChanged = true
-              groupChat.recallAlert = content.recallAlert
+            recallAlertChanged = true
+            groupChat.recallAlert = content.recallAlert
           }
           if (nameChanged || descriptionChanged || recallTimeLimitChanged || recallAlertChanged) {
             let groupChatRecord = await contactComponent.get(ContactDataType.GROUP, groupChat._id)
@@ -2349,29 +2349,29 @@ export default {
         let _content = ``
         if (modifierName && (nameChanged || descriptionChanged)) {
           _content = modifierName + _that.$i18n.t(" has modified ") + (nameChanged ? (descriptionChanged ? _that.$i18n.t("Group Name to be : ") + groupChat.name + _that.$i18n.t(",") + _that.$i18n.t(" modified ")
-              + _that.$i18n.t("Group Description to be : ") + groupChat.description : _that.$i18n.t("Group Name to be : ") + groupChat.name) : _that.$i18n.t("Group Description to be : ") + groupChat.description)
+            + _that.$i18n.t("Group Description to be : ") + groupChat.description : _that.$i18n.t("Group Name to be : ") + groupChat.name) : _that.$i18n.t("Group Description to be : ") + groupChat.description)
 
-        }else if(modifierName && (recallTimeLimitChanged || recallAlertChanged)){
-            let _type
-            let value
-            if(recallTimeLimitChanged){
-                _type = _that.$i18n.t("Recall Time Limit")
-                value = groupChat.recallTimeLimit
-            }else{
-                _type = _that.$i18n.t("Recall Alert")
-                value = groupChat.recallAlert
-                _that.$forceUpdate()
-            }
-            _content = `${modifierName}${(value? _that.$i18n.t("Add") : _that.$i18n.t("Cancel")) }${_type}`
+        } else if (modifierName && (recallTimeLimitChanged || recallAlertChanged)) {
+          let _type
+          let value
+          if (recallTimeLimitChanged) {
+            _type = _that.$i18n.t("Recall Time Limit")
+            value = groupChat.recallTimeLimit
+          } else {
+            _type = _that.$i18n.t("Recall Alert")
+            value = groupChat.recallAlert
+            _that.$forceUpdate()
+          }
+          _content = `${modifierName}${(value ? _that.$i18n.t("Add") : _that.$i18n.t("Cancel"))}${_type}`
         }
-        if(_content){
-            let chat = await store.getChat(groupChat.groupId)
-            let chatMessage = {
-                messageType: P2pChatMessageType.CHAT_SYS,
-                contentType: ChatContentType.EVENT,
-                content: _content
-            }
-            await store.addCHATSYSMessage(chat, chatMessage)
+        if (_content) {
+          let chat = await store.getChat(groupChat.groupId)
+          let chatMessage = {
+            messageType: P2pChatMessageType.CHAT_SYS,
+            contentType: ChatContentType.EVENT,
+            content: _content
+          }
+          await store.addCHATSYSMessage(chat, chatMessage)
         }
 
         // 发送Receive收条
@@ -2381,7 +2381,7 @@ export default {
         let message = {
           messageType: P2pChatMessageType.MODIFY_GROUPCHAT_RECEIPT,
           ownerPeerId: myselfPeerClient.peerId,
-          subjectId:content.senderPeerId,
+          subjectId: content.senderPeerId,
           content: linkmanRequest
         }
         await _that.sendOrSaveReceipt(message)
@@ -2495,138 +2495,150 @@ export default {
         let message = {
           messageType: P2pChatMessageType.ADD_GROUPCHAT_RECEIPT,
           ownerPeerId: myselfPeerClient.peerId,
-          subjectId:content.senderPeerId,
+          subjectId: content.senderPeerId,
           content: linkmanRequest
         }
         await _that.sendOrSaveReceipt(message)
       }
       else if (messageType === P2pChatMessageType.REMOVE_GROUPCHAT_MEMBER && content) {
+        debugger
         let _id = content._id
         let currentTime = new Date()
         let groupChat = store.state.groupChatMap[content.groupId]
-        if(groupChat){
-            let gms = groupChat.groupMembers
-            let removeGroupChat = false
+        if (groupChat) {
+          let gms = groupChat.groupMembers
+          let removeGroupChat = false
+          for (let gm of content.data) {
+            if (gm.memberPeerId === myselfPeerClient.peerId) {
+              removeGroupChat = true
+            }
+          }
+          let inviterName
+          let removedGroupMemberNames
+          let includeNonContacts = false
+          for (let groupChatMember of gms) {
+            if (groupChatMember.memberPeerId === content.senderPeerId) {
+              let linkman = store.state.linkmanMap[groupChatMember.memberPeerId]
+              if (linkman) {
+                inviterName = (linkman.givenName ? linkman.givenName : linkman.name)
+              }
+              break
+            }
+          }
+          if (removeGroupChat) {
+            // 删除聊天记录
+            /*let messages = await chatComponent.loadMessage({
+              ownerPeerId: myselfPeerClient.peerId,
+              subjectId: groupChat.groupId
+            })
+            if (messages && messages.length > 0) {
+              await chatComponent.remove(ChatDataType.MESSAGE, messages)
+            }
+            let chat = store.state.chatMap[groupChat.groupId]
+            chat = await chatComponent.get(ChatDataType.CHAT, chat._id)
+            if (chat) {
+              await chatComponent.remove(ChatDataType.CHAT, chat, store.state.chats)
+            }
+            delete store.state.chatMap[groupChat.groupId]*/
+
+            // 删除群组成员
+            let removeGroupMembers = await contactComponent.loadGroupMember({
+              ownerPeerId: myselfPeerClient.peerId,
+              groupId: groupChat.groupId,
+              memberPeerId: myselfPeerClient.peerId
+            })
+            if (removeGroupMembers && removeGroupMembers.length > 0) {
+              await contactComponent.remove(ContactDataType.GROUP_MEMBER, removeGroupMembers, gms)
+            }
+
+            // 删除群组
+            /*let groupChatRecord = await contactComponent.get(ContactDataType.GROUP, groupChat._id)
+            await contactComponent.remove(ContactDataType.GROUP, groupChatRecord, store.state.groupChats)
+            delete store.state.groupChatMap[groupChat.groupId]
+            if (store.state.currentChat && store.state.currentChat.subjectId === groupChat.groupId) {
+              store.state.currentChat = null
+              _that.subKind = "default"
+              if (store.state.ifMobileStyle) {
+                store.toggleDrawer(false)
+              }
+            }*/
+            groupChat.groupMembers = gms
+            store.state.groupChatMap[content.groupId] = groupChat
+
+            let chat = await store.getChat(groupChat.groupId)
+            let chatMessage = {
+              messageType: P2pChatMessageType.CHAT_SYS,
+              contentType: ChatContentType.EVENT,
+              content: inviterName + _that.$i18n.t(" has removed ") + _that.$i18n.t("you") + _that.$i18n.t(" from group chat")
+            }
+            await store.addCHATSYSMessage(chat, chatMessage)
+          } else {
+            // 删除群组成员
+            let fromGroupOwner = false
+            for (let groupChatMember of gms) {
+              if (groupChatMember.memberType === MemberType.OWNER && groupChatMember.memberPeerId === content.senderPeerId) {
+                fromGroupOwner = true
+                break
+              }
+            }
             for (let gm of content.data) {
-                if (gm.memberPeerId === myselfPeerClient.peerId) {
-                    removeGroupChat = true
+              let linkman = store.state.linkmanMap[gm.memberPeerId]
+              if (fromGroupOwner) {
+                if (linkman) {
+                  removedGroupMemberNames = (removedGroupMemberNames ? removedGroupMemberNames + _that.$i18n.t(", ") : '') + (linkman.givenName ? linkman.givenName : linkman.name)
+                } else if (gm.memberPeerId !== myselfPeerClient.peerId) {
+                  includeNonContacts = true
                 }
+              }
+              let groupMembers = await contactComponent.loadGroupMember(
+                {
+                  ownerPeerId: myselfPeerClient.peerId,
+                  groupId: gm.groupId,
+                  memberPeerId: gm.memberPeerId
+                }
+              )
+              if (groupMembers && groupMembers.length > 0) {
+                await contactComponent.remove(ContactDataType.GROUP_MEMBER, groupMembers, gms)
+              }
+              if (linkman) {
+                let _index = 0
+                for (let gc of linkman.groupChats) {
+                  if (gc.groupId === groupChat.groupId) {
+                    linkman.groupChats.splice(_index, 1)
+                    break
+                  }
+                  _index++
+                }
+              }
             }
-            if (removeGroupChat) {
-                // 删除聊天记录
-                let messages = await chatComponent.loadMessage({
-                    ownerPeerId: myselfPeerClient.peerId,
-                    subjectId: groupChat.groupId
-                })
-                if (messages && messages.length > 0) {
-                    await chatComponent.remove(ChatDataType.MESSAGE, messages)
+            // 更新groupChat activeStatus
+            if (groupChat.activeStatus === ActiveStatus.UP) {
+              let hasActiveGroupMember = false
+              for (let groupChatMember of gms) {
+                let linkman = store.state.linkmanMap[groupChatMember.memberPeerId]
+                if (linkman && linkman.activeStatus === ActiveStatus.UP) {
+                  hasActiveGroupMember = true
+                  break
                 }
-                let chat = store.state.chatMap[groupChat.groupId]
-                chat = await chatComponent.get(ChatDataType.CHAT, chat._id)
-                if (chat) {
-                    await chatComponent.remove(ChatDataType.CHAT, chat, store.state.chats)
-                }
-                delete store.state.chatMap[groupChat.groupId]
-
-                // 删除群组成员
-                let removeGroupMembers = await contactComponent.loadGroupMember({
-                    ownerPeerId: myselfPeerClient.peerId,
-                    groupId: groupChat.groupId
-                })
-                if (removeGroupMembers && removeGroupMembers.length > 0) {
-                    await contactComponent.remove(ContactDataType.GROUP_MEMBER, removeGroupMembers)
-                }
-
-                // 删除群组
-                let groupChatRecord = await contactComponent.get(ContactDataType.GROUP, groupChat._id)
-                await contactComponent.remove(ContactDataType.GROUP, groupChatRecord, store.state.groupChats)
-                delete store.state.groupChatMap[groupChat.groupId]
-                if (store.state.currentChat && store.state.currentChat.subjectId === groupChat.groupId) {
-                    store.state.currentChat = null
-                    _that.subKind = "default"
-                    if (store.state.ifMobileStyle) {
-                        store.toggleDrawer(false)
-                    }
-                }
-            } else {
-                // 删除群组成员
-                let fromGroupOwner = false
-                for (let groupChatMember of gms) {
-                    if (groupChatMember.memberType === MemberType.OWNER && groupChatMember.memberPeerId === content.senderPeerId) {
-                        fromGroupOwner = true
-                        break
-                    }
-                }
-                let inviterName
-                let removedGroupMemberNames
-                let includeNonContacts = false
-                for (let groupChatMember of gms) {
-                    if (groupChatMember.memberPeerId === content.senderPeerId) {
-                        let linkman = store.state.linkmanMap[groupChatMember.memberPeerId]
-                        if (linkman) {
-                            inviterName = (linkman.givenName ? linkman.givenName : linkman.name)
-                        }
-                        break
-                    }
-                }
-                for (let gm of content.data) {
-                    let linkman = store.state.linkmanMap[gm.memberPeerId]
-                    if (fromGroupOwner) {
-                        if (linkman) {
-                            removedGroupMemberNames = (removedGroupMemberNames ? removedGroupMemberNames + _that.$i18n.t(", ") : '') + (linkman.givenName ? linkman.givenName : linkman.name)
-                        } else if (gm.memberPeerId !== myselfPeerClient.peerId) {
-                            includeNonContacts = true
-                        }
-                    }
-                    let groupMembers = await contactComponent.loadGroupMember(
-                        {
-                            ownerPeerId: myselfPeerClient.peerId,
-                            groupId: gm.groupId,
-                            memberPeerId: gm.memberPeerId
-                        }
-                    )
-                    if (groupMembers && groupMembers.length > 0) {
-                        await contactComponent.remove(ContactDataType.GROUP_MEMBER, groupMembers, gms)
-                    }
-                    if (linkman && gm.memberPeerId !== myselfPeerClient.peerId) {
-                        let _index = 0
-                        for (let gc of linkman.groupChats) {
-                            if (gc.groupId === groupChat.groupId) {
-                                linkman.groupChats.splice(_index, 1)
-                                break
-                            }
-                            _index++
-                        }
-                    }
-                }
-                // 更新groupChat activeStatus
-                if (groupChat.activeStatus === ActiveStatus.UP) {
-                    let hasActiveGroupMember = false
-                    for (let groupChatMember of gms) {
-                        let linkman = store.state.linkmanMap[groupChatMember.memberPeerId]
-                        if (linkman && linkman.activeStatus === ActiveStatus.UP) {
-                            hasActiveGroupMember = true
-                            break
-                        }
-                    }
-                    if (!hasActiveGroupMember) {
-                        groupChat.activeStatus = ActiveStatus.DOWN
-                    }
-                }
-                groupChat.groupMembers = gms
-                store.state.groupChatMap[content.groupId] = groupChat
-
-                let chat = await store.getChat(groupChat.groupId)
-                let chatMessage = {
-                    messageType: P2pChatMessageType.CHAT_SYS,
-                    contentType: ChatContentType.EVENT,
-                    content: fromGroupOwner ?
-                        inviterName + _that.$i18n.t(" has removed ") + removedGroupMemberNames + (includeNonContacts ? _that.$i18n.t(" and ") + _that.$i18n.t("other NonContacts") : '') + _that.$i18n.t(" from group chat")
-                        :
-                        inviterName + _that.$i18n.t(" has left the group chat")
-                }
-                await store.addCHATSYSMessage(chat, chatMessage)
+              }
+              if (!hasActiveGroupMember) {
+                groupChat.activeStatus = ActiveStatus.DOWN
+              }
             }
+            groupChat.groupMembers = gms
+            store.state.groupChatMap[content.groupId] = groupChat
+
+            let chat = await store.getChat(groupChat.groupId)
+            let chatMessage = {
+              messageType: P2pChatMessageType.CHAT_SYS,
+              contentType: ChatContentType.EVENT,
+              content: fromGroupOwner ?
+                inviterName + _that.$i18n.t(" has removed ") + removedGroupMemberNames + (includeNonContacts ? _that.$i18n.t(" and ") + _that.$i18n.t("other NonContacts") : '') + _that.$i18n.t(" from group chat")
+                :
+                inviterName + _that.$i18n.t(" has left the group chat")
+            }
+            await store.addCHATSYSMessage(chat, chatMessage)
+          }
         }
 
         // 发送Receive收条
@@ -2636,7 +2648,7 @@ export default {
         let message = {
           messageType: P2pChatMessageType.REMOVE_GROUPCHAT_MEMBER_RECEIPT,
           ownerPeerId: myselfPeerClient.peerId,
-          subjectId:content.senderPeerId,
+          subjectId: content.senderPeerId,
           content: linkmanRequest
         }
         await _that.sendOrSaveReceipt(message)
@@ -2699,7 +2711,7 @@ export default {
         let message = {
           messageType: P2pChatMessageType.MODIFY_GROUPCHAT_OWNER_RECEIPT,
           ownerPeerId: myselfPeerClient.peerId,
-          subjectId:content.senderPeerId,
+          subjectId: content.senderPeerId,
           content: linkmanRequest
         }
         await _that.sendOrSaveReceipt(message)
@@ -2734,75 +2746,75 @@ export default {
         await _that.receiveCallClose(message)
       }
       else if (messageType === P2pChatMessageType.RECALL) {
-          await _that.receiveRecallMessage(message)
+        await _that.receiveRecallMessage(message)
       }
-      else if(messageType === P2pChatMessageType.CHAT_LINKMAN){
+      else if (messageType === P2pChatMessageType.CHAT_LINKMAN) {
         await store.insertReceivedMessage(message)
       }
     },
-    async receiveRecallMessage(message){
+    async receiveRecallMessage(message) {
       let _that = this
       let store = _that.$store
       let preMessageId = message.preMessageId
       let myselfPeerClient = myself.myselfPeerClient
       let currentMes
       let subjectId
-      if(message.preSubjectType === SubjectType.GROUP_CHAT){
-          subjectId = message.preSubjectId
-      }else{
-          subjectId = message.senderPeerId
+      if (message.preSubjectType === SubjectType.GROUP_CHAT) {
+        subjectId = message.preSubjectId
+      } else {
+        subjectId = message.senderPeerId
       }
       let chat = store.state.chatMap[subjectId]
-      if(chat){
-          let chatMessages = chat.messages
-            if (chatMessages && chatMessages.length > 0) {
-              if(chatMessages[chatMessages.length-1].messageId === preMessageId){
-                chat.content =  `[${_that.$i18n.t("This message has been recalled")}]`
-                let db_chat = await chatComponent.get(ChatDataType.CHAT, chat._id)
-                db_chat.content = chat.content
-                await chatComponent.update(ChatDataType.CHAT, db_chat)
-              }
-              for (let i = chatMessages.length; i--; i > -1) {
-                  let _currentMes = chatMessages[i]
-                  if (_currentMes.messageId === preMessageId) {
-                      currentMes = _currentMes
-                      currentMes.status = ChatMessageStatus.RECALL
-                  }
-              }
+      if (chat) {
+        let chatMessages = chat.messages
+        if (chatMessages && chatMessages.length > 0) {
+          if (chatMessages[chatMessages.length - 1].messageId === preMessageId) {
+            chat.content = `[${_that.$i18n.t("This message has been recalled")}]`
+            let db_chat = await chatComponent.get(ChatDataType.CHAT, chat._id)
+            db_chat.content = chat.content
+            await chatComponent.update(ChatDataType.CHAT, db_chat)
           }
-      }
-      if(!currentMes){
-          let messages = await chatComponent.loadMessage(
-              {
-                  ownerPeerId: myselfPeerClient.peerId,
-                  messageId: preMessageId,
-              })
-          if(messages && messages.length > 0) {
-              currentMes = messages[0]
+          for (let i = chatMessages.length; i--; i > -1) {
+            let _currentMes = chatMessages[i]
+            if (_currentMes.messageId === preMessageId) {
+              currentMes = _currentMes
+              currentMes.status = ChatMessageStatus.RECALL
+            }
           }
-      }else{
-          currentMes.status = ChatMessageStatus.RECALL
-          currentMes = await chatComponent.get(ChatDataType.MESSAGE, currentMes._id)
+        }
       }
-      if(!currentMes)return
+      if (!currentMes) {
+        let messages = await chatComponent.loadMessage(
+          {
+            ownerPeerId: myselfPeerClient.peerId,
+            messageId: preMessageId,
+          })
+        if (messages && messages.length > 0) {
+          currentMes = messages[0]
+        }
+      } else {
+        currentMes.status = ChatMessageStatus.RECALL
+        currentMes = await chatComponent.get(ChatDataType.MESSAGE, currentMes._id)
+      }
+      if (!currentMes) return
       currentMes.status = ChatMessageStatus.RECALL
       await chatComponent.update(ChatDataType.MESSAGE, currentMes, null)
     },
-    async sendOrSaveReceipt(message){
+    async sendOrSaveReceipt(message) {
       let _that = this
-      let webrtcPeers  = webrtcPeerPool.getConnected(message.subjectId)
-      if(webrtcPeers && webrtcPeers.length > 0){
-          await store.p2pSend( message ,message.subjectId)
-      }else if(message._id != undefined){
-          await chatComponent.insert(ChatDataType.MESSAGE, message)
+      let webrtcPeers = webrtcPeerPool.getConnected(message.subjectId)
+      if (webrtcPeers && webrtcPeers.length > 0) {
+        await store.p2pSend(message, message.subjectId)
+      } else if (message._id != undefined) {
+        await chatComponent.insert(ChatDataType.MESSAGE, message)
       }
     },
-    async webrtcConnect(evt){
+    async webrtcConnect(evt) {
       let _that = this
       let myselfPeerClient = myself.myselfPeerClient
       let peerId = evt.source.targetPeerId
       let linkman = store.state.linkmanMap[peerId]
-      if(!linkman)return
+      if (!linkman) return
       if (linkman.activeStatus === ActiveStatus.UP) {
         return
       }
@@ -2910,41 +2922,41 @@ export default {
             linkmanRequest.statusDate = currentTime
           }
         }
-        await _that.sendLinkmanInfo(peerId,`init`)
+        await _that.sendLinkmanInfo(peerId, `init`)
         await _that.sendUnsentMessage(peerId)
       }
     },
-    async sendLinkmanInfo(peerId,syncType){
-        let _that = this
-        let myselfPeerClient = myself.myselfPeerClient
-        let linkman = store.state.linkmanMap[peerId]
-        if(!linkman)return
-        if (linkman.activeStatus !== ActiveStatus.UP) {
-            return
-        }
-        let myselfBasicInfo = {}
-        myselfBasicInfo.peerId = myselfPeerClient.peerId
-        myselfBasicInfo.name = myselfPeerClient.name
-        if (myselfPeerClient.visibilitySetting && myselfPeerClient.visibilitySetting.substring(1, 2) === 'N') {
-          myselfBasicInfo.mobile = ''
-        } else {
-          myselfBasicInfo.mobile = myselfPeerClient.mobile
-        }
-        myselfBasicInfo.avatar = myselfPeerClient.avatar
-        myselfBasicInfo.publicKey = myselfPeerClient.publicKey
-        myselfBasicInfo.signalPublicKey = myselfPeerClient.signalPublicKey
-        myselfBasicInfo.udpSwitch = myselfPeerClient.udpSwitch
-        myselfBasicInfo.recallTimeLimit = linkman.myselfRecallTimeLimit
-        myselfBasicInfo.recallAlert = linkman.myselfRecallAlert
-        let message = {
-            messageType: P2pChatMessageType.SYNC_LINKMAN_INFO,
-            content: myselfBasicInfo,
-            syncType:syncType
-        }
-        await store.p2pSend(message,peerId)
+    async sendLinkmanInfo(peerId, syncType) {
+      let _that = this
+      let myselfPeerClient = myself.myselfPeerClient
+      let linkman = store.state.linkmanMap[peerId]
+      if (!linkman) return
+      if (linkman.activeStatus !== ActiveStatus.UP) {
+        return
+      }
+      let myselfBasicInfo = {}
+      myselfBasicInfo.peerId = myselfPeerClient.peerId
+      myselfBasicInfo.name = myselfPeerClient.name
+      if (myselfPeerClient.visibilitySetting && myselfPeerClient.visibilitySetting.substring(1, 2) === 'N') {
+        myselfBasicInfo.mobile = ''
+      } else {
+        myselfBasicInfo.mobile = myselfPeerClient.mobile
+      }
+      myselfBasicInfo.avatar = myselfPeerClient.avatar
+      myselfBasicInfo.publicKey = myselfPeerClient.publicKey
+      myselfBasicInfo.signalPublicKey = myselfPeerClient.signalPublicKey
+      myselfBasicInfo.udpSwitch = myselfPeerClient.udpSwitch
+      myselfBasicInfo.recallTimeLimit = linkman.myselfRecallTimeLimit
+      myselfBasicInfo.recallAlert = linkman.myselfRecallAlert
+      let message = {
+        messageType: P2pChatMessageType.SYNC_LINKMAN_INFO,
+        content: myselfBasicInfo,
+        syncType: syncType
+      }
+      await store.p2pSend(message, peerId)
 
     },
-    async webrtcClose(evt){
+    async webrtcClose(evt) {
       let _that = this
       let peerId = evt.source.targetPeerId
       let myselfPeerClient = myself.myselfPeerClient
@@ -2973,7 +2985,7 @@ export default {
         // 更新linkman activeStatus
         linkman.activeStatus = ActiveStatus.DOWN
         let signalSession = await _that.getSignalSession(peerId)
-        if(signalSession){
+        if (signalSession) {
           await signalSession.close()
         }
         // 更新lastConnectTime
@@ -2995,11 +3007,11 @@ export default {
       }
     },
     async p2pSend(message, peerId) {
-      try{
+      try {
         let _that = this
-        let blockId = UUID.string(null,null)
+        let blockId = UUID.string(null, null)
         let store = _that.$store
-        if(store.state.networkStatus !== 'CONNECTED'){
+        if (store.state.networkStatus !== 'CONNECTED') {
           _that.$q.notify({
             message: _that.$i18n.t('CONNECTING'),
             timeout: 3000,
@@ -3008,19 +3020,19 @@ export default {
           })
           return
         }
-        if(message.subjectType === SubjectType.CHAT){
+        if (message.subjectType === SubjectType.CHAT) {
           let currentMes
           let messages = await chatComponent.loadMessage(
             {
               ownerPeerId: message.ownerPeerId,
               messageId: message.messageId
             })
-            if(messages && messages.length > 0) {
-              currentMes = messages[0]
-              currentMes.blockId = blockId
-              await chatComponent.update(ChatDataType.MESSAGE, currentMes, null)
-            }
-        } else if(message.subjectType === SubjectType.GROUP_CHAT) {
+          if (messages && messages.length > 0) {
+            currentMes = messages[0]
+            currentMes.blockId = blockId
+            await chatComponent.update(ChatDataType.MESSAGE, currentMes, null)
+          }
+        } else if (message.subjectType === SubjectType.GROUP_CHAT) {
           let receives = await chatComponent.loadReceive(
             {
               ownerPeerId: message.ownerPeerId,
@@ -3043,7 +3055,7 @@ export default {
         }
         let messageString = JSON.stringify(message)
         let createTimestamp = new Date().getTime()
-        let expireDate = new Date().getTime() + 3600*24*10 // 10 days
+        let expireDate = new Date().getTime() + 3600 * 24 * 10 // 10 days
         let payload = { payload: messageString, metadata: null, expireDate: expireDate }
         let dataBlock = DataBlockService.create(blockId, null, peerId, BlockType.P2pChat, createTimestamp, payload, [])
         await dataBlockService.encrypt(dataBlock)
@@ -3057,7 +3069,7 @@ export default {
         await p2pChatAction.chat(null, dataBlock, peerId)
         //socket已连接，webrtc未连接且最后连接时间超过1分钟
         let linkman = store.state.linkmanMap[peerId]
-        if( linkman && store.state.networkStatus === 'CONNECTED' && linkman.activeStatus === ActiveStatus.DOWN && (!linkman.lastWebrtcRequestTime || (linkman.lastWebrtcRequestTime &&(createTimestamp - linkman.lastWebrtcRequestTime)/1000 > 60))&& message.messageType !== P2pChatMessageType.CALL_REQUEST){
+        if (linkman && store.state.networkStatus === 'CONNECTED' && linkman.activeStatus === ActiveStatus.DOWN && (!linkman.lastWebrtcRequestTime || (linkman.lastWebrtcRequestTime && (createTimestamp - linkman.lastWebrtcRequestTime) / 1000 > 60)) && message.messageType !== P2pChatMessageType.CALL_REQUEST) {
           let option = {}
           option.config = {
             "iceServers": config.appParams.iceServer[0]
@@ -3065,8 +3077,8 @@ export default {
           webrtcPeerPool.create(linkman.peerId, option)
           linkman.lastWebrtcRequestTime = createTimestamp
         }
-      }catch(e){
-          await logService.log(e, 'p2pSendError', 'error')
+      } catch (e) {
+        await logService.log(e, 'p2pSendError', 'error')
       }
     },
     async getSignalSession(peerId) {
@@ -3107,37 +3119,37 @@ export default {
           }
           let responses = await Promise.all(ps)
           if (responses && responses.length > 0) {
-              let dataBlocks = []
-              for (let i = 0; i < responses.length; ++i) {
-                dataBlocks.push(responses[i][0])
-              }
-              dataBlocks = CollaUtil.sortByKey(dataBlocks,'createDate','asc')
-              let callbackPs = []
-              let _peerIds = new Map()
-              for (let i = 0; i < dataBlocks.length; ++i) {
-                    let dataBlock = dataBlocks[i]
-                      if (dataBlock) {
-                        //let _callbackP = new Promise(async function(resolve, reject) {
-                          console.log(dataBlock)
-                          await _that.p2pChatReceiver(dataBlock.peerId, dataBlock.payload)
-                          await collectionUtil.deleteBlock(dataBlock, true, BlockType.P2pChat)
-                          if (!_peerIds.get(dataBlock.peerId)) {
-                            _peerIds.set(dataBlock.peerId, dataBlock.peerId)
-                          }
-                          console.log('------one block resolve')
-                          //resolve()
-                       // })
-                       // callbackPs.push(_callbackP)
-                    }
-              }
-           // Promise.all(callbackPs).then(async function() {
-              console.log('-------Promise.all then')
-              for (let _peerId of _peerIds.keys()) {
-                let signalSession = await _that.getSignalSession(_peerId)
-                if (signalSession) {
-                  await signalSession.close()
+            let dataBlocks = []
+            for (let i = 0; i < responses.length; ++i) {
+              dataBlocks.push(responses[i][0])
+            }
+            dataBlocks = CollaUtil.sortByKey(dataBlocks, 'createDate', 'asc')
+            let callbackPs = []
+            let _peerIds = new Map()
+            for (let i = 0; i < dataBlocks.length; ++i) {
+              let dataBlock = dataBlocks[i]
+              if (dataBlock) {
+                //let _callbackP = new Promise(async function(resolve, reject) {
+                console.log(dataBlock)
+                await _that.p2pChatReceiver(dataBlock.peerId, dataBlock.payload)
+                await collectionUtil.deleteBlock(dataBlock, true, BlockType.P2pChat)
+                if (!_peerIds.get(dataBlock.peerId)) {
+                  _peerIds.set(dataBlock.peerId, dataBlock.peerId)
                 }
+                console.log('------one block resolve')
+                //resolve()
+                // })
+                // callbackPs.push(_callbackP)
               }
+            }
+            // Promise.all(callbackPs).then(async function() {
+            console.log('-------Promise.all then')
+            for (let _peerId of _peerIds.keys()) {
+              let signalSession = await _that.getSignalSession(_peerId)
+              if (signalSession) {
+                await signalSession.close()
+              }
+            }
             //})
           }
         }
@@ -3147,8 +3159,8 @@ export default {
       let _that = this
       let store = _that.$store
       if (data &&
-          (data.MessageType === MsgType[MsgType.CONSENSUS_REPLY] || data.MessageType === MsgType[MsgType.CONSENSUS_RAFT_REPLY] || data.MessageType === MsgType[MsgType.CONSENSUS_PBFT_REPLY]) &&
-          data.PayloadType === PayloadType.ConsensusLog) {
+        (data.MessageType === MsgType[MsgType.CONSENSUS_REPLY] || data.MessageType === MsgType[MsgType.CONSENSUS_RAFT_REPLY] || data.MessageType === MsgType[MsgType.CONSENSUS_PBFT_REPLY]) &&
+        data.PayloadType === PayloadType.ConsensusLog) {
         let consensusLog = data.Payload
         console.log('consensusReceiver consensusLog:' + JSON.stringify(consensusLog))
         console.log('consensusReceiver time:' + new Date())
@@ -3192,16 +3204,16 @@ export default {
             {
               blockId: blockId
             })
-          if(messages && messages.length > 0) {
+          if (messages && messages.length > 0) {
             let currentMes = messages[0]
             currentMes.receiveTag = true
             await chatComponent.update(ChatDataType.MESSAGE, currentMes, null)
-          }else{
+          } else {
             let receives = await chatComponent.loadReceive(
               {
                 blockId: blockId
               })
-            if(receives && receives.length > 0) {
+            if (receives && receives.length > 0) {
               let currentRec = receives[0]
               currentRec.receiveTag = true
               await chatComponent.update(ChatDataType.RECEIVE, currentRec, null)
@@ -3210,7 +3222,7 @@ export default {
         }
       }
     },
-    showInitMigrateDialog: async function(url, filename) {
+    showInitMigrateDialog: async function (url, filename) {
       let _that = this
       _that.initMigrateDialog = true
       let content = 'Migration::' + url + '::' + filename
@@ -3219,14 +3231,14 @@ export default {
         mediaComponent.generateQRCode('qrCode', content, 256, logoSrc)
       })
     },
-    cancelInitMigrate: function() {
+    cancelInitMigrate: function () {
       let _that = this
       _that.initMigrateDialog = false
       if (_that.logoutFlag) {
         _that.gotoLogin()
       }
     },
-    acceptMigrate: async function() {
+    acceptMigrate: async function () {
       let _that = this
       let store = _that.$store
       if (_that.migrateQRContent) {
@@ -3253,7 +3265,7 @@ export default {
               title: _that.$i18n.t('Alert'),
               message: _that.$i18n.t('This function uses self-signed ssl certificate, when you first time use it, a Not secure error page will be prompted, please click Advanced button and Proceed to ... link.'),
               cancel: false,
-              ok: {"label":_that.$i18n.t('Ok'),"color":"primary","unelevated":true,"no-caps":true},
+              ok: { "label": _that.$i18n.t('Ok'), "color": "primary", "unelevated": true, "no-caps": true },
               persistent: true
             }).onOk(() => {
               url = migrateUrl + '?language=' + _that.$i18n.locale
@@ -3283,7 +3295,7 @@ export default {
         }
       }
     },
-    closeMigrate: async function() {
+    closeMigrate: async function () {
       let _that = this
       let clientPeerId = myself.myselfPeerClient.peerId
       let newPayload = {}
@@ -3293,15 +3305,15 @@ export default {
       await chatAction.chat(null, newPayload, clientPeerId)
       _that.migrateDialog = false
     },
-    showInitBackupDialog: function() {
+    showInitBackupDialog: function () {
       let _that = this
       _that.initBackupDialog = true
     },
-    cancelInitBackup: function() {
+    cancelInitBackup: function () {
       let _that = this
       _that.initBackupDialog = false
     },
-    acceptBackup: async function() {
+    acceptBackup: async function () {
       let _that = this
       let url = _that.backupUrl + '/' + _that.backupFilename
       let json
@@ -3332,20 +3344,20 @@ export default {
           if (filenameArr.length === 3) {
             let arr = filenameArr[2].split('.')
             let filename = filenameArr[0] + '-' + filenameArr[1] + '(' + date.formatDate(new Date(parseInt(arr[0])), 'YYYY-MM-DD_HH:mm:ss') + ').db'*/
-            let filename = _that.backupFilename
-            let element = document.createElement('a')
-            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(json))
-            element.setAttribute('download', filename)
-            element.style.display = 'none'
-            document.body.appendChild(element)
-            element.click()
-            document.body.removeChild(element)
+          let filename = _that.backupFilename
+          let element = document.createElement('a')
+          element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(json))
+          element.setAttribute('download', filename)
+          element.style.display = 'none'
+          document.body.appendChild(element)
+          element.click()
+          document.body.removeChild(element)
           /*}*/
         }
         await _that.closeBackup('Accept')
       }
     },
-    closeBackup: async function(operation) {
+    closeBackup: async function (operation) {
       let _that = this
       let clientPeerId = myself.myselfPeerClient.peerId
       let newPayload = {}
@@ -3356,7 +3368,7 @@ export default {
       await chatAction.chat(null, newPayload, clientPeerId)
       _that.backupDialog = false
     },
-    acceptRestore: async function() {
+    acceptRestore: async function () {
       let _that = this
       let store = _that.$store
       let dirEntry = await fileComponent.getRootDirEntry('/')
@@ -3375,11 +3387,11 @@ export default {
         })
       }
     },
-    closeRestore: function() {
+    closeRestore: function () {
       let _that = this
       _that.restoreDialog = false
     },
-    restoreChatRecord: async function(txt) {
+    restoreChatRecord: async function (txt) {
       let _that = this
       let store = _that.$store
       _that.$q.loading.show()
@@ -3577,7 +3589,7 @@ export default {
             await chatComponent.insert(ChatDataType.CHAT, chats, null)
             for (let i = chats.length - 1; i >= 0; i--) {
               let _chat = await store.getChat(chats[i].subjectId)
-                needInsertMessageChats.push(_chat)
+              needInsertMessageChats.push(_chat)
             }
           }
         }
@@ -3676,22 +3688,22 @@ export default {
           }
         }
       }
-      if(needInsertMessageChats.length > 0){
-          for(let needInsertMessageChat of needInsertMessageChats){
-              needInsertMessageChat.messages = []
-              let _messages = await chatComponent.loadMessage(
-                  {
-                      ownerPeerId: myself.myselfPeerClient.peerId,
-                      subjectId: needInsertMessageChat.subjectId,
-                  }, [{ _id: 'desc' }], null, 10
-              )
-              if (_messages && _messages.length > 0) {
-                  CollaUtil.sortByKey(_messages, 'receiveTime', 'asc');
-                  needInsertMessageChat.messages = _messages
-              } else {
-                  needInsertMessageChat.noMoreMessageTag = true
-              }
+      if (needInsertMessageChats.length > 0) {
+        for (let needInsertMessageChat of needInsertMessageChats) {
+          needInsertMessageChat.messages = []
+          let _messages = await chatComponent.loadMessage(
+            {
+              ownerPeerId: myself.myselfPeerClient.peerId,
+              subjectId: needInsertMessageChat.subjectId,
+            }, [{ _id: 'desc' }], null, 10
+          )
+          if (_messages && _messages.length > 0) {
+            CollaUtil.sortByKey(_messages, 'receiveTime', 'asc');
+            needInsertMessageChat.messages = _messages
+          } else {
+            needInsertMessageChat.noMoreMessageTag = true
           }
+        }
       }
       _that.$q.loading.hide()
     },
@@ -3816,17 +3828,17 @@ export default {
         store.state.channels = channelDBItems
       }
     },
-    startServer: function(type, filename) {
+    startServer: function (type, filename) {
       let _that = this
-      let httpd = ( cordova && cordova.plugins && cordova.plugins.CorHttpd ) ? cordova.plugins.CorHttpd : null
+      let httpd = (cordova && cordova.plugins && cordova.plugins.CorHttpd) ? cordova.plugins.CorHttpd : null
       if (httpd) {
-        httpd.getURL(function(url) {
+        httpd.getURL(function (url) {
           if (url.length > 0) {
             console.log('server is up:' + url)
-            httpd.stopServer(function() {
+            httpd.stopServer(function () {
               console.log('server is stopped.')
               _that.start(httpd, type, filename)
-            }, function(error) {
+            }, function (error) {
               console.error('failed to stop server:' + error)
             })
           } else {
@@ -3837,7 +3849,7 @@ export default {
         alert('CorHttpd plugin not available/ready.')
       }
     },
-    start: async function(httpd, type, filename) {
+    start: async function (httpd, type, filename) {
       let _that = this
       let store = _that.$store
       let dirEntry = await fileComponent.getRootDirEntry('/')
@@ -3850,12 +3862,12 @@ export default {
       }
       console.log('path:' + path)
       httpd.startServer({
-        'www_root' : path,
-        'port' : 8090
-      }, async function(url) {
+        'www_root': path,
+        'port': 8090
+      }, async function (url) {
         if (url.length > 0) {
           console.log('server is started:' + url)
-          httpd.getLocalPath(function(path) {
+          httpd.getLocalPath(function (path) {
             console.log('localpath:' + path)
           })
           if (type === 'migrate') {
@@ -3883,7 +3895,7 @@ export default {
         } else {
           console.log('server is down')
         }
-      }, async function(error) {
+      }, async function (error) {
         await logService.log(error, 'startServerError', 'error')
       })
     },
@@ -3905,7 +3917,7 @@ export default {
       conditionBean['getAllBlockIndex'] = true
       conditionBean['blockType'] = BlockType.ChannelArticle
       let articleIndexList = []
-      if (store.state.networkStatus === 'CONNECTED'){
+      if (store.state.networkStatus === 'CONNECTED') {
         let ret = await queryValueAction.queryValue(null, conditionBean)
         if (ret && ret.length > 0) {
           articleIndexList = ret
@@ -3997,7 +4009,7 @@ export default {
           conditionBean['getAllBlockIndex'] = true
           conditionBean['blockType'] = BlockType.Channel
           let channelIndexList = []
-          if (store.state.networkStatus === 'CONNECTED'){
+          if (store.state.networkStatus === 'CONNECTED') {
             let ret = await queryValueAction.queryValue(null, conditionBean)
             if (ret && ret.length > 0) {
               channelIndexList = ret
@@ -4059,7 +4071,7 @@ export default {
           conditionBean['getAllBlockIndex'] = true
           conditionBean['blockType'] = BlockType.Channel
           let channelIndexList = []
-          if (store.state.networkStatus === 'CONNECTED'){
+          if (store.state.networkStatus === 'CONNECTED') {
             let ret = await queryValueAction.queryValue(null, conditionBean)
             if (ret && ret.length > 0) {
               channelIndexList = ret
@@ -4124,7 +4136,7 @@ export default {
           }
           if (changed) {
             await channelComponent.save(ChannelDataType.CHANNEL, channelList, null)
-            for (let i=channelList.length-1;i>=0;i--) {
+            for (let i = channelList.length - 1; i >= 0; i--) {
               let channel = channelList[i]
               let deleted = false
               for (let deleteChannel of deleteChannelList) {
@@ -4164,120 +4176,120 @@ export default {
       return window.device && (window.device.platform === 'Android' || window.device.platform === 'iOS')
     }
     if (window.device) {
-        document.addEventListener('deviceready', async function () {
-          if(window.device.platform === 'Android'){
-                  let permissions = cordova.plugins.permissions
-                  permissionHelper.init(permissions)
-                  let list = [
-                    'android.permission.CAMERA',
-                    'android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS',
-                    'android.permission.WAKE_LOCK',
-                    'android.permission.FOREGROUND_SERVICE',
-                    'android.permission.MODIFY_AUDIO_SETTINGS',
-                    'android.permission.READ_PHONE_STATE',
-                    'android.permission.WRITE_EXTERNAL_STORAGE',
-                    'android.permission.READ_CONTACTS',
-                    //'android.permission.WRITE_CONTACTS',
-                    //'android.permission.GET_ACCOUNTS',
-                    //'android.permission.USE_BIOMETRIC',
-                    //'android.permission.ACCESS_COARSE_LOCATION',
-                    'android.permission.RECORD_VIDEO',
-                    'android.permission.RECORD_AUDIO',
-                    'android.permission.READ_EXTERNAL_STORAGE',
-                    'android.permission.ACCESS_NETWORK_STATE',
-                    'android.permission.MANAGE_DOCUMENTS',
-                    'android.permission.VIBRATE'
-                  ]
-                  await permissionHelper.requestPermissions(list)
-                  document.addEventListener('backbutton', function (e) {
-                    navigator.app.clearHistory()
-                    if(!(_that.$refs[`mainDrawer`] && _that.$refs[`mainDrawer`].value)){
-                      navigator.Backbutton.goHome(function() {
-                        console.log('goHome success')
-                      }, function() {
-                        console.log('goHome fail')
-                      })
-                    }
-                  },false)
-          }
-        })
-        if(AudioToggle){
-            AudioToggle.setAudioMode(AudioToggle.EARPIECE);
-        }
-        /*cordova.plugins.backgroundMode.enable()
-        cordova.plugins.backgroundMode.on('activate', function() {
-          cordova.plugins.backgroundMode.disableWebViewOptimizations()
-          cordova.plugins.backgroundMode.disableBatteryOptimizations()
-        })*/
-        document.addEventListener("pause", function () {
-            if(cordova.plugins.notification){
-                cordova.plugins.notification.foreground = false
+      document.addEventListener('deviceready', async function () {
+        if (window.device.platform === 'Android') {
+          let permissions = cordova.plugins.permissions
+          permissionHelper.init(permissions)
+          let list = [
+            'android.permission.CAMERA',
+            'android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS',
+            'android.permission.WAKE_LOCK',
+            'android.permission.FOREGROUND_SERVICE',
+            'android.permission.MODIFY_AUDIO_SETTINGS',
+            'android.permission.READ_PHONE_STATE',
+            'android.permission.WRITE_EXTERNAL_STORAGE',
+            'android.permission.READ_CONTACTS',
+            //'android.permission.WRITE_CONTACTS',
+            //'android.permission.GET_ACCOUNTS',
+            //'android.permission.USE_BIOMETRIC',
+            //'android.permission.ACCESS_COARSE_LOCATION',
+            'android.permission.RECORD_VIDEO',
+            'android.permission.RECORD_AUDIO',
+            'android.permission.READ_EXTERNAL_STORAGE',
+            'android.permission.ACCESS_NETWORK_STATE',
+            'android.permission.MANAGE_DOCUMENTS',
+            'android.permission.VIBRATE'
+          ]
+          await permissionHelper.requestPermissions(list)
+          document.addEventListener('backbutton', function (e) {
+            navigator.app.clearHistory()
+            if (!(_that.$refs[`mainDrawer`] && _that.$refs[`mainDrawer`].value)) {
+              navigator.Backbutton.goHome(function () {
+                console.log('goHome success')
+              }, function () {
+                console.log('goHome fail')
+              })
             }
-        })
-        document.addEventListener("resume", function () {
-            if(cordova.plugins.notification){
-                cordova.plugins.notification.foreground = true
-            }
-        })
-        console.log('getNetworkState:' + deviceComponent.getNetworkState())
-        if ((_that.$q.screen.width < 481 || _that.$q.screen.height < 481) && (window.device.platform === 'Android' || window.device.platform === 'iOS')) {
-          deviceComponent.lockScreen('portrait')
+          }, false)
         }
+      })
+      if (AudioToggle) {
+        AudioToggle.setAudioMode(AudioToggle.EARPIECE);
+      }
+      /*cordova.plugins.backgroundMode.enable()
+      cordova.plugins.backgroundMode.on('activate', function() {
+        cordova.plugins.backgroundMode.disableWebViewOptimizations()
+        cordova.plugins.backgroundMode.disableBatteryOptimizations()
+      })*/
+      document.addEventListener("pause", function () {
+        if (cordova.plugins.notification) {
+          cordova.plugins.notification.foreground = false
+        }
+      })
+      document.addEventListener("resume", function () {
+        if (cordova.plugins.notification) {
+          cordova.plugins.notification.foreground = true
+        }
+      })
+      console.log('getNetworkState:' + deviceComponent.getNetworkState())
+      if ((_that.$q.screen.width < 481 || _that.$q.screen.height < 481) && (window.device.platform === 'Android' || window.device.platform === 'iOS')) {
+        deviceComponent.lockScreen('portrait')
+      }
+      store.state.ifMobileStyle = (_that.$q.screen.width < 481 || _that.$q.screen.height < 481) || ((window.device.platform === 'Android' || window.device.platform === 'iOS') && screen.orientation.type.substring(0, 8) === 'portrait')
+      deviceComponent.registScreenChange(function () {
         store.state.ifMobileStyle = (_that.$q.screen.width < 481 || _that.$q.screen.height < 481) || ((window.device.platform === 'Android' || window.device.platform === 'iOS') && screen.orientation.type.substring(0, 8) === 'portrait')
-        deviceComponent.registScreenChange(function () {
-          store.state.ifMobileStyle = (_that.$q.screen.width < 481 || _that.$q.screen.height < 481) || ((window.device.platform === 'Android' || window.device.platform === 'iOS') && screen.orientation.type.substring(0, 8) === 'portrait')
-        })
-        if (store.state.ifMobileStyle) {
-          document.querySelector("body").classList.add('bgc')
-          if (_that.drawer) {
-            /*if (_that.kind === 'contactsDetails') {
-              statusBarComponent.style(true, '#ffffff')
-            } else {
-              statusBarComponent.style(true, '#eee')
-            }*/
-            if (_that.$q.dark.isActive) {
-              statusBarComponent.style(false, '#1d1d1d')
-            } else {
-              statusBarComponent.style(true, '#ffffff')
-            }
+      })
+      if (store.state.ifMobileStyle) {
+        document.querySelector("body").classList.add('bgc')
+        if (_that.drawer) {
+          /*if (_that.kind === 'contactsDetails') {
+            statusBarComponent.style(true, '#ffffff')
           } else {
-            /*if (_that.tab === 'me') {
-              statusBarComponent.style(true, '#ffffff')
-            } else {*/
-              if (store.state.ifScan) {
-                statusBarComponent.style(false, '#33000000')
-              } else {
-                //statusBarComponent.style(true, '#eee')
-                if (_that.$q.dark.isActive) {
-                  statusBarComponent.style(false, '#212121')
-                } else {
-                  statusBarComponent.style(true, '#fafafa')
-                }
-              }
-            /*}*/
+            statusBarComponent.style(true, '#eee')
+          }*/
+          if (_that.$q.dark.isActive) {
+            statusBarComponent.style(false, '#1d1d1d')
+          } else {
+            statusBarComponent.style(true, '#ffffff')
           }
         } else {
-          document.querySelector("body").classList.remove('bgc')
-          statusBarComponent.style(false, '#33000000')
+          /*if (_that.tab === 'me') {
+            statusBarComponent.style(true, '#ffffff')
+          } else {*/
+          if (store.state.ifScan) {
+            statusBarComponent.style(false, '#33000000')
+          } else {
+            //statusBarComponent.style(true, '#eee')
+            if (_that.$q.dark.isActive) {
+              statusBarComponent.style(false, '#212121')
+            } else {
+              statusBarComponent.style(true, '#fafafa')
+            }
+          }
+          /*}*/
         }
-        //statusBarComponent.show(false) // 放开此处设置（目前属于重复设置，其实不需要），会导致Android登录后状态栏字体颜色设置不生效
-        // 针对iPad状态栏styleDefault无效的补丁
-        if (deviceComponent.getDeviceProperty('model') && deviceComponent.getDeviceProperty('model').substring(0, 4) === 'iPad') {
-          statusBarComponent.style(false, '#33000000')
-        }
-        /*if (window.device.platform === 'iOS') {
-          document.body.addEventListener('touchmove', function (e) {
-            e.preventDefault() // 阻止默认的处理方式（iOS有下拉滑动的效果）
-          }, { passive: false }) // passive参数用于兼容iOS和Android
-        }*/
-        console.log('device.model:' + deviceComponent.getDeviceProperty('model'))
-        console.log('device.platform:' + deviceComponent.getDeviceProperty('platform'))
-        console.log('device.uuid:' + deviceComponent.getDeviceProperty('uuid'))
-        console.log('device.version:' + deviceComponent.getDeviceProperty('version'))
-        console.log('device.manufacturer:' + deviceComponent.getDeviceProperty('manufacturer'))
-        console.log('device.serial:' + deviceComponent.getDeviceProperty('serial'))
-        console.log('window.device.platform:' + window.device.platform)
-        console.log('currentScreen:' + deviceComponent.currentScreen())
+      } else {
+        document.querySelector("body").classList.remove('bgc')
+        statusBarComponent.style(false, '#33000000')
+      }
+      //statusBarComponent.show(false) // 放开此处设置（目前属于重复设置，其实不需要），会导致Android登录后状态栏字体颜色设置不生效
+      // 针对iPad状态栏styleDefault无效的补丁
+      if (deviceComponent.getDeviceProperty('model') && deviceComponent.getDeviceProperty('model').substring(0, 4) === 'iPad') {
+        statusBarComponent.style(false, '#33000000')
+      }
+      /*if (window.device.platform === 'iOS') {
+        document.body.addEventListener('touchmove', function (e) {
+          e.preventDefault() // 阻止默认的处理方式（iOS有下拉滑动的效果）
+        }, { passive: false }) // passive参数用于兼容iOS和Android
+      }*/
+      console.log('device.model:' + deviceComponent.getDeviceProperty('model'))
+      console.log('device.platform:' + deviceComponent.getDeviceProperty('platform'))
+      console.log('device.uuid:' + deviceComponent.getDeviceProperty('uuid'))
+      console.log('device.version:' + deviceComponent.getDeviceProperty('version'))
+      console.log('device.manufacturer:' + deviceComponent.getDeviceProperty('manufacturer'))
+      console.log('device.serial:' + deviceComponent.getDeviceProperty('serial'))
+      console.log('window.device.platform:' + window.device.platform)
+      console.log('currentScreen:' + deviceComponent.currentScreen())
       /*if (localNotificationComponent && JSON.stringify(localNotificationComponent) !== '{}') {
         let granted = await localNotificationComponent.requestPermission()
         if (granted) {
@@ -4429,7 +4441,7 @@ export default {
     webrtcPeerPool.peerPublicKey = myself.myselfPeerClient.peerPublicKey
     webrtcPeerPool.registEvent('connect', _that.webrtcConnect)
     webrtcPeerPool.registEvent('close', _that.webrtcClose)
-    webrtcPeerPool.registEvent('stream', async function(evt) {
+    webrtcPeerPool.registEvent('stream', async function (evt) {
       _that.receiveRemoteStream(evt.stream, evt.source.targetPeerId)
     })
     // online status monitoring

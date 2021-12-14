@@ -43,7 +43,7 @@ export default {
   props: [],
   data() {
     return {
-      sending:false,
+      sending: false,
       Platform: Platform,
       subKind: this.$store.messageEntry === 'search' ? 'searchChatHistory' : 'default',
       SubjectType: SubjectType,
@@ -177,6 +177,24 @@ export default {
         return ret
       }
     },
+    ifObsoleteGroupChat() {
+      let _that = this
+      let store = _that.$store
+      return function (currentChat) {
+        let ret = true
+        if (currentChat) {
+          let groupChat = store.state.groupChatMap[currentChat.subjectId]
+          if (groupChat && groupChat.groupMembers && groupChat.groupMembers.length > 0) {
+            for (groupMember of groupChat.groupMembers) {
+              if (groupMember.memberPeerId === myself.myselfPeerClient.peerId) {
+                ret = false
+              }
+            }
+          }
+        }
+        return ret
+      }
+    },
     MessageName() {
       let _that = this
       let store = _that.$store
@@ -212,37 +230,37 @@ export default {
         return chatTitle
       }
     },
-    isRecallTimeLimit(){
+    isRecallTimeLimit() {
       let _that = this
       let store = _that.$store
 
       return function (message) {
-        if(message.senderPeerId !== store.state.myselfPeerClient.peerId){
-            return true
+        if (message.senderPeerId !== store.state.myselfPeerClient.peerId) {
+          return true
         }
         let result = false
         let recallTimeLimit
-        if(message.subjectType === SubjectType.CHAT){
-            let linkman = store.state.linkmanMap[message.subjectId]
-            if(!linkman) return true
-            recallTimeLimit = linkman.recallTimeLimit
-        }else if(message.subjectType === SubjectType.GROUP_CHAT){
-            let group = store.state.groupChatMap[message.subjectId]
-            if(!group) return true
-            recallTimeLimit = group.recallTimeLimit
+        if (message.subjectType === SubjectType.CHAT) {
+          let linkman = store.state.linkmanMap[message.subjectId]
+          if (!linkman) return true
+          recallTimeLimit = linkman.recallTimeLimit
+        } else if (message.subjectType === SubjectType.GROUP_CHAT) {
+          let group = store.state.groupChatMap[message.subjectId]
+          if (!group) return true
+          recallTimeLimit = group.recallTimeLimit
         }
-        if(recallTimeLimit){
-          return (new Date().getTime()- message.createDate) > 2 * 60 * 1000
+        if (recallTimeLimit) {
+          return (new Date().getTime() - message.createDate) > 2 * 60 * 1000
         }
       }
     },
-    ifSelfChat(){
+    ifSelfChat() {
       let _that = this
       let store = _that.$store
       let currentChat = store.state.currentChat
-      if(currentChat && currentChat.subjectId === myself.myselfPeerClient.peerId){
+      if (currentChat && currentChat.subjectId === myself.myselfPeerClient.peerId) {
         return true
-      }else{
+      } else {
         return false
       }
     },
@@ -274,9 +292,9 @@ export default {
             let weekTimeArrary = weekTimeString.split(' ')
             let weekString = `${_that.$i18n.t(weekTimeArrary[0])} ${weekTimeArrary[1]}`
             return weekString
-            } else {
-              return date.formatDate(createDate, 'YYYY-MM-DD HH:mm')
-            }
+          } else {
+            return date.formatDate(createDate, 'YYYY-MM-DD HH:mm')
+          }
         }
       }
     },
@@ -386,14 +404,14 @@ export default {
           groupFileFilteredArray = groupFileList.filter((groupFile) => {
             if (groupFile) {
               return groupFile.name.toLowerCase().includes(groupFileFilter.toLowerCase())
-              || pinyinUtil.getPinyin(groupFile.name).toLowerCase().includes(groupFileFilter.toLowerCase())
+                || pinyinUtil.getPinyin(groupFile.name).toLowerCase().includes(groupFileFilter.toLowerCase())
             }
           })
         } else {
           groupFileFilteredArray = groupFileList
         }
-        if(groupFileFilteredArray.length > 0) {
-            CollaUtil.sortByKey(groupFileFilteredArray, 'createTimestamp', 'desc')
+        if (groupFileFilteredArray.length > 0) {
+          CollaUtil.sortByKey(groupFileFilteredArray, 'createTimestamp', 'desc')
         }
       }
       return groupFileFilteredArray
@@ -529,7 +547,7 @@ export default {
         store.captureType = type
         _that.subKind = 'captureMedia'
       } else {
-          console.error('Not support browser safari!')
+        console.error('Not support browser safari!')
       }
     },
     async saveChatMediaFile() {
@@ -720,7 +738,7 @@ export default {
             if (block[0].attachs && block[0].attachs.length > 0) {
               let attach = block[0].attachs[0]
               if (attach) {
-                  fileData = attach.content
+                fileData = attach.content
                 if (!message.messageId) { // 群共享接收方创建message
                   message.ownerPeerId = myself.myselfPeerClient.peerId
                   message.messageId = UUID.string(null, null)
@@ -736,7 +754,7 @@ export default {
                   await chatComponent.insert(ChatDataType.MESSAGE, message, null)
                 }
                 attach.ownerPeerId = myself.myselfPeerClient.peerId
-                await chatBlockComponent.saveLocalAttach({attachs : [attach]})
+                await chatBlockComponent.saveLocalAttach({ attachs: [attach] })
                 if (message.contentType === ChatContentType.VIDEO) {
                   fileData = mediaComponent.fixVideoUrl(fileData)
                 }
@@ -768,31 +786,31 @@ export default {
         store.state.imageMessageSrc = fileData
         _that.$nextTick(() => {
           store.state.imageMessageViewDialog = true
-            _that.$nextTick(() => {
-                if (store.ifMobile()) {
-                  setTimeout(function () {
-                    var img = new Image()
-                      img.src = store.state.imageMessageSrc
-                      console.log('img.width: ' + img.width + ', img.height: ' + img.height)
-                      let selectedContainer = document.getElementById('dialog-image-container')
-                      let canvas = document.getElementById('dialog-image-canvas')
-                      let ctx = canvas.getContext('2d')
-                      canvas.width = _that.ifMobileSize || store.state.ifMobileStyle ? _that.$q.screen.width : (img.width > selectedContainer.clientWidth ? selectedContainer.clientWidth : img.width)
-                      canvas.height = canvas.width * img.height / img.width
-                      ctx.clearRect(0, 0, canvas.width, canvas.height)
-                      ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
-                      let selectedImg = document.querySelector('#dialog-image')
-                      selectedImg.src = canvas.toDataURL('image/png', 1.0)
-                      let marginTop = 0
-                      marginTop = (store.screenHeight - canvas.height) / 2 // 不使用_that.$q.screen.height，避免键盘弹出时的影响
-                      marginTop = marginTop < 0 ? 0 : marginTop
-                      console.log('$q.screen.Height:' + _that.$q.screen.height + ',canvas.width:' + canvas.width + ',canvas.height:' + canvas.height + ',marginTop:' + marginTop)
-                      selectedImg.style.cssText += 'margin-top: ' + marginTop + 'px'
-                      alloyFingerComponent.initImage('#dialog-image')
-                      alloyFingerComponent.initLongSingleTap('#dialog-image-container', _that.mediaHold, _that.fullscreenBack)    
-                  },0)
-                }
-            })
+          _that.$nextTick(() => {
+            if (store.ifMobile()) {
+              setTimeout(function () {
+                var img = new Image()
+                img.src = store.state.imageMessageSrc
+                console.log('img.width: ' + img.width + ', img.height: ' + img.height)
+                let selectedContainer = document.getElementById('dialog-image-container')
+                let canvas = document.getElementById('dialog-image-canvas')
+                let ctx = canvas.getContext('2d')
+                canvas.width = _that.ifMobileSize || store.state.ifMobileStyle ? _that.$q.screen.width : (img.width > selectedContainer.clientWidth ? selectedContainer.clientWidth : img.width)
+                canvas.height = canvas.width * img.height / img.width
+                ctx.clearRect(0, 0, canvas.width, canvas.height)
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+                let selectedImg = document.querySelector('#dialog-image')
+                selectedImg.src = canvas.toDataURL('image/png', 1.0)
+                let marginTop = 0
+                marginTop = (store.screenHeight - canvas.height) / 2 // 不使用_that.$q.screen.height，避免键盘弹出时的影响
+                marginTop = marginTop < 0 ? 0 : marginTop
+                console.log('$q.screen.Height:' + _that.$q.screen.height + ',canvas.width:' + canvas.width + ',canvas.height:' + canvas.height + ',marginTop:' + marginTop)
+                selectedImg.style.cssText += 'margin-top: ' + marginTop + 'px'
+                alloyFingerComponent.initImage('#dialog-image')
+                alloyFingerComponent.initLongSingleTap('#dialog-image-container', _that.mediaHold, _that.fullscreenBack)
+              }, 0)
+            }
+          })
         })
       } else if (message.contentType === ChatContentType.AUDIO) {
         store.state.audioRecordMessageSrc = fileData
@@ -801,14 +819,14 @@ export default {
         })
       } else if (message.contentType === ChatContentType.VIDEO) {
 
-        if(window.device && window.device.platform === 'iOS' && fileData.indexOf('data:video/webm;base64,') > -1){
+        if (window.device && window.device.platform === 'iOS' && fileData.indexOf('data:video/webm;base64,') > -1) {
           _that.$q.notify({
             message: _that.$i18n.t("Can not play this video"),
             timeout: 3000,
             type: "warning",
             color: "warning",
           })
-        }else{
+        } else {
           store.state.videoRecordMessageSrc = fileData
           _that.$nextTick(() => {
             store.state.videoRecordMessageViewDialog = true
@@ -849,11 +867,11 @@ export default {
           })
         } else {
           let hyperlink = document.createElement("a"),
-          mouseEvent = new MouseEvent('click', {
-            view: window,
-            bubbles: true,
-            cancelable: true
-          });
+            mouseEvent = new MouseEvent('click', {
+              view: window,
+              bubbles: true,
+              cancelable: true
+            });
           hyperlink.href = fileData;
           hyperlink.target = '_blank';
           hyperlink.download = message.content;
@@ -866,7 +884,7 @@ export default {
       let _that = this
       let bottomSheet = document.getElementsByClassName('q-bottom-sheet')
       if (!bottomSheet || !bottomSheet[0] || bottomSheet[0].style.display === 'none') { // 排除longTap触发的singleTapCallback
-          store.state.imageMessageViewDialog = false
+        store.state.imageMessageViewDialog = false
       }
     },
     async uploadMessageFile(file) {
@@ -936,13 +954,13 @@ export default {
         for (let i = 0; i < medias.length; i++) {
           let media = medias[i]
           let type;
-          MediaPicker.fileToBlob(media.path, async function(data) {
+          MediaPicker.fileToBlob(media.path, async function (data) {
             let blob, fileData;
             if (media.mediaType === 'image') {
-              blob = new Blob([data], {"type": "image/jpeg"});
+              blob = new Blob([data], { "type": "image/jpeg" });
               type = ChatContentType.IMAGE
             } else {
-              blob = new Blob([data], {"type": "video/mp4"});
+              blob = new Blob([data], { "type": "video/mp4" });
               type = ChatContentType.VIDEO
             }
             let fileReader = new FileReader();
@@ -951,7 +969,7 @@ export default {
               await store.saveFileAndSendMessage(store.state.currentChat, fileData, type)
             }
             fileReader.readAsDataURL(blob);
-          }, function(e) { console.log(e) });
+          }, function (e) { console.log(e) });
         }
       }
     },
@@ -977,7 +995,7 @@ export default {
         store.state.currentChat.tempText = ''
         setTimeout(function () {
           _that.sending = false
-        },100)
+        }, 100)
         return;
       }
       _that.sending = true
@@ -997,15 +1015,15 @@ export default {
       _that.sending = false
       editor.focus();
       _that.$nextTick(() => {
-          let container = document.getElementById('talk')
-          if (container) {
-              setTimeout(function () {
-                  container.scrollTop = container.scrollHeight
-              }, 100)
-          }
+        let container = document.getElementById('talk')
+        if (container) {
+          setTimeout(function () {
+            container.scrollTop = container.scrollHeight
+          }, 100)
+        }
       })
     },
-    async recallMessage(message,index){
+    async recallMessage(message, index) {
       let _that = this
       let store = _that.$store
       let currentChat = store.state.currentChat
@@ -1014,14 +1032,14 @@ export default {
       curr_message.status = message.status
       await chatComponent.update(ChatDataType.MESSAGE, curr_message, null)
       let _message = {
-          messageType: P2pChatMessageType.RECALL,
-          preSubjectType: message.subjectType,
-          preSubjectId: message.subjectId,
-          preMessageId: message.messageId,
+        messageType: P2pChatMessageType.RECALL,
+        preSubjectType: message.subjectType,
+        preSubjectId: message.subjectId,
+        preMessageId: message.messageId,
       }
       //撤回的是最新的消息
-      if(currentChat.messages[currentChat.messages.length-1]._id === message._id){
-        currentChat.content =  `[${_that.$i18n.t("This message has been recalled")}]`
+      if (currentChat.messages[currentChat.messages.length - 1]._id === message._id) {
+        currentChat.content = `[${_that.$i18n.t("This message has been recalled")}]`
         let db_chat = await chatComponent.get(ChatDataType.CHAT, currentChat._id)
         db_chat.content = currentChat.content
         await chatComponent.update(ChatDataType.CHAT, db_chat)
@@ -1036,8 +1054,8 @@ export default {
       let messages = chat.messages
       message = await chatComponent.get(ChatDataType.MESSAGE, message._id)
       await chatComponent.remove(ChatDataType.MESSAGE, message, messages)
-      let message_last = messages[messages.length-1]
-      if(message_last && message_last.contentType === ChatContentType.TIME){
+      let message_last = messages[messages.length - 1]
+      if (message_last && message_last.contentType === ChatContentType.TIME) {
         message_last = await chatComponent.get(ChatDataType.MESSAGE, message_last._id)
         await chatComponent.remove(ChatDataType.MESSAGE, message_last, messages)
       }
@@ -1064,21 +1082,21 @@ export default {
         message.content = store.getChatContent(firstMergeMessage.contentType, firstMergeMessage.content)
         message.title = firstMergeMessage.mergeName
         message.mergeMessages = mergeMessages
-        for(let mergeMessage of mergeMessages){
+        for (let mergeMessage of mergeMessages) {
           mergeMessage.mergeMessageId = message.messageId
           mergeMessage.topMessageId = message.messageId
-          if(mergeMessage.contentType === ChatContentType.CHAT){
+          if (mergeMessage.contentType === ChatContentType.CHAT) {
             await _that.recursiveMergeMessages(chat, mergeMessage)
           }
           if ((message.contentType === ChatContentType.VIDEO || message.contentType === ChatContentType.FILE || message.contentType === ChatContentType.IMAGE)) {
             let fileData = await store.getMessageFile(mergeMessage)
-            await store.saveFileInMessage(chat,message,fileData, message.contentType,null,mergeMessage.fileoriginalMessageId)
+            await store.saveFileInMessage(chat, message, fileData, message.contentType, null, mergeMessage.fileoriginalMessageId)
           }
         }
         await store.sendChatMessage(chat, message)
-      }else{
+      } else {
 
-        for(let singleMessage of forwardMessage) {
+        for (let singleMessage of forwardMessage) {
           let message = {}
           message.messageId = UUID.string(null, null)
           message.messageType = P2pChatMessageType.CHAT_LINKMAN
@@ -1094,30 +1112,30 @@ export default {
         store.changeMessageSubKind('default')
       }
     },
-    async recursiveMergeMessages(chat, message){//mergeMessage
+    async recursiveMergeMessages(chat, message) {//mergeMessage
       let _that = this
       let store = _that.$store
       let mergeMessages
-      if(message.mergeMessages && message.mergeMessages.length > 0){
+      if (message.mergeMessages && message.mergeMessages.length > 0) {
         mergeMessages = message.mergeMessages
-      }else{
+      } else {
         let mergeMessages = await chatComponent.loadMergeMessage(
           {
             mergeMessageId: message.messageId
           }, null, null)
         message.mergeMessages = mergeMessages
       }
-      for(let mergeMessage of message.mergeMessages){
+      for (let mergeMessage of message.mergeMessages) {
         let fileData
-        if(message.contentType === ChatContentType.VIDEO || message.contentType === ChatContentType.FILE || message.contentType === ChatContentType.IMAGE){
+        if (message.contentType === ChatContentType.VIDEO || message.contentType === ChatContentType.FILE || message.contentType === ChatContentType.IMAGE) {
           fileData = await store.getMessageFile(mergeMessage)
         }
         mergeMessage.mergeMessageId = message.messageId
         mergeMessage.topMessageId = message.topMessageId
-        if(mergeMessage.contentType === message.contentType === ChatContentType.CHAT){
-         await _that.recursiveMergeMessages(message)
-        }else if(message.contentType === ChatContentType.VIDEO || message.contentType === ChatContentType.FILE || message.contentType === ChatContentType.IMAGE){
-            await store.saveFileInMessage(chat, message, fileData, message.contentType,null,mergeMessage.fileoriginalMessageId)
+        if (mergeMessage.contentType === message.contentType === ChatContentType.CHAT) {
+          await _that.recursiveMergeMessages(message)
+        } else if (message.contentType === ChatContentType.VIDEO || message.contentType === ChatContentType.FILE || message.contentType === ChatContentType.IMAGE) {
+          await store.saveFileInMessage(chat, message, fileData, message.contentType, null, mergeMessage.fileoriginalMessageId)
         }
       }
     },
@@ -1170,7 +1188,7 @@ export default {
           createTime: new Date().getTime(),
           chatName: _that.ChatTitle(chat),
           blockId: message.attachBlockId,
-          mergeMessages:message.mergeMessages
+          mergeMessages: message.mergeMessages
         }
         mergeMessages.push(mergeMessage)
         //attach
@@ -1211,10 +1229,10 @@ export default {
     async collectMessage(message, index) {
       let _that = this
       let store = _that.$store
-      if(message.contentType === ChatContentType.CARD){
-          _that.messageMultiSelectedVal = [message]
-          await _that.multiCollectionMessage()
-          return
+      if (message.contentType === ChatContentType.CARD) {
+        _that.messageMultiSelectedVal = [message]
+        await _that.multiCollectionMessage()
+        return
       }
       try {
         let chat = store.state.chatMap[message.subjectId]
@@ -1277,13 +1295,13 @@ export default {
             }
           }
         }
-        if(message.contentType !== ChatContentType.VOICE){
+        if (message.contentType !== ChatContentType.VOICE) {
           console.log('collectMessage-content:' + content)
-        let files = []
-        if (content) {
-          files.push(content)
-        }
-        inserted.content = message.contentType !== ChatContentType.FILE ? await collectionUtil.getInsertHtml(files) : content
+          let files = []
+          if (content) {
+            files.push(content)
+          }
+          inserted.content = message.contentType !== ChatContentType.FILE ? await collectionUtil.getInsertHtml(files) : content
         }
         await collectionUtil.save('collection', inserted)
         // 云端cloud保存
@@ -1356,7 +1374,7 @@ export default {
       store.state.currentChat.tempText = messageText
       _that.$refs.editor.focus()
     },
-      //已不在接收已读回执
+    //已不在接收已读回执
     async handleReadCallback(mes) {
       let _that = this
       let store = _that.$store
@@ -1367,15 +1385,15 @@ export default {
             let currentMes = messages[i]
             if (currentMes.messageId === mes.messageId) {
               currentMes.readTime = mes.readTime
-                console.log(JSON.stringify(currentMes))
+              console.log(JSON.stringify(currentMes))
               await chatComponent.update(ChatDataType.MESSAGE, currentMes, messages)
-                console.log(JSON.stringify(currentMes))
+              console.log(JSON.stringify(currentMes))
               //count down
               currentMes.countDown = currentMes.destroyTime / 1000
               let countDownInterval = setInterval(async function () {
                 if (!currentMes.countDown) {
                   clearInterval(countDownInterval)
-                    console.log(JSON.stringify(currentMes))
+                  console.log(JSON.stringify(currentMes))
                   await chatComponent.remove(ChatDataType.MESSAGE, currentMes, messages)
                   return;
                 }
@@ -1491,45 +1509,45 @@ export default {
 
       _that.subKind = "default"
     },
-    async sendGroupInfo(){
-        let _that = this
-        let store = _that.$store
-        let currentTime = new Date()
-        let myselfPeerClient = myself.myselfPeerClient
-        let groupChat = store.state.groupChatMap[store.state.currentChat.subjectId]
-        let linkmanRequest = {}
-        linkmanRequest.requestType = RequestType.MODIFY_GROUPCHAT
-        linkmanRequest.ownerPeerId = myselfPeerClient.peerId
-        linkmanRequest.senderPeerId = myselfPeerClient.peerId
-        //linkmanRequest.data = JSON.stringify(groupMembers) // 数据库为JSON格式
-        linkmanRequest.groupId = groupChat.groupId
-        //linkmanRequest.groupCreateDate = groupChat.createDate
-        linkmanRequest.groupName = groupChat.name
-        linkmanRequest.groupDescription = groupChat.description
-        linkmanRequest.myAlias = groupChat.myAlias
-        linkmanRequest.recallTimeLimit = groupChat.recallTimeLimit
-        linkmanRequest.recallAlert = groupChat.recallAlert
-        linkmanRequest.createDate = currentTime
-        linkmanRequest.status = RequestStatus.SENT
-        console.log(linkmanRequest)
-        await contactComponent.insert(ContactDataType.LINKMAN_REQUEST, linkmanRequest, null)
+    async sendGroupInfo() {
+      let _that = this
+      let store = _that.$store
+      let currentTime = new Date()
+      let myselfPeerClient = myself.myselfPeerClient
+      let groupChat = store.state.groupChatMap[store.state.currentChat.subjectId]
+      let linkmanRequest = {}
+      linkmanRequest.requestType = RequestType.MODIFY_GROUPCHAT
+      linkmanRequest.ownerPeerId = myselfPeerClient.peerId
+      linkmanRequest.senderPeerId = myselfPeerClient.peerId
+      //linkmanRequest.data = JSON.stringify(groupMembers) // 数据库为JSON格式
+      linkmanRequest.groupId = groupChat.groupId
+      //linkmanRequest.groupCreateDate = groupChat.createDate
+      linkmanRequest.groupName = groupChat.name
+      linkmanRequest.groupDescription = groupChat.description
+      linkmanRequest.myAlias = groupChat.myAlias
+      linkmanRequest.recallTimeLimit = groupChat.recallTimeLimit
+      linkmanRequest.recallAlert = groupChat.recallAlert
+      linkmanRequest.createDate = currentTime
+      linkmanRequest.status = RequestStatus.SENT
+      console.log(linkmanRequest)
+      await contactComponent.insert(ContactDataType.LINKMAN_REQUEST, linkmanRequest, null)
 
-        // 保存/发送Sent请求
-        let message = {
-            subjectType: SubjectType.LINKMAN_REQUEST,
-            messageType: P2pChatMessageType.MODIFY_GROUPCHAT,
-            content: linkmanRequest
+      // 保存/发送Sent请求
+      let message = {
+        subjectType: SubjectType.LINKMAN_REQUEST,
+        messageType: P2pChatMessageType.MODIFY_GROUPCHAT,
+        content: linkmanRequest
+      }
+      let groupChatLinkmans = []
+      for (let groupMember of groupChat.groupMembers) {
+        let linkman = store.state.linkmanMap[groupMember.memberPeerId]
+        if (linkman && linkman.peerId !== myselfPeerClient.peerId) { // 自己和非联系人除外
+          groupChatLinkmans.push(store.state.linkmanMap[groupMember.memberPeerId])
         }
-        let groupChatLinkmans = []
-        for (let groupMember of groupChat.groupMembers) {
-            let linkman = store.state.linkmanMap[groupMember.memberPeerId]
-            if (linkman && linkman.peerId !== myselfPeerClient.peerId) { // 自己和非联系人除外
-                groupChatLinkmans.push(store.state.linkmanMap[groupMember.memberPeerId])
-            }
-        }
-        for (let groupChatLinkman of groupChatLinkmans) {
-            await store.saveAndSendMessage(message, groupChatLinkman)
-        }
+      }
+      for (let groupChatLinkman of groupChatLinkmans) {
+        await store.saveAndSendMessage(message, groupChatLinkman)
+      }
     },
     confirmRemoveChat() {
       let _that = this
@@ -1727,7 +1745,7 @@ export default {
           content: linkmanRequest
         }
         for (let groupChatLinkman of groupChatLinkmans) {
-            await store.saveAndSendMessage(message, groupChatLinkman)
+          await store.saveAndSendMessage(message, groupChatLinkman)
         }
       }
     },
@@ -1951,7 +1969,7 @@ export default {
         content: linkmanRequest
       }
       for (let groupChatLinkman of groupChatLinkmans) {
-          await store.saveAndSendMessage(message, groupChatLinkman)
+        await store.saveAndSendMessage(message, groupChatLinkman)
       }
 
       let chat = await store.getChat(groupChat.groupId)
@@ -2219,79 +2237,79 @@ export default {
       }
     },
     changeRecallTimeLimit: async function (value) {
-          let _that = this
-          let store = _that.$store
-          let subjectType = store.state.currentChat.subjectType
-          let subjectId = store.state.currentChat.subjectId
-          if (subjectType === SubjectType.CHAT) {
-              let linkman = store.state.linkmanMap[subjectId]
-              let linkmanRecord = await contactComponent.get(ContactDataType.LINKMAN, linkman._id)
-              if (linkmanRecord) {
-                  linkman.myselfRecallTimeLimit = value
-                  linkmanRecord.myselfRecallTimeLimit = value
-                  await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
-                  await store.sendLinkmanInfo(subjectId,`modify`)
-              }
-          } else if (subjectType === SubjectType.GROUP_CHAT) {
-              let groupChat = store.state.groupChatMap[subjectId]
-              let groupChatRecord = await contactComponent.get(ContactDataType.GROUP, groupChat._id)
-              if (groupChatRecord) {
-                  groupChat.recallTimeLimit = value
-                  groupChatRecord.recallTimeLimit = value
-                  await contactComponent.update(ContactDataType.GROUP, groupChatRecord)
-                  _that.sendGroupInfo()
-              }
+      let _that = this
+      let store = _that.$store
+      let subjectType = store.state.currentChat.subjectType
+      let subjectId = store.state.currentChat.subjectId
+      if (subjectType === SubjectType.CHAT) {
+        let linkman = store.state.linkmanMap[subjectId]
+        let linkmanRecord = await contactComponent.get(ContactDataType.LINKMAN, linkman._id)
+        if (linkmanRecord) {
+          linkman.myselfRecallTimeLimit = value
+          linkmanRecord.myselfRecallTimeLimit = value
+          await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
+          await store.sendLinkmanInfo(subjectId, `modify`)
+        }
+      } else if (subjectType === SubjectType.GROUP_CHAT) {
+        let groupChat = store.state.groupChatMap[subjectId]
+        let groupChatRecord = await contactComponent.get(ContactDataType.GROUP, groupChat._id)
+        if (groupChatRecord) {
+          groupChat.recallTimeLimit = value
+          groupChatRecord.recallTimeLimit = value
+          await contactComponent.update(ContactDataType.GROUP, groupChatRecord)
+          _that.sendGroupInfo()
+        }
 
-              let _type = _that.$i18n.t("Recall Time Limit")
-              let _content = `${store.state.myselfPeerClient.name}${(value? _that.$i18n.t("Add") : _that.$i18n.t("Cancel")) }${_type}`
-              if(_content){
-                  let chat = await store.getChat(groupChat.groupId)
-                  let chatMessage = {
-                      messageType: P2pChatMessageType.CHAT_SYS,
-                      contentType: ChatContentType.EVENT,
-                      content: _content
-                  }
-                  await store.addCHATSYSMessage(chat, chatMessage)
-              }
+        let _type = _that.$i18n.t("Recall Time Limit")
+        let _content = `${store.state.myselfPeerClient.name}${(value ? _that.$i18n.t("Add") : _that.$i18n.t("Cancel"))}${_type}`
+        if (_content) {
+          let chat = await store.getChat(groupChat.groupId)
+          let chatMessage = {
+            messageType: P2pChatMessageType.CHAT_SYS,
+            contentType: ChatContentType.EVENT,
+            content: _content
           }
-          _that.$forceUpdate()
+          await store.addCHATSYSMessage(chat, chatMessage)
+        }
+      }
+      _that.$forceUpdate()
     },
     changeRecallAlert: async function (value) {
-          let _that = this
-          let store = _that.$store
-          let subjectType = store.state.currentChat.subjectType
-          let subjectId = store.state.currentChat.subjectId
-          if (subjectType === SubjectType.CHAT) {
-              let linkman = store.state.linkmanMap[subjectId]
-              let linkmanRecord = await contactComponent.get(ContactDataType.LINKMAN, linkman._id)
-              if (linkmanRecord) {
-                  linkman.myselfRecallAlert = value
-                  linkmanRecord.myselfRecallAlert = value
-                  await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
-                  await store.sendLinkmanInfo(subjectId,`modify`)
-              }
-          } else if (subjectType === SubjectType.GROUP_CHAT) {
-              let groupChat = store.state.groupChatMap[subjectId]
-              let groupChatRecord = await contactComponent.get(ContactDataType.GROUP, groupChat._id)
-              if (groupChatRecord) {
-                  groupChat.recallAlert = value
-                  groupChatRecord.recallAlert = value
-                  await contactComponent.update(ContactDataType.GROUP, groupChatRecord)
-                  _that.sendGroupInfo()
+      let _that = this
+      let store = _that.$store
+      let subjectType = store.state.currentChat.subjectType
+      let subjectId = store.state.currentChat.subjectId
+      if (subjectType === SubjectType.CHAT) {
+        let linkman = store.state.linkmanMap[subjectId]
+        let linkmanRecord = await contactComponent.get(ContactDataType.LINKMAN, linkman._id)
+        if (linkmanRecord) {
+          linkman.myselfRecallAlert = value
+          linkmanRecord.myselfRecallAlert = value
+          await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
+          await store.sendLinkmanInfo(subjectId, `modify`)
+        }
+      } else if (subjectType === SubjectType.GROUP_CHAT) {
+        let groupChat = store.state.groupChatMap[subjectId]
+        let groupChatRecord = await contactComponent.get(ContactDataType.GROUP, groupChat._id)
+        if (groupChatRecord) {
+          groupChat.recallAlert = value
+          groupChatRecord.recallAlert = value
+          await contactComponent.update(ContactDataType.GROUP, groupChatRecord)
+          _that.sendGroupInfo()
 
-                  let _type = _that.$i18n.t("Recall Alert")
-                  let _content = `${store.state.myselfPeerClient.name}${(value? _that.$i18n.t("Add") : _that.$i18n.t("Cancel")) }${_type}`
-                  if(_content){
-                      let chat = await store.getChat(groupChat.groupId)
-                      let chatMessage = {
-                          messageType: P2pChatMessageType.CHAT_SYS,
-                          contentType: ChatContentType.EVENT,
-                          content: _content
-                      }
-                      await store.addCHATSYSMessage(chat, chatMessage)
-                  }
-              }
+          let _type = _that.$i18n.t("Recall Alert")
+          let _content = `${store.state.myselfPeerClient.name}${(value ? _that.$i18n.t("Add") : _that.$i18n.t("Cancel"))}${_type}`
+          if (_content) {
+            let chat = await store.getChat(groupChat.groupId)
+            let chatMessage = {
+              messageType: P2pChatMessageType.CHAT_SYS,
+              contentType: ChatContentType.EVENT,
+              content: _content
+            }
+            await store.addCHATSYSMessage(chat, chatMessage)
           }
+        }
+      }
     },
     async showContacts(peerId) {
       let _that = this
@@ -2301,7 +2319,7 @@ export default {
         let linkman = store.state.linkmanMap[peerId]
         if (linkman) {
           store.state.currentLinkman = linkman
-          store.contactsDetailsEntry =  _that.subKind // CHATDetails, GROUP_CHATDetails,default
+          store.contactsDetailsEntry = _that.subKind // CHATDetails, GROUP_CHATDetails,default
           _that.subKind = 'contactsDetails'
           /*if (store.state.ifMobileStyle) {
             statusBarComponent.style(true, '#ffffff')
@@ -2456,7 +2474,7 @@ export default {
         }
       }
     },
-    preventDefault(e){
+    preventDefault(e) {
       e.preventDefault()
     },
     audioTouchStart(e) {
@@ -2489,7 +2507,7 @@ export default {
         if (_that.eY1 - _that.eY2 < 150) {
           // 发送成功
           await _that.captureAudio()
-          if(!Platform.is.ios){
+          if (!Platform.is.ios) {
             let blob = null
             blob = _that.audioUrl
             _that.audioBlobMessageHandle(blob)
@@ -2524,7 +2542,7 @@ export default {
       } else {
         if (((e.shiftKey && e.keyCode == 50)) && store.state.currentChat.subjectType === SubjectType.GROUP_CHAT) {
           _that.focusGroupMemberDialog = true
-        }else if(store.state.ifMobileStyle){
+        } else if (store.state.ifMobileStyle) {
           _that.talkHeight()
         }
       }
@@ -2623,7 +2641,7 @@ export default {
       let _that = this
       let store = _that.$store
       let albums = await photoLibraryComponent.getAlbums()
-      await photoLibraryComponent.saveVideo(store.state.videoRecordMessageSrc,albums[0])
+      await photoLibraryComponent.saveVideo(store.state.videoRecordMessageSrc, albums[0])
       _that.$q.notify({
         message: _that.$i18n.t("Saved successfully"),
         timeout: 3000,
@@ -2842,7 +2860,7 @@ export default {
     async enterGroupFile() {
       let _that = this
       let store = _that.$store
-      _that.subKind='groupFile'
+      _that.subKind = 'groupFile'
       _that.$q.loading.show()
       await _that.getGroupFileList()
       _that.$q.loading.hide()
@@ -2857,38 +2875,38 @@ export default {
       conditionBean['getAllBlockIndex'] = true
       conditionBean['blockType'] = BlockType.GroupFile
       _that.groupFileList = []
-      if(store.state.networkStatus === 'CONNECTED'){
+      if (store.state.networkStatus === 'CONNECTED') {
         _that.groupFileList = await queryValueAction.queryValue(null, conditionBean)
       }
       let _messages = await chatComponent.loadMessage({
         ownerPeerId: myself.myselfPeerClient.peerId,
         messageType: P2pChatMessageType.GROUP_FILE,
-        subjectId : currentChat.subjectId
+        subjectId: currentChat.subjectId
       })
-      if(_messages && _messages.length > 0) {
-        if(store.state.networkStatus === 'CONNECTED'){
+      if (_messages && _messages.length > 0) {
+        if (store.state.networkStatus === 'CONNECTED') {
           //只做比较删除，下载到本地后才会新增
           let cloudGroupFileMap = {}
-          for(let cloudGroupFile of _that.groupFileList){
-              cloudGroupFileMap[cloudGroupFile.blockId] = cloudGroupFile.blockId
+          for (let cloudGroupFile of _that.groupFileList) {
+            cloudGroupFileMap[cloudGroupFile.blockId] = cloudGroupFile.blockId
           }
-          for(let _groupFileMessage of _messages){
-            if(!cloudGroupFileMap[_groupFileMessage.attachBlockId]){
-                await chatComponent.remove(ChatDataType.MESSAGE, _groupFileMessage)
-                let localGroupAttachs = await chatBlockComponent.loadLocalAttach(_groupFileMessage.attachBlockId)
-                for(let localGroupAttach of localGroupAttachs){
-                    localGroupAttach.state = EntityState.Deleted
-                }
-                await chatBlockComponent.saveLocalAttach({attachs : localGroupAttachs})
+          for (let _groupFileMessage of _messages) {
+            if (!cloudGroupFileMap[_groupFileMessage.attachBlockId]) {
+              await chatComponent.remove(ChatDataType.MESSAGE, _groupFileMessage)
+              let localGroupAttachs = await chatBlockComponent.loadLocalAttach(_groupFileMessage.attachBlockId)
+              for (let localGroupAttach of localGroupAttachs) {
+                localGroupAttach.state = EntityState.Deleted
+              }
+              await chatBlockComponent.saveLocalAttach({ attachs: localGroupAttachs })
             }
           }
-        }else{
-          for(let _groupFileMessage of _messages){
+        } else {
+          for (let _groupFileMessage of _messages) {
             _that.groupFileList.push({
-              blockId : _groupFileMessage.attachBlockId,
-              createTimestamp : _groupFileMessage.createDate,
-              name : _groupFileMessage.content,
-              businessNumber : _groupFileMessage.subjectId
+              blockId: _groupFileMessage.attachBlockId,
+              createTimestamp: _groupFileMessage.createDate,
+              name: _groupFileMessage.content,
+              businessNumber: _groupFileMessage.subjectId
             })
           }
         }
@@ -3012,19 +3030,19 @@ export default {
       let message
       let _messages = await chatComponent.loadMessage(
         {
-            ownerPeerId: myself.myselfPeerClient.peerId,
-            attachBlockId : groupFile.blockId
+          ownerPeerId: myself.myselfPeerClient.peerId,
+          attachBlockId: groupFile.blockId
         })
-      if(_messages && _messages.length > 0) {
-          message = _messages[0]
+      if (_messages && _messages.length > 0) {
+        message = _messages[0]
       }
-      if(!message){
-          message = {
-              attachBlockId : groupFile.blockId,
-              content : groupFile.name,
-              createDate : groupFile.createTimestamp,
-              subjectId : groupFile.businessNumber
-          }
+      if (!message) {
+        message = {
+          attachBlockId: groupFile.blockId,
+          content: groupFile.name,
+          createDate: groupFile.createTimestamp,
+          subjectId: groupFile.businessNumber
+        }
       }
       _that.getMessageFileAndOpen(message)
     },
@@ -3122,7 +3140,7 @@ export default {
     store.getMessageFileAndOpen = _that.getMessageFileAndOpen
     store.collectionPicked = _that.collectionPicked
     store.forwardToChat = _that.forwardToChat
-    if(audioInputComponent.audioinput){
+    if (audioInputComponent.audioinput) {
       audioInputComponent.audioinput.stopCallback = function (blob) {
         _that.audioUrl = blob
         _that.captureStatus = false

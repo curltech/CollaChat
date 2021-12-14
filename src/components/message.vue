@@ -32,7 +32,7 @@
                       q-item-section {{$t('MultiSelect')}}
                 q-chat-message(v-if='message.messageType === P2pChatMessageType.CHAT_SYS && message.contentType === ChatContentType.EVENT' :label="detailDateFormat(message.createDate)+'</br>'+ message.content")
                 q-chat-message(v-if='message.messageType === P2pChatMessageType.CHAT_SYS && message.contentType === ChatContentType.TIME' :label="detailDateFormat(message.content)")
-        .message-editor-wrap(:class="ifMobileSize || $store.state.ifMobileStyle ? 'bg-c-grey-message-editor' : 'bg-c-grey-message-editor-pc'")
+        .message-editor-wrap(v-if="$store.state.currentChat && ($store.state.currentChat.subjectType === SubjectType.CHAT || !ifObsoleteGroupChat($store.state.currentChat))" :class="ifMobileSize || $store.state.ifMobileStyle ? 'bg-c-grey-message-editor' : 'bg-c-grey-message-editor-pc'")
           .message-editor-area
             q-toolbar.row(style="height:40px;min-height:40px" v-if="!(ifMobileSize || $store.state.ifMobileStyle) && !messageMultiSelectMode")
               q-btn.text-primary.q-mr-sm(round flat icon="alarm" :disable ='!(!ifSelfChat && activeStatus($store.state.currentChat) && ($store.state.currentChat && $store.state.currentChat.subjectType === SubjectType.CHAT))' @click='destroyClock = true')
