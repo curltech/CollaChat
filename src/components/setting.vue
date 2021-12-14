@@ -51,7 +51,7 @@
           q-separator.c-separator(style="height:8px;margin-left:0px;margin-right:0px")
           q-item
             q-item-section(align="center")
-              q-btn.btnText(unelevated no-caps :label="$t('Logout')" @click="confirmLogout")
+              q-btn.bg-primary.text-grey-1(unelevated no-caps :label="$t('Logout')" @click="confirmLogout")
       q-tab-panel(name="accountSecurity" style="padding:0px 0px")
         accountSecurity.drawcontent
       q-tab-panel(name="privacy" style="padding:0px 0px")

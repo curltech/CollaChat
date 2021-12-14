@@ -29,6 +29,36 @@ export default {
       return {
         height: `${this.$q.screen.height}px`
       }
+    },
+    ifMobileSize() {
+      return (!window.device && this.$q.screen.width < 481)
+    },
+    BlackList() {
+      let _that = this
+      let store = _that.$store
+      let BlackArray = []
+      let linkmans = store.state.linkmans
+      if (linkmans && linkmans.length > 0) {
+        let filter = _that.filter
+        if (filter) {
+          BlackArray = linkmans.filter((linkman) => {
+            return (linkman.peerId.toLowerCase().includes(filter.toLowerCase())
+              || linkman.mobile.toLowerCase().includes(filter.toLowerCase())
+              || linkman.name.toLowerCase().includes(filter.toLowerCase())
+              || linkman.pyName.toLowerCase().includes(filter.toLowerCase())
+              || (linkman.givenName && linkman.givenName.toLowerCase().includes(filter.toLowerCase()))
+              || (linkman.pyGivenName && linkman.pyGivenName.toLowerCase().includes(filter.toLowerCase()))
+              || (linkman.tag && linkman.tag.toLowerCase().includes(filter.toLowerCase()))
+              || (linkman.pyTag && linkman.pyTag.toLowerCase().includes(filter.toLowerCase())))
+              && linkman.status === 'BLOCKED' && ((store.state.lockContactsSwitch && !linkman.locked) || !store.state.lockContactsSwitch)
+          })
+        } else {
+          BlackArray = linkmans.filter((linkman) => {
+            return linkman.status === 'BLOCKED' && ((store.state.lockContactsSwitch && !linkman.locked) || !store.state.lockContactsSwitch)
+          })
+        }
+      }
+      return BlackArray
     }
   },
   methods: {
@@ -92,42 +122,6 @@ export default {
         }
       }
     }
-  },
-  computed: {
-    ifMobileSize() {
-      return (!window.device && this.$q.screen.width < 481)
-    },
-    BlackList() {
-      let _that = this
-      let store = _that.$store
-      let BlackArray = []
-      let linkmans = store.state.linkmans
-      if (linkmans && linkmans.length > 0) {
-        let filter = _that.filter
-        if (filter) {
-          BlackArray = linkmans.filter((linkman) => {
-            return (linkman.peerId.toLowerCase().includes(filter.toLowerCase())
-              || linkman.mobile.toLowerCase().includes(filter.toLowerCase())
-              || linkman.name.toLowerCase().includes(filter.toLowerCase())
-              || linkman.pyName.toLowerCase().includes(filter.toLowerCase())
-              || (linkman.givenName && linkman.givenName.toLowerCase().includes(filter.toLowerCase()))
-              || (linkman.pyGivenName && linkman.pyGivenName.toLowerCase().includes(filter.toLowerCase()))
-              || (linkman.tag && linkman.tag.toLowerCase().includes(filter.toLowerCase()))
-              || (linkman.pyTag && linkman.pyTag.toLowerCase().includes(filter.toLowerCase())))
-              && linkman.status === 'BLOCKED' && ((store.state.lockContactsSwitch && !linkman.locked) || !store.state.lockContactsSwitch)
-          })
-        } else {
-          BlackArray = linkmans.filter((linkman) => {
-            return linkman.status === 'BLOCKED' && ((store.state.lockContactsSwitch && !linkman.locked) || !store.state.lockContactsSwitch)
-          })
-        }
-      }
-      return BlackArray
-    }
-  },
-  mounted() {
-    let _that = this
-    let store = _that.$store
   },
   created() {
     let _that = this

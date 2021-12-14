@@ -13,7 +13,7 @@
             q-list
               q-item(dense)
                 q-item-section(avatar)
-                  q-icon.menuIcon(name="info" color="primary")
+                  q-icon.text-primary(name="info")
                 q-item-label(header) {{$t('About Colla')}}
               q-separator.c-separator
               q-item(clickable v-ripple @click="$store.versionUpdate()")
@@ -34,7 +34,7 @@
             q-list
               q-item(dense)
                 q-item-section(avatar)
-                  q-icon.menuIcon(name="send" color="primary")
+                  q-icon.text-primary(name="send")
                 q-item-label(header) {{$t('Contact Us')}}
               q-separator.c-separator
               //q-item

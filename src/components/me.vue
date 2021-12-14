@@ -15,21 +15,21 @@
       //q-separator.c-separator(style="height:8px;margin-left:0px;margin-right:0px")
       q-item(clickable v-ripple :active-class="ifMobileSize || $store.state.ifMobileStyle ? 'bg-c-grey-1' : 'bg-c-grey-1'" class="text-c-grey-9" :active="$store.getKind() === 'collection'" @click="$store.changeKind('collection', 'me');$store.toggleDrawer(true);$store.collectionEntry=''")
         q-item-section(avatar)
-          q-icon.menuIcon(name="bookmarks" color="primary")
+          q-icon.text-primary(name="bookmarks")
         q-item-section {{$t('Collection')}}
         q-item-section(avatar)
           q-icon(v-if="ifMobileSize || $store.state.ifMobileStyle" name="keyboard_arrow_right")
       //q-separator.c-separator(inset="item")
       //q-item(clickable v-ripple :active-class="ifMobileSize || $store.state.ifMobileStyle ? 'bg-c-grey-1' : 'bg-c-grey-1'" class="text-c-grey-9" :active="$store.getKind() === 'wallet'" @click="$store.changeKind('wallet', 'me');$store.toggleDrawer(true)")
         q-item-section(avatar)
-          q-icon.menuIcon(name="account_balance_wallet" color="primary")
+          q-icon.text-primary(name="account_balance_wallet")
         q-item-section {{$t('Wallet')}}
         q-item-section(avatar)
           q-icon(v-if="ifMobileSize || $store.state.ifMobileStyle" name="keyboard_arrow_right")
       //q-separator.c-separator(style="height:8px;margin-left:0px;margin-right:0px")
       q-item(clickable v-ripple :active-class="ifMobileSize || $store.state.ifMobileStyle ? 'bg-c-grey-1' : 'bg-c-grey-1'" class="text-c-grey-9" :active="$store.getKind() === 'setting'" @click="$store.changeKind('setting', 'me');$store.toggleDrawer(true)")
         q-item-section(avatar)
-          q-icon.menuIcon(name="settings" color="primary")
+          q-icon.text-primary(name="settings")
         q-item-section {{$t('Settings')}}
         q-item-section(avatar)
           q-badge(v-if="$store.latestVersion !== $store.currentVersion" color="red" floating rounded) New

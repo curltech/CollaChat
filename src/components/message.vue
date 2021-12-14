@@ -136,7 +136,7 @@
           q-separator.c-separator(style="height:8px;margin-left:0px;margin-right:0px")
           q-item
             q-item-section(align="center")
-              q-btn.btnText(:label="$t('Remove Chat')" unelevated no-caps @click="confirmRemoveChat")
+              q-btn.bg-primary.text-grey-1(:label="$t('Remove Chat')" unelevated no-caps @click="confirmRemoveChat")
       // group chat ///////////////////////////////////////////////////////////////////////////////////
       q-tab-panel(name="GROUP_CHATDetails" style="padding:0px 0px")
         q-toolbar
@@ -255,7 +255,7 @@
           q-separator.c-separator.message-sep-2
           q-item
             q-item-section(align="center")
-              q-btn.btnText(:label="$t('Remove GroupChat')" unelevated no-caps @click="confirmRemoveGroupChat")
+              q-btn.bg-primary.text-grey-1(:label="$t('Remove GroupChat')" unelevated no-caps @click="confirmRemoveGroupChat")
       q-tab-panel(name="contactsDetails" style="padding:0px 0px")
         contactsDetails.drawcontent
       q-tab-panel(name="findContacts" style="padding:0px 0px")
@@ -341,7 +341,7 @@
             div(v-for="(groupFile, index) in GroupFileFilteredList" :key="groupFile.blockId")
               q-item(:active-class="ifMobileSize || $store.state.ifMobileStyle ? 'bg-c-grey-1' : 'bg-c-grey-2'" class="text-c-grey-10")
                 q-item-section(avatar)
-                  q-icon.menuIcon(:name="FileIconName(groupFile.name)" color="primary")
+                  q-icon.text-primary(:name="FileIconName(groupFile.name)")
                 q-item-section
                   q-item-label(lines="1" clickable v-ripple @click="groupFileSelected(groupFile, index)" ) {{ groupFile.name }}
                 q-item-section(side)

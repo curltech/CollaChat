@@ -92,16 +92,16 @@
         q-toolbar
           q-btn(flat round icon="keyboard_arrow_left" @click="subKind=tagEntry")
           q-toolbar-title(align="center") {{ $t('Edit Tags') }}
-          q-btn.text-primary(flat round icon="check" @click="saveTag()")
+          q-btn(flat round icon="check" :disable="!collectionData.tags || collectionData.tags.length === 0" :class="collectionData.tags && collectionData.tags.length > 0 ? 'text-primary' : 'c-grey-0'" @click="saveTag()")
         q-form(ref="formEditTags" @submit="saveTag()")
           div(style="margin-left:12px" class="text-c-grey-10 q-my-sm") {{ $t('Tags') + $t(' (please input Return after input new tags)') }}
-          q-select.c-field(v-if="myCollections.c_meta.current" bg-color="c-white" color="c-grey-7" square standout hide-bottom-space clearable v-model="collectionData.tags"
+          q-select.c-field(v-if="myCollections.c_meta.current" color="c-grey-7" square standout hide-bottom-space clearable v-model="collectionData.tags"
             use-input use-chips multiple input-debounce="0" new-value-mode="add-unique" @new-value="createNewTag" :options="filterOptions" @filter="filterFn" lazy-rules :rules="[]")
       q-tab-panel(:style="heightStyle" name="tagName" class="q-pa-none")
         q-toolbar
           q-btn(flat round icon="keyboard_arrow_left" @click="subKind = 'search'")
           q-toolbar-title(align="center") {{ $t('Tag Name') }}
-          q-btn(flat round icon="check" ':disable'="!tagName" :class="tagName ? 'primary' : 'c-grey-0'" @click="saveTagName")
+          q-btn(flat round icon="check" ':disable'="!tagName" :class="tagName ? 'text-primary' : 'c-grey-0'" @click="saveTagName")
         q-form(ref="formTagName")
           div(style="margin-left:12px" class="text-c-grey-10 q-my-sm") {{ $t('Name') }}
           q-input.c-field(bg-color="c-white" color="c-grey-3" square outlined hide-bottom-space clearable autofocus v-model="tagName" lazy-rules :rules="[ val => val && val.length > 0 || $t('Please input Name'), val => !tagExceedsLengthLimit(val) || $t('Tag name exceeds length limit'), val=> !tagAlreadyExists(val) || $t('Tag name already exists') ]")

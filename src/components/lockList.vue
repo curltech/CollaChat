@@ -6,7 +6,7 @@
           q-btn(flat round icon="keyboard_arrow_left" @click="$store.changePrivacySubKind('default')")
           q-toolbar-title(align="center" style="padding-right:54px") {{$t('Locklist') + '(' + LockList.length + ')'}}
         q-toolbar(insert class="q-px-xs")
-          q-input.c-field(debounce="100" outlined dense color="c-grey-3" bg-color="c-white" v-model="filter" :placeholder="placeholder" input-class="text-center iconfont")
+          q-input.c-field(autofocus debounce="100" filled dense v-model="filter" :placeholder="placeholder" input-class="text-center iconfont")
             template(slot="append")
               //q-icon(v-if="!filter" name="search")
               //q-icon(v-else name="cancel" class="cursor-pointer" @click.stop="filter = null")
@@ -24,7 +24,6 @@
                 q-icon(color="c-grey-7" :name="linkman.locked ? 'lock' : ''")
               //q-item-section(side)
                 q-btn.text-primary(dense round flat icon="remove_circle" @click="unlock(linkman)")
-              
             q-separator.c-separator(inset="item" v-if="index < LockList.length - 1")
             q-separator.c-separator(v-if="index === LockList.length - 1")
       q-tab-panel(name="contactsDetails" style="padding:0px 0px")
