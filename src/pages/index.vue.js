@@ -3938,12 +3938,13 @@ export default {
         for (let articleIndex of articleIndexList) {
           if (article.articleId === articleIndex.businessNumber) {
             exists = true
-            if (articleIndex.createTimestamp > article.updateDate) {
+            if (article.blockId !== articleIndex.blockId || articleIndex.createTimestamp > article.updateDate) {
               changed = true
               article.state = EntityState.Modified
               article.cover = articleIndex.cover
               article.title = articleIndex.title
               article.abstract = articleIndex.abstract
+              article.blockId = articleIndex.blockId
               article.updateDate = articleIndex.createTimestamp
             }
             break

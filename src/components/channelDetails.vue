@@ -48,7 +48,7 @@
         q-toolbar
           q-btn(flat round icon="keyboard_arrow_left" @click="subKind='default'")
           q-toolbar-title(align="center") {{$t('Edit Channel')}}
-          q-btn(flat round icon="check" @click="editChannel" :disable="!channelData.name || !channelData.description" :class="channelData.name && channelData.description?'text-primary':'c-grey-0'")
+          q-btn(flat round icon="check" @click="editChannel" :disable="!channelData.name" :class="channelData.name?'text-primary':'c-grey-0'")
         q-card(flat)
           q-card-section(align="center")
             q-item-label(class="q-field__label q-py-sm" :style="$q.dark.isActive ? 'color: rgba(255,255,255,0.7)' : ''") {{$t('Channel Avatar')}}
@@ -59,7 +59,7 @@
             q-form(ref="formCreateChannel" @submit="editChannel" class="q-pa-sm")
               q-input.c-field(autofocus :label="$t('Name')" filled clearable v-model="channelData.name" lazy-rules :rules="[val => val && val.length > 0 || $t('Please input Name')]")
               p
-              q-input.c-field(:label="$t('Description')" filled clearable v-model="channelData.description" lazy-rules :rules="[val => val && val.length > 0 || $t('Please input Description')]")
+              q-input.c-field(:label="$t('Description')" filled clearable v-model="channelData.description" lazy-rules :rules="[]")
       q-tab-panel(name="selectChat" style="padding:0px 0px")
         selectChat.drawcontent
     q-uploader(style="display:none" ref="channelUpload" @added="files => channelUpload(files)" accept=".jpg, image/*")
