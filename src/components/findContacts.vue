@@ -181,21 +181,24 @@
           @click="addContactsBack"
         )
         q-toolbar-title(align="center") {{ $t('Add Contacts') }}
-        q-btn(
+        q-btn.text-primary(
           flat,
           round,
           dense,
           icon="check",
-          color="primary",
           @click="addLinkman"
         )
-      q-form(ref="formAddContacts", @submit="addLinkman" class="q-pa-sm")
+      q-form(
+        ref="formAddContacts",
+        @submit="addLinkman"
+        class="q-pa-sm"
+      )
         q-input.c-field(
           autofocus,
           :label="$t('Invite Message')",
           filled,
           clearable,
-          v-model="$store.state.findLinkmanData.message",
+          v-model="addFindLinkmanData.message",
           lazy-rules,
           :rules="[]"
         )
@@ -204,7 +207,7 @@
           :label="$t('Given Name')",
           filled,
           clearable,
-          v-model="$store.state.findLinkmanData.givenName",
+          v-model="addFindLinkmanData.givenName",
           lazy-rules,
           :rules="[]"
         )
@@ -213,7 +216,7 @@
           :label="$t('Tags') + $t(' (please input Return after input new tags)')",
           filled,
           clearable,
-          v-model="$store.state.findLinkmanData.tagNames",
+          v-model="addFindLinkmanData.tagNames",
           use-input,
           use-chips,
           multiple,
@@ -242,7 +245,6 @@
           round,
           dense,
           icon="check",
-          color="primary",
           @click="acceptLinkman"
         )
       q-form(
@@ -255,7 +257,7 @@
           :label="$t('Given Name')",
           filled,
           clearable,
-          v-model="$store.state.findLinkmanData.givenName",
+          v-model="acceptFindLinkmanData.givenName",
           lazy-rules,
           :rules="[]"
         )
@@ -264,7 +266,7 @@
           :label="$t('Tags') + $t(' (please input Return after input new tags)')",
           filled,
           clearable,
-          v-model="$store.state.findLinkmanData.tagNames",
+          v-model="acceptFindLinkmanData.tagNames",
           use-input,
           use-chips,
           multiple,

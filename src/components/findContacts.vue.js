@@ -29,7 +29,16 @@ export default {
     return {
       ActiveStatus: ActiveStatus,
       qrCodeDialog: false,
-      filterOptions: this.$store.state.linkmanTagNames
+      filterOptions: this.$store.state.linkmanTagNames,
+      addFindLinkmanData: {
+        message: null,
+        givenName: null,
+        tagNames: null
+      },
+      acceptFindLinkmanData: {
+        givenName: null,
+        tagNames: null
+      }
     }
   },
   computed: {
@@ -127,9 +136,9 @@ export default {
       if (linkman) {
         this.$store.findLinkman = linkman
       }
-      this.$store.state.findLinkmanData.message = this.$i18n.t("I'm ") + myself.myselfPeerClient.name
-      this.$store.state.findLinkmanData.givenName = null
-      this.$store.state.findLinkmanData.tagNames = []
+      this.addFindLinkmanData.message = this.$i18n.t("I'm ") + myself.myselfPeerClient.name
+      this.addFindLinkmanData.givenName = null
+      this.addFindLinkmanData.tagNames = []
       if (this.$store.findContactsEntry === 'phoneContactsList') {
         this.$store.findContactsEntry = 'phoneContactsList-result' // 复杂页面导航处理
       }
@@ -139,8 +148,8 @@ export default {
       if (linkman) {
         this.$store.findLinkman = linkman
       }
-      this.$store.state.findLinkmanData.givenName = null
-      this.$store.state.findLinkmanData.tagNames = []
+      this.acceptFindLinkmanData.givenName = null
+      this.acceptFindLinkmanData.tagNames = []
       this.$store.state.findContactsSubKind = 'acceptContacts'
     },
     async addLinkman() {
@@ -149,8 +158,8 @@ export default {
       let myselfPeerClient = myself.myselfPeerClient
       let findLinkman = store.findLinkman
       let peerId = findLinkman.peerId
-      let message = store.state.findLinkmanData.message
-      let givenName = store.state.findLinkmanData.givenName
+      let message = _that.addFindLinkmanData.message
+      let givenName = _that.addFindLinkmanData.givenName
       let currentTime = new Date()
       let linkman = store.state.linkmanMap[peerId]
 
@@ -193,7 +202,7 @@ export default {
         })
         let tag = ''
         let linkmanTagLinkmans = []
-        for (let findLinkmanDataTagName of store.state.findLinkmanData.tagNames) {
+        for (let findLinkmanDataTagName of _that.addFindLinkmanData.tagNames) {
           let id = store.state.linkmanTagNameMap[findLinkmanDataTagName]
           if (!id) {
             let linkmanTag = {}
@@ -216,7 +225,7 @@ export default {
           tag = (tag ? tag + ", " + findLinkmanDataTagName : findLinkmanDataTagName)
         }
         await contactComponent.save(ContactDataType.LINKMAN_TAGLINKMAN, linkmanTagLinkmans, null)
-        newLinkman.tagNames = store.state.findLinkmanData.tagNames
+        newLinkman.tagNames = _that.addFindLinkmanData.tagNames
         newLinkman.tag = tag
         newLinkman.pyTag = pinyinUtil.getPinyin(tag)
         store.state.linkmanMap[peerId] = newLinkman
@@ -319,7 +328,7 @@ export default {
       let myselfPeerClient = myself.myselfPeerClient
       let linkmanRequest = store.findLinkman // 数据对象为linkmanRequest、不是linkman
       let peerId = linkmanRequest.senderPeerId
-      let givenName = store.state.findLinkmanData.givenName
+      let givenName = _that.acceptFindLinkmanData.givenName
       let currentTime = new Date()
 
       // 新增linkman
@@ -360,7 +369,7 @@ export default {
       });
       let tag = ''
       let linkmanTagLinkmans = []
-      for (let findLinkmanDataTagName of store.state.findLinkmanData.tagNames) {
+      for (let findLinkmanDataTagName of _that.acceptFindLinkmanData.tagNames) {
         let id = store.state.linkmanTagNameMap[findLinkmanDataTagName]
         if (!id) {
           let linkmanTag = {}
@@ -383,7 +392,7 @@ export default {
         tag = (tag ? tag + ", " + findLinkmanDataTagName : findLinkmanDataTagName)
       }
       await contactComponent.save(ContactDataType.LINKMAN_TAGLINKMAN, linkmanTagLinkmans, null)
-      newLinkman.tagNames = store.state.findLinkmanData.tagNames
+      newLinkman.tagNames = _that.acceptFindLinkmanData.tagNames
       newLinkman.tag = tag
       newLinkman.pyTag = pinyinUtil.getPinyin(tag)
       store.state.linkmanMap[peerId] = newLinkman
