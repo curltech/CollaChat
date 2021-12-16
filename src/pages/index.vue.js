@@ -654,7 +654,7 @@ export default {
       ]
       config.appParams.iceServer = [iceServer]
       for (let linkman of store.state.linkmans) {
-        if (linkman.peerId !== myselfPeerClient.peerId) {
+        if (linkman.peerId !== myselfPeerClient.peerId && linkman.status !== LinkmanStatus.REQUESTED) {
           let option = {}
           option.config = {
             "iceServers": iceServer

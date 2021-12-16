@@ -2,7 +2,7 @@ import { date } from 'quasar'
 
 import { webrtcPeerPool, peerClientService, BlockType, queryValueAction, myself } from 'libcolla'
 
-import {  ChatDataType, chatComponent, ChatMessageStatus, ChatContentType, P2pChatMessageType, SubjectType } from '@/libs/biz/colla-chat'
+import { ChatDataType, chatComponent, ChatMessageStatus, ChatContentType, P2pChatMessageType, SubjectType } from '@/libs/biz/colla-chat'
 import { ActiveStatus } from '@/libs/biz/colla-contact'
 import { channelComponent, ChannelType, EntityType } from '@/libs/biz/colla-channel'
 import NotePreview from '@/components/notePreview'
@@ -14,13 +14,13 @@ export default {
     notePreview: NotePreview,
     mobileAudio: MobileAudio,
   },
-  props: ['message', 'entry',"showContacts"],
+  props: ['message', 'entry', "showContacts"],
   data() {
     return {
       SubjectType: SubjectType,
       ActiveStatus: ActiveStatus,
       P2pChatMessageType: P2pChatMessageType,
-      ChatMessageStatus:ChatMessageStatus,
+      ChatMessageStatus: ChatMessageStatus,
       ChatContentType: ChatContentType,
       date: date,
     }
@@ -111,18 +111,18 @@ export default {
 
       return name
     },
-    isShowRecalld(message){
+    isShowRecalld(message) {
       let _that = this
       let store = _that.$store
       let recallSetting
-      if(message.subjectType === SubjectType.CHAT){
+      if (message.subjectType === SubjectType.CHAT) {
         let linkman = store.state.linkmanMap[message.subjectId]
-        if(message.senderPeerId == this.$store.state.myselfPeerClient.peerId){
-            recallSetting = linkman.myselfRecallAlert
-        }else{
-            recallSetting = linkman.recallAlert
+        if (message.senderPeerId == this.$store.state.myselfPeerClient.peerId) {
+          recallSetting = linkman.myselfRecallAlert
+        } else {
+          recallSetting = linkman.recallAlert
         }
-      }else if(message.subjectType === SubjectType.GROUP_CHAT){
+      } else if (message.subjectType === SubjectType.GROUP_CHAT) {
         let group = store.state.groupChatMap[message.subjectId]
         recallSetting = group.recallAlert
       }
@@ -138,16 +138,16 @@ export default {
         // && state.linkmanMap[state.currentChat.subjectId]
         // && state.linkmanMap[state.currentChat.subjectId].activeStatus !== ActiveStatus.UP
         && message.senderPeerId === state.myselfPeerClient.peerId && !message.actualReceiveTime
-        //&& gapTime > 5
+      //&& gapTime > 5
       return result
     },
     async attemptConnect(message) {
       let _that = this
       let store = _that.$store
       let peerId = store.state.currentChat.subjectId
-      if(store.state.linkmanMap[store.state.currentChat.subjectId].activeStatus !== ActiveStatus.UP){
+      if (store.state.linkmanMap[store.state.currentChat.subjectId].activeStatus !== ActiveStatus.UP) {
         webrtcPeerPool.create(peerId)
-      }else{
+      } else {
         await store.sendUnsentMessage(peerId)
       }
 
@@ -212,23 +212,23 @@ export default {
       let store = _that.$store
       let article = message.content
       if (!article.content) {
-          let blocks = await dataBlockService.findTxPayload(null, article.blockId)
-          if (blocks && blocks.length > 0) {
-            article = blocks[0]
-          } else {
-            _that.$q.notify({
-              message: `${_that.$i18n.t("Article")} ${_that.$i18n.t("Deleted")}`,
-              timeout: 3000,
-              type: "warning",
-              color: "warning",
-            })
-          }
+        let blocks = await dataBlockService.findTxPayload(null, article.blockId)
+        if (blocks && blocks.length > 0) {
+          article = blocks[0]
+        } else {
+          _that.$q.notify({
+            message: `${_that.$i18n.t("Article")} ${_that.$i18n.t("Deleted")}`,
+            timeout: 3000,
+            type: "warning",
+            color: "warning",
+          })
+        }
       }
       store.state.currentArticle = article
       store.changeKind('channelDetails')
       _that.$nextTick(() => {
         store.channelDetailsArticleEntry = 'message'
-        store.changeChannelDetailsSubKind('view') 
+        store.changeChannelDetailsSubKind('view')
       })
     },
     async openMergeMessage(message) {
@@ -250,30 +250,30 @@ export default {
       store.state.noteMessageSrc = await store.getMessageFile(message)
       store.state.noteMessageDialog = true
     },
-    avatarClick(mouseEvent,message){
-      if(this.entry === 'message' && mouseEvent.path[0].getAttribute("class") && mouseEvent.path[0].getAttribute("class").indexOf('q-message-avatar') > -1){
+    avatarClick(mouseEvent, message) {
+      if (this.entry === 'message' && mouseEvent.path[0].getAttribute("class") && mouseEvent.path[0].getAttribute("class").indexOf('q-message-avatar') > -1) {
         this.showContacts(message.senderPeerId)
       }
     },
-    async openDestroyMessage(message){
-          let _that = this
-          let store = _that.$store
-          message.opened = true
-          message.countDown = message.destroyTime / 1000
-          let countDownInterval = setInterval(async function () {
-              if (!message.countDown) {
-                  clearInterval(countDownInterval)
-                  let currentChatMessages = store.state.chatMap[message.senderPeerId].messages
-                  for (let i = currentChatMessages.length - 1; i >= 0; i--) {
-                      if (message == currentChatMessages[i]) {
-                          await chatComponent.remove(ChatDataType.MESSAGE, message, store.state.currentChat.messages)
-                      }
-                  }
-                  return
-              }
-              message.countDown--
-          }, 1000)
-      }
+    async openDestroyMessage(message) {
+      let _that = this
+      let store = _that.$store
+      message.opened = true
+      message.countDown = message.destroyTime / 1000
+      let countDownInterval = setInterval(async function () {
+        if (!message.countDown) {
+          clearInterval(countDownInterval)
+          let currentChatMessages = store.state.chatMap[message.senderPeerId].messages
+          for (let i = currentChatMessages.length - 1; i >= 0; i--) {
+            if (message == currentChatMessages[i]) {
+              await chatComponent.remove(ChatDataType.MESSAGE, message, store.state.currentChat.messages)
+            }
+          }
+          return
+        }
+        message.countDown--
+      }, 1000)
+    }
   },
   mounted() {
     let _that = this
