@@ -544,7 +544,7 @@ export default {
   "Reset key failed": "重置秘钥失败",
   "Restore successfully": "恢复成功",
   "Failed to read the qr code": "二维码识别失败",
-  "Send contacts request and add contacts successfully": "添加联系人和发送联系人请求成功",
+  "Send contacts request successfully": "发送联系人请求成功",
   "Accept contacts request and add contacts successfully": "接受联系人请求和添加联系人成功",
   "Receive contacts request from ": "接收联系人请求自：",
   ", auto accept it as the requestor is already in your contacts list": "，已在你的联系人列表中，自动接受请求",

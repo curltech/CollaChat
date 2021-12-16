@@ -1420,7 +1420,7 @@ export default {
               for (let i = store.findLinkmans.length - 1; i >= 0; i--) {
                 let thePeerId = store.findLinkmans[i].peerId
                 let linkman = store.state.linkmanMap[thePeerId]
-                if (linkman) {
+                if (linkman && linkman.status !== LinkmanStatus.REQUESTED) {
                   //store.state.findLinkmanResult = 2
                   linkman.findLinkmanResult = 2
                   //store.state.findLinkmanTip = ''
@@ -1808,7 +1808,7 @@ export default {
           }*/
         }
         let newPayload = {}
-        newPayload.type = ChatMessageType.ADD_LINKMAN_INDIVIDUAL_RECEIPT
+        newPayload.type = ChatMessageType.ADD_LINKMAN_RECEIPT
         newPayload.srcClientId = myselfPeerClient.clientId
         newPayload.srcPeerId = clientPeerId
         if (linkman && linkman.status !== LinkmanStatus.REQUESTED) {
@@ -1841,7 +1841,7 @@ export default {
             color: "info",
           })
         }
-      } else if (type === ChatMessageType.ADD_LINKMAN_INDIVIDUAL_RECEIPT) {
+      } else if (type === ChatMessageType.ADD_LINKMAN_RECEIPT) {
         let acceptTime = data.acceptTime
         let receiveTime = data.receiveTime
         if (acceptTime && !receiveTime) {
@@ -4341,7 +4341,7 @@ export default {
       payload.createDate = currentTime
       await chatAction.chat(null, payload, peerId)
       _that.$q.notify({
-        message: _that.$i18n.t("Send contacts request and add contacts successfully"),
+        message: _that.$i18n.t("Send contacts request uccessfully"),
         timeout: 3000,
         type: "info",
         color: "info",

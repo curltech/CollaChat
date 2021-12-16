@@ -543,7 +543,7 @@
   "Reset key failed": "秘密鍵のリセットに失敗しました",
   "Restore successfully": "正常な回復",
   "Failed to read the qr code": "QRコードの認識に失敗しました",
-  "Send contacts request and add contacts successfully": "連絡先の追加と連絡先リクエストの送信に成功しました",
+  "Send contacts request successfully": "連絡先リクエストを正常に送信する",
   "Accept contacts request and add contacts successfully": "連絡先リクエストを受け入れ，連絡先を正常に追加します",
   "Receive contacts request from ": "連絡先のリクエストを受け取る：",
   ", auto accept it as the requestor is already in your contacts list": "，すでに連絡先リストにあり，自動的にリクエストを受け入れます",

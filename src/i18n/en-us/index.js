@@ -533,7 +533,7 @@ export default {
   "Reset key failed": "Reset key failed",
   "Restore successfully": "Restore successfully",
   "Failed to read the qr code": "Failed to read the qr code",
-  "Send contacts request and add contacts successfully": "Send contacts request and add contacts successfully",
+  "Send contacts request successfully": "Send contacts request successfully",
   "Accept contacts request and add contacts successfully": "Accept contacts request and add contacts successfully",
   "Receive contacts request from ": "Receive contacts request from ",
   ", auto accept it as the requestor is already in your contacts list": ", auto accept it as the requestor is already in your contacts list",

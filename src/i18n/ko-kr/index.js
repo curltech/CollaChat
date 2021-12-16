@@ -543,7 +543,7 @@
   "Reset key failed": "비밀 키를 재설정하지 못했습니다",
   "Restore successfully": "성공적인 복구",
   "Failed to read the qr code": "QR 코드 인식 실패",
-  "Send contacts request and add contacts successfully": "연락처 추가 및 연락처 요청 전송에 성공했습니다",
+  "Send contacts request successfully": "연락처 요청을 성공적으로 보내기",
   "Accept contacts request and add contacts successfully": "연락처 요청을 수락하고 연락처를 성공적으로 추가",
   "Receive contacts request from ": "다음에서 연락 요청 받기：",
   ", auto accept it as the requestor is already in your contacts list": "，이미 연락처 목록에 있으며 자동으로 요청을 수락합니다",

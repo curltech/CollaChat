@@ -542,7 +542,7 @@
   "Reset key failed": "重置秘鑰失敗",
   "Restore successfully": "恢復成功",
   "Failed to read the qr code": "二維碼識別失敗",
-  "Send contacts request and add contacts successfully": "添加聯繫人和發送聯繫人請求成功",
+  "Send contacts request successfully": "發送聯繫人請求成功",
   "Accept contacts request and add contacts successfully": "接受聯繫人請求和添加聯繫人成功",
   "Receive contacts request from ": "接收聯繫人請求自：",
   ", auto accept it as the requestor is already in your contacts list": "，已在你的聯繫人列表中，自動接受請求",
