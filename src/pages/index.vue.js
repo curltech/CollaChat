@@ -1968,13 +1968,13 @@ export default {
             let chat = store.state.chatMap[srcPeerId]
             if (!chat) { // 尚未创建对应聊天时才需要执行
               let chat = await store.getChat(srcPeerId)
-              let chatMessage = {
-                messageType: P2pChatMessageType.CHAT_SYS,
-                contentType: ChatContentType.EVENT,
-                content: (linkman.givenName ? linkman.givenName : linkman.name) + _that.$i18n.t(" has accepted ") + _that.$i18n.t("you") + _that.$i18n.t(", you can chat now")
-              }
-              await store.addCHATSYSMessage(chat, chatMessage)
             }
+            let chatMessage = {
+              messageType: P2pChatMessageType.CHAT_SYS,
+              contentType: ChatContentType.EVENT,
+              content: (linkman.givenName ? linkman.givenName : linkman.name) + _that.$i18n.t(" has accepted ") + _that.$i18n.t("you") + _that.$i18n.t(", you can chat now")
+            }
+            await store.addCHATSYSMessage(chat, chatMessage)
           }
         }
       } else if (type === ChatMessageType.LOGOUT) {
