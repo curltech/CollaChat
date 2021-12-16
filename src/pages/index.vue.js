@@ -1962,7 +1962,8 @@ export default {
               linkmanRecord.status = LinkmanStatus.EFFECTIVE
               await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
             }
-            let chat = store.state.chatMap[linkman.peerId]
+            webrtcPeerPool.create(srcPeerId)
+            let chat = store.state.chatMap[srcPeerId]
             if (!chat) { // 尚未创建对应聊天时才需要执行
               let chat = await store.getChat(srcPeerId)
               let chatMessage = {
