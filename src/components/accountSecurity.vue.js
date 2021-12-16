@@ -63,7 +63,7 @@ export default {
           // update password for mobile device
           if (this.$store.ifMobile()) {
             if (myself.myselfPeer.loginStatus === 'Y') {
-              myself.myselfPeer.updateDate = new Date().getTime()
+              myself.myselfPeer.updateDate = new Date()
               myself.myselfPeer.password = openpgp.encodeBase64(myself.password)
               await myselfPeerService.update(myself.myselfPeer)
             }

@@ -1637,7 +1637,7 @@ export default {
       let _that = this
       let store = _that.$store
       // save logout time
-      myself.myselfPeer.updateDate = new Date().getTime()
+      myself.myselfPeer.updateDate = new Date()
       // remove loginStatus and password
       if (myself.myselfPeer.loginStatus === 'Y') {
         myself.myselfPeer.loginStatus = 'N'

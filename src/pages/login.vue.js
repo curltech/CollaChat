@@ -82,11 +82,11 @@ export default {
       options: null,
       connectAddressOptions: null,
       connectAddressOptionsISO: {
-        'zh-hans' : [],
-        'zh-tw' : [],
-        'en-us' : [],
-        'ja-jp' : [],
-        'ko-kr' : [],
+        'zh-hans': [],
+        'zh-tw': [],
+        'en-us': [],
+        'ja-jp': [],
+        'ko-kr': [],
       },
       versionHistory: [],
       connectAddress: null,
@@ -241,7 +241,7 @@ export default {
         }
       }
       // save login time
-      myself.myselfPeer.updateDate = new Date().getTime()
+      myself.myselfPeer.updateDate = new Date()
       // save loginStatus and password if switch on for mobile device
       if (store.ifMobile() && myself.peerProfile.autoLoginSwitch === true) {
         myself.myselfPeer.loginStatus = 'Y'
@@ -251,16 +251,16 @@ export default {
       // 跳转页面
       _that.$router.push('/blockChain/chat')
     },
-    async initSignalProtocol(name){
+    async initSignalProtocol(name) {
       let _that = this
       let myselfPeer = myself.myselfPeer
-      if(!myselfPeer.signalPrivateKey){
+      if (!myselfPeer.signalPrivateKey) {
         await signalProtocol.init()
         myselfPeer.signalPrivateKey = await signalProtocol.export(_that.loginData.password_)
         myselfPeer.signalPublicKey = await signalProtocol.exportPublic(name)
         await myselfPeerService.update(myselfPeer)
-      }else{
-        await signalProtocol.import(myselfPeer.signalPrivateKey,_that.loginData.password_)
+      } else {
+        await signalProtocol.import(myselfPeer.signalPrivateKey, _that.loginData.password_)
       }
     },
     upload: function (files) {
@@ -602,11 +602,11 @@ export default {
       let verArr = version.split(".")
       let len = Math.max(currentVerArr.length, verArr.length)
       for (let i = 0; i < len; i++) {
-          let currentVer = ~~currentVerArr[i]
-          let ver = ~~verArr[i]
-          if (currentVer < ver) {
-              return true
-          }
+        let currentVer = ~~currentVerArr[i]
+        let ver = ~~verArr[i]
+        if (currentVer < ver) {
+          return true
+        }
       }
       return false
     },
@@ -653,8 +653,8 @@ export default {
             Dialog.create({
               title: _that.$i18n.t('Alert'),
               message: store.mandatory ? _that.$i18n.t('Please upgrade to the new version!') : _that.$i18n.t('There is a new version available, upgrade now?'),
-              cancel: store.mandatory ? false : {"label":_that.$i18n.t('Cancel'),"color":"primary","unelevated":true,"no-caps":true},
-              ok: {"label":_that.$i18n.t('Ok'),"color":"primary","unelevated":true,"no-caps":true},
+              cancel: store.mandatory ? false : { "label": _that.$i18n.t('Cancel'), "color": "primary", "unelevated": true, "no-caps": true },
+              ok: { "label": _that.$i18n.t('Ok'), "color": "primary", "unelevated": true, "no-caps": true },
               persistent: true
             }).onOk(() => {
               _that.versionUpdate()
@@ -789,7 +789,7 @@ export default {
               }
             }
           }
-          
+
           if (store.ios === true) {
             // havesource/cordova-plugin-push
             if (PushNotification) {
@@ -797,7 +797,7 @@ export default {
                 android: {
                 },
                 browser: {
-                    pushServiceURL: 'http://push.api.phonegap.com/v1/push'
+                  pushServiceURL: 'http://push.api.phonegap.com/v1/push'
                 },
                 ios: {
                   alert: "true",
@@ -838,13 +838,13 @@ export default {
               if (HmsPush) {
                 HmsPush.init()
                 HmsPush.getToken()
-                .then((result) => {
-                  console.log("hms getToken result", result)
-                  store.deviceToken = result
-                })
-                .catch((error) => {
-                  console.error("hms getToken error", error)
-                })
+                  .then((result) => {
+                    console.log("hms getToken result", result)
+                    store.deviceToken = result
+                  })
+                  .catch((error) => {
+                    console.error("hms getToken error", error)
+                  })
                 HmsPushEvent.onTokenReceived((ret) => {
                   if (ret) {
                     console.log('hms onTokenReceived', ret.token)
@@ -853,31 +853,31 @@ export default {
                 })
               }
             } else if (prefixArr[0] === 'Xiaomi') {
-              xiaomiPush.register(function(token) {
+              xiaomiPush.register(function (token) {
                 console.log('Xiaomi push register token', token)
                 store.deviceToken = token
-              }, function(err) {
+              }, function (err) {
                 console.error('Xiaomi push register error', err)
               }, [])
-              xiaomiPush.onNewToken(function(token) {
+              xiaomiPush.onNewToken(function (token) {
                 console.log('Xiaomi push onNewToken token', token) // 会多次接收到token
                 store.deviceToken = token
               })
-              document.addEventListener("messageReceived", function(result) {
+              document.addEventListener("messageReceived", function (result) {
                 console.log('Xiaomi push messageReceived', result)
               }, false)
             } else if (prefixArr[0] === 'OPPO') {
-              oppoPush.register(function(token) {
+              oppoPush.register(function (token) {
                 console.log('OPPO push register token', token)
                 store.deviceToken = token
-              }, function(err) {
+              }, function (err) {
                 console.error('OPPO push register error', err)
               }, [])
-              oppoPush.onNewToken(function(token) {
+              oppoPush.onNewToken(function (token) {
                 console.log('OPPO push onNewToken token', token) // 会多次接收到token
                 store.deviceToken = token
               })
-              document.addEventListener("messageReceived", function(result) {
+              document.addEventListener("messageReceived", function (result) {
                 console.log('OPPO push messageReceived', result)
               }, false)
             } else if (prefixArr[0] === 'VIVO') {
