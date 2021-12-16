@@ -7,8 +7,8 @@ import { myself } from 'libcolla'
 
 import { statusBarComponent } from '@/libs/base/colla-cordova'
 import { systemAudioComponent } from '@/libs/base/colla-media'
-import { chatComponent, ChatContentType, ChatDataType, P2pChatMessageType, SubjectType } from '@/libs/biz/colla-chat'
-import { ActiveStatus, contactComponent, ContactDataType } from '@/libs/biz/colla-contact'
+import { chatComponent, ChatContentType, ChatDataType, SubjectType } from '@/libs/biz/colla-chat'
+import { ActiveStatus, contactComponent, ContactDataType, LinkmanStatus } from '@/libs/biz/colla-contact'
 import GroupAvatar from '@/components/groupAvatar'
 import Message from '@/components/message'
 

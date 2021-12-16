@@ -1,4 +1,4 @@
-import { ActiveStatus, RequestStatus } from '@/libs/biz/colla-contact'
+import { ActiveStatus, RequestStatus, LinkmanStatus } from '@/libs/biz/colla-contact'
 import { myself } from 'libcolla'
 
 export default {
