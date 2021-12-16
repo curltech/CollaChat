@@ -20,7 +20,7 @@ import { cameraComponent, systemAudioComponent, mediaComponent } from '@/libs/ba
 import { fileComponent } from '@/libs/base/colla-cordova'
 import { CollectionType, collectionComponent } from '@/libs/biz/colla-collection'
 import { ChatDataType, ChatContentType, ChatMessageStatus, P2pChatMessageType, SubjectType, chatComponent, chatBlockComponent } from '@/libs/biz/colla-chat'
-import { ContactDataType, RequestType, RequestStatus, LinkmanStatus, ActiveStatus, contactComponent, MemberType } from '@/libs/biz/colla-contact'
+import { ContactDataType, RequestType, RequestStatus, LinkmanStatus, ActiveStatus, contactComponent, MemberType, Linkman } from '@/libs/biz/colla-contact'
 import { channelComponent, ChannelDataType, ChannelType, EntityType } from '@/libs/biz/colla-channel'
 import { collectionUtil, blockLogComponent } from '@/libs/biz/colla-collection-util'
 import Chat from '@/components/chat'
@@ -1335,7 +1335,7 @@ export default {
           }
           if (isPeerIdValid) {
             let linkman = store.state.linkmanMap[peerId]
-            if (linkman) {
+            if (linkman && linkman.status !== LinkmanStatus.REQUESTED) {
               store.state.findLinkmanResult = 2
               //store.state.findLinkmanTip = _that.$i18n.t('The contact is already in your contacts list')
               store.state.findLinkmanTip = ''
@@ -1743,7 +1743,7 @@ export default {
       let clientPeerId = myselfPeerClient.peerId
       let linkman = store.state.linkmanMap[srcPeerId]
       let currentTime = new Date()
-      if (type === ChatMessageType.ADD_LINKMAN_INDIVIDUAL) {
+      if (type === ChatMessageType.ADD_LINKMAN) {
         // 重复消息不处理、但仍发送Receive收条
         let duplicated = false
         let srcName = data.srcName
@@ -1759,7 +1759,7 @@ export default {
         if (!duplicated) {
           // 新增linkmanRequest
           let linkmanRequest = {}
-          linkmanRequest.requestType = RequestType.ADD_LINKMAN_INDIVIDUAL
+          linkmanRequest.requestType = RequestType.ADD_LINKMAN
           linkmanRequest.ownerPeerId = clientPeerId
           linkmanRequest.senderPeerId = srcPeerId
           linkmanRequest.receiverPeerId = clientPeerId
@@ -1770,7 +1770,7 @@ export default {
           linkmanRequest._id = _id // 标识重复消息
           linkmanRequest.message = data.message
           linkmanRequest.createDate = data.createDate
-          if (linkman) { // 如果请求方已是联系人，直接接受
+          if (linkman && linkman.status !== LinkmanStatus.REQUESTED) { // 如果请求方已是联系人，直接接受
             linkmanRequest.status = RequestStatus.ACCEPTED
             linkmanRequest.statusDate = currentTime
           } else {
@@ -1779,14 +1779,14 @@ export default {
           }
           await contactComponent.insert(ContactDataType.LINKMAN_REQUEST, linkmanRequest, null)
           store.state.linkmanRequests.unshift(linkmanRequest)
-          if (linkman) { // 之前的我的请求，状态置为Expired（Received状态记录可能有多条，Sent状态记录只应有1条），不包括群组请求
+          /*if (linkman) { // 之前的我的请求，状态置为Expired（Received状态记录可能有多条，Sent状态记录只应有1条），不包括群组请求
             let linkmanRequests = await contactComponent.loadLinkmanRequest(
               {
                 ownerPeerId: clientPeerId,
                 senderPeerId: clientPeerId,
                 receiverPeerId: srcPeerId,
                 status: { $in: [RequestStatus.SENT, RequestStatus.RECEIVED] },
-                requestType: RequestType.ADD_LINKMAN_INDIVIDUAL
+                requestType: RequestType.ADD_LINKMAN
               }
             )
             if (linkmanRequests && linkmanRequests.length > 0) {
@@ -1800,18 +1800,18 @@ export default {
               if (linkmanRequest.senderPeerId === clientPeerId
                 && linkmanRequest.receiverPeerId === srcPeerId
                 && (linkmanRequest.status === RequestStatus.SENT || linkmanRequest.status === RequestStatus.RECEIVED)
-                && linkmanRequest.requestType === RequestType.ADD_LINKMAN_INDIVIDUAL) {
+                && linkmanRequest.requestType === RequestType.ADD_LINKMAN) {
                 linkmanRequest.status = RequestStatus.EXPIRED
                 linkmanRequest.statusDate = currentTime
               }
             }
-          }
+          }*/
         }
         let newPayload = {}
         newPayload.type = ChatMessageType.ADD_LINKMAN_INDIVIDUAL_RECEIPT
         newPayload.srcClientId = myselfPeerClient.clientId
         newPayload.srcPeerId = clientPeerId
-        if (linkman) {
+        if (linkman && linkman.status !== LinkmanStatus.REQUESTED) {
           newPayload.receiveTime = currentTime
           newPayload.acceptTime = currentTime
         } else {
@@ -1820,20 +1820,27 @@ export default {
         await chatAction.chat(null, newPayload, srcPeerId)
         // 打招呼
         if (linkman) {
-          let chat = await store.getChat(srcPeerId)
+          /*let chat = await store.getChat(srcPeerId)
           let chatMessage = {
             messageType: P2pChatMessageType.CHAT_SYS,
             contentType: ChatContentType.EVENT,
             content: _that.$i18n.t("You") + _that.$i18n.t(" have accepted ") + (linkman.givenName ? linkman.givenName : linkman.name) + _that.$i18n.t(", you can chat now")
           }
           await store.addCHATSYSMessage(chat, chatMessage)
+          _that.$q.notify({
+            message: _that.$i18n.t("Receive contacts request from ") + srcName + _that.$i18n.t(", auto accept it as the requestor is already in your contacts list"),
+            timeout: 3000,
+            type: "info",
+            color: "info",
+          })*/
+        } else {
+          _that.$q.notify({
+            message: _that.$i18n.t("Receive contacts request from ") + srcName,
+            timeout: 3000,
+            type: "info",
+            color: "info",
+          })
         }
-        _that.$q.notify({
-          message: _that.$i18n.t("Receive contacts request from ") + srcName + (linkman ? _that.$i18n.t(", auto accept it as the requestor is already in your contacts list") : ""),
-          timeout: 3000,
-          type: "info",
-          color: "info",
-        })
       } else if (type === ChatMessageType.ADD_LINKMAN_INDIVIDUAL_RECEIPT) {
         let acceptTime = data.acceptTime
         let receiveTime = data.receiveTime
@@ -1845,7 +1852,7 @@ export default {
               senderPeerId: clientPeerId,
               receiverPeerId: srcPeerId,
               status: RequestStatus.RECEIVED,
-              requestType: RequestType.ADD_LINKMAN_INDIVIDUAL
+              requestType: RequestType.ADD_LINKMAN
             }
           )
           if (linkmanRequests && linkmanRequests.length > 0) {
@@ -1859,7 +1866,7 @@ export default {
             if (linkmanRequest.senderPeerId === clientPeerId
               && linkmanRequest.receiverPeerId === srcPeerId
               && linkmanRequest.status === RequestStatus.RECEIVED
-              && linkmanRequest.requestType === RequestType.ADD_LINKMAN_INDIVIDUAL) {
+              && linkmanRequest.requestType === RequestType.ADD_LINKMAN) {
               linkmanRequest.status = RequestStatus.ACCEPTED
               linkmanRequest.statusDate = acceptTime
             }
@@ -1872,7 +1879,7 @@ export default {
               senderPeerId: clientPeerId,
               receiverPeerId: srcPeerId,
               status: RequestStatus.SENT,
-              requestType: RequestType.ADD_LINKMAN_INDIVIDUAL
+              requestType: RequestType.ADD_LINKMAN
             }
           )
           if (linkmanRequests && linkmanRequests.length > 0) {
@@ -1886,7 +1893,7 @@ export default {
             if (linkmanRequest.senderPeerId === clientPeerId
               && linkmanRequest.receiverPeerId === srcPeerId
               && linkmanRequest.status === RequestStatus.SENT
-              && linkmanRequest.requestType === RequestType.ADD_LINKMAN_INDIVIDUAL) {
+              && linkmanRequest.requestType === RequestType.ADD_LINKMAN) {
               linkmanRequest.status = RequestStatus.RECEIVED
               linkmanRequest.receiveTime = receiveTime
             }
@@ -1899,7 +1906,7 @@ export default {
               senderPeerId: clientPeerId,
               receiverPeerId: srcPeerId,
               status: RequestStatus.RECEIVED,
-              requestType: RequestType.ADD_LINKMAN_INDIVIDUAL
+              requestType: RequestType.ADD_LINKMAN
             }
           )
           if (linkmanRequests && linkmanRequests.length > 0) {
@@ -1913,7 +1920,7 @@ export default {
             if (linkmanRequest.senderPeerId === clientPeerId
               && linkmanRequest.receiverPeerId === srcPeerId
               && linkmanRequest.status === RequestStatus.RECEIVED
-              && linkmanRequest.requestType === RequestType.ADD_LINKMAN_INDIVIDUAL) {
+              && linkmanRequest.requestType === RequestType.ADD_LINKMAN) {
               linkmanRequest.status = RequestStatus.ACCEPTED
               linkmanRequest.statusDate = acceptTime
             }
@@ -1924,7 +1931,7 @@ export default {
               senderPeerId: clientPeerId,
               receiverPeerId: srcPeerId,
               status: RequestStatus.SENT,
-              requestType: RequestType.ADD_LINKMAN_INDIVIDUAL
+              requestType: RequestType.ADD_LINKMAN
             }
           )
           if (linkmanRequests && linkmanRequests.length > 0) {
@@ -1939,23 +1946,32 @@ export default {
             if (linkmanRequest.senderPeerId === clientPeerId
               && linkmanRequest.receiverPeerId === srcPeerId
               && linkmanRequest.status === RequestStatus.SENT
-              && linkmanRequest.requestType === RequestType.ADD_LINKMAN_INDIVIDUAL) {
+              && linkmanRequest.requestType === RequestType.ADD_LINKMAN) {
               linkmanRequest.status = RequestStatus.ACCEPTED
               linkmanRequest.receiveTime = receiveTime
               linkmanRequest.statusDate = acceptTime
             }
           }
         }
-        if (linkman && acceptTime) {
-          let chat = store.state.chatMap[linkman.peerId]
-          if (!chat) { // 尚未创建对应聊天时才需要执行
-            let chat = await store.getChat(srcPeerId)
-            let chatMessage = {
-              messageType: P2pChatMessageType.CHAT_SYS,
-              contentType: ChatContentType.EVENT,
-              content: (linkman.givenName ? linkman.givenName : linkman.name) + _that.$i18n.t(" has accepted ") + _that.$i18n.t("you") + _that.$i18n.t(", you can chat now")
+        if (acceptTime) {
+          if (linkman && linkman.status === LinkmanStatus.REQUESTED) {
+            linkman.status = LinkmanStatus.EFFECTIVE
+            store.state.linkmanMap[srcPeerId] = linkman
+            let linkmanRecord = await contactComponent.get(ContactDataType.LINKMAN, linkman._id)
+            if (linkmanRecord) {
+              linkmanRecord.status = LinkmanStatus.EFFECTIVE
+              await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
             }
-            await store.addCHATSYSMessage(chat, chatMessage)
+            let chat = store.state.chatMap[linkman.peerId]
+            if (!chat) { // 尚未创建对应聊天时才需要执行
+              let chat = await store.getChat(srcPeerId)
+              let chatMessage = {
+                messageType: P2pChatMessageType.CHAT_SYS,
+                contentType: ChatContentType.EVENT,
+                content: (linkman.givenName ? linkman.givenName : linkman.name) + _that.$i18n.t(" has accepted ") + _that.$i18n.t("you") + _that.$i18n.t(", you can chat now")
+              }
+              await store.addCHATSYSMessage(chat, chatMessage)
+            }
           }
         }
       } else if (type === ChatMessageType.LOGOUT) {
@@ -2156,28 +2172,26 @@ export default {
           linkman.recallAlert = content.recallAlert
           linkman.udpSwitch = content.udpSwitch
           store.state.linkmanMap[linkmanPeerId] = linkman
-          setTimeout(async function () {
-            let linkmen = await contactComponent.loadLinkman({
-              ownerPeerId: myselfPeerClient.peerId,
-              peerId: linkmanPeerId
-            })
-            if (linkmen && linkmen.length > 0) {
-              for (let _linkman of linkmen) {
-                _linkman.name = content.name
-                _linkman.mobile = content.mobile
-                _linkman.avatar = content.avatar
-                _linkman.publicKey = content.publicKey
-                _linkman.downloadSwitch = content.downloadSwitch
-                _linkman.signalPublicKey = content.signalPublicKey
-                //_linkman.localDataCryptoSwitch = content.localDataCryptoSwitch
-                _linkman.autoLoginSwitch = content.autoLoginSwitch
-                _linkman.recallTimeLimit = content.recallTimeLimit
-                _linkman.recallAlert = content.recallAlert
-                _linkman.udpSwitch = content.udpSwitch
-              }
-              await contactComponent.update(ContactDataType.LINKMAN, linkmen, null)
+          let linkmen = await contactComponent.loadLinkman({
+            ownerPeerId: myselfPeerClient.peerId,
+            peerId: linkmanPeerId
+          })
+          if (linkmen && linkmen.length > 0) {
+            for (let _linkman of linkmen) {
+              _linkman.name = content.name
+              _linkman.mobile = content.mobile
+              _linkman.avatar = content.avatar
+              _linkman.publicKey = content.publicKey
+              _linkman.downloadSwitch = content.downloadSwitch
+              _linkman.signalPublicKey = content.signalPublicKey
+              //_linkman.localDataCryptoSwitch = content.localDataCryptoSwitch
+              _linkman.autoLoginSwitch = content.autoLoginSwitch
+              _linkman.recallTimeLimit = content.recallTimeLimit
+              _linkman.recallAlert = content.recallAlert
+              _linkman.udpSwitch = content.udpSwitch
             }
-          }, 200)
+            await contactComponent.update(ContactDataType.LINKMAN, linkmen, null)
+          }
         }
       }
       else if (messageType === P2pChatMessageType.ADD_GROUPCHAT && content) {
@@ -2848,7 +2862,7 @@ export default {
             senderPeerId: myselfPeerClient.peerId,
             receiverPeerId: peerId,
             status: RequestStatus.RECEIVED,
-            requestType: RequestType.ADD_LINKMAN_INDIVIDUAL
+            requestType: RequestType.ADD_LINKMAN
           }
         )
         if (linkmanRequests && linkmanRequests.length > 0) {
@@ -2863,7 +2877,7 @@ export default {
           if (linkmanRequest.senderPeerId === myselfPeerClient.peerId
             && linkmanRequest.receiverPeerId === peerId
             && linkmanRequest.status === RequestStatus.RECEIVED
-            && linkmanRequest.requestType === RequestType.ADD_LINKMAN_INDIVIDUAL) {
+            && linkmanRequest.requestType === RequestType.ADD_LINKMAN) {
             linkmanRequest.status = RequestStatus.ACCEPTED
             linkmanRequest.statusDate = currentTime
           }
@@ -2875,7 +2889,7 @@ export default {
             senderPeerId: myselfPeerClient.peerId,
             receiverPeerId: peerId,
             status: RequestStatus.SENT,
-            requestType: RequestType.ADD_LINKMAN_INDIVIDUAL
+            requestType: RequestType.ADD_LINKMAN
           }
         )
         if (linkmanRequests && linkmanRequests.length > 0) {
@@ -2890,7 +2904,7 @@ export default {
           if (linkmanRequest.senderPeerId === myselfPeerClient.peerId
             && linkmanRequest.receiverPeerId === peerId
             && linkmanRequest.status === RequestStatus.SENT
-            && linkmanRequest.requestType === RequestType.ADD_LINKMAN_INDIVIDUAL) {
+            && linkmanRequest.requestType === RequestType.ADD_LINKMAN) {
             linkmanRequest.status = RequestStatus.ACCEPTED
             linkmanRequest.receiveTime = currentTime
             linkmanRequest.statusDate = currentTime
@@ -2903,7 +2917,7 @@ export default {
             receiverPeerId: myselfPeerClient.peerId,
             senderPeerId: peerId,
             status: RequestStatus.RECEIVED,
-            requestType: RequestType.ADD_LINKMAN_INDIVIDUAL
+            requestType: RequestType.ADD_LINKMAN
           }
         )
         if (linkmanRequests && linkmanRequests.length > 0) {
@@ -2917,7 +2931,7 @@ export default {
           if (linkmanRequest.receiverPeerId === myselfPeerClient.peerId
             && linkmanRequest.senderPeerId === peerId
             && linkmanRequest.status === RequestStatus.RECEIVED
-            && linkmanRequest.requestType === RequestType.ADD_LINKMAN_INDIVIDUAL) {
+            && linkmanRequest.requestType === RequestType.ADD_LINKMAN) {
             linkmanRequest.status = RequestStatus.ACCEPTED
             linkmanRequest.statusDate = currentTime
           }
@@ -4165,6 +4179,173 @@ export default {
           }
         }
       }
+    },
+    async addLinkman(findLinkman, linkmanData) {
+      let _that = this
+      let store = _that.$store
+      let myselfPeerClient = myself.myselfPeerClient
+      let peerId = findLinkman.peerId
+      let message = linkmanData.message
+      let givenName = linkmanData.givenName
+      let currentTime = new Date()
+      let linkman = store.state.linkmanMap[peerId]
+
+      // 新增linkman
+      if (!linkman) {
+        let newLinkman = {}
+        newLinkman.ownerPeerId = myselfPeerClient.peerId
+        newLinkman.peerId = peerId
+        newLinkman.name = findLinkman.name
+        newLinkman.pyName = pinyinUtil.getPinyin(findLinkman.name)
+        newLinkman.givenName = givenName
+        newLinkman.pyGivenName = pinyinUtil.getPinyin(givenName)
+        newLinkman.mobile = findLinkman.mobile
+        newLinkman.avatar = findLinkman.avatar
+        newLinkman.publicKey = findLinkman.publicKey
+        newLinkman.sourceType = "Search&Add"
+        newLinkman.createDate = currentTime
+        newLinkman.statusDate = currentTime
+        newLinkman.status = LinkmanStatus.REQUESTED
+        newLinkman.activeStatus = ActiveStatus.DOWN
+        newLinkman.locked = false
+        newLinkman.notAlert = false
+        newLinkman.top = false
+        newLinkman.recallTimeLimit = true
+        newLinkman.recallAlert = true
+        newLinkman.myselfRecallTimeLimit = true
+        newLinkman.myselfRecallAlert = true
+        await contactComponent.insert(ContactDataType.LINKMAN, newLinkman, store.state.linkmans)
+        newLinkman.groupChats = []
+        store.state.linkmans.sort(function (a, b) {
+          let aPy = a.pyGivenName ? a.pyGivenName : a.pyName
+          let bPy = b.pyGivenName ? b.pyGivenName : b.pyName
+          if (aPy < bPy) {
+            return -1;
+          } else if (aPy == bPy) {
+            return 0;
+          } else {
+            return 1;
+          }
+        });
+        let tag = ''
+        let linkmanTagLinkmans = []
+        for (let findLinkmanDataTagName of linkmanData.tagNames) {
+          let id = store.state.linkmanTagNameMap[findLinkmanDataTagName]
+          if (!id) {
+            let linkmanTag = {}
+            linkmanTag.ownerPeerId = myselfPeerClient.peerId
+            linkmanTag.name = findLinkmanDataTagName
+            linkmanTag.createDate = new Date()
+            await contactComponent.insert(ContactDataType.LINKMAN_TAG, linkmanTag, null)
+            id = linkmanTag._id
+            store.state.linkmanTagNames.push(findLinkmanDataTagName)
+            store.state.linkmanTagNameMap[findLinkmanDataTagName] = id
+            store.state.linkmanTagIdMap[id] = findLinkmanDataTagName
+          }
+          let linkmanTagLinkman = {}
+          linkmanTagLinkman.ownerPeerId = myselfPeerClient.peerId
+          linkmanTagLinkman.tagId = id
+          linkmanTagLinkman.linkmanPeerId = peerId
+          linkmanTagLinkman.createDate = new Date()
+          linkmanTagLinkman.state = EntityState.New
+          linkmanTagLinkmans.push(linkmanTagLinkman)
+          tag = (tag ? tag + ", " + findLinkmanDataTagName : findLinkmanDataTagName)
+        }
+        await contactComponent.save(ContactDataType.LINKMAN_TAGLINKMAN, linkmanTagLinkmans, null)
+        newLinkman.tagNames = linkmanData.tagNames
+        newLinkman.tag = tag
+        newLinkman.pyTag = pinyinUtil.getPinyin(tag)
+        store.state.linkmanMap[peerId] = newLinkman
+      }
+      // 之前的我的请求，状态置为Expired（Sent状态记录只应有1条），不包括群组请求
+      let linkmanRequests = await contactComponent.loadLinkmanRequest(
+        {
+          ownerPeerId: myselfPeerClient.peerId,
+          senderPeerId: myselfPeerClient.peerId,
+          receiverPeerId: peerId,
+          status: RequestStatus.SENT,
+          requestType: RequestType.ADD_LINKMAN
+        }
+      )
+      if (linkmanRequests && linkmanRequests.length > 0) {
+        for (let linkmanRequest of linkmanRequests) {
+          linkmanRequest.status = RequestStatus.EXPIRED
+          linkmanRequest.statusDate = currentTime
+        }
+        await contactComponent.update(ContactDataType.LINKMAN_REQUEST, linkmanRequests, null)
+      }
+      for (let linkmanRequest of store.state.linkmanRequests) {
+        if (linkmanRequest.senderPeerId === myselfPeerClient.peerId
+          && linkmanRequest.receiverPeerId === peerId
+          && linkmanRequest.status === RequestStatus.SENT
+          && linkmanRequest.requestType === RequestType.ADD_LINKMAN) {
+          linkmanRequest.status = RequestStatus.EXPIRED
+          linkmanRequest.statusDate = currentTime
+        }
+      }
+
+      // 新增Sent请求
+      let linkmanRequest = {}
+      linkmanRequest.requestType = RequestType.ADD_LINKMAN
+      linkmanRequest.ownerPeerId = myselfPeerClient.peerId
+      linkmanRequest.senderPeerId = myselfPeerClient.peerId
+      linkmanRequest.receiverPeerId = peerId
+      linkmanRequest.name = findLinkman.name
+      linkmanRequest.mobile = findLinkman.mobile
+      linkmanRequest.avatar = findLinkman.avatar
+      linkmanRequest.publicKey = findLinkman.publicKey
+      linkmanRequest.message = message
+      linkmanRequest.createDate = currentTime
+      linkmanRequest.status = RequestStatus.SENT
+      await contactComponent.insert(ContactDataType.LINKMAN_REQUEST, linkmanRequest, null)
+      store.state.linkmanRequests.unshift(linkmanRequest)
+
+      // 发送Sent请求
+      /*let targetPeerClient = new PeerClient()
+      targetPeerClient.peerId = peerId
+      targetPeerClient.connectPeerId = findLinkman.connectPeerId
+      targetPeerClient.connectAddress = findLinkman.connectAddress
+      targetPeerClient.connectPublicKey = findLinkman.connectPublicKey
+      let srcPeerClient = new PeerClient()
+      srcPeerClient.peerId = myselfPeerClient.peerId
+      srcPeerClient.connectPeerId = myselfPeerClient.connectPeerId
+      srcPeerClient.connectAddress = myselfPeerClient.connectAddress
+      srcPeerClient.connectPublicKey = myselfPeerClient.connectPublicKey
+      srcPeerClient.name = myselfPeerClient.name
+      srcPeerClient.mobile = myselfPeerClient.mobile
+      srcPeerClient.avatar = myselfPeerClient.avatar
+      srcPeerClient.publicKey = myselfPeerClient.publicKey
+      let payload = {}
+      payload._id = linkmanRequest._id // 标识重复消息
+      payload.message = message
+      payload.createDate = currentTime
+      await store.socketSend({
+        messageType: ChatMessageType.ADD_LINKMAN,
+        targetPeerClient: targetPeerClient,
+        srcPeerClient: srcPeerClient,
+        payload: payload
+      })*/
+      let payload = {}
+      payload.type = ChatMessageType.ADD_LINKMAN
+      payload.srcClientId = myselfPeerClient.clientId
+      payload.srcPeerId = myselfPeerClient.peerId
+      payload.srcName = myselfPeerClient.name
+      if (myselfPeerClient.visibilitySetting && myselfPeerClient.visibilitySetting.substring(1, 2) === 'N') {
+        payload.srcMobile = ''
+      } else {
+        payload.srcMobile = myselfPeerClient.mobile
+      }
+      payload.srcAvatar = myselfPeerClient.avatar
+      payload._id = linkmanRequest._id // 标识重复消息
+      payload.message = message
+      payload.createDate = currentTime
+      await chatAction.chat(null, payload, peerId)
+      _that.$q.notify({
+        message: _that.$i18n.t("Send contacts request and add contacts successfully"),
+        timeout: 3000,
+        type: "info",
+        color: "info",
+      })
     }
   },
   async created() {
@@ -4317,7 +4498,7 @@ export default {
     store.displayConnected = true //是否展示好友在线状态
     let linkmanRequestDBItems = await contactComponent.loadLinkmanRequest({
       ownerPeerId: myself.myselfPeerClient.peerId,
-      requestType: RequestType.ADD_LINKMAN_INDIVIDUAL,
+      requestType: RequestType.ADD_LINKMAN,
       createDate: { $gt: null }
     }, [{ createDate: 'desc' }])
     if (linkmanRequestDBItems && linkmanRequestDBItems.length > 0) {
@@ -4425,6 +4606,7 @@ export default {
     store.cloudSyncChannelArticle = _that.cloudSyncChannelArticle
     store.acquireChannel = _that.acquireChannel
     store.cloudSyncChannel = _that.cloudSyncChannel
+    store.addLinkman = _that.addLinkman
     _that.tab = 'chat'
     _that.kind = 'message'
     _that.chatKind = 'message'

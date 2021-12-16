@@ -185,7 +185,7 @@ export default {
         if (currentChat) {
           let groupChat = store.state.groupChatMap[currentChat.subjectId]
           if (groupChat && groupChat.groupMembers && groupChat.groupMembers.length > 0) {
-            for (groupMember of groupChat.groupMembers) {
+            for (let groupMember of groupChat.groupMembers) {
               if (groupMember.memberPeerId === myself.myselfPeerClient.peerId) {
                 ret = false
               }

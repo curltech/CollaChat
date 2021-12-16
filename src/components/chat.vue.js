@@ -139,7 +139,7 @@ export default {
             if (chat) {
               if (chat.subjectType === SubjectType.CHAT) {
                 let linkman = store.state.linkmanMap[chat.subjectId]
-                return (linkman.peerId.toLowerCase().includes(chatFilter.toLowerCase())
+                return linkman && (linkman.peerId.toLowerCase().includes(chatFilter.toLowerCase())
                   || linkman.mobile.toLowerCase().includes(chatFilter.toLowerCase())
                   || linkman.name.toLowerCase().includes(chatFilter.toLowerCase())
                   || linkman.pyName.toLowerCase().includes(chatFilter.toLowerCase())
@@ -148,6 +148,7 @@ export default {
                   || (linkman.tag && chat.tag.toLowerCase().includes(chatFilter.toLowerCase()))
                   || (linkman.pyTag && chat.pyTag.toLowerCase().includes(chatFilter.toLowerCase())))
                   && ((store.state.lockContactsSwitch && !linkman.locked) || !store.state.lockContactsSwitch)
+                  && linkman.status !== LinkmanStatus.REQUESTED
               } else if (chat.subjectType === SubjectType.GROUP_CHAT) {
                 let groupChat = store.state.groupChatMap[chat.subjectId]
                 return (groupChat.groupId.toLowerCase().includes(chatFilter.toLowerCase())
@@ -168,6 +169,7 @@ export default {
               if (chat.subjectType === SubjectType.CHAT) {
                 let linkman = store.state.linkmanMap[chat.subjectId]
                 return linkman && ((store.state.lockContactsSwitch && !linkman.locked) || !store.state.lockContactsSwitch)
+                  && linkman.status !== LinkmanStatus.REQUESTED
               } else if (chat.subjectType === SubjectType.GROUP_CHAT) {
                 let groupChat = store.state.groupChatMap[chat.subjectId]
                 return groupChat
@@ -476,7 +478,7 @@ export default {
       if (linkmanResults && linkmanResults.rows && linkmanResults.rows.length > 0) {
         for (let linkmanResult of linkmanResults.rows) {
           let linkman = store.state.linkmanMap[linkmanResult.doc.peerId]
-          if (linkman) {
+          if (linkman && linkman.status !== LinkmanStatus.REQUESTED) {
             linkman.highlightingGivenName = null
             linkman.highlightingName = null
             linkman.highlighting = null
@@ -510,7 +512,7 @@ export default {
           if (linkmanTagLinkmanDBItems && linkmanTagLinkmanDBItems.length > 0) {
             for (let linkmanTagLinkmanDBItem of linkmanTagLinkmanDBItems) {
               let linkman = store.state.linkmanMap[linkmanTagLinkmanDBItem.linkmanPeerId]
-              if (linkman) {
+              if (linkman && linkman.status !== LinkmanStatus.REQUESTED) {
                 if (!linkmanResultMap[linkman.peerId]) {
                   linkman.highlightingGivenName = null
                   linkman.highlightingName = null

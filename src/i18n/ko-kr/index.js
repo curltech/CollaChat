@@ -149,6 +149,9 @@
   "tag name already exists": "태그 이름 이 이미 존재 합 니 다",
   "Please input PeerId": "주민등록번호를 입력해주세요",
   "Please input ConferenceId": "회의 ID를 입력하세요",
+  "You are in your oppoent's blacklist.": "당신은 상대방의 블랙리스트에 있습니다",
+  "You are no longer your opponent's friend.": "당신은 더 이상 상대방의 친구가 아닙니다",
+  "You have been removed from this group chat.": "이 그룹 채팅에서 제거되었습니다",
 
   // Chat
   "no internet connection, please check network settings": "현재 네트워크 가 사용 할 수 없습니다. 네트워크 설정 을 확인 하 세 요",

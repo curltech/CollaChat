@@ -149,6 +149,9 @@
   "tag name already exists": "タグ名は既に存在します",
   "Please input PeerId": "ID番号を入力してください",
   "Please input ConferenceId": "会議IDを入力してください",
+  "You are in your oppoent's blacklist.": "あなたは対戦相手のブラックリストに載っています",
+  "You are no longer your opponent's friend.": "あなたはもはや対戦相手の友達ではありません",
+  "You have been removed from this group chat.": "このグループチャットから削除されました",
 
   // Chat
   "no internet connection, please check network settings": "現在のネットワークは利用できません，ネットワーク設定を確認してください",

@@ -83,10 +83,10 @@
           style="height:8px;margin-left:0px;margin-right:0px"
         )
         q-item(
+          v-if="$store.state.currentLinkman && $store.state.currentLinkman.droppedMe === true",
           clickable,
           v-ripple,
-          @click="showSendInvitation",
-          :class="$store.state.currentLinkman && $store.state.currentLinkman.activeStatus !== ActiveStatus.UP ? '' : 'hidden'"
+          @click="showSendInvitation"
         )
           q-item-section
           q-item-section(side, style="padding-left:0px")
@@ -137,7 +137,7 @@
             q-toggle(
               v-model="$store.state.currentLinkman && $store.state.currentLinkman.status",
               false-value="EFFECTIVE",
-              true-value="BLOCKED",
+              true-value="BLACKED",
               @input="confirmBlackList"
             )
         q-separator.c-separator(

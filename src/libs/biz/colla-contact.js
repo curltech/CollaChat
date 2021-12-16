@@ -37,7 +37,7 @@ let indexFields = {
 }
 
 export let RequestType = {
-  'ADD_LINKMAN_INDIVIDUAL': 'ADD_LINKMAN_INDIVIDUAL',
+  'ADD_LINKMAN': 'ADD_LINKMAN',
   'REMOVE_GROUPCHAT_MEMBER': 'REMOVE_GROUPCHAT_MEMBER',
   'ADD_GROUPCHAT': 'ADD_GROUPCHAT',
   'MODIFY_GROUPCHAT': 'MODIFY_GROUPCHAT',
@@ -52,8 +52,9 @@ export let RequestStatus = {
   'IGNORED': 'IGNORED'
 }
 export let LinkmanStatus = {
-  'BLOCKED': 'BLOCKED',
-  'EFFECTIVE': 'EFFECTIVE'
+  'BLACKED': 'BLACKED', // 已加入黑名单
+  'EFFECTIVE': 'EFFECTIVE', // 已成为好友
+  'REQUESTED': 'REQUESTED' // 已发送好友请求
 }
 export let MemberType = {
   'MEMBER': 'MEMBER',
@@ -85,6 +86,8 @@ export class Linkman {
     this.locked = null // 是否锁定，包括：true（锁定）, false（未锁定）
     this.notAlert = null // 消息免打扰，包括：true（提醒）, false（免打扰）
     this.top = null // 是否置顶，包括：true（置顶）, false（不置顶）
+    this.blackedMe = null // true-对方已将你加入黑名单
+    this.droppedMe = null // true-对方已将你从好友中删除
 
     // 非持久化属性
     //activeStatus: 活动状态，包括：Up（连接）, Down（未连接）

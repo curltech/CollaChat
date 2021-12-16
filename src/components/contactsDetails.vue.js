@@ -129,170 +129,10 @@ export default {
     async addLinkman() {
       let _that = this
       let store = _that.$store
-      let myselfPeerClient = myself.myselfPeerClient
       let findLinkman = store.state.currentLinkman
-      let peerId = findLinkman.peerId
-      let message = _that.linkmanData.message
-      let givenName = _that.linkmanData.givenName
-      let currentTime = new Date()
-      let linkman = store.state.linkmanMap[peerId]
+      let linkmanData = _that.linkmanData
 
-      // 新增linkman
-      if (!linkman) {
-        let newLinkman = {}
-        newLinkman.ownerPeerId = myselfPeerClient.peerId
-        newLinkman.peerId = peerId
-        newLinkman.name = findLinkman.name
-        newLinkman.pyName = pinyinUtil.getPinyin(findLinkman.name)
-        newLinkman.givenName = givenName
-        newLinkman.pyGivenName = pinyinUtil.getPinyin(givenName)
-        newLinkman.mobile = findLinkman.mobile
-        newLinkman.avatar = findLinkman.avatar
-        newLinkman.publicKey = findLinkman.publicKey
-        newLinkman.sourceType = "Search&Add"
-        newLinkman.createDate = currentTime
-        newLinkman.statusDate = currentTime
-        newLinkman.status = LinkmanStatus.EFFECTIVE
-        newLinkman.activeStatus = ActiveStatus.DOWN
-        newLinkman.locked = false
-        newLinkman.notAlert = false
-        newLinkman.top = false
-        newLinkman.recallTimeLimit = true
-        newLinkman.recallAlert = true
-        newLinkman.myselfRecallTimeLimit = true
-        newLinkman.myselfRecallAlert = true
-        await contactComponent.insert(ContactDataType.LINKMAN, newLinkman, store.state.linkmans)
-        newLinkman.groupChats = []
-        store.state.linkmans.sort(function (a, b) {
-          let aPy = a.pyGivenName ? a.pyGivenName : a.pyName
-          let bPy = b.pyGivenName ? b.pyGivenName : b.pyName
-          if (aPy < bPy) {
-            return -1;
-          } else if (aPy == bPy) {
-            return 0;
-          } else {
-            return 1;
-          }
-        });
-        let tag = ''
-        let linkmanTagLinkmans = []
-        for (let findLinkmanDataTagName of store.state.findLinkmanData.tagNames) {
-          let id = store.state.linkmanTagNameMap[findLinkmanDataTagName]
-          if (!id) {
-            let linkmanTag = {}
-            linkmanTag.ownerPeerId = myselfPeerClient.peerId
-            linkmanTag.name = findLinkmanDataTagName
-            linkmanTag.createDate = new Date()
-            await contactComponent.insert(ContactDataType.LINKMAN_TAG, linkmanTag, null)
-            id = linkmanTag._id
-            store.state.linkmanTagNames.push(findLinkmanDataTagName)
-            store.state.linkmanTagNameMap[findLinkmanDataTagName] = id
-            store.state.linkmanTagIdMap[id] = findLinkmanDataTagName
-          }
-          let linkmanTagLinkman = {}
-          linkmanTagLinkman.ownerPeerId = myselfPeerClient.peerId
-          linkmanTagLinkman.tagId = id
-          linkmanTagLinkman.linkmanPeerId = peerId
-          linkmanTagLinkman.createDate = new Date()
-          linkmanTagLinkman.state = EntityState.New
-          linkmanTagLinkmans.push(linkmanTagLinkman)
-          tag = (tag ? tag + ", " + findLinkmanDataTagName : findLinkmanDataTagName)
-        }
-        await contactComponent.save(ContactDataType.LINKMAN_TAGLINKMAN, linkmanTagLinkmans, null)
-        newLinkman.tagNames = store.state.findLinkmanData.tagNames
-        newLinkman.tag = tag
-        newLinkman.pyTag = pinyinUtil.getPinyin(tag)
-        store.state.linkmanMap[peerId] = newLinkman
-      }
-      // 之前的我的请求，状态置为Expired（Sent状态记录只应有1条），不包括群组请求
-      let linkmanRequests = await contactComponent.loadLinkmanRequest(
-        {
-          ownerPeerId: myselfPeerClient.peerId,
-          senderPeerId: myselfPeerClient.peerId,
-          receiverPeerId: peerId,
-          status: RequestStatus.SENT,
-          requestType: RequestType.ADD_LINKMAN_INDIVIDUAL
-        }
-      )
-      if (linkmanRequests && linkmanRequests.length > 0) {
-        for (let linkmanRequest of linkmanRequests) {
-          linkmanRequest.status = RequestStatus.EXPIRED
-          linkmanRequest.statusDate = currentTime
-        }
-        await contactComponent.update(ContactDataType.LINKMAN_REQUEST, linkmanRequests, null)
-      }
-      for (let linkmanRequest of store.state.linkmanRequests) {
-        if (linkmanRequest.senderPeerId === myselfPeerClient.peerId
-          && linkmanRequest.receiverPeerId === peerId
-          && linkmanRequest.status === RequestStatus.SENT
-          && linkmanRequest.requestType === RequestType.ADD_LINKMAN_INDIVIDUAL) {
-          linkmanRequest.status = RequestStatus.EXPIRED
-          linkmanRequest.statusDate = currentTime
-        }
-      }
-
-      // 新增Sent请求
-      let linkmanRequest = {}
-      linkmanRequest.requestType = RequestType.ADD_LINKMAN_INDIVIDUAL
-      linkmanRequest.ownerPeerId = myselfPeerClient.peerId
-      linkmanRequest.senderPeerId = myselfPeerClient.peerId
-      linkmanRequest.receiverPeerId = peerId
-      linkmanRequest.name = findLinkman.name
-      linkmanRequest.mobile = findLinkman.mobile
-      linkmanRequest.avatar = findLinkman.avatar
-      linkmanRequest.publicKey = findLinkman.publicKey
-      linkmanRequest.message = message
-      linkmanRequest.createDate = currentTime
-      linkmanRequest.status = RequestStatus.SENT
-      await contactComponent.insert(ContactDataType.LINKMAN_REQUEST, linkmanRequest, null)
-      store.state.linkmanRequests.unshift(linkmanRequest)
-
-      // 发送Sent请求
-      /*let targetPeerClient = new PeerClient()
-      targetPeerClient.peerId = peerId
-      targetPeerClient.connectPeerId = findLinkman.connectPeerId
-      targetPeerClient.connectAddress = findLinkman.connectAddress
-      targetPeerClient.connectPublicKey = findLinkman.connectPublicKey
-      let srcPeerClient = new PeerClient()
-      srcPeerClient.peerId = myselfPeerClient.peerId
-      srcPeerClient.connectPeerId = myselfPeerClient.connectPeerId
-      srcPeerClient.connectAddress = myselfPeerClient.connectAddress
-      srcPeerClient.connectPublicKey = myselfPeerClient.connectPublicKey
-      srcPeerClient.name = myselfPeerClient.name
-      srcPeerClient.mobile = myselfPeerClient.mobile
-      srcPeerClient.avatar = myselfPeerClient.avatar
-      srcPeerClient.publicKey = myselfPeerClient.publicKey
-      let payload = {}
-      payload._id = linkmanRequest._id // 标识重复消息
-      payload.message = message
-      payload.createDate = currentTime
-      await store.socketSend({
-        messageType: ChatMessageType.ADD_LINKMAN_INDIVIDUAL,
-        targetPeerClient: targetPeerClient,
-        srcPeerClient: srcPeerClient,
-        payload: payload
-      })*/
-      let payload = {}
-      payload.type = ChatMessageType.ADD_LINKMAN_INDIVIDUAL
-      payload.srcClientId = myselfPeerClient.clientId
-      payload.srcPeerId = myselfPeerClient.peerId
-      payload.srcName = myselfPeerClient.name
-      if (myselfPeerClient.visibilitySetting && myselfPeerClient.visibilitySetting.substring(1, 2) === 'N') {
-        payload.srcMobile = ''
-      } else {
-        payload.srcMobile = myselfPeerClient.mobile
-      }
-      payload.srcAvatar = myselfPeerClient.avatar
-      payload._id = linkmanRequest._id // 标识重复消息
-      payload.message = message
-      payload.createDate = currentTime
-      await chatAction.chat(null, payload, peerId)
-      _that.$q.notify({
-        message: _that.$i18n.t("Send contacts request and add contacts successfully"),
-        timeout: 3000,
-        type: "info",
-        color: "info",
-      })
+      await store.addLinkman(findLinkman, linkmanData)
 
       _that.subKind = 'default'
     },
@@ -301,7 +141,7 @@ export default {
       let store = _that.$store
       if (value === LinkmanStatus.EFFECTIVE) {
         await _that.changeStatus(LinkmanStatus.EFFECTIVE)
-      } else if (value === LinkmanStatus.BLOCKED) {
+      } else if (value === LinkmanStatus.BLACKED) {
         _that.$q.bottomSheet({
           message: _that.$i18n.t('Add into blacklist (you will not receive his/her messages)?'),
           actions: [
@@ -323,7 +163,7 @@ export default {
         }).onOk(async action => {
           // console.log('Action chosen:', action.id)
           if (action.id === 'confirm') {
-            await _that.changeStatus(LinkmanStatus.BLOCKED)
+            await _that.changeStatus(LinkmanStatus.BLACKED)
           } else if (action.id === 'cancel') {
             let linkman = store.state.linkmanMap[store.state.currentLinkman.peerId]
             linkman.status = LinkmanStatus.EFFECTIVE

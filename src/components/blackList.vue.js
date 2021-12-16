@@ -50,11 +50,11 @@ export default {
               || (linkman.pyGivenName && linkman.pyGivenName.toLowerCase().includes(filter.toLowerCase()))
               || (linkman.tag && linkman.tag.toLowerCase().includes(filter.toLowerCase()))
               || (linkman.pyTag && linkman.pyTag.toLowerCase().includes(filter.toLowerCase())))
-              && linkman.status === 'BLOCKED' && ((store.state.lockContactsSwitch && !linkman.locked) || !store.state.lockContactsSwitch)
+              && linkman.status === 'BLACKED' && ((store.state.lockContactsSwitch && !linkman.locked) || !store.state.lockContactsSwitch)
           })
         } else {
           BlackArray = linkmans.filter((linkman) => {
-            return linkman.status === 'BLOCKED' && ((store.state.lockContactsSwitch && !linkman.locked) || !store.state.lockContactsSwitch)
+            return linkman.status === 'BLACKED' && ((store.state.lockContactsSwitch && !linkman.locked) || !store.state.lockContactsSwitch)
           })
         }
       }

@@ -149,6 +149,9 @@ export default {
   "Tag name already exists": "Tag name already exists",
   "Please input PeerId": "Please input PeerId",
   "Please input ConferenceId": "Please input ConferenceId",
+  "You are in your oppoent's blacklist.": "You are in your oppoent's blacklist.",
+  "You are no longer your opponent's friend.": "You are no longer your opponent's friend.",
+  "You have been removed from this group chat.": "You have been removed from this group chat.",
 
   // Chat
   "no internet connection, please check network settings": "internet connection unavailable, check network settings",
