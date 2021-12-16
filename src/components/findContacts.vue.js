@@ -312,7 +312,7 @@ export default {
       let chatMessage = {
         messageType: P2pChatMessageType.CHAT_SYS,
         contentType: ChatContentType.EVENT,
-        content: _that.$i18n.t("You") + _that.$i18n.t(" have accepted ") + (newLinkman.givenName ? newLinkman.givenName : newLinkman.name) + _that.$i18n.t(", you can chat now")
+        content: _that.$i18n.t("You") + _that.$i18n.t(" have accepted ") + (givenName ? givenName : linkmanRequest.name) + _that.$i18n.t(", you can chat now")
       }
       await store.addCHATSYSMessage(chat, chatMessage)
 

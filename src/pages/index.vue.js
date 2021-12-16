@@ -675,12 +675,15 @@ export default {
       let store = _that.$store
       //receipt
       let receiptTypes = [
-        P2pChatMessageType.ADD_GROUPCHAT_MEMBER_RECEIPT,
         P2pChatMessageType.CHAT_RECEIVE_RECEIPT,
+        P2pChatMessageType.ADD_GROUPCHAT_MEMBER_RECEIPT,
         P2pChatMessageType.MODIFY_GROUPCHAT_OWNER_RECEIPT,
         P2pChatMessageType.MODIFY_GROUPCHAT_RECEIPT,
         P2pChatMessageType.REMOVE_GROUPCHAT_MEMBER_RECEIPT,
-        P2pChatMessageType.ADD_GROUPCHAT_RECEIPT
+        P2pChatMessageType.ADD_GROUPCHAT_RECEIPT,
+        P2pChatMessageType.DROP_LINKMAN_RECEIPT,
+        P2pChatMessageType.BLACK_LINKMAN_RECEIPT,
+        P2pChatMessageType.UNBLACK_LINKMAN_RECEIPT
       ]
       let receiptMessages = await chatComponent.loadMessage({
         ownerPeerId: myself.myselfPeerClient.peerId,
@@ -743,7 +746,6 @@ export default {
           }
         }
       }, 1000)
-
     },
     async insertReceivedMessage(message) {
       let _that = this
@@ -2731,11 +2733,53 @@ export default {
         }
         await _that.sendOrSaveReceipt(message)
       }
+      else if (messageType === P2pChatMessageType.DROP_LINKMAN && content) {
+        let peerId = message.senderPeerId
+        let linkman = store.state.linkmanMap[peerId]
+        if (linkman) {
+          linkman.droppedMe = true
+          store.state.linkmanMap[peerId] = linkman
+          let linkmanRecord = await contactComponent.get(ContactDataType.LINKMAN, linkman._id)
+          if (linkmanRecord) {
+            linkmanRecord.droppedMe = true
+            await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
+          }
+        }
+      }
+      else if (messageType === P2pChatMessageType.BLACK_LINKMAN && content) {
+        let peerId = message.senderPeerId
+        let linkman = store.state.linkmanMap[peerId]
+        if (linkman) {
+          linkman.blackedMe = true
+          store.state.linkmanMap[peerId] = linkman
+          let linkmanRecord = await contactComponent.get(ContactDataType.LINKMAN, linkman._id)
+          if (linkmanRecord) {
+            linkmanRecord.droppedMe = true
+            await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
+          }
+        }
+      }
+      else if (messageType === P2pChatMessageType.UNBLACK_LINKMAN && content) {
+        let peerId = message.senderPeerId
+        let linkman = store.state.linkmanMap[peerId]
+        if (linkman) {
+          linkman.blackedMe = false
+          store.state.linkmanMap[peerId] = linkman
+          let linkmanRecord = await contactComponent.get(ContactDataType.LINKMAN, linkman._id)
+          if (linkmanRecord) {
+            linkmanRecord.droppedMe = true
+            await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
+          }
+        }
+      }
       else if ((messageType === P2pChatMessageType.ADD_GROUPCHAT_RECEIPT
         || messageType === P2pChatMessageType.MODIFY_GROUPCHAT_RECEIPT
         || messageType === P2pChatMessageType.ADD_GROUPCHAT_MEMBER_RECEIPT
         || messageType === P2pChatMessageType.REMOVE_GROUPCHAT_MEMBER_RECEIPT
-        || messageType === P2pChatMessageType.MODIFY_GROUPCHAT_OWNER_RECEIPT) && content) {
+        || messageType === P2pChatMessageType.MODIFY_GROUPCHAT_OWNER_RECEIPT
+        || messageType === P2pChatMessageType.DROP_LINKMAN_RECEIPT
+        || messageType === P2pChatMessageType.BLACK_LINKMAN_RECEIPT
+        || messageType === P2pChatMessageType.UNBLACK_LINKMAN_RECEIPT) && content) {
         let _id = content._id
         let receiveTime = content.receiveTime
         let receives = await chatComponent.loadReceive({
@@ -4342,7 +4386,7 @@ export default {
       payload.createDate = currentTime
       await chatAction.chat(null, payload, peerId)
       _that.$q.notify({
-        message: _that.$i18n.t("Send contacts request uccessfully"),
+        message: _that.$i18n.t("Send contacts request successfully"),
         timeout: 3000,
         type: "info",
         color: "info",
