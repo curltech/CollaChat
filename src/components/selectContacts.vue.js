@@ -51,11 +51,14 @@ export default {
               || (linkman.tag && linkman.tag.toLowerCase().includes(selectContactsfilter.toLowerCase()))
               || (linkman.pyTag && linkman.pyTag.toLowerCase().includes(selectContactsfilter.toLowerCase())))
               && ((store.state.lockContactsSwitch && !linkman.locked) || !store.state.lockContactsSwitch)
-            && linkman.peerId !== myself.myselfPeerClient.peerId
+              && linkman.status !== LinkmanStatus.REQUESTED
+              && linkman.peerId !== myself.myselfPeerClient.peerId
           })
         } else {
           SelectLinkmanFilteredArray = linkmans.filter((linkman) => {
-            return ((store.state.lockContactsSwitch && !linkman.locked) || !store.state.lockContactsSwitch) && linkman.peerId !== myself.myselfPeerClient.peerId
+            return ((store.state.lockContactsSwitch && !linkman.locked) || !store.state.lockContactsSwitch)
+              && linkman.status !== LinkmanStatus.REQUESTED
+              && linkman.peerId !== myself.myselfPeerClient.peerId
           })
         }
       }

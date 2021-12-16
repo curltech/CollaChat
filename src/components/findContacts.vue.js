@@ -175,7 +175,7 @@ export default {
       if (linkman) {
         if (linkman.status === LinkmanStatus.REQUESTED) {
           linkman.status = LinkmanStatus.EFFECTIVE
-          store.state.linkmanMap[srcPeerId] = linkman
+          store.state.linkmanMap[peerId] = linkman
           let linkmanRecord = await contactComponent.get(ContactDataType.LINKMAN, linkman._id)
           if (linkmanRecord) {
             linkmanRecord.status = LinkmanStatus.EFFECTIVE

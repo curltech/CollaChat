@@ -62,7 +62,7 @@
  // 消息类型（messageType）
  export let P2pChatMessageType = {
    'SYNC_LINKMAN_INFO': 'SYNC_LINKMAN_INFO', // 联系人基本信息同步
-   'BLOCK_LINKMAN': 'BLOCK_LINKMAN', // 加入黑名单
+   'BLACK_LINKMAN': 'BLACK_LINKMAN', // 加入黑名单
    'DROP_LINKMAN': 'DROP_LINKMAN', // 从好友中删除
    // 联系人请求
    'ADD_GROUPCHAT': 'ADD_GROUPCHAT', // 新增群聊请求

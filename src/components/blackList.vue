@@ -24,7 +24,7 @@
               //q-item-section
                 q-item-label(caption lines="1") {{ $t('JoinTime: ') + date.formatDate(linkman.statusDate, 'YYYY-MM-DD HH:mm:ss') }}
               //q-item-section(side)
-                q-btn.text-primary(dense round flat icon="remove_circle" @click="unblock(linkman)")
+                q-btn.text-primary(dense round flat icon="remove_circle" @click="unblack(linkman)")
               q-item-section(avatar)
                 q-icon(color="c-grey-10" :name="linkman.locked ? 'lock' : ''")
             q-separator.c-separator(inset="item" v-if="index < BlackList.length - 1")

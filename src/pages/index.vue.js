@@ -3138,7 +3138,7 @@ export default {
               dataBlocks.push(responses[i][0])
             }
             dataBlocks = CollaUtil.sortByKey(dataBlocks, 'createDate', 'asc')
-            let callbackPs = []
+            //let callbackPs = []
             let _peerIds = new Map()
             for (let i = 0; i < dataBlocks.length; ++i) {
               let dataBlock = dataBlocks[i]

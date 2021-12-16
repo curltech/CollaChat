@@ -166,12 +166,18 @@ export default {
             await _that.changeStatus(LinkmanStatus.BLACKED)
           } else if (action.id === 'cancel') {
             let linkman = store.state.linkmanMap[store.state.currentLinkman.peerId]
-            linkman.status = LinkmanStatus.EFFECTIVE
+            if (linkman) {
+              linkman.status = LinkmanStatus.EFFECTIVE
+              store.state.linkmanMap[store.state.currentLinkman.peerId] = linkman
+            }
           }
         }).onCancel(() => {
           // console.log('Dismissed')
           let linkman = store.state.linkmanMap[store.state.currentLinkman.peerId]
-          linkman.status = LinkmanStatus.EFFECTIVE
+          if (linkman) {
+            linkman.status = LinkmanStatus.EFFECTIVE
+            store.state.linkmanMap[store.state.currentLinkman.peerId] = linkman
+          }
         }).onDismiss(() => {
           // console.log('I am triggered on both OK and Cancel')
         })
@@ -183,17 +189,37 @@ export default {
       let myselfPeerClient = myself.myselfPeerClient
       let currentTime = new Date()
       let linkman = store.state.linkmanMap[store.state.currentLinkman.peerId]
-      linkman.status = value
-      linkman.statusDate = currentTime
-      let linkmanRecord = await contactComponent.get(ContactDataType.LINKMAN, linkman._id)
-      if (linkmanRecord) {
-        linkmanRecord.status = value
-        linkmanRecord.statusDate = currentTime
-        await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
+      if (linkman) {
+        linkman.status = value
+        linkman.statusDate = currentTime
+        store.state.linkmanMap[store.state.currentLinkman.peerId] = linkman
+        let linkmanRecord = await contactComponent.get(ContactDataType.LINKMAN, linkman._id)
+        if (linkmanRecord) {
+          linkmanRecord.status = value
+          linkmanRecord.statusDate = currentTime
+          await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
+        }
+
+        // 新增Sent请求
+        let linkmanRequest = {}
+        linkmanRequest.requestType = (value === LinkmanStatus.EFFECTIVE ? RequestType.UNBLACK_LINKMAN : RequestType.BLACK_LINKMAN)
+        linkmanRequest.ownerPeerId = myselfPeerClient.peerId
+        linkmanRequest.senderPeerId = myselfPeerClient.peerId
+        linkmanRequest.createDate = currentTime
+        linkmanRequest.status = RequestStatus.SENT
+        await contactComponent.insert(ContactDataType.LINKMAN_REQUEST, linkmanRequest, null)
+
+        // 保存/发送Sent请求
+        let message = {
+          subjectType: SubjectType.LINKMAN_REQUEST,
+          messageType: (value === LinkmanStatus.EFFECTIVE ? P2pChatMessageType.UNBLACK_LINKMAN : P2pChatMessageType.BLACK_LINKMAN),
+          content: linkmanRequest
+        }
+        await store.saveAndSendMessage(message, linkman)
+        //todo setupRTC
+        // webrtcComponent.resetFlag = false
+        // webrtcComponent.closeDataChannel(store.state.currentLinkman.peerId)
       }
-      //todo setupRTC
-      // webrtcComponent.resetFlag = false
-      // webrtcComponent.closeDataChannel(store.state.currentLinkman.peerId)
     },
     async updateContactsLock() {
       let _that = this
@@ -312,6 +338,24 @@ export default {
       let store = _that.$store
       let myselfPeerClient = myself.myselfPeerClient
       let currentLinkmanPeerId = store.state.currentLinkman.peerId
+
+      // 新增Sent请求
+      let linkmanRequest = {}
+      linkmanRequest.requestType = RequestType.DROP_LINKMAN
+      linkmanRequest.ownerPeerId = myselfPeerClient.peerId
+      linkmanRequest.senderPeerId = myselfPeerClient.peerId
+      linkmanRequest.createDate = new Date()
+      linkmanRequest.status = RequestStatus.SENT
+      await contactComponent.insert(ContactDataType.LINKMAN_REQUEST, linkmanRequest, null)
+
+      // 保存/发送Sent请求
+      let message = {
+        subjectType: SubjectType.LINKMAN_REQUEST,
+        messageType: P2pChatMessageType.DROP_LINKMAN,
+        content: linkmanRequest
+      }
+      await store.saveAndSendMessage(message, store.state.currentLinkman)
+
       //todo setupRTC
       // webrtcComponent.resetFlag = false
       // webrtcComponent.closeDataChannel(currentLinkmanPeerId)

@@ -119,10 +119,12 @@ export default {
               || (linkman.tag && linkman.tag.toLowerCase().includes(contactsfilter.toLowerCase()))
               || (linkman.pyTag && linkman.pyTag.toLowerCase().includes(contactsfilter.toLowerCase())))
               && ((store.state.lockContactsSwitch && !linkman.locked) || !store.state.lockContactsSwitch)
+              && linkman.status !== LinkmanStatus.REQUESTED
           })
         } else {
           LinkmanFilteredArray = linkmans.filter((linkman) => {
             return ((store.state.lockContactsSwitch && !linkman.locked) || !store.state.lockContactsSwitch)
+              && linkman.status !== LinkmanStatus.REQUESTED
           })
         }
       }

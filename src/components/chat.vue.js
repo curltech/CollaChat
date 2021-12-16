@@ -148,7 +148,6 @@ export default {
                   || (linkman.tag && chat.tag.toLowerCase().includes(chatFilter.toLowerCase()))
                   || (linkman.pyTag && chat.pyTag.toLowerCase().includes(chatFilter.toLowerCase())))
                   && ((store.state.lockContactsSwitch && !linkman.locked) || !store.state.lockContactsSwitch)
-                  && linkman.status !== LinkmanStatus.REQUESTED
               } else if (chat.subjectType === SubjectType.GROUP_CHAT) {
                 let groupChat = store.state.groupChatMap[chat.subjectId]
                 return (groupChat.groupId.toLowerCase().includes(chatFilter.toLowerCase())
@@ -169,7 +168,6 @@ export default {
               if (chat.subjectType === SubjectType.CHAT) {
                 let linkman = store.state.linkmanMap[chat.subjectId]
                 return linkman && ((store.state.lockContactsSwitch && !linkman.locked) || !store.state.lockContactsSwitch)
-                  && linkman.status !== LinkmanStatus.REQUESTED
               } else if (chat.subjectType === SubjectType.GROUP_CHAT) {
                 let groupChat = store.state.groupChatMap[chat.subjectId]
                 return groupChat

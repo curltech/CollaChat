@@ -38,6 +38,9 @@ let indexFields = {
 
 export let RequestType = {
   'ADD_LINKMAN': 'ADD_LINKMAN',
+  'DROP_LINKMAN': 'DROP_LINKMAN',
+  'BLACK_LINKMAN': 'BLACK_LINKMAN',
+  'UNBLACK_LINKMAN': 'UNBLACK_LINKMAN',
   'REMOVE_GROUPCHAT_MEMBER': 'REMOVE_GROUPCHAT_MEMBER',
   'ADD_GROUPCHAT': 'ADD_GROUPCHAT',
   'MODIFY_GROUPCHAT': 'MODIFY_GROUPCHAT',
@@ -81,7 +84,7 @@ export class Linkman {
     this.sourceType = null // 来源，包括：Search&Add（搜索添加）, AcceptRequest（接受请求）…
     this.createDate = null // 创建时间（添加时间）
     this.statusDate = null // 状态变更时间
-    this.status = null // 状态，包括：Effective（正常）, Blocked（黑名单）
+    this.status = null // 状态，见LinkmanStatus
     this.lastConnectTime = null // 最近连接时间
     this.locked = null // 是否锁定，包括：true（锁定）, false（未锁定）
     this.notAlert = null // 消息免打扰，包括：true（提醒）, false（免打扰）
@@ -164,7 +167,7 @@ export class Group {
     this.pyTag = null // 标签拼音
     this.createDate = null // 创建时间（添加时间）
     this.statusDate = null // 状态变更时间
-    this.status = null // 状态，包括：Effective（正常）, Blocked（移除）
+    this.status = null // 状态
     this.locked = null // 是否锁定（群聊不使用，频道使用），包括：true（锁定）, false（未锁定）
     this.alert = null // 是否提醒，包括：true（提醒）, false（免打扰）
     this.top = null // 是否置顶，包括：true（置顶）, false（不置顶）
@@ -190,7 +193,7 @@ export class GroupMember {
     this.memberType = null // 成员类型，包括：Owner（创建者/群主，默认管理员）, Member（一般成员）,…可能的扩充：Admin（管理员）, Subscriber（订阅者）
     this.createDate = null // 创建时间（添加时间）
     this.statusDate = null // 状态变更时间
-    this.status = null // 状态，包括：Effective（正常）, Blocked（移除）
+    this.status = null // 状态
   }
 }
 

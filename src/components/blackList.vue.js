@@ -3,7 +3,8 @@ import { date } from 'quasar'
 import { myself } from 'libcolla'
 
 import { statusBarComponent } from '@/libs/base/colla-cordova'
-import { ContactDataType, LinkmanStatus, contactComponent, ActiveStatus } from '@/libs/biz/colla-contact'
+import { ContactDataType, LinkmanStatus, contactComponent, ActiveStatus, RequestType, RequestStatus } from '@/libs/biz/colla-contact'
+import { SubjectType, P2pChatMessageType } from '@/libs/biz/colla-chat'
 
 import ContactsDetails from '@/components/contactsDetails'
 
@@ -50,11 +51,11 @@ export default {
               || (linkman.pyGivenName && linkman.pyGivenName.toLowerCase().includes(filter.toLowerCase()))
               || (linkman.tag && linkman.tag.toLowerCase().includes(filter.toLowerCase()))
               || (linkman.pyTag && linkman.pyTag.toLowerCase().includes(filter.toLowerCase())))
-              && linkman.status === 'BLACKED' && ((store.state.lockContactsSwitch && !linkman.locked) || !store.state.lockContactsSwitch)
+              && linkman.status === LinkmanStatus.BLACKED && ((store.state.lockContactsSwitch && !linkman.locked) || !store.state.lockContactsSwitch)
           })
         } else {
           BlackArray = linkmans.filter((linkman) => {
-            return linkman.status === 'BLACKED' && ((store.state.lockContactsSwitch && !linkman.locked) || !store.state.lockContactsSwitch)
+            return linkman.status === LinkmanStatus.BLACKED && ((store.state.lockContactsSwitch && !linkman.locked) || !store.state.lockContactsSwitch)
           })
         }
       }
@@ -62,18 +63,38 @@ export default {
     }
   },
   methods: {
-    async unblock(blockedLinkman) {
+    async unblack(blackedLinkman) {
       let _that = this
       let store = _that.$store
       let currentTime = new Date()
-      let linkman = store.state.linkmanMap[blockedLinkman.peerId]
-      linkman.status = LinkmanStatus.EFFECTIVE
-      linkman.statusDate = currentTime
-      let linkmanRecord = await contactComponent.get(ContactDataType.LINKMAN, linkman._id)
-      if (linkmanRecord) {
-        linkmanRecord.status = LinkmanStatus.EFFECTIVE
-        linkmanRecord.statusDate = currentTime
-        await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
+      let linkman = store.state.linkmanMap[blackedLinkman.peerId]
+      if (linkman) {
+        linkman.status = LinkmanStatus.EFFECTIVE
+        linkman.statusDate = currentTime
+        store.state.linkmanMap[blackedLinkman.peerId] = linkman
+        let linkmanRecord = await contactComponent.get(ContactDataType.LINKMAN, linkman._id)
+        if (linkmanRecord) {
+          linkmanRecord.status = LinkmanStatus.EFFECTIVE
+          linkmanRecord.statusDate = currentTime
+          await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
+        }
+
+        // 新增Sent请求
+        let linkmanRequest = {}
+        linkmanRequest.requestType = RequestType.UNBLACK_LINKMAN
+        linkmanRequest.ownerPeerId = myself.myselfPeerClient.peerId
+        linkmanRequest.senderPeerId = myself.myselfPeerClient.peerId
+        linkmanRequest.createDate = currentTime
+        linkmanRequest.status = RequestStatus.SENT
+        await contactComponent.insert(ContactDataType.LINKMAN_REQUEST, linkmanRequest, null)
+
+        // 保存/发送Sent请求
+        let message = {
+          subjectType: SubjectType.LINKMAN_REQUEST,
+          messageType: P2pChatMessageType.UNBLACK_LINKMAN,
+          content: linkmanRequest
+        }
+        await store.saveAndSendMessage(message, linkman)
       }
     },
     showContacts(linkman, index) {
