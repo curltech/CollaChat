@@ -750,7 +750,7 @@ export default {
     async insertReceivedMessage(message) {
       let _that = this
       let store = _that.$store
-      if (message.messageType == P2pChatMessageType.CHAT_LINKMAN || message.messageType == P2pChatMessageType.CALL_REQUEST) {
+      if (message.messageType == P2pChatMessageType.CHAT_LINKMAN) {
         await _that.insertReceivedChatMessage(message)
       }
     },
@@ -981,7 +981,7 @@ export default {
         //if(_that.ifOnlySocketConnected(subjectId)){
         //    message.actualReceiveTime = message.createDate
         //}
-        await store.p2pSend(message, subjectId)
+        store.p2pSend(message, subjectId)
       } else if (subjectType === SubjectType.GROUP_CHAT) {
         let groupMembers
         if (message.contentType === ChatContentType.VIDEO_INVITATION || message.contentType === ChatContentType.AUDIO_INVITATION || message.messageType === P2pChatMessageType.CALL_CLOSE) {

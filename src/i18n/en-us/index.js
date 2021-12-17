@@ -260,7 +260,7 @@ export default {
   "Destroy ID": "Destroy ID",
   Logout: "Logout",
   "Change Avatar": "Change Avatar",
-  "Restricted to images, size less than 2M": "Restricted to images, size less than 2M",
+  "Upload file cannot exceed": "Upload file cannot exceed",
   "Change Name": "Change Name",
   "Change Mobile": "Change Mobile",
   "Scan QR code to add me into your contacts": "Scan QR code to add me into your contacts",

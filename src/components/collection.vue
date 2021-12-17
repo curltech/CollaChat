@@ -68,7 +68,7 @@
           q-btn(flat round icon="keyboard_arrow_left" @click="subKind='default'")
           q-space
           q-btn.text-primary(v-if="$store.collectionEntry !== 'message'" flat round icon="more_horiz" @click="viewCommand()")
-        div.scroll.header-mar-top.bg-c-white(id="scroll-target-view" :class="ifMobileSize || $store.state.ifMobileStyle ? (ifMobileSize ? 'scrollHeightMobileSize-editor' : 'scrollHeightMobileStyle-editor') : 'scrollHeightStyle'")
+        div.scroll.header-mar-top.bg-c-white(id="scroll-target-view" :class="ifMobileSize || $store.state.ifMobileStyle ? (ifMobileSize ? 'scrollHeightMobileSize-editor' : 'scrollHeightMobileStyle-editor') : 'scrollHeightStyle'" style="padding-left:10px;padding-right:10px;")
           iframe(v-if="myCollections.c_meta.current && myCollections.c_meta.current.content && myCollections.c_meta.current.content.substr(0,4)==='http'" id="iframeContent"
             :src="myCollections.c_meta.current.content" frameborder="no" border="0" marginwidth="0" marginheight="0" allowtransparency="yes" scrolling="yes")
           div(v-if="myCollections.c_meta.current && myCollections.c_meta.current.content && myCollections.c_meta.current.content.substr(0,4)!=='http' && myCollections.c_meta.current.collectionType !== CollectionType.VOICE && myCollections.c_meta.current.collectionType !== CollectionType.FILE && myCollections.c_meta.current.collectionType !== CollectionType.CHAT" v-html="myCollections.c_meta.current.content")
