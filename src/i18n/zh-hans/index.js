@@ -149,8 +149,8 @@ export default {
   "tag name already exists": "标签名已存在",
   "Please input PeerId": "请输入身份编号",
   "Please input ConferenceId": "请输入会议ID",
-  "You are in your oppoent's blacklist.": "你在对方的黑名单中",
-  "You are no longer your opponent's friend.": "你不再是对方的好友",
+  "You are in your opponent's blacklist.": "你在对方的黑名单中",
+  "You are no longer your opponent's contacts.": "你不再是对方的联系人",
   "You have been removed from this group chat.": "你已被移出此群聊",
 
   // Chat

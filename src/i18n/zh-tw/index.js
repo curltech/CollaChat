@@ -149,8 +149,8 @@
   "tag name already exists": "標簽名已存在",
   "Please input PeerId": "請輸入身份編號",
   "Please input ConferenceId": "請輸入會議ID",
-  "You are in your oppoent's blacklist.": "你在對方的黑名單中",
-  "You are no longer your opponent's friend.": "你不再是對方的好友",
+  "You are in your opponent's blacklist.": "你在對方的黑名單中",
+  "You are no longer your opponent's contacts.": "你不再是對方的聯系人",
   "You have been removed from this group chat.": "你已被移出此群聊",
 
   // Chat
