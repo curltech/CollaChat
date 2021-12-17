@@ -319,6 +319,11 @@ export default {
       let store = _that.$store
       let subjectId = message.senderPeerId
       if (message.subjectType === SubjectType.CHAT) {
+        let currentTime = new Date().getTime()
+        //大于1分钟的请求忽略掉
+        if(((currentTime - message.createDate) / 1000 > 60)){
+            return;
+        }
         if (store.state.currentCallChat && store.state.currentCallChat.subjectId && store.state.videoDialog) {
           await _that.sendCallCloseMessage(subjectId, ChatContentType.MEDIA_BUSY, '')
           return;

@@ -41,6 +41,8 @@ export default {
         store.changeMessageSubKind('default')
       } else if (store.selectChatEntry === 'accountInformationQrCode') {
         store.accountInformationEnterQRCode()
+      } else if (store.selectChatEntry === 'accountSecurityQrCode') {
+        store.changeAccountSecuritySubKind('qrCode')
       } else if (store.selectChatEntry === 'channelForward') {
         store.changeChannelDetailsSubKind('default')
       } else if (store.selectChatEntry === 'articleForward') {

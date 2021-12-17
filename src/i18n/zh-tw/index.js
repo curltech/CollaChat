@@ -267,7 +267,7 @@
   "Destroy ID": "銷毀身份",
   "Logout": "退出登錄",
   "Change Avatar": "修改頭像",
-  "Restricted to images, size less than 2M": "限定圖片文件，大小不超過2M",
+  "Upload file cannot exceed": "上傳文件不能超過",
   "Change Name": "修改用戶名",
   "Change Mobile": "修改手機號",
   "Scan QR code to add me into your contacts": "掃描二維碼，將我加為妳的聯系人",

@@ -1066,7 +1066,7 @@ class MediaComponent {
   isAssetTypeAnImage(ext) {
     if (!ext) return
     return [
-      'png', 'jpg', 'jpeg', 'bmp', 'gif', 'webp', 'psd', 'svg', 'tiff'].indexOf(ext.toLowerCase()) !== -1;
+      'png', 'jpg', 'jpeg', 'bmp', 'gif', 'webp', 'svg', 'tiff'].indexOf(ext.toLowerCase()) !== -1;
   }
   isAssetTypeAnAudio(ext) {
     if (!ext) return

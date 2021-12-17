@@ -268,7 +268,7 @@
   "Destroy ID": "アイデンティティの廃棄",
   "Logout": "ログアウト",
   "Change Avatar": "顔写真の修正",
-  "Restricted to images, size less than 2M": "画像ファイルを限定し,サイズは2 Mを超えない",
+  "Upload file cannot exceed": "アップロードファイルはを超えることはできません",
   "Change Name": "ユーザー名を変更",
   "Change Mobile": "携帯番号の変更",
   "Scan QR code to add me into your contacts": "QRコードをスキャンして,私をあなたの連絡先に追加します",

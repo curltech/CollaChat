@@ -1,12 +1,15 @@
 import { myself, myselfPeerService, config } from 'libcolla'
 import { StringUtil } from 'libcolla'
 import { openpgp } from 'libcolla'
-
+import SelectChat from '@/components/selectChat'
 import VanillaQR from '@/libs/base/colla-vanillaQR'
 import { mediaComponent } from '@/libs/base/colla-media'
 
 export default {
   name: "AccountSecurity",
+  components: {
+    selectChat: SelectChat
+  },
   data() {
     return {
       subKind: 'default',
@@ -205,7 +208,9 @@ export default {
         }).onOk(async action => {
           // console.log('Action chosen:', action.id)
           if (action.id === 'forward') {
-            // TODO
+            store.state.currentQrCode = await mediaComponent.html2canvasById('qrCodeCard', 'base64')
+            store.selectChatEntry = 'accountSecurityQrCode'
+            _that.subKind = 'selectChat'
           } else if (action.id === 'save') {
             let canvas = await mediaComponent.html2canvasById('qrCodeCard', null)
             window.canvas2ImagePlugin.saveImageDataToLibrary(
@@ -260,10 +265,12 @@ export default {
               id: 'cancel'
             }
           ]
-        }).onOk(action => {
+        }).onOk(async action => {
           // console.log('Action chosen:', action.id)
           if (action.id === 'forward') {
-            // TODO
+            store.state.currentQrCode = await mediaComponent.html2canvasById('qrCodeCard', 'base64')
+            store.selectChatEntry = 'accountSecurityQrCode'
+            _that.subKind = 'selectChat'
           } else if (action.id === 'save') {
             mediaComponent.exportDiv('qrCodeCard', _that.$i18n.t('myCollaQRCode') + '-' + _that.$i18n.t('ID'))
           }
@@ -294,5 +301,15 @@ export default {
       await myselfPeerService.destroyID()
       await store.logout()
     }
-  }
+  },
+  async created() {
+    let _that = this
+    let store = _that.$store
+    store.changeAccountSecuritySubKind = function (subKind) {
+      _that.subKind = subKind
+      if(subKind === 'qrCode'){
+        _that.exportID()
+      }
+    }
+  },
 }

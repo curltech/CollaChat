@@ -79,6 +79,7 @@ export default {
   "Recall Alert":"Alerta de Rechamada",
   "This message has been recalled":"Esta mensagem foi recuperada",
   "You were mentioned":"Você foi mencionado",
+  "Upload file cannot exceed": "O arquivo de upload não pode exceder",
   // Outros
   Other: "Outro",
   System: "Sistema",

@@ -461,14 +461,15 @@ export default {
       let store = _that.$store
       let editor = _that.$refs.editor
       let emojiVal = emoji.data
-      let selectionStart = editor.selectionStart
+      let selectionStart = editor.$refs.input?editor.$refs.input.selectionStart:null
       if (selectionStart == null) {
         selectionStart = 0
       }
-      if (selectionStart == store.state.currentChat.tempText.length - 1) {
-        store.state.currentChat.tempText = store.state.currentChat.tempText.slice(0, selectionStart) + emojiVal
+      let currentText = store.state.currentChat.tempText ? store.state.currentChat.tempText : ""
+      if (selectionStart == currentText.length - 1) {
+        store.state.currentChat.tempText = currentText.slice(0, selectionStart) + emojiVal
       } else {
-        store.state.currentChat.tempText = store.state.currentChat.tempText.slice(0, selectionStart) + emojiVal + store.state.currentChat.tempText.slice(selectionStart, store.state.currentChat.tempText.length - 1)
+        store.state.currentChat.tempText = currentText.slice(0, selectionStart) + emojiVal + currentText.slice(selectionStart, currentText.length - 1)
       }
       _that.emojiShow = false
     },
@@ -891,6 +892,16 @@ export default {
       let _that = this
       let store = _that.$store
       let peerId = store.state.currentChat.subjectId
+      if (file.size > 2097152*100) { // 2M
+        _that.$q.notify({
+          message: `${_that.$i18n.t("Upload file cannot exceed")} 200M`,
+          timeout: 3000,
+          type: "warning",
+          color: "warning",
+        })
+        _that.$refs.messageUpload.reset()
+        return
+    }
       let fileType
       if (file.name) {
         let index = file.name.lastIndexOf(".")
@@ -899,16 +910,6 @@ export default {
       let fileData = await BlobUtil.fileObjectToBase64(file)
       let type, name, fileSize;
       if (mediaComponent.isAssetTypeAnImage(fileType)) {
-        /*if (file.size > 2097152) { // 2M
-          _that.$q.notify({
-            message: _that.$i18n.t("Restricted to images, size less than 2M"),
-            timeout: 3000,
-            type: "warning",
-            color: "warning",
-          })
-          _that.$refs.messageUpload.reset()
-          return
-        }*/
         type = ChatContentType.IMAGE
       } else if (mediaComponent.isAssetTypeAVideo(fileType)) {
         type = ChatContentType.VIDEO
@@ -1010,10 +1011,10 @@ export default {
         messageType: P2pChatMessageType.CHAT_LINKMAN
       }
 
-      store.sendChatMessage(store.state.currentChat, message)
       store.state.currentChat.tempText = ''
       _that.sending = false
       editor.focus();
+      store.sendChatMessage(store.state.currentChat, message)
       _that.$nextTick(() => {
         let container = document.getElementById('talk')
         if (container) {
@@ -1267,7 +1268,11 @@ export default {
             inserted.collectionType = CollectionType.NOTE
           }
           else if (message.contentType === ChatContentType.CHAT) {
-            inserted.collectionType = CollectionType.CHAT
+            if(_that.messageMultiSelectedVal.length === 1 && _that.messageMultiSelectedVal[0].contentType ===  ChatContentType.CARD){
+              inserted.collectionType = CollectionType.CARD
+            }else{
+              inserted.collectionType = CollectionType.CHAT
+            }
           }
           content = message.content
         } else {
@@ -1275,7 +1280,10 @@ export default {
             inserted.collectionType = CollectionType.IMAGE
           } else if (message.contentType === ChatContentType.VIDEO) {
             inserted.collectionType = CollectionType.VIDEO
-          } else if (message.contentType === ChatContentType.VOICE) {
+          } else if (message.contentType === ChatContentType.AUDIO) {
+            inserted.collectionType = CollectionType.AUDIO
+          }  
+          else if (message.contentType === ChatContentType.VOICE) {
             inserted.collectionType = CollectionType.VOICE
           } else if (message.contentType === ChatContentType.FILE) {
             inserted.attachOAmount = 1
@@ -1371,6 +1379,7 @@ export default {
       let _that = this
       let store = _that.$store
       let messageText = `「 ${store.state.linkmanMap[message.senderPeerId].name}:${message.content} 」 - - - - - - - - - - - - - -\n`
+      _that.$forceUpdate()
       store.state.currentChat.tempText = messageText
       _that.$refs.editor.focus()
     },

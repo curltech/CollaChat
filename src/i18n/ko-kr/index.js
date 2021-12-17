@@ -268,7 +268,7 @@
   "Destroy ID": "신분 파기",
   "Logout": "로그 인 종료",
   "Change Avatar": "프로필 사진 수정",
-  "Restricted to images, size less than 2M": "한정 이미지 파일, 크기 는 2M 을 초과 하지 않 습 니 다",
+  "Upload file cannot exceed": "업로드 파일은 를 초과할 수 없습니다.",
   "Change Name": "닉네임 변경",
   "Change Mobile": "핸드폰 번호 변경",
   "Scan QR code to add me into your contacts": "QR 코드 스 캔, 나 를 당신 의 연락처 로 추가 합 니 다",
