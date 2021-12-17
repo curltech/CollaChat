@@ -1268,7 +1268,11 @@ export default {
             inserted.collectionType = CollectionType.NOTE
           }
           else if (message.contentType === ChatContentType.CHAT) {
-            inserted.collectionType = CollectionType.CHAT
+            if(_that.messageMultiSelectedVal.length === 1 && _that.messageMultiSelectedVal[0].contentType ===  ChatContentType.CARD){
+              inserted.collectionType = CollectionType.CARD
+            }else{
+              inserted.collectionType = CollectionType.CHAT
+            }
           }
           content = message.content
         } else {

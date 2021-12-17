@@ -213,7 +213,7 @@ import { P2pChatMessageType } from '@/libs/biz/colla-chat'
     }
     current['thumbType'] = currentThumbType
     current['thumbnail'] = currentThumbnail
-    if(current['collectionType'] !== CollectionType.CHAT){
+    if(current['collectionType'] !== CollectionType.CHAT && current['collectionType'] !== CollectionType.CARD){
       current['contentTitle'] = contentTitle.replace(/\&nbsp\;/g, '')
     }
     current['contentBody'] = contentBody.replace(/\&nbsp\;/g, '')

@@ -1197,6 +1197,16 @@ export default {
       }
       store.changeKind('message')
     },
+    async qrCodeForwardToChat(item, chat) {
+      let _that = this
+      let store = _that.$store
+      await store.saveFileAndSendMessage(chat, item, ChatContentType.IMAGE, null)
+      _that.setCurrentChat(chat.subjectId)
+      if (_that.tab !== 'chat') {
+        store.changeTab('chat')
+      }
+      store.changeKind('message')
+    },
     async articleForwardToChat(item, chat) {
       let _that = this
       let store = _that.$store
@@ -4633,6 +4643,7 @@ export default {
     store.collectionForwardToChat = _that.collectionForwardToChat
     store.channelForwardToChat = _that.channelForwardToChat
     store.articleForwardToChat = _that.articleForwardToChat
+    store.qrCodeForwardToChat = _that.qrCodeForwardToChat
     store.saveFileInMessage = _that.saveFileInMessage
     store.saveFileAndSendMessage = _that.saveFileAndSendMessage
     store.findContacts = _that.findContacts

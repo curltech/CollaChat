@@ -64,6 +64,8 @@
                 div#qrCode
               //q-card-section(class="q-pt-none")
                 div(class="text-center text-c-grey-10 text-caption") {{ $t('Scan QR code to import ID') }}
+      q-tab-panel(name="selectChat" style="padding:0px 0px")
+        selectChat.drawcontent
     q-dialog(v-model="resetKeyDialog" persistent)
       q-card(style="width: 250px")
         q-bar(class="bg-primary text-c-grey-0")

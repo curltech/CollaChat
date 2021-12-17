@@ -124,7 +124,7 @@ export default {
           } else if (store.selectChatEntry === 'messageForward') {
             await store.forwardToChat(chatRecord)
           } else if (store.selectChatEntry === 'accountInformationQrCode') {
-            // TODO
+            await store.qrCodeForwardToChat(store.state.currentQrCode,chatRecord)
           } else if (store.selectChatEntry === 'channelForward') {
             await store.channelForwardToChat(store.state.currentChannel,chatRecord)
           } else if (store.selectChatEntry === 'articleForward') {
