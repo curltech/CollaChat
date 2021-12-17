@@ -214,7 +214,7 @@ export default {
         })
         return
       }
-      await _that.initSignalProtocol(_that.loginData.mobile_)
+      await _that.initSignalProtocol(myself.myselfPeer.peerId)
       myselfPeerService.setMyselfPeerClient(myself.myselfPeer, myself.peerProfile)
       store.state.myselfPeerClient = myself.myselfPeerClient
       // 登录后初始化设置
