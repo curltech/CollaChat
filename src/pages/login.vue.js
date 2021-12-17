@@ -17,7 +17,6 @@ import { cameraComponent, systemAudioComponent } from '@/libs/base/colla-media'
 import { deviceComponent, statusBarComponent, simComponent, inAppBrowserComponent } from '@/libs/base/colla-cordova'
 import { ContactDataType, LinkmanStatus, ActiveStatus, contactComponent } from '@/libs/biz/colla-contact'
 import GetConfigWorker from '@/worker/getConfig.worker.js'
-
 import defaultActiveAvatar from '@/assets/colla-o1.png'
 //import defaultDisabledAvatar from '@/assets/colla-o-disabled.png'
 //import defaultChannelAvatar from '@/assets/colla-o2.png'
