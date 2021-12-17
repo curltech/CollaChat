@@ -321,7 +321,6 @@ export default {
       if (message.subjectType === SubjectType.CHAT) {
         let currentTime = new Date().getTime()
         //大于1分钟的请求忽略掉
-        debugger
         if(((currentTime - message.createDate) / 1000 > 60)){
             return;
         }
