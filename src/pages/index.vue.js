@@ -1977,7 +1977,7 @@ export default {
             webrtcPeerPool.create(srcPeerId)
             let chat = store.state.chatMap[srcPeerId]
             if (!chat) { // 尚未创建对应聊天时才需要执行
-              let chat = await store.getChat(srcPeerId)
+              chat = await store.getChat(srcPeerId)
             }
             let chatMessage = {
               messageType: P2pChatMessageType.CHAT_SYS,
@@ -2744,7 +2744,7 @@ export default {
         await _that.sendOrSaveReceipt(message)
       }
       else if (messageType === P2pChatMessageType.DROP_LINKMAN && content) {
-        let peerId = message.senderPeerId
+        let peerId = content.senderPeerId
         let linkman = store.state.linkmanMap[peerId]
         if (linkman) {
           linkman.droppedMe = true
@@ -2755,9 +2755,22 @@ export default {
             await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
           }
         }
+        let _id = content._id
+        let currentTime = new Date()
+        // 发送Receive收条
+        let linkmanRequest = {}
+        linkmanRequest._id = _id
+        linkmanRequest.receiveTime = currentTime
+        let message = {
+          messageType: P2pChatMessageType.ADD_GROUPCHAT_RECEIPT,
+          ownerPeerId: myselfPeerClient.peerId,
+          subjectId: content.senderPeerId,
+          content: linkmanRequest
+        }
+        await _that.sendOrSaveReceipt(message)
       }
       else if (messageType === P2pChatMessageType.BLACK_LINKMAN && content) {
-        let peerId = message.senderPeerId
+        let peerId = content.senderPeerId
         let linkman = store.state.linkmanMap[peerId]
         if (linkman) {
           linkman.blackedMe = true
@@ -2768,9 +2781,22 @@ export default {
             await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
           }
         }
+        let _id = content._id
+        let currentTime = new Date()
+        // 发送Receive收条
+        let linkmanRequest = {}
+        linkmanRequest._id = _id
+        linkmanRequest.receiveTime = currentTime
+        let message = {
+          messageType: P2pChatMessageType.ADD_GROUPCHAT_RECEIPT,
+          ownerPeerId: myselfPeerClient.peerId,
+          subjectId: content.senderPeerId,
+          content: linkmanRequest
+        }
+        await _that.sendOrSaveReceipt(message)
       }
       else if (messageType === P2pChatMessageType.UNBLACK_LINKMAN && content) {
-        let peerId = message.senderPeerId
+        let peerId = content.senderPeerId
         let linkman = store.state.linkmanMap[peerId]
         if (linkman) {
           linkman.blackedMe = false
@@ -2781,6 +2807,19 @@ export default {
             await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
           }
         }
+        let _id = content._id
+        let currentTime = new Date()
+        // 发送Receive收条
+        let linkmanRequest = {}
+        linkmanRequest._id = _id
+        linkmanRequest.receiveTime = currentTime
+        let message = {
+          messageType: P2pChatMessageType.ADD_GROUPCHAT_RECEIPT,
+          ownerPeerId: myselfPeerClient.peerId,
+          subjectId: content.senderPeerId,
+          content: linkmanRequest
+        }
+        await _that.sendOrSaveReceipt(message)
       }
       else if ((messageType === P2pChatMessageType.ADD_GROUPCHAT_RECEIPT
         || messageType === P2pChatMessageType.MODIFY_GROUPCHAT_RECEIPT
