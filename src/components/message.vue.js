@@ -177,24 +177,6 @@ export default {
         return ret
       }
     },
-    ifObsoleteGroupChat() {
-      let _that = this
-      let store = _that.$store
-      return function (currentChat) {
-        let ret = true
-        if (currentChat) {
-          let groupChat = store.state.groupChatMap[currentChat.subjectId]
-          if (groupChat && groupChat.groupMembers && groupChat.groupMembers.length > 0) {
-            for (let groupMember of groupChat.groupMembers) {
-              if (groupMember.memberPeerId === myself.myselfPeerClient.peerId) {
-                ret = false
-              }
-            }
-          }
-        }
-        return ret
-      }
-    },
     MessageName() {
       let _that = this
       let store = _that.$store
@@ -992,6 +974,40 @@ export default {
       let store = _that.$store
       let editor = _that.$refs.editor
       let editorContent = store.state.currentChat.tempText
+      if (store.state.currentChat.subjectType === SubjectType.CHAT) {
+        if (store.state.linkmanMap[store.state.currentChat.subjectId].blackedMe) {
+          alert(_that.$i18n.t("You are in your opponent's blacklist."))
+          if (editorContent.substr(editorContent.length - 1, editorContent.length) === '\n') {
+            store.state.currentChat.tempText = editorContent.substr(0, editorContent.length - 1)
+          }
+          return
+        }
+        if (store.state.linkmanMap[store.state.currentChat.subjectId].droppedMe) {
+          alert(_that.$i18n.t("You are no longer your opponent's contacts."))
+          if (editorContent.substr(editorContent.length - 1, editorContent.length) === '\n') {
+            store.state.currentChat.tempText = editorContent.substr(0, editorContent.length - 1)
+          }
+          return
+        }
+      } else if (store.state.currentChat.subjectType === SubjectType.GROUP_CHAT) {
+        let ret = true
+        let groupChat = store.state.groupChatMap[store.state.currentChat.subjectId]
+        if (groupChat && groupChat.groupMembers && groupChat.groupMembers.length > 0) {
+          for (let groupMember of groupChat.groupMembers) {
+            if (groupMember.memberPeerId === myself.myselfPeerClient.peerId) {
+              ret = false
+            }
+          }
+        }
+        if (ret) {
+          alert(_that.$i18n.t('You have been removed from this group chat.'))
+          if (editorContent.substr(editorContent.length - 1, editorContent.length) === '\n') {
+            store.state.currentChat.tempText = editorContent.substr(0, editorContent.length - 1)
+          }
+          return
+        }
+      }
+
       if (!editorContent || _that.sending) {
         store.state.currentChat.tempText = ''
         setTimeout(function () {

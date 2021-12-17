@@ -2749,6 +2749,7 @@ export default {
         if (linkman) {
           linkman.droppedMe = true
           store.state.linkmanMap[peerId] = linkman
+          _that.$forceUpdate()
           let linkmanRecord = await contactComponent.get(ContactDataType.LINKMAN, linkman._id)
           if (linkmanRecord) {
             linkmanRecord.droppedMe = true
@@ -2762,7 +2763,7 @@ export default {
         linkmanRequest._id = _id
         linkmanRequest.receiveTime = currentTime
         let message = {
-          messageType: P2pChatMessageType.ADD_GROUPCHAT_RECEIPT,
+          messageType: P2pChatMessageType.DROP_LINKMAN_RECEIPT,
           ownerPeerId: myselfPeerClient.peerId,
           subjectId: content.senderPeerId,
           content: linkmanRequest
@@ -2775,9 +2776,10 @@ export default {
         if (linkman) {
           linkman.blackedMe = true
           store.state.linkmanMap[peerId] = linkman
+          _that.$forceUpdate()
           let linkmanRecord = await contactComponent.get(ContactDataType.LINKMAN, linkman._id)
           if (linkmanRecord) {
-            linkmanRecord.droppedMe = true
+            linkmanRecord.blackedMe = true
             await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
           }
         }
@@ -2788,7 +2790,7 @@ export default {
         linkmanRequest._id = _id
         linkmanRequest.receiveTime = currentTime
         let message = {
-          messageType: P2pChatMessageType.ADD_GROUPCHAT_RECEIPT,
+          messageType: P2pChatMessageType.BLACK_LINKMAN_RECEIPT,
           ownerPeerId: myselfPeerClient.peerId,
           subjectId: content.senderPeerId,
           content: linkmanRequest
@@ -2801,9 +2803,10 @@ export default {
         if (linkman) {
           linkman.blackedMe = false
           store.state.linkmanMap[peerId] = linkman
+          _that.$forceUpdate()
           let linkmanRecord = await contactComponent.get(ContactDataType.LINKMAN, linkman._id)
           if (linkmanRecord) {
-            linkmanRecord.droppedMe = true
+            linkmanRecord.blackedMe = false
             await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
           }
         }
@@ -2814,7 +2817,7 @@ export default {
         linkmanRequest._id = _id
         linkmanRequest.receiveTime = currentTime
         let message = {
-          messageType: P2pChatMessageType.ADD_GROUPCHAT_RECEIPT,
+          messageType: P2pChatMessageType.UNBLACK_LINKMAN_RECEIPT,
           ownerPeerId: myselfPeerClient.peerId,
           subjectId: content.senderPeerId,
           content: linkmanRequest

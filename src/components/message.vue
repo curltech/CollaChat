@@ -32,10 +32,7 @@
                       q-item-section {{$t('MultiSelect')}}
                 q-chat-message(v-if='message.messageType === P2pChatMessageType.CHAT_SYS && message.contentType === ChatContentType.EVENT' :label="detailDateFormat(message.createDate)+'</br>'+ message.content")
                 q-chat-message(v-if='message.messageType === P2pChatMessageType.CHAT_SYS && message.contentType === ChatContentType.TIME' :label="detailDateFormat(message.content)")
-        q-item-label(v-if="$store.state.currentChat && $store.state.currentChat.subjectType === SubjectType.CHAT && $store.state.linkmanMap[$store.state.currentChat.subjectId].blackedMe === true") {{$t("You are in your opponent's blacklist.")}}
-        q-item-label(v-if="$store.state.currentChat && $store.state.currentChat.subjectType === SubjectType.CHAT && $store.state.linkmanMap[$store.state.currentChat.subjectId].droppedMe === true") {{$t("You are no longer your opponent's contacts.")}}
-        q-item-label(v-if="$store.state.currentChat && $store.state.currentChat.subjectType === SubjectType.GROUP_CHAT && ifObsoleteGroupChat($store.state.currentChat)") {{$t('You have been removed from this group chat.')}}
-        .message-editor-wrap(v-if="$store.state.currentChat && (($store.state.currentChat.subjectType === SubjectType.CHAT && !$store.state.linkmanMap[$store.state.currentChat.subjectId].blackedMe && !$store.state.linkmanMap[$store.state.currentChat.subjectId].droppedMe) || !ifObsoleteGroupChat($store.state.currentChat))" :class="ifMobileSize || $store.state.ifMobileStyle ? 'bg-c-grey-message-editor' : 'bg-c-grey-message-editor-pc'")
+        .message-editor-wrap(:class="ifMobileSize || $store.state.ifMobileStyle ? 'bg-c-grey-message-editor' : 'bg-c-grey-message-editor-pc'")
           .message-editor-area
             q-toolbar.row(style="height:40px;min-height:40px" v-if="!(ifMobileSize || $store.state.ifMobileStyle) && !messageMultiSelectMode")
               q-btn.text-primary.q-mr-sm(round flat icon="alarm" :disable ='!(!ifSelfChat && activeStatus($store.state.currentChat) && ($store.state.currentChat && $store.state.currentChat.subjectType === SubjectType.CHAT))' @click='destroyClock = true')
