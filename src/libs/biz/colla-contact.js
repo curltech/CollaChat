@@ -146,6 +146,7 @@ export class LinkmanRequest {
     this.groupDescription = null // 群公告
     this.myAlias = null // 发送人在本群的昵称
     this.data = null // 消息数据（群成员列表）
+    this.blackedMe = null
   }
 }
 

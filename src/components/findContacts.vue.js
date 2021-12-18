@@ -206,6 +206,9 @@ export default {
         newLinkman.recallAlert = true
         newLinkman.myselfRecallTimeLimit = true
         newLinkman.myselfRecallAlert = true
+        if (linkmanRequest.blackedMe === true) {
+          newLinkman.blackedMe = true
+        }
         await contactComponent.insert(ContactDataType.LINKMAN, newLinkman, store.state.linkmans)
         newLinkman.groupChats = []
         store.state.linkmans.sort(function (a, b) {

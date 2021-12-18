@@ -214,7 +214,7 @@ export default {
     async initiateCallRequest(type, entry) {
       let _that = this
       let store = _that.$store
-      let subjectId;
+      let subjectId
       if (entry === 'phoneContacts') {
         let peerContact = store.state.currentPhoneContact
         subjectId = peerContact.peerId
@@ -225,6 +225,9 @@ export default {
           entry: 'phoneContacts'
         }
       } else {
+        if (!store.preCheck()) {
+          return
+        }
         subjectId = store.state.currentChat.subjectId
         store.state.currentCallChat = store.state.currentChat
       }

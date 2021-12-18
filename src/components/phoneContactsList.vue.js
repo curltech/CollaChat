@@ -91,11 +91,11 @@ export default {
         _that.subKind = 'findContacts'
       }
     },
-    async mediaRequest(type,peerContact){
+    async mediaRequest(type, peerContact) {
       let _that = this
-      let store =_that.$store
+      let store = _that.$store
       store.state.currentPhoneContact = peerContact
-      _that.initiateCallRequest(type,'phoneContacts')
+      _that.initiateCallRequest(type, 'phoneContacts')
     },
     showAddContacts() {
       let _that = this

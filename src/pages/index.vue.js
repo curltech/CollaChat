@@ -1094,70 +1094,72 @@ export default {
     async collectionForwardToChat(item, chat) {
       let _that = this
       let store = _that.$store
-      // put content into attach
-      if (!item.content) {
-        let attachs = await collectionComponent.loadAttach(item, null, null)
-        if (attachs && attachs.length > 0) {
-          item.attachs = attachs
-          item.content = attachs[0].content
-        }
+      if (store.preCheck()) {
+        // put content into attach
         if (!item.content) {
-          item.content = ''
-        }
-      }
-      if (item.collectionType === CollectionType.FILE || item.collectionType === CollectionType.VIDEO || item.collectionType === CollectionType.AUDIO || item.collectionType === CollectionType.IMAGE) {
-        let _content = item.content
-        let name
-        if (item.collectionType !== CollectionType.FILE) {
-          let pat = /\bsrc\b\s*=\s*[\'\"]?([^\'\"]*)[\'\"]?/i
-          let res = _content.match(pat)
-          if (res && res.length > 1) {
-            _content = res[1]
+          let attachs = await collectionComponent.loadAttach(item, null, null)
+          if (attachs && attachs.length > 0) {
+            item.attachs = attachs
+            item.content = attachs[0].content
           }
-        } else {
-          let firstFileInfo = item.firstFileInfo
-          name = firstFileInfo.slice(firstFileInfo.indexOf(' ') + 1, firstFileInfo.length)
+          if (!item.content) {
+            item.content = ''
+          }
         }
-        let fileData = _content
-        let type = item.collectionType
-        await store.saveFileAndSendMessage(chat, fileData, type, name)
-      } else {
-        let message = {}
-        message.title = item.contentTitle
-        if (item.collectionType === ChatContentType.CHAT) {
-          let mergeMessages = JSON.parse(item.plainContent)
-          let firstMessage = mergeMessages[0]
-          message.mergeMessageId = firstMessage.mergeMessageId
-          message.content = store.getChatContent(firstMessage.contentType, firstMessage.content)
-          message.mergeMessages = mergeMessages
-        } else if (item.collectionType === ChatContentType.NOTE) {
-          message.title = item.title
-          message.thumbnail = item.thumbnail
-          message.thumbType = item.thumbType
-          message.attachIVAmount = item.attachIVAmount
-          message.contentIVAmount = item.contentIVAmount
-          message.contentTitle = item.contentTitle
-          message.contentAAmount = item.contentAAmount
-          message.attachAAmount = item.attachAAmount
-          message.attachOAmount = item.attachOAmount
-          message.firstAudioDuration = item.firstAudioDuration
-          message.firstFileInfo = item.firstFileInfo
-          message.contentBody = item.contentBody
-          //message.content = item.content
-          message.srcEntityType = item.srcEntityType
-          message.srcEntityId = item.srcEntityId
-          message.srcEntityName = item.srcEntityName
-          message.messageId = UUID.string(null, null)
+        if (item.collectionType === CollectionType.FILE || item.collectionType === CollectionType.VIDEO || item.collectionType === CollectionType.AUDIO || item.collectionType === CollectionType.IMAGE) {
+          let _content = item.content
+          let name
+          if (item.collectionType !== CollectionType.FILE) {
+            let pat = /\bsrc\b\s*=\s*[\'\"]?([^\'\"]*)[\'\"]?/i
+            let res = _content.match(pat)
+            if (res && res.length > 1) {
+              _content = res[1]
+            }
+          } else {
+            let firstFileInfo = item.firstFileInfo
+            name = firstFileInfo.slice(firstFileInfo.indexOf(' ') + 1, firstFileInfo.length)
+          }
+          let fileData = _content
+          let type = item.collectionType
+          await store.saveFileAndSendMessage(chat, fileData, type, name)
+        } else {
+          let message = {}
+          message.title = item.contentTitle
+          if (item.collectionType === ChatContentType.CHAT) {
+            let mergeMessages = JSON.parse(item.plainContent)
+            let firstMessage = mergeMessages[0]
+            message.mergeMessageId = firstMessage.mergeMessageId
+            message.content = store.getChatContent(firstMessage.contentType, firstMessage.content)
+            message.mergeMessages = mergeMessages
+          } else if (item.collectionType === ChatContentType.NOTE) {
+            message.title = item.title
+            message.thumbnail = item.thumbnail
+            message.thumbType = item.thumbType
+            message.attachIVAmount = item.attachIVAmount
+            message.contentIVAmount = item.contentIVAmount
+            message.contentTitle = item.contentTitle
+            message.contentAAmount = item.contentAAmount
+            message.attachAAmount = item.attachAAmount
+            message.attachOAmount = item.attachOAmount
+            message.firstAudioDuration = item.firstAudioDuration
+            message.firstFileInfo = item.firstFileInfo
+            message.contentBody = item.contentBody
+            //message.content = item.content
+            message.srcEntityType = item.srcEntityType
+            message.srcEntityId = item.srcEntityId
+            message.srcEntityName = item.srcEntityName
+            message.messageId = UUID.string(null, null)
+            message.messageType = P2pChatMessageType.CHAT_LINKMAN
+            await store.saveFileInMessage(chat, message, item.content, item.collectionType, item.title, message.messageId)
+          } else {
+            message.content = item.plainContent
+          }
           message.messageType = P2pChatMessageType.CHAT_LINKMAN
-          await store.saveFileInMessage(chat, message, item.content, item.collectionType, item.title, message.messageId)
-        } else {
-          message.content = item.plainContent
+          message.contentType = item.collectionType
+          console.log(message)
+          await store.sendChatMessage(chat, message)
+          _that.setCurrentChat(chat.subjectId)
         }
-        message.messageType = P2pChatMessageType.CHAT_LINKMAN
-        message.contentType = item.collectionType
-        console.log(message)
-        await store.sendChatMessage(chat, message)
-        _that.setCurrentChat(chat.subjectId)
       }
       if (_that.tab !== 'chat') {
         store.changeTab('chat')
@@ -1762,6 +1764,7 @@ export default {
         let srcMobile = data.srcMobile
         let srcAvatar = data.srcAvatar
         let _id = data.id
+        let blackedMe = data.blackedMe
         for (let linkmanRequest of store.state.linkmanRequests) {
           if (linkmanRequest._id === _id) {
             duplicated = true
@@ -1788,6 +1791,9 @@ export default {
           } else {
             linkmanRequest.status = RequestStatus.RECEIVED
             linkmanRequest.receiveTime = currentTime
+          }
+          if (blackedMe) {
+            linkmanRequest.blackedMe = true
           }
           await contactComponent.insert(ContactDataType.LINKMAN_REQUEST, linkmanRequest, null)
           store.state.linkmanRequests.unshift(linkmanRequest)
@@ -1826,12 +1832,15 @@ export default {
         if (linkman && linkman.status !== LinkmanStatus.REQUESTED) {
           newPayload.receiveTime = currentTime
           newPayload.acceptTime = currentTime
+          if (linkman.status === LinkmanStatus.BLACKED) {
+            newPayload.blackedMe = true
+          }
         } else {
           newPayload.receiveTime = currentTime
         }
         await chatAction.chat(null, newPayload, srcPeerId)
         // 打招呼
-        if (linkman) {
+        if (linkman && linkman.status !== LinkmanStatus.REQUESTED) {
           /*let chat = await store.getChat(srcPeerId)
           let chatMessage = {
             messageType: P2pChatMessageType.CHAT_SYS,
@@ -1845,6 +1854,13 @@ export default {
             type: "info",
             color: "info",
           })*/
+          linkman.droppedMe = false
+          store.state.linkmanMap[srcPeerId] = linkman
+          let linkmanRecord = await contactComponent.get(ContactDataType.LINKMAN, linkman._id)
+          if (linkmanRecord) {
+            linkmanRecord.droppedMe = false
+            await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
+          }
         } else {
           _that.$q.notify({
             message: _that.$i18n.t("Receive contacts request from ") + srcName,
@@ -1856,6 +1872,7 @@ export default {
       } else if (type === ChatMessageType.ADD_LINKMAN_RECEIPT) {
         let acceptTime = data.acceptTime
         let receiveTime = data.receiveTime
+        let blackedMe = data.blackedMe
         if (acceptTime && !receiveTime) {
           // 更新Received状态记录（可能有多条)，不包括群组请求
           let linkmanRequests = await contactComponent.loadLinkmanRequest(
@@ -1968,10 +1985,16 @@ export default {
         if (acceptTime) {
           if (linkman && linkman.status === LinkmanStatus.REQUESTED) {
             linkman.status = LinkmanStatus.EFFECTIVE
+            if (blackedMe === true) {
+              linkman.blackedMe = true
+            }
             store.state.linkmanMap[srcPeerId] = linkman
             let linkmanRecord = await contactComponent.get(ContactDataType.LINKMAN, linkman._id)
             if (linkmanRecord) {
               linkmanRecord.status = LinkmanStatus.EFFECTIVE
+              if (blackedMe === true) {
+                linkmanRecord.blackedMe = true
+              }
               await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
             }
             webrtcPeerPool.create(srcPeerId)
@@ -4436,6 +4459,9 @@ export default {
       payload._id = linkmanRequest._id // 标识重复消息
       payload.message = message
       payload.createDate = currentTime
+      if (linkman && linkman.status === LinkmanStatus.BLACKED) {
+        payload.blackedMe = true
+      }
       await chatAction.chat(null, payload, peerId)
       _that.$q.notify({
         message: _that.$i18n.t("Send contacts request successfully"),

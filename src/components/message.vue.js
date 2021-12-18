@@ -549,7 +549,7 @@ export default {
           mediaUrl = _that.videoUrl
         }
       }
-      if (mediaUrl) {
+      if (mediaUrl && _that.preCheck()) {
         await _that._saveChatMediaFile(mediaUrl)
       }
       _that.captureType = null
@@ -618,6 +618,9 @@ export default {
     audioBlobMessageHandle(blob) {
       let _that = this
       let store = _that.$store
+      if (!_that.preCheck()) {
+        return
+      }
       let audio = new FileReader();
       audio.onload = async function (e) {
         _that.audioUrl = e.target.result;
@@ -873,8 +876,7 @@ export default {
     async uploadMessageFile(file) {
       let _that = this
       let store = _that.$store
-      let peerId = store.state.currentChat.subjectId
-      if (file.size > 2097152*100) { // 2M
+      if (file.size > 2097152 * 100) { // 2M
         _that.$q.notify({
           message: `${_that.$i18n.t("Upload file cannot exceed")} 200M`,
           timeout: 3000,
@@ -883,7 +885,7 @@ export default {
         })
         _that.$refs.messageUpload.reset()
         return
-    }
+      }
       let fileType
       if (file.name) {
         let index = file.name.lastIndexOf(".")
@@ -907,6 +909,9 @@ export default {
     async uploadMessageFilePC(file) {
       let _that = this
       let store = _that.$store
+      if (!_that.preCheck()) {
+        return
+      }
       if (file) {
         await _that.uploadMessageFile(file)
       }
@@ -915,6 +920,9 @@ export default {
     uploadMessageFileMobile(file) {
       let _that = this
       let store = _that.$store
+      if (!_that.preCheck()) {
+        return
+      }
       _that.$nextTick(async () => {
         let messageUpload = document.getElementById('messageUpload')
         if (messageUpload && messageUpload.files) {
@@ -972,42 +980,13 @@ export default {
     async preSend() {
       let _that = this
       let store = _that.$store
-      let editor = _that.$refs.editor
-      let editorContent = store.state.currentChat.tempText
-      if (store.state.currentChat.subjectType === SubjectType.CHAT) {
-        if (store.state.linkmanMap[store.state.currentChat.subjectId].blackedMe) {
-          alert(_that.$i18n.t("You are in your opponent's blacklist."))
-          if (editorContent.substr(editorContent.length - 1, editorContent.length) === '\n') {
-            store.state.currentChat.tempText = editorContent.substr(0, editorContent.length - 1)
-          }
-          return
-        }
-        if (store.state.linkmanMap[store.state.currentChat.subjectId].droppedMe) {
-          alert(_that.$i18n.t("You are no longer your opponent's contacts."))
-          if (editorContent.substr(editorContent.length - 1, editorContent.length) === '\n') {
-            store.state.currentChat.tempText = editorContent.substr(0, editorContent.length - 1)
-          }
-          return
-        }
-      } else if (store.state.currentChat.subjectType === SubjectType.GROUP_CHAT) {
-        let ret = true
-        let groupChat = store.state.groupChatMap[store.state.currentChat.subjectId]
-        if (groupChat && groupChat.groupMembers && groupChat.groupMembers.length > 0) {
-          for (let groupMember of groupChat.groupMembers) {
-            if (groupMember.memberPeerId === myself.myselfPeerClient.peerId) {
-              ret = false
-            }
-          }
-        }
-        if (ret) {
-          alert(_that.$i18n.t('You have been removed from this group chat.'))
-          if (editorContent.substr(editorContent.length - 1, editorContent.length) === '\n') {
-            store.state.currentChat.tempText = editorContent.substr(0, editorContent.length - 1)
-          }
-          return
-        }
+
+      if (!_that.preCheck()) {
+        return
       }
 
+      let editor = _that.$refs.editor
+      let editorContent = store.state.currentChat.tempText
       if (!editorContent || _that.sending) {
         store.state.currentChat.tempText = ''
         setTimeout(function () {
@@ -1039,6 +1018,45 @@ export default {
           }, 100)
         }
       })
+    },
+    preCheck() {
+      let _that = this
+      let store = _that.$store
+      let editorContent = store.state.currentChat.tempText
+      if (store.state.currentChat.subjectType === SubjectType.CHAT) {
+        if (store.state.linkmanMap[store.state.currentChat.subjectId].blackedMe) {
+          alert(_that.$i18n.t("You are in your opponent's blacklist."))
+          if (editorContent && editorContent.substr(editorContent.length - 1, editorContent.length) === '\n') {
+            store.state.currentChat.tempText = editorContent.substr(0, editorContent.length - 1)
+          }
+          return false
+        }
+        if (store.state.linkmanMap[store.state.currentChat.subjectId].droppedMe) {
+          alert(_that.$i18n.t("You are no longer your opponent's contacts."))
+          if (editorContent && editorContent.substr(editorContent.length - 1, editorContent.length) === '\n') {
+            store.state.currentChat.tempText = editorContent.substr(0, editorContent.length - 1)
+          }
+          return false
+        }
+      } else if (store.state.currentChat.subjectType === SubjectType.GROUP_CHAT) {
+        let ret = true
+        let groupChat = store.state.groupChatMap[store.state.currentChat.subjectId]
+        if (groupChat && groupChat.groupMembers && groupChat.groupMembers.length > 0) {
+          for (let groupMember of groupChat.groupMembers) {
+            if (groupMember.memberPeerId === myself.myselfPeerClient.peerId) {
+              ret = false
+            }
+          }
+        }
+        if (ret) {
+          alert(_that.$i18n.t('You have been removed from this group chat.'))
+          if (editorContent && editorContent.substr(editorContent.length - 1, editorContent.length) === '\n') {
+            store.state.currentChat.tempText = editorContent.substr(0, editorContent.length - 1)
+          }
+          return false
+        }
+      }
+      return true
     },
     async recallMessage(message, index) {
       let _that = this
@@ -2401,6 +2419,9 @@ export default {
     async selectedLinkmanCard() {
       let _that = this
       let store = _that.$store
+      if (!_that.preCheck()) {
+        return
+      }
       let linkmans = store.state.includedLinkmans
       for (let linkman of linkmans) {
         let card = {
@@ -2538,7 +2559,6 @@ export default {
             _that.audioBlobMessageHandle(blob)
             _that.stopStream()
           }
-
         } else {
           _that.cancel()
         }
@@ -3193,6 +3213,7 @@ export default {
     store.changeMessageSubKind = function (subKind) {
       _that.subKind = subKind
     }
+    store.preCheck = _that.preCheck
     Vue.prototype.initSearch = function (searchPrefix, searchText, messageResultList) {
       _that.searchPrefix = searchPrefix
       _that.searchText = searchText
