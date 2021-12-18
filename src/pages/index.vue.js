@@ -1714,7 +1714,7 @@ export default {
         if (_that.$q.dark.isActive) {
           statusBarComponent.style(false, '#2d2d2d')
         } else {
-          statusBarComponent.style(true, '#f5f5f5') // grey-2
+          statusBarComponent.style(true, '#eeeeee') // grey-3
         }
       }
     },
@@ -4792,7 +4792,7 @@ export default {
             }
           } else {
             if (_that.kind === 'message') {
-              statusBarComponent.style(true, '#f5f5f5') // grey-2
+              statusBarComponent.style(true, '#eeeeee') // grey-3
             } else {
               statusBarComponent.style(true, '#ffffff')
             }

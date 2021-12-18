@@ -3246,7 +3246,7 @@ export default {
             }
           } else {
             if (val === 'default') {
-              statusBarComponent.style(true, '#f5f5f5') // grey-2
+              statusBarComponent.style(true, '#eeeeee') // grey-3
             } else {
               statusBarComponent.style(true, '#ffffff')
             }
