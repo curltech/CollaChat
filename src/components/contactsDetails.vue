@@ -94,7 +94,9 @@
           q-item-section.text-primary(side) {{ $t('Send Invitation') }}
           q-item-section
         q-separator.c-separator
-        q-item(clickable, v-ripple, @click="$store.gotoChat($store.state.currentLinkman.peerId)")
+        q-item(
+          v-if="$store.state.currentLinkman && !$store.state.currentLinkman.droppedMe",
+          clickable, v-ripple, @click="$store.gotoChat($store.state.currentLinkman.peerId)")
           q-item-section
           q-item-section(side, style="padding-left:0px")
             q-icon(

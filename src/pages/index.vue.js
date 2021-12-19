@@ -1983,17 +1983,29 @@ export default {
           }
         }
         if (acceptTime) {
-          if (linkman && linkman.status === LinkmanStatus.REQUESTED) {
-            linkman.status = LinkmanStatus.EFFECTIVE
-            if (blackedMe === true) {
-              linkman.blackedMe = true
+          if (linkman) {
+            if (linkman.status === LinkmanStatus.REQUESTED) {
+              linkman.status = LinkmanStatus.EFFECTIVE
+              if (blackedMe === true) {
+                linkman.blackedMe = true
+              }
+            } else {
+              if (linkman.droppedMe === true) {
+                linkman.droppedMe = false
+              }
             }
             store.state.linkmanMap[srcPeerId] = linkman
             let linkmanRecord = await contactComponent.get(ContactDataType.LINKMAN, linkman._id)
             if (linkmanRecord) {
-              linkmanRecord.status = LinkmanStatus.EFFECTIVE
-              if (blackedMe === true) {
-                linkmanRecord.blackedMe = true
+              if (linkman.status === LinkmanStatus.REQUESTED) {
+                linkmanRecord.status = LinkmanStatus.EFFECTIVE
+                if (blackedMe === true) {
+                  linkmanRecord.blackedMe = true
+                }
+              } else {
+                if (linkman.droppedMe === true) {
+                  linkmanRecord.droppedMe = false
+                }
               }
               await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
             }
