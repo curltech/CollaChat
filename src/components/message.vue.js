@@ -2384,6 +2384,9 @@ export default {
             store.state.findLinkmanResult = 4
             store.state.findLinkmanTip = ''
             store.findLinkman = linkman
+            if (store.findLinkmans) {
+              store.findLinkmans.splice(0)
+            }
             store.state.findContactsSubKind = 'result'
           } else {
             store.state.findLinkmanResult = 1

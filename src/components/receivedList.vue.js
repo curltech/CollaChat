@@ -25,6 +25,9 @@ export default {
       store.state.findLinkmanTip = ''
       store.findLinkman = linkmanRequest
       store.findLinkman.peerId = linkmanRequest.senderPeerId
+      if (store.findLinkmans) {
+        store.findLinkmans.splice(0)
+      }
       store.state.findContactsSubKind = 'result'
       store.findContactsEntry = 'receivedList'
       _that.subKind = 'findContacts'

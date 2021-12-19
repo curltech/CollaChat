@@ -86,6 +86,9 @@ export default {
           givenName: null,
           tag: null
         }
+        if (store.findLinkmans) {
+          store.findLinkmans.splice(0)
+        }
         store.state.findContactsSubKind = 'result'
         store.findContactsEntry = 'phoneContactsList'
         _that.subKind = 'findContacts'
