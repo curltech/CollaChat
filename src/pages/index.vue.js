@@ -1984,13 +1984,14 @@ export default {
         }
         if (acceptTime) {
           if (linkman) {
+            let droppedMe = linkman.droppedMe
             if (linkman.status === LinkmanStatus.REQUESTED) {
               linkman.status = LinkmanStatus.EFFECTIVE
               if (blackedMe === true) {
                 linkman.blackedMe = true
               }
             } else {
-              if (linkman.droppedMe === true) {
+              if (droppedMe === true) {
                 linkman.droppedMe = false
               }
             }
@@ -2003,7 +2004,7 @@ export default {
                   linkmanRecord.blackedMe = true
                 }
               } else {
-                if (linkman.droppedMe === true) {
+                if (droppedMe === true) {
                   linkmanRecord.droppedMe = false
                 }
               }
