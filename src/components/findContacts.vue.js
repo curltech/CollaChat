@@ -111,6 +111,7 @@ export default {
       let store = _that.$store
       let val = store.state.findLinkmanData.peerId
       if (val && val.length > 0 && _that.validate(val)) {
+        store.findContactsEntry = ''
         store.findContacts(null, null)
       }
     },

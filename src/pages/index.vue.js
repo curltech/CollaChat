@@ -2116,7 +2116,7 @@ export default {
           console.log(e)
         }
         if (!messageString) {
-          console.log("signal deceypt failed")
+          console.log("signal decrypt failed")
           return
         }
         message = JSON.parse(messageString)
@@ -2138,28 +2138,24 @@ export default {
             }
           }
           if (!currentMes) {
-            let messages = await chatComponent.loadMessage(
-              {
-                ownerPeerId: myselfPeerClient.peerId,
-                messageId: message.preMessageId,
-              })
+            let messages = await chatComponent.loadMessage({
+              ownerPeerId: myselfPeerClient.peerId,
+              messageId: message.preMessageId
+            })
             if (messages && messages.length > 0) {
               currentMes = messages[0]
             }
           } else {
-            currentMes.actualReceiveTime = message.receiveTime
             currentMes = await chatComponent.get(ChatDataType.MESSAGE, currentMes._id)
           }
           currentMes.actualReceiveTime = message.receiveTime
           await chatComponent.update(ChatDataType.MESSAGE, currentMes, null)
-
         } else {
-          let receives = await chatComponent.loadReceive(
-            {
-              ownerPeerId: myselfPeerClient.peerId,
-              messageId: message.preMessageId,
-              receiverPeerId: message.senderPeerId
-            })
+          let receives = await chatComponent.loadReceive({
+            ownerPeerId: myselfPeerClient.peerId,
+            messageId: message.preMessageId,
+            receiverPeerId: message.senderPeerId
+          })
           if (receives && receives.length > 0) {
             receives[0].receiveTime = message.receiveTime
             await chatComponent.update(ChatDataType.RECEIVE, receives[0], null)
@@ -2172,7 +2168,6 @@ export default {
             _message.actualReceiveTime = message.receiveTime
           }
         }
-
       }
       else if (messageType === P2pChatMessageType.SYNC_LINKMAN_INFO && content) {
         // 更新联系人信息
