@@ -54,8 +54,9 @@
                     span(v-if="chat.tempText && chat !== $store.state.currentChat"  style="color:red") {{`[${$t('Draft')}] `}}
                     span {{ chat.tempText && chat !== $store.state.currentChat ? chat.tempText : ChatContent(chat) }}
                 q-item-section(side top style="padding-left:0px")
-                  q-icon(size="16px" v-if="$store.displayConnected" name="person" :color="activeStatus(chat) ? 'secondary' : 'c-grey'")
-                    q-icon(size="16px" name="notifications_off" v-if="alertStatus(chat)")
+                  q-icon(v-if="$store.displayActiveStatus" size="16px" name="person" :color="activeStatus(chat) ? 'secondary' : 'c-grey'")
+                    q-icon(v-if="alertStatus(chat)" size="16px" name="notifications_off")
+                  q-icon(v-if="!$store.displayActiveStatus && alertStatus(chat)" size="16px" name="notifications_off")
                   q-item-label(caption lines="1" style="padding-top:7px") {{ ChatUpdateTime(chat.updateTime) }}
                 //q-menu(touch-position context-menu)
                   q-list(dense)
@@ -82,7 +83,7 @@
                       img(:src="linkman.avatar ? linkman.avatar : $store.defaultActiveAvatar")
                 q-item-section
                   q-item-label(v-html="linkman.highlightingGivenName ? linkman.highlightingGivenName : (linkman.givenName ? linkman.givenName : (linkman.highlightingName ? linkman.highlightingName : linkman.name))")
-                    q-icon(class="q-pl-sm" name="person"  v-if="$store.displayConnected" :color="linkman.activeStatus === ActiveStatus.UP ? 'secondary' : 'c-grey'")
+                    q-icon(v-if="$store.displayActiveStatus" class="q-pl-sm" name="person" :color="linkman.activeStatus === ActiveStatus.UP ? 'secondary' : 'c-grey'")
                   q-item-label(v-if="linkman.highlighting" caption v-html="linkman.highlighting")
                 q-item-section(avatar)
                   q-icon(color="primary" :name="linkman.locked ? 'lock' : ''")
@@ -104,7 +105,7 @@
                   groupAvatar(v-bind:group_members="groupChat.groupMembers" v-bind:avatar_width="40")
                 q-item-section
                   q-item-label(v-html="groupChat.highlightingGivenName ? groupChat.highlightingGivenName : (groupChat.givenName ? groupChat.givenName : (groupChat.highlightingName ? groupChat.highlightingName : groupChat.name))")
-                    q-icon(class="q-pl-sm" name="person" :color="groupChat && groupChat.activeStatus === ActiveStatus.UP ? 'secondary' : 'c-grey'")
+                    q-icon(v-if="$store.displayActiveStatus" class="q-pl-sm" name="person" :color="groupChat && groupChat.activeStatus === ActiveStatus.UP ? 'secondary' : 'c-grey'")
                   q-item-label(v-if="groupChat.highlighting" caption v-html="groupChat.highlighting")
             q-item(v-if="searchResult === 'allResult' && groupChatResultList && groupChatResultList.length > 3" clickable v-ripple class="text-c-grey-10" @click="groupChatResult()")
               q-item-section(side)
@@ -129,8 +130,9 @@
                   q-item-label(lines="1") {{ ChatName(chat) }}
                   q-item-label(caption lines="1") {{ chat.messageResultList.length + ' ' + $t(' relevant chat records') }}
                 q-item-section(side top style="padding-left:0px")
-                  q-icon(size="16px" name="person"  v-if="$store.displayConnected" :color="activeStatus(chat) ? 'secondary' : 'c-grey'")
-                    q-icon(size="16px" name="notifications_off" v-if="alertStatus(chat)")
+                  q-icon(v-if="$store.displayActiveStatus" size="16px" name="person" :color="activeStatus(chat) ? 'secondary' : 'c-grey'")
+                    q-icon(v-if="alertStatus(chat)" size="16px" name="notifications_off")
+                  q-icon(v-if="!$store.displayActiveStatus && alertStatus(chat)" size="16px" name="notifications_off")
                   q-item-label(caption lines="1" style="padding-top:7px") {{ ChatUpdateTime(chat.updateTime) }}
             q-item(v-if="searchResult === 'allResult' && chatResultList && chatResultList.length > 3" clickable v-ripple class="text-c-grey-10" @click="chatResult()")
               q-item-section(side)

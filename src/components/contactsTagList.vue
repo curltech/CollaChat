@@ -38,7 +38,7 @@
                   img(:src="linkman.avatar ? linkman.avatar : $store.defaultActiveAvatar")
               q-item-section(@click="showContacts(linkman, index)")
                 q-item-label {{ linkman.givenName ? linkman.givenName : linkman.name }}
-                  q-icon(name="person" :color="linkman.activeStatus === ActiveStatus.UP ? 'secondary' : 'c-grey'")
+                  q-icon(v-if="$store.displayActiveStatus" name="person" :color="linkman.activeStatus === ActiveStatus.UP ? 'secondary' : 'c-grey'")
               q-item-section(side)
                 q-btn.text-primary(dense round flat icon="remove_circle_outline" @click="removeLinkmanTagLinkman(linkman)")
             q-separator.c-separator(style="margin-left:16px;width:calc(100% - 16px)" v-if="index < $store.state.linkmans.length - 1")

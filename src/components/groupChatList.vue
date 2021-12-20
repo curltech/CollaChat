@@ -16,7 +16,7 @@
                 groupAvatar(v-bind:group_members="groupChat.groupMembers" v-bind:avatar_width="66")
               q-item-section
                   q-item-label {{ ChatName(groupChat) }}
-                    q-icon(class="q-pl-sm" name="person" :color="groupChat && groupChat.activeStatus === ActiveStatus.UP ? 'secondary' : 'c-grey'")
+                    q-icon(v-if="$store.displayActiveStatus" class="q-pl-sm" name="person" :color="groupChat && groupChat.activeStatus === ActiveStatus.UP ? 'secondary' : 'c-grey'")
                   //q-item-label(caption, lines="1") {{ $t('Name: ') + (groupChat.name ? groupChat.name : '') }}
                   q-item-label(caption lines="5") {{ $t('Description: ') + (groupChat.description ? groupChat.description : '') }}
                   //q-item-label(caption lines="5") {{ $t('Tag: ') + (groupChat.tag ? groupChat.tag : '') }}
@@ -36,7 +36,7 @@
                 groupAvatar(v-bind:group_members="groupChat.groupMembers" v-bind:avatar_width="66")
               q-item-section
                   q-item-label {{ ChatName(groupChat) }}
-                    q-icon(class="q-pl-sm" name="person" :color="groupChat && groupChat.activeStatus === ActiveStatus.UP ? 'secondary' : 'c-grey'")
+                    q-icon(v-if="$store.displayActiveStatus" class="q-pl-sm" name="person" :color="groupChat && groupChat.activeStatus === ActiveStatus.UP ? 'secondary' : 'c-grey'")
                   //q-item-label(caption, lines="1") {{ $t('Name: ') + (groupChat.name ? groupChat.name : '') }}
                   q-item-label(caption lines="5") {{ $t('Description: ') + (groupChat.description ? groupChat.description : '') }}
                   //q-item-label(caption lines="5") {{ $t('Tag: ') + (groupChat.tag ? groupChat.tag : '') }}

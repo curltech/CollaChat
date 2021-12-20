@@ -83,7 +83,7 @@
                                     img(:src="($store.state.linkmanMap[memberPeerId] && $store.state.linkmanMap[memberPeerId].avatar) ? $store.state.linkmanMap[memberPeerId].avatar : $store.defaultActiveAvatar"  @click="iosGroupVideoFocus(memberPeerId)")
                                 q-item(style="justify-content: center;" v-if="$store.state.currentCallChat.callType != 'video'")
                                     span {{getName(memberPeerId)}}
-                                    q-icon(size="20px" name="person" :color="$store.state.currentCallChat.streamMap && $store.state.currentCallChat.streamMap[memberPeerId] ? 'secondary' : 'c-grey'")
+                                    q-icon(v-if="$store.displayActiveStatus" size="20px" name="person" :color="$store.state.currentCallChat.streamMap && $store.state.currentCallChat.streamMap[memberPeerId] ? 'secondary' : 'c-grey'")
                             q-item-section.call-pending-section(v-if = '$store.state.currentCallChat.streamMap && $store.state.currentCallChat.streamMap[memberPeerId] && $store.state.currentCallChat.streamMap[memberPeerId].pending')
                                 q-spinner-dots(size="2rem")
                             q-item-section(v-if="Platform.is.ios && $store.state.currentCallChat.streamMap && $store.state.currentCallChat.streamMap[memberPeerId] && $store.state.currentCallChat.streamMap[memberPeerId].focus" style="position:fixed;width:100vw;z-index:99;height:100vh;background:#FFF;left:0;")

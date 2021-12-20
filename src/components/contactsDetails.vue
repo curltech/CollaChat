@@ -35,7 +35,7 @@
                 )
           q-item-section
             q-item-label.text-h6 {{ $store.state.currentLinkman ? ($store.state.currentLinkman.givenName ? $store.state.currentLinkman.givenName : $store.state.currentLinkman.name) : '' }}
-              q-icon(
+              q-icon(v-if="$store.displayActiveStatus",
                 name="person",
                 :color="$store.state.currentLinkman && $store.state.currentLinkman.activeStatus === ActiveStatus.UP ? 'secondary' : 'c-grey'"
               )
@@ -196,7 +196,7 @@
               )
             q-item-section
               q-item-label {{ groupChat.givenName ? groupChat.givenName : (groupChat.name ? groupChat.name : '') }}
-                q-icon(class="q-pl-sm" name="person" :color="groupChat && groupChat.activeStatus === ActiveStatus.UP ? 'secondary' : 'c-grey'")
+                q-icon(v-if="$store.displayActiveStatus" class="q-pl-sm" name="person" :color="groupChat && groupChat.activeStatus === ActiveStatus.UP ? 'secondary' : 'c-grey'")
               q-item-label(caption, lines="1") {{ $t('Name: ') + (groupChat.name ? groupChat.name : '') }}
               q-item-label(caption, lines="5") {{ $t('Description: ') + (groupChat.description ? groupChat.description : '') }}
               //q-item-label(caption, lines="5") {{ $t('Tag: ') + (groupChat.tag ? groupChat.tag : '') }}

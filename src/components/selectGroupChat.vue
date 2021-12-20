@@ -26,7 +26,7 @@
             groupAvatar(v-bind:group_members="groupChat.groupMembers" v-bind:avatar_width="40")
           q-item-section
             q-item-label {{$store.getChatName(SubjectType.GROUP_CHAT,groupChat.groupId)}}
-              q-icon(name="person" :color="groupChat.activeStatus === ActiveStatus.UP ? 'secondary' : 'c-grey'")
+              q-icon(v-if="$store.displayActiveStatus" name="person" :color="groupChat.activeStatus === ActiveStatus.UP ? 'secondary' : 'c-grey'")
           q-item-section(avatar)
             q-icon(color="primary" :name="groupChat.locked ? 'lock' : ''")
         q-separator.c-separator(inset="item" v-if="index < SelectGroupChatFilteredList.length - 1")

@@ -4485,9 +4485,6 @@ export default {
     window.store = store
     console.log('screen.availWidth:' + screen.availWidth + ',screen.availHeight:' + screen.availHeight + ',window.devicePixelRatio:' + window.devicePixelRatio)
     store.screenHeight = _that.$q.screen.height
-    store.ifMobile = function () {
-      return window.device && (window.device.platform === 'Android' || window.device.platform === 'iOS')
-    }
     if (window.device) {
       document.addEventListener('deviceready', async function () {
         if (window.device.platform === 'Android') {
@@ -4626,7 +4623,7 @@ export default {
       store.collectionWorkerEnabler = false
     }
     store.useNativeAndroid = false // 是否使用Android原生拍照、拍摄、相册等功能
-    store.displayConnected = true //是否展示好友在线状态
+    store.displayActiveStatus = true // 是否显示在线状态
     let linkmanRequestDBItems = await contactComponent.loadLinkmanRequest({
       ownerPeerId: myself.myselfPeerClient.peerId,
       requestType: RequestType.ADD_LINKMAN,

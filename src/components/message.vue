@@ -96,7 +96,7 @@
               q-btn(dense flat round @click="showContacts($store.state.currentChat.subjectId)")
                 q-avatar(size="56px")
                   img(:src="$store.state.currentChat && $store.state.linkmanMap[$store.state.currentChat.subjectId] ? ($store.state.linkmanMap[$store.state.currentChat.subjectId].avatar ? $store.state.linkmanMap[$store.state.currentChat.subjectId].avatar : $store.defaultActiveAvatar) : null")
-              q-icon(size="16px" name="person" :color="$store.state.currentChat && $store.state.linkmanMap[$store.state.currentChat.subjectId] && $store.state.linkmanMap[$store.state.currentChat.subjectId].activeStatus === ActiveStatus.UP ? 'secondary' : 'grey-1'")
+              q-icon(v-if="$store.displayActiveStatus" size="16px" name="person" :color="$store.state.currentChat && $store.state.linkmanMap[$store.state.currentChat.subjectId] && $store.state.linkmanMap[$store.state.currentChat.subjectId].activeStatus === ActiveStatus.UP ? 'secondary' : 'grey-1'")
             q-item-section(avatar)
               q-btn.text-primary(dense flat round size="28px" icon="add" @click="showAddGroupChatAndMember")
           q-separator.c-separator(style="height:8px;margin-left:0px;margin-right:0px")
@@ -147,21 +147,21 @@
             q-item-section(avatar v-for="(groupChatMember, index) in ($store.state.groupChatMap[$store.state.currentChat.subjectId] ? $store.state.groupChatMap[$store.state.currentChat.subjectId].groupMembers : [])" v-if="groupChatMember.memberType === MemberType.OWNER && groupChatMember.memberPeerId === $store.state.myselfPeerClient.peerId" :key="groupChatMember.memberPeerId") {{$store.state.myselfPeerClient.name}}
               q-avatar(size="56px")
                 img(:src="$store.state.myselfPeerClient.avatar ? $store.state.myselfPeerClient.avatar : $store.defaultActiveAvatar")
-              q-icon(size="16px" name="person" color="secondary")
+              q-icon(v-if="$store.displayActiveStatus" size="16px" name="person" color="secondary")
             q-item-section(avatar v-for="(groupChatMember, index) in ($store.state.groupChatMap[$store.state.currentChat.subjectId] ? $store.state.groupChatMap[$store.state.currentChat.subjectId].groupMembers : [])" v-if="groupChatMember.memberType === MemberType.OWNER && groupChatMember.memberPeerId !== $store.state.myselfPeerClient.peerId" :key="groupChatMember.memberPeerId") {{ groupChatMemberName(groupChatMember) }}
               q-btn(dense flat round @click="showContacts(groupChatMember.memberPeerId)")
                 q-avatar(size="56px")
                   img(:src="groupChatMemeberAvatar(groupChatMember)")
-              q-icon(size="16px" name="person" :color="groupChatMember.memberPeerId === $store.state.myselfPeerClient.peerId || ($store.state.linkmanMap[groupChatMember.memberPeerId] && $store.state.linkmanMap[groupChatMember.memberPeerId].activeStatus === ActiveStatus.UP) ? 'secondary' : 'grey-1'")
+              q-icon(v-if="$store.displayActiveStatus" size="16px" name="person" :color="groupChatMember.memberPeerId === $store.state.myselfPeerClient.peerId || ($store.state.linkmanMap[groupChatMember.memberPeerId] && $store.state.linkmanMap[groupChatMember.memberPeerId].activeStatus === ActiveStatus.UP) ? 'secondary' : 'grey-1'")
             q-item-section(avatar v-for="(groupChatMember, index) in ($store.state.groupChatMap[$store.state.currentChat.subjectId] ? $store.state.groupChatMap[$store.state.currentChat.subjectId].groupMembers : [])" v-if="groupChatMember.memberType !== MemberType.OWNER && groupChatMember.memberPeerId === $store.state.myselfPeerClient.peerId" :key="groupChatMember.memberPeerId") {{$store.state.myselfPeerClient.name}}
               q-avatar(size="56px")
                 img(:src="$store.state.myselfPeerClient.avatar ? $store.state.myselfPeerClient.avatar : $store.defaultActiveAvatar")
-              q-icon(size="16px" name="person" color="secondary")
+              q-icon(v-if="$store.displayActiveStatus" size="16px" name="person" color="secondary")
             q-item-section(avatar v-for="(groupChatMember, index) in ($store.state.groupChatMap[$store.state.currentChat.subjectId] ? $store.state.groupChatMap[$store.state.currentChat.subjectId].groupMembers : [])" v-if="groupChatMember.memberType !== MemberType.OWNER && groupChatMember.memberPeerId !== $store.state.myselfPeerClient.peerId" :key="groupChatMember.memberPeerId") {{ groupChatMemberName(groupChatMember) }}
               q-btn(dense flat round @click="showContacts(groupChatMember.memberPeerId)")
                 q-avatar(size="56px")
                   img(:src="groupChatMemeberAvatar(groupChatMember)")
-              q-icon(size="16px" name="person" :color="$store.state.linkmanMap[groupChatMember.memberPeerId] && $store.state.linkmanMap[groupChatMember.memberPeerId].activeStatus === ActiveStatus.UP ? 'secondary' : 'grey-1'")
+              q-icon(v-if="$store.displayActiveStatus" size="16px" name="person" :color="$store.state.linkmanMap[groupChatMember.memberPeerId] && $store.state.linkmanMap[groupChatMember.memberPeerId].activeStatus === ActiveStatus.UP ? 'secondary' : 'grey-1'")
             q-item-section(avatar v-if="ifIAmGroupOwner($store.state.currentChat)")
               q-btn.text-primary(dense flat round size="28px" icon="add" @click="showAddGroupChatMember")
             q-item-section(avatar v-if="ifIAmGroupOwner($store.state.currentChat)")
@@ -380,7 +380,7 @@
                   img(:src="groupChatMember.avatar ? groupChatMember.avatar : $store.defaultActiveAvatar")
               q-item-section
                 q-item-label {{ groupChatMember.name }}
-                  q-icon(name="person" :color="groupChatMember.activeStatus === ActiveStatus.UP ? 'secondary' : 'grey-1'")
+                  q-icon(v-if="$store.displayActiveStatus" name="person" :color="groupChatMember.activeStatus === ActiveStatus.UP ? 'secondary' : 'grey-1'")
               q-item-section(avatar)
                 q-icon(color="c-grey-10" :name="groupChatMember.locked ? 'lock' : ''")
             q-separator.c-separator(inset="item" v-if="index < GroupChatMemberFilteredList.length - 1")

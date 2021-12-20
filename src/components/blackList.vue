@@ -20,7 +20,7 @@
                   img(:src="linkman.avatar ? linkman.avatar : $store.defaultActiveAvatar")
               q-item-section
                 q-item-label {{ linkman.givenName ? linkman.givenName : linkman.name }}
-                  q-icon(name="person" :color="linkman.activeStatus === ActiveStatus.UP ? 'secondary' : 'c-grey'")
+                  q-icon(v-if="$store.displayActiveStatus" name="person" :color="linkman.activeStatus === ActiveStatus.UP ? 'secondary' : 'c-grey'")
               //q-item-section
                 q-item-label(caption lines="1") {{ $t('JoinTime: ') + date.formatDate(linkman.statusDate, 'YYYY-MM-DD HH:mm:ss') }}
               //q-item-section(side)

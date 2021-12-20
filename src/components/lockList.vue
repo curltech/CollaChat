@@ -19,7 +19,7 @@
                   img(:src="linkman.avatar ? linkman.avatar : $store.defaultActiveAvatar")
               q-item-section
                 q-item-label {{ linkman.givenName ? linkman.givenName : linkman.name }}
-                  q-icon(name="person" :color="linkman.activeStatus === ActiveStatus.UP ? 'secondary' : 'c-grey'")
+                  q-icon(v-if="$store.displayActiveStatus" name="person" :color="linkman.activeStatus === ActiveStatus.UP ? 'secondary' : 'c-grey'")
               q-item-section(avatar)
                 q-icon(color="c-grey-7" :name="linkman.locked ? 'lock' : ''")
               //q-item-section(side)

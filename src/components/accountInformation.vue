@@ -53,7 +53,7 @@
                   q-icon(:name="$store.state.myselfPeerClient.clientDevice === 'DESKTOP' ? 'desktop_windows' : 'smartphone'")
               q-item-section
                 q-item-label(caption lines="1") {{ $t('Id: ') + $store.state.myselfPeerClient.clientId }}
-                  q-icon(class="q-pl-sm" name="person" color="secondary")
+                  q-icon(v-if="$store.displayActiveStatus" class="q-pl-sm" name="person" color="secondary")
                 q-item-label(caption lines="1") {{ $t('Device: ') + $store.state.myselfPeerClient.clientType }}
                 q-item-label(caption lines="1") {{ $t('LastAccessTime: ') + date.formatDate($store.state.myselfPeerClient.lastAccessTime, 'YYYY-MM-DD HH:mm:ss') }}
                 q-item-label(caption lines="1") {{ $t('LastAccessNode: ') + $store.getAddressLabel($store.state.myselfPeerClient.connectPeerId) }}
@@ -64,7 +64,7 @@
                   q-icon(:name="peerClient.clientDevice === 'DESKTOP' ? 'desktop_windows' : 'smartphone'")
               q-item-section
                 q-item-label(caption lines="1") {{ $t('Id: ') + peerClient.clientId }}
-                  q-icon(class="q-pl-sm" name="person" :color="peerClient.clientDevice === $store.state.myselfPeerClient.clientDevice ? 'c-grey' : (peerClient.activeStatus === 'Up' ? 'secondary' : 'c-grey')")
+                  q-icon(v-if="$store.displayActiveStatus" class="q-pl-sm" name="person" :color="peerClient.clientDevice === $store.state.myselfPeerClient.clientDevice ? 'c-grey' : (peerClient.activeStatus === 'Up' ? 'secondary' : 'c-grey')")
                 q-item-label(caption lines="1") {{ $t('Device: ') + peerClient.clientType }}
                 q-item-label(caption lines="1") {{ $t('LastAccessTime: ') + date.formatDate(peerClient.lastAccessTime, 'YYYY-MM-DD HH:mm:ss') }}
                 q-item-label(caption lines="1") {{ $t('LastAccessNode: ') + $store.getAddressLabel(peerClient.connectPeerId) }}

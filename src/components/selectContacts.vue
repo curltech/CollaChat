@@ -28,7 +28,7 @@
               img(:src="selectLinkman.avatar ? selectLinkman.avatar : $store.defaultActiveAvatar")
           q-item-section
             q-item-label {{ selectLinkman.givenName ? selectLinkman.givenName : selectLinkman.name }}
-              q-icon(name="person" :color="selectLinkman.activeStatus === ActiveStatus.UP ? 'secondary' : 'c-grey'")
+              q-icon(v-if="$store.displayActiveStatus" name="person" :color="selectLinkman.activeStatus === ActiveStatus.UP ? 'secondary' : 'c-grey'")
           q-item-section(avatar)
             q-icon(color="primary" :name="selectLinkman.locked ? 'lock' : ''")
         //q-separator.c-separator(inset="item" v-if="index < SelectLinkmanFilteredList.length - 1")

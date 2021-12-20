@@ -55,7 +55,7 @@
             groupAvatar(v-if="chat.subjectType === SubjectType.GROUP_CHAT" v-bind:group_members="$store.state.groupChatMap[chat.subjectId].groupMembers" v-bind:avatar_width="40")
           q-item-section
             q-item-label {{ ChatName(chat) }}
-              q-icon(name="person" :color="chat.activeStatus === ActiveStatus.UP ? 'secondary' : 'c-grey'")
+              q-icon(v-if="$store.displayActiveStatus" name="person" :color="chat.activeStatus === ActiveStatus.UP ? 'secondary' : 'c-grey'")
         //q-separator.c-separator(inset="item" v-if="index < SelectChatFilteredList.length - 1")
         //q-separator.c-separator(v-if="index === SelectChatFilteredList.length - 1")
 </template>
