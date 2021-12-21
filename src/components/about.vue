@@ -37,21 +37,21 @@
                   q-icon.text-primary(name="send")
                 q-item-label(header) {{$t('Contact Us')}}
               q-separator.c-separator
-              //q-item
+              q-item
                 q-item-section
                   q-item-label {{$t('Peer Id')}}
-                  q-item-label(caption lines="1") {{collaPeerId}}
+                  q-item-label(caption lines="3" style="word-break:break-all") {{collaPeerId}}
                 q-item-section(side style="padding-left:0px")
                   q-btn(flat dense round color="primary" icon="content_copy" v-clipboard:copy="collaPeerId" v-clipboard:success="onCopySuccess" v-clipboard:error="onCopyFailure")
-              //q-separator.c-separator
-              //q-item(clickable v-ripple @click="enterQRCode")
+              q-separator.c-separator
+              q-item(clickable v-ripple @click="enterQRCode")
                 q-item-section
                   q-item-label {{$t('QR Code')}}
                 q-item-section(avatar)
                   q-icon(color="primary" name="qr_code")
                 q-item-section(side)
                   q-icon(name="keyboard_arrow_right")
-              //q-separator.c-separator
+              q-separator.c-separator
               q-item(clickable v-ripple @click="")
                 q-item-section
                   q-item-label {{$t('Website')}}

@@ -13,7 +13,7 @@ export default {
       subKind: 'default',
       collaPeerId: '12D3KooWRhVM5JJSbjwyiA3MNJyzpMaZ21wPshtmRYW8TdxvTJ5S',
       github: 'https://github.com/curltech',
-      website: 'https://curltech.io'
+      website: 'https://curltech.io/#/curltech'
     }
   },
   computed: {
