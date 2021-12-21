@@ -2779,11 +2779,13 @@ export default {
         let linkman = store.state.linkmanMap[peerId]
         if (linkman) {
           linkman.droppedMe = true
+          linkman.blackedMe = false
           store.state.linkmanMap[peerId] = linkman
           _that.$forceUpdate()
           let linkmanRecord = await contactComponent.get(ContactDataType.LINKMAN, linkman._id)
           if (linkmanRecord) {
             linkmanRecord.droppedMe = true
+            linkmanRecord.blackedMe = false
             await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
           }
         }
