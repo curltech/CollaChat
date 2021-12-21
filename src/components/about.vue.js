@@ -11,7 +11,7 @@ export default {
   data() {
     return {
       subKind: 'default',
-      collaPeerId: '12D3KooWRhVM5JJSbjwyiA3MNJyzpMaZ21wPshtmRYW8TdxvTJ5S',
+      collaPeerId: '12D3KooWHUhUiB7TxH4qVUhjBusTJoxnxzYvnVWLSoewcEThUT1B',
       github: 'https://github.com/curltech',
       website: 'https://curltech.io/#/curltech'
     }
