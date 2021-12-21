@@ -1984,8 +1984,9 @@ export default {
         }
         if (acceptTime) {
           if (linkman) {
+            let status = linkman.status
             let droppedMe = linkman.droppedMe
-            if (linkman.status === LinkmanStatus.REQUESTED) {
+            if (status === LinkmanStatus.REQUESTED) {
               linkman.status = LinkmanStatus.EFFECTIVE
               if (blackedMe === true) {
                 linkman.blackedMe = true
@@ -1998,7 +1999,7 @@ export default {
             store.state.linkmanMap[srcPeerId] = linkman
             let linkmanRecord = await contactComponent.get(ContactDataType.LINKMAN, linkman._id)
             if (linkmanRecord) {
-              if (linkman.status === LinkmanStatus.REQUESTED) {
+              if (status === LinkmanStatus.REQUESTED) {
                 linkmanRecord.status = LinkmanStatus.EFFECTIVE
                 if (blackedMe === true) {
                   linkmanRecord.blackedMe = true
