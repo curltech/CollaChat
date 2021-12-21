@@ -251,7 +251,7 @@ export default {
       store.state.noteMessageDialog = true
     },
     avatarClick(mouseEvent, message) {
-      if (this.entry === 'message' && mouseEvent.path[0].getAttribute("class") && mouseEvent.path[0].getAttribute("class").indexOf('q-message-avatar') > -1) {
+      if (this.entry === 'message' && mouseEvent.target && mouseEvent.target.getAttribute("class") && mouseEvent.target.getAttribute("class").indexOf('q-message-avatar') > -1) {
         this.showContacts(message.senderPeerId)
       }
     },

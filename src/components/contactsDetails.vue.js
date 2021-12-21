@@ -1,6 +1,6 @@
 import { date } from 'quasar'
 
-import { myself, chatAction } from 'libcolla'
+import { myself, chatAction, webrtcPeerPool } from 'libcolla'
 import { ChatMessageType } from 'libcolla'
 import { CollaUtil, BlobUtil } from 'libcolla'
 import { EntityState } from 'libcolla'
@@ -357,8 +357,7 @@ export default {
       await store.saveAndSendMessage(message, store.state.currentLinkman)
 
       //todo setupRTC
-      // webrtcComponent.resetFlag = false
-      // webrtcComponent.closeDataChannel(currentLinkmanPeerId)
+      webrtcPeerPool.remove(currentLinkmanPeerId)
       // 删除聊天记录
       let messages = await chatComponent.loadMessage({
         ownerPeerId: myselfPeerClient.peerId,
