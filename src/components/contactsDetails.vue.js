@@ -357,7 +357,7 @@ export default {
       await store.saveAndSendMessage(message, store.state.currentLinkman)
 
       //todo setupRTC
-      webrtcPeerPool.remove(currentLinkmanPeerId)
+      webrtcPeerPool.clearPeer(currentLinkmanPeerId)
       // 删除聊天记录
       let messages = await chatComponent.loadMessage({
         ownerPeerId: myselfPeerClient.peerId,
