@@ -392,9 +392,11 @@ export default {
       if (_that.ifMobileSize || store.state.ifMobileStyle) {
         store.toggleDrawer(false)
         store.state.currentLinkman = null
+        store.state.currentChat = null
       } else {
         store.changeKind('receivedList')
         store.state.currentLinkman = null
+        store.state.currentChat = null
       }
     },
     async removeGroupChatMember(groupChat, selectedGroupChatMembers) {

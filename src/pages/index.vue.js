@@ -3135,15 +3135,15 @@ export default {
         }
         // 更新lastConnectTime
         linkman.lastConnectTime = currentTime
-        let linkmen = await contactComponent.loadLinkman({
+        let lks = await contactComponent.loadLinkman({
           ownerPeerId: myselfPeerClient.peerId,
           peerId: peerId
         })
-        if (linkmen && linkmen.length > 0) {
-          for (let linkman of linkmen) {
-            linkman.lastConnectTime = currentTime
+        if (lks && lks.length > 0) {
+          for (let lk of lks) {
+            lk.lastConnectTime = currentTime
           }
-          await contactComponent.update(ContactDataType.LINKMAN, linkmen, null)
+          await contactComponent.update(ContactDataType.LINKMAN, lks, null)
         }
         console.log('activeStatus => Down, peerId:' + peerId)
         if (_that.pendingCall && store.state.currentCallChat && store.state.currentCallChat.streamMap && store.state.currentCallChat.streamMap[peerId]) {

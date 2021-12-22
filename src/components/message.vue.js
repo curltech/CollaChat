@@ -1024,15 +1024,15 @@ export default {
       let store = _that.$store
       let editorContent = store.state.currentChat.tempText
       if (store.state.currentChat.subjectType === SubjectType.CHAT) {
-        if (store.state.linkmanMap[store.state.currentChat.subjectId].droppedMe) {
-          alert(_that.$i18n.t("You are no longer your opponent's contacts."))
+        if (store.state.linkmanMap[store.state.currentChat.subjectId].blackedMe === true) {
+          alert(_that.$i18n.t("You are in your opponent's blacklist."))
           if (editorContent && editorContent.substr(editorContent.length - 1, editorContent.length) === '\n') {
             store.state.currentChat.tempText = editorContent.substr(0, editorContent.length - 1)
           }
           return false
         }
-        if (store.state.linkmanMap[store.state.currentChat.subjectId].blackedMe) {
-          alert(_that.$i18n.t("You are in your opponent's blacklist."))
+        if (store.state.linkmanMap[store.state.currentChat.subjectId].droppedMe === true) {
+          alert(_that.$i18n.t("You are no longer your opponent's contacts."))
           if (editorContent && editorContent.substr(editorContent.length - 1, editorContent.length) === '\n') {
             store.state.currentChat.tempText = editorContent.substr(0, editorContent.length - 1)
           }
