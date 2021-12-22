@@ -1826,7 +1826,7 @@ export default {
           }*/
         }
         let newPayload = {}
-        newPayload.type = ChatMessageType.ADD_LINKMAN_RECEIPT
+        newPayload.type = ChatMessageType.ADD_LINKMAN_REPLY
         newPayload.srcClientId = myselfPeerClient.clientId
         newPayload.srcPeerId = clientPeerId
         if (linkman && linkman.status !== LinkmanStatus.REQUESTED) {
@@ -1869,7 +1869,7 @@ export default {
             color: "info",
           })
         }
-      } else if (type === ChatMessageType.ADD_LINKMAN_RECEIPT) {
+      } else if (type === ChatMessageType.ADD_LINKMAN_REPLY) {
         let acceptTime = data.acceptTime
         let receiveTime = data.receiveTime
         let blackedMe = data.blackedMe

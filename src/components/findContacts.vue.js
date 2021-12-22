@@ -292,13 +292,13 @@ export default {
       let payload = {}
       payload.acceptTime = currentTime
       await store.socketSend({
-        messageType: ChatMessageType.ADD_LINKMAN_RECEIPT,
+        messageType: ChatMessageType.ADD_LINKMAN_REPLY,
         targetPeerClient: targetPeerClient,
         srcPeerClient: srcPeerClient,
         payload: payload
       })*/
       let payload = {}
-      payload.type = ChatMessageType.ADD_LINKMAN_RECEIPT
+      payload.type = ChatMessageType.ADD_LINKMAN_REPLY
       payload.srcClientId = myselfPeerClient.clientId
       payload.srcPeerId = myselfPeerClient.peerId
       payload.acceptTime = currentTime
