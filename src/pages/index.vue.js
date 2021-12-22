@@ -673,79 +673,61 @@ export default {
     async sendUnsentMessage(linkmanPeerId) {
       let _that = this
       let store = _that.$store
-      //receipt
-      let receiptTypes = [
-        P2pChatMessageType.CHAT_RECEIVE_RECEIPT,
-        P2pChatMessageType.ADD_GROUPCHAT_MEMBER_RECEIPT,
-        P2pChatMessageType.MODIFY_GROUPCHAT_OWNER_RECEIPT,
-        P2pChatMessageType.MODIFY_GROUPCHAT_RECEIPT,
-        P2pChatMessageType.REMOVE_GROUPCHAT_MEMBER_RECEIPT,
-        P2pChatMessageType.ADD_GROUPCHAT_RECEIPT,
-        P2pChatMessageType.DROP_LINKMAN_RECEIPT,
-        P2pChatMessageType.BLACK_LINKMAN_RECEIPT,
-        P2pChatMessageType.UNBLACK_LINKMAN_RECEIPT
-      ]
-      let receiptMessages = await chatComponent.loadMessage({
+        //linkman
+      let unSentIndividualMessages = await chatComponent.loadMessage({
         ownerPeerId: myself.myselfPeerClient.peerId,
+        senderPeerId: myself.myselfPeerClient.peerId,
         subjectId: linkmanPeerId,
-        messageType: { $in: receiptTypes }
+        subjectType: SubjectType.CHAT,
+        actualReceiveTime: { $eq: null }
       })
-      if (receiptMessages && receiptMessages.length > 0) {
-        for (let receiptMessage of receiptMessages) {
-          await store.p2pSend(receiptMessage, linkmanPeerId)
-          await chatComponent.remove(ChatDataType.MESSAGE, receiptMessage)
+      if (unSentIndividualMessages && unSentIndividualMessages.length > 0) {
+        for (let unSentIndividualMessage of unSentIndividualMessages) {
+          await store.p2pSend(unSentIndividualMessage, linkmanPeerId)
         }
       }
-      setTimeout(async function () {//等待1s的回执
-        //linkman
-        let unSentIndividualMessages = await chatComponent.loadMessage({
-          ownerPeerId: myself.myselfPeerClient.peerId,
-          senderPeerId: myself.myselfPeerClient.peerId,
-          subjectId: linkmanPeerId,
-          subjectType: SubjectType.CHAT,
-          actualReceiveTime: { $eq: null }
-        })
-        if (unSentIndividualMessages && unSentIndividualMessages.length > 0) {
-          for (let unSentIndividualMessage of unSentIndividualMessages) {
-            await store.p2pSend(unSentIndividualMessage, linkmanPeerId)
-          }
-        }
-        //group
-        let unSentReceives = await chatComponent.loadReceive({
-          ownerPeerId: myself.myselfPeerClient.peerId,
-          receiverPeerId: linkmanPeerId,
-          receiveTime: { $eq: null }
-        })
-        if (unSentReceives && unSentReceives.length > 0) {
-          for (let unSentReceive of unSentReceives) {
-            if (unSentReceive.subjectType === SubjectType.LINKMAN_REQUEST) {
-              let linkmanRequest = await contactComponent.get(ContactDataType.LINKMAN_REQUEST, unSentReceive.messageId)
-              if (linkmanRequest.data) {
-                try {
-                  linkmanRequest.data = JSON.parse(linkmanRequest.data)
-                } catch (e) {
-                  console.log('JSON parse error, string:' + linkmanRequest.data + '; error:' + e)
-                }
+      //group and sysmessage
+      let unSentReceives = await chatComponent.loadReceive({
+        ownerPeerId: myself.myselfPeerClient.peerId,
+        receiverPeerId: linkmanPeerId,
+        receiveTime: { $eq: null }
+      })
+      if (unSentReceives && unSentReceives.length > 0) {
+        for (let unSentReceive of unSentReceives) {
+          if (unSentReceive.subjectType === SubjectType.LINKMAN_REQUEST) {
+            //删除联系人、加入黑名单，如果是好友、已不在黑名单，则不再发送
+            if((unSentReceive.messageType === P2pChatMessageType.DROP_LINKMAN && store.state.linkmanMap[unSentReceive.receiverPeerId]) || (unSentReceive.messageType === P2pChatMessageType.BLACK_LINKMAN && store.state.linkmanMap[unSentReceive.receiverPeerId] && store.state.linkmanMap[unSentReceive.receiverPeerId].status === LinkmanStatus.EFFECTIVE)){
+              unSentReceive.receiveTime = new Date().getTime()
+              await chatComponent.update(ChatDataType.RECEIVE, unSentReceive, null)
+              continue
+            }
+            let linkmanRequest = await contactComponent.get(ContactDataType.LINKMAN_REQUEST, unSentReceive.messageId)
+            debugger
+            if (linkmanRequest.data) {
+              try {
+                linkmanRequest.data = JSON.parse(linkmanRequest.data)
+              } catch (e) {
+                console.log('JSON parse error, string:' + linkmanRequest.data + '; error:' + e)
               }
-              let message = {
-                messageType: unSentReceive.messageType,
-                content: linkmanRequest
-              }
-              await store.p2pSend(message, linkmanPeerId)
-            } else {
-              let unSentGroupMessages = await chatComponent.loadMessage({
-                ownerPeerId: myself.myselfPeerClient.peerId,
-                messageId: unSentReceive.messageId
-              })
-              if (unSentGroupMessages && unSentGroupMessages.length > 0) {
-                for (let unSentGroupMessage of unSentGroupMessages) {
-                  await store.p2pSend(unSentGroupMessage, linkmanPeerId)
-                }
+            }
+            let message = {
+              messageType: unSentReceive.messageType,
+              content: linkmanRequest
+            }
+            await store.p2pSend(message, linkmanPeerId)
+          } else {
+            let unSentGroupMessages = await chatComponent.loadMessage({
+              ownerPeerId: myself.myselfPeerClient.peerId,
+              messageId: unSentReceive.messageId
+            })
+            if (unSentGroupMessages && unSentGroupMessages.length > 0) {
+              for (let unSentGroupMessage of unSentGroupMessages) {
+                await store.p2pSend(unSentGroupMessage, linkmanPeerId)
               }
             }
           }
         }
-      }, 1000)
+      }
     },
     async insertReceivedMessage(message) {
       let _that = this
@@ -1323,7 +1305,8 @@ export default {
         messageType: message.messageType,
         content: message.content
       }
-      console.log('saveAndSendMessage _id '+rtcMessage.content._id)
+      console.log('saveAndSendMessage')
+      console.log(rtcMessage)
       await store.p2pSend(rtcMessage, groupChatLinkman.peerId)
     },
     async findContacts(findType, peerId) {
@@ -2175,21 +2158,19 @@ export default {
         // 更新联系人信息
         let linkmanPeerId = content.peerId
         let linkman = store.state.linkmanMap[linkmanPeerId]
-        console.log('receive SYNC_LINKMAN_INFO')
         if (linkman) {
           linkman.name = content.name
           linkman.mobile = content.mobile
           linkman.avatar = content.avatar
           linkman.publicKey = content.publicKey
+          linkman.signalPublicKey = content.signalPublicKey
+          signalProtocol.signalPublicKeys.set(linkmanPeerId, linkman.signalPublicKey)
           if (message.syncType === `init`) {
             let signalSession = await _that.getSignalSession(linkmanPeerId)
             if (signalSession) {
-              console.log('signalSession close')
               await signalSession.close()
             }
           }
-          linkman.signalPublicKey = content.signalPublicKey
-          signalProtocol.signalPublicKeys.set(linkmanPeerId, linkman.signalPublicKey)
           linkman.downloadSwitch = content.downloadSwitch
           //linkman.localDataCryptoSwitch = content.localDataCryptoSwitch
           linkman.autoLoginSwitch = content.autoLoginSwitch
@@ -2831,7 +2812,6 @@ export default {
           subjectId: content.senderPeerId,
           content: linkmanRequest
         }
-        console.log("sendOrSaveReceipt content _Id"+ message.content._id)
         await _that.sendOrSaveReceipt(message)
       }
       else if (messageType === P2pChatMessageType.UNBLACK_LINKMAN && content) {
@@ -2870,14 +2850,12 @@ export default {
         || messageType === P2pChatMessageType.BLACK_LINKMAN_RECEIPT
         || messageType === P2pChatMessageType.UNBLACK_LINKMAN_RECEIPT) && content) {
         let receiveTime = content.receiveTime
-        console.log('receive  BLACK_LINKMAN_RECEIPT '+ content._id)
         let receives = await chatComponent.loadReceive({
           ownerPeerId: myselfPeerClient.peerId,
           messageId: content._id,
           receiverPeerId: message.ownerPeerId,
           receiveTime: { $eq: null }
         }, null, null, null)
-        console.log(receives)
         if (receives && receives.length > 0) {
           for (let receive of receives) {
             receive.receiveTime = receiveTime
@@ -3111,7 +3089,6 @@ export default {
       let myselfPeerClient = myself.myselfPeerClient
       let linkman = store.state.linkmanMap[peerId]
       if (!linkman || linkman.activeStatus === ActiveStatus.DOWN) return
-      console.log('webrtc close index.vue.js')
       let currentTime = new Date()
       if (linkman) {
         // 更新关联groupChat activeStatus
@@ -3195,7 +3172,7 @@ export default {
             await chatComponent.update(ChatDataType.RECEIVE, receives[0], null)
           }
         }
-        if (typeof message === "object" && message.messageType === P2pChatMessageType.CHAT_LINKMAN) {
+        if (typeof message === "object" && message.messageType !== P2pChatMessageType.SYNC_LINKMAN_INFO && message.messageType !== P2pChatMessageType.CALL_REQUEST) {
           let signalSession = await _that.getSignalSession(peerId)
           if (signalSession) {
             message = await signalSession.encrypt(JSON.stringify(message))
