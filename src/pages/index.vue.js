@@ -750,7 +750,7 @@ export default {
     async insertReceivedMessage(message) {
       let _that = this
       let store = _that.$store
-      if (message.messageType == P2pChatMessageType.CHAT_LINKMAN) {
+      if (message.messageType == P2pChatMessageType.CHAT_LINKMAN || message.messageType == P2pChatMessageType.CALL_REQUEST) {
         await _that.insertReceivedChatMessage(message)
       }
     },
@@ -2182,6 +2182,7 @@ export default {
           if (message.syncType === `init`) {
             let signalSession = await _that.getSignalSession(linkmanPeerId)
             if (signalSession) {
+              console.log('signalSession close')
               await signalSession.close()
             }
           }
@@ -2560,7 +2561,6 @@ export default {
         await _that.sendOrSaveReceipt(message)
       }
       else if (messageType === P2pChatMessageType.REMOVE_GROUPCHAT_MEMBER && content) {
-        debugger
         let _id = content._id
         let currentTime = new Date()
         let groupChat = store.state.groupChatMap[content.groupId]
@@ -3107,6 +3107,7 @@ export default {
       let myselfPeerClient = myself.myselfPeerClient
       let linkman = store.state.linkmanMap[peerId]
       if (!linkman || linkman.activeStatus === ActiveStatus.DOWN) return
+      console.log('webrtc close index.vue.js')
       let currentTime = new Date()
       if (linkman) {
         // 更新关联groupChat activeStatus
