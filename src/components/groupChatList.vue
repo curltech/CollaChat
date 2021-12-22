@@ -25,7 +25,7 @@
               //q-item-section(side)
               //  q-btn.text-primary(dense round flat icon="more" @click="groupChatDetails(groupChat)")
               q-item-section(side)
-                q-btn(dense round flat icon="chat" :color="groupChat && groupChat.activeStatus === ActiveStatus.UP ? 'primary' : 'c-grey'")
+                q-btn(dense round flat icon="chat" :color="!$store.displayActiveStatus || (groupChat && groupChat.activeStatus === ActiveStatus.UP) ? 'primary' : 'c-grey'")
             q-separator.c-separator(inset="item" v-if="index < $store.state.groupChats.length - 1")
             q-separator.c-separator(v-if="index === $store.state.groupChats.length - 1")
       q-tab-panel(name="memberGroupChatList" style="padding:0px 0px")
@@ -45,7 +45,7 @@
               //q-item-section(side)
               //  q-btn.text-primary(dense round flat icon="more" @click="groupChatDetails(groupChat)")
               q-item-section(side)
-                q-btn(dense round flat icon="chat" :color="groupChat && groupChat.activeStatus === ActiveStatus.UP ? 'primary' : 'c-grey'")
+                q-btn(dense round flat icon="chat" :color="!$store.displayActiveStatus || (groupChat && groupChat.activeStatus === ActiveStatus.UP) ? 'primary' : 'c-grey'")
             q-separator.c-separator(inset="item" v-if="index < $store.state.groupChats.length - 1")
             q-separator.c-separator(v-if="index === $store.state.groupChats.length - 1")
 </template>

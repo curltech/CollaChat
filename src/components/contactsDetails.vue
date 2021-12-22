@@ -106,11 +106,11 @@
           q-item-section(side, style="padding-left:0px")
             q-icon(
               name="chat",
-              :color="$store.state.currentLinkman && $store.state.currentLinkman.activeStatus === ActiveStatus.UP ? 'primary' : 'c-grey'"
+              :color="!$store.displayActiveStatus || ($store.state.currentLinkman && $store.state.currentLinkman.activeStatus === ActiveStatus.UP) ? 'primary' : 'c-grey'"
             )
           q-item-section(
             side,
-            :class="$store.state.currentLinkman && $store.state.currentLinkman.activeStatus === ActiveStatus.UP ? 'text-primary' : ''"
+            :class="!$store.displayActiveStatus || ($store.state.currentLinkman && $store.state.currentLinkman.activeStatus === ActiveStatus.UP) ? 'text-primary' : ''"
           ) {{ $t('Goto Chat') }}
           q-item-section
     q-tab-panel#avatarContainer(
@@ -208,7 +208,7 @@
                 round,
                 flat,
                 icon="chat",
-                :color="groupChat && groupChat.activeStatus === ActiveStatus.UP ? 'primary' : 'c-grey'",
+                :color="!$store.displayActiveStatus || (groupChat && groupChat.activeStatus === ActiveStatus.UP) ? 'primary' : 'c-grey'",
                 @click="$store.gotoChat(groupChat.groupId)"
               )
           q-separator.c-separator(inset="item")
