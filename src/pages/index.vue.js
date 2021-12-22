@@ -1323,6 +1323,7 @@ export default {
         messageType: message.messageType,
         content: message.content
       }
+      console.log('saveAndSendMessage _id '+rtcMessage.content._id)
       await store.p2pSend(rtcMessage, groupChatLinkman.peerId)
     },
     async findContacts(findType, peerId) {
@@ -2174,6 +2175,7 @@ export default {
         // 更新联系人信息
         let linkmanPeerId = content.peerId
         let linkman = store.state.linkmanMap[linkmanPeerId]
+        console.log('receive SYNC_LINKMAN_INFO')
         if (linkman) {
           linkman.name = content.name
           linkman.mobile = content.mobile
@@ -2829,6 +2831,7 @@ export default {
           subjectId: content.senderPeerId,
           content: linkmanRequest
         }
+        console.log("sendOrSaveReceipt content _Id"+ message.content._id)
         await _that.sendOrSaveReceipt(message)
       }
       else if (messageType === P2pChatMessageType.UNBLACK_LINKMAN && content) {
@@ -2866,14 +2869,15 @@ export default {
         || messageType === P2pChatMessageType.DROP_LINKMAN_RECEIPT
         || messageType === P2pChatMessageType.BLACK_LINKMAN_RECEIPT
         || messageType === P2pChatMessageType.UNBLACK_LINKMAN_RECEIPT) && content) {
-        let _id = content._id
         let receiveTime = content.receiveTime
+        console.log('receive  BLACK_LINKMAN_RECEIPT '+ content._id)
         let receives = await chatComponent.loadReceive({
           ownerPeerId: myselfPeerClient.peerId,
-          messageId: _id,
+          messageId: content._id,
           receiverPeerId: message.ownerPeerId,
           receiveTime: { $eq: null }
         }, null, null, null)
+        console.log(receives)
         if (receives && receives.length > 0) {
           for (let receive of receives) {
             receive.receiveTime = receiveTime
@@ -3191,13 +3195,11 @@ export default {
             await chatComponent.update(ChatDataType.RECEIVE, receives[0], null)
           }
         }
-        if (typeof message === "object" && message.messageType !== P2pChatMessageType.SYNC_LINKMAN_INFO && message.messageType !== P2pChatMessageType.CALL_REQUEST) {
+        if (typeof message === "object" && message.messageType === P2pChatMessageType.CHAT_LINKMAN) {
           let signalSession = await _that.getSignalSession(peerId)
           if (signalSession) {
             message = await signalSession.encrypt(JSON.stringify(message))
           }
-        } else if (message.messageType === P2pChatMessageType.SYNC_LINKMAN_INFO) {
-
         }
         let messageString = JSON.stringify(message)
         let createTimestamp = new Date().getTime()
