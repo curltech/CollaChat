@@ -115,7 +115,7 @@ export default {
             await store.collectionForwardToChat(currentCollection,chatRecord)
           } else if (store.selectChatEntry === 'messageForward') {
             await store.forwardToChat(chatRecord)
-          } else if (store.selectChatEntry === 'accountInformationQrCode') {
+          } else if (store.selectChatEntry === 'accountInformationQrCode' || store.selectChatEntry === 'accountSecurityQrCode') {
             await store.qrCodeForwardToChat(store.state.currentQrCode,chatRecord)
           } else if (store.selectChatEntry === 'channelForward') {
             await store.channelForwardToChat(store.state.currentChannel,chatRecord)

@@ -141,17 +141,6 @@ export default {
       //&& gapTime > 5
       return result
     },
-    async attemptConnect(message) {
-      let _that = this
-      let store = _that.$store
-      let peerId = store.state.currentChat.subjectId
-      if (store.state.linkmanMap[store.state.currentChat.subjectId].activeStatus !== ActiveStatus.UP) {
-        webrtcPeerPool.create(peerId)
-      } else {
-        await store.sendUnsentMessage(peerId)
-      }
-
-    },
     async openCard(message) {
       let _that = this
       let store = _that.$store

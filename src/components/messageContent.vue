@@ -6,7 +6,6 @@
         q-btn(dark-percentage unelevated color="secondary" text-color="grey-1" @click="openDestroyMessage(message)")
             span {{$t('Open Timing Message')}}
     q-chat-message(v-else-if="message.status !== ChatMessageStatus.RECALL" @click ='avatarClick($event,message)' :class = "entry === 'message'?'':'list-message'" :name = "getName(message)" :avatar = "getAvatar(message)" :stamp= "getStamp(message)"  :sent="isSent(message)" text-color="grey-10" bg-color="primary")
-      //q-btn.text-primary.q-mr-sm.resend-btn(v-if = " entry === 'message' && isResend(message)" flat round dense icon="sync" @click="attemptConnect(message)")
       span.message-text(v-if="message.contentType === ChatContentType.TEXT" v-html="message.content")
       div(v-if="message.contentType === ChatContentType.AUDIO_HISTORY || message.contentType === ChatContentType.VIDEO_HISTORY")
         q-icon(:name="message.contentType === ChatContentType.VIDEO_HISTORY?'videocam':'call'")

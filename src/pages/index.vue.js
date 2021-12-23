@@ -664,9 +664,10 @@ export default {
             option.stream.getAudioTracks()[0].enable = true
             store.state.currentCallChat.streamMap[linkman.peerId].pending = false
             console.log('index.vue -add stream')
+            webrtcPeerPool.create(linkman.peerId, option)
+            linkman.lastWebrtcRequestTime = new Date().getTime()
           }
-          webrtcPeerPool.create(linkman.peerId, option)
-          linkman.lastWebrtcRequestTime = new Date().getTime()
+          
         }
       }
     },
@@ -702,7 +703,6 @@ export default {
               continue
             }
             let linkmanRequest = await contactComponent.get(ContactDataType.LINKMAN_REQUEST, unSentReceive.messageId)
-            debugger
             if (linkmanRequest.data) {
               try {
                 linkmanRequest.data = JSON.parse(linkmanRequest.data)
@@ -835,6 +835,12 @@ export default {
           }, 100)
         }
       })
+      if(message._id){
+        delete message._id
+      }
+      if(message._rev){
+        delete message._rev
+      }
       await chatComponent.insert(ChatDataType.MESSAGE, message, messages)
       // AutoDownload
       if (message.subjectType == SubjectType.CHAT && myself.myselfPeerClient.downloadSwitch && (message.contentType === ChatContentType.FILE || message.contentType === ChatContentType.IMAGE)) {
@@ -1181,6 +1187,7 @@ export default {
       }
       store.changeKind('message')
     },
+    //个人二维码及导出身份二维码共用
     async qrCodeForwardToChat(item, chat) {
       let _that = this
       let store = _that.$store
@@ -1995,7 +2002,7 @@ export default {
               }
               await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
             }
-            webrtcPeerPool.create(srcPeerId)
+            //webrtcPeerPool.create(srcPeerId)
             let chat = store.state.chatMap[srcPeerId]
             if (!chat) { // 尚未创建对应聊天时才需要执行
               chat = await store.getChat(srcPeerId)

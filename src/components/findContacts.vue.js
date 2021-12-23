@@ -303,7 +303,7 @@ export default {
       payload.srcPeerId = myselfPeerClient.peerId
       payload.acceptTime = currentTime
       await chatAction.chat(null, payload, peerId)
-      webrtcPeerPool.create(peerId)
+      //webrtcPeerPool.create(peerId)
       _that.$q.notify({
         message: _that.$i18n.t("Accept contacts request and add contacts successfully"),
         timeout: 3000,

@@ -589,6 +589,7 @@ export default {
         }).onOk(async action => {
           // console.log('Action chosen:', action.id)
           if (action.id === 'forward') {
+            store.state.currentQrCode = await mediaComponent.html2canvasById('qrCodeCard', 'base64')
             store.selectChatEntry = 'accountInformationQrCode'
             _that.subKind = 'selectChat'
           } else if (action.id === 'save') {
@@ -645,9 +646,10 @@ export default {
               id: 'cancel'
             }
           ]
-        }).onOk(action => {
+        }).onOk(async action => {
           // console.log('Action chosen:', action.id)
           if (action.id === 'forward') {
+            store.state.currentQrCode = await mediaComponent.html2canvasById('qrCodeCard', 'base64')
             store.selectChatEntry = 'accountInformationQrCode'
             _that.subKind = 'selectChat'
           } else if (action.id === 'save') {
