@@ -1015,7 +1015,7 @@ export default {
         if (container) {
           setTimeout(function () {
             container.scrollTop = container.scrollHeight
-          }, 100)
+          }, 200)
         }
       })
     },
