@@ -667,14 +667,14 @@ export default {
             webrtcPeerPool.create(linkman.peerId, option)
             linkman.lastWebrtcRequestTime = new Date().getTime()
           }
-          
+
         }
       }
     },
     async sendUnsentMessage(linkmanPeerId) {
       let _that = this
       let store = _that.$store
-        //linkman
+      // 单聊消息
       let unSentIndividualMessages = await chatComponent.loadMessage({
         ownerPeerId: myself.myselfPeerClient.peerId,
         senderPeerId: myself.myselfPeerClient.peerId,
@@ -687,7 +687,7 @@ export default {
           await store.p2pSend(unSentIndividualMessage, linkmanPeerId)
         }
       }
-      //group and sysmessage
+      // 群聊消息和系统消息
       let unSentReceives = await chatComponent.loadReceive({
         ownerPeerId: myself.myselfPeerClient.peerId,
         receiverPeerId: linkmanPeerId,
@@ -696,25 +696,26 @@ export default {
       if (unSentReceives && unSentReceives.length > 0) {
         for (let unSentReceive of unSentReceives) {
           if (unSentReceive.subjectType === SubjectType.LINKMAN_REQUEST) {
-            //删除联系人、加入黑名单，如果是好友、已不在黑名单，则不再发送
-            if((unSentReceive.messageType === P2pChatMessageType.DROP_LINKMAN && store.state.linkmanMap[unSentReceive.receiverPeerId]) || (unSentReceive.messageType === P2pChatMessageType.BLACK_LINKMAN && store.state.linkmanMap[unSentReceive.receiverPeerId] && store.state.linkmanMap[unSentReceive.receiverPeerId].status === LinkmanStatus.EFFECTIVE)){
+            // 删除联系人/加入黑名单系统消息重发前检查：如果联系人存在/不在黑名单，则不重发
+            if ((unSentReceive.messageType === P2pChatMessageType.DROP_LINKMAN && store.state.linkmanMap[unSentReceive.receiverPeerId])
+              || (unSentReceive.messageType === P2pChatMessageType.BLACK_LINKMAN && (!store.state.linkmanMap[unSentReceive.receiverPeerId] || store.state.linkmanMap[unSentReceive.receiverPeerId].status !== LinkmanStatus.BLACKED))) {
               unSentReceive.receiveTime = new Date().getTime()
               await chatComponent.update(ChatDataType.RECEIVE, unSentReceive, null)
-              continue
-            }
-            let linkmanRequest = await contactComponent.get(ContactDataType.LINKMAN_REQUEST, unSentReceive.messageId)
-            if (linkmanRequest.data) {
-              try {
-                linkmanRequest.data = JSON.parse(linkmanRequest.data)
-              } catch (e) {
-                console.log('JSON parse error, string:' + linkmanRequest.data + '; error:' + e)
+            } else {
+              let linkmanRequest = await contactComponent.get(ContactDataType.LINKMAN_REQUEST, unSentReceive.messageId)
+              if (linkmanRequest.data) {
+                try {
+                  linkmanRequest.data = JSON.parse(linkmanRequest.data)
+                } catch (e) {
+                  console.log('JSON parse error, string:' + linkmanRequest.data + '; error:' + e)
+                }
               }
+              let message = {
+                messageType: unSentReceive.messageType,
+                content: linkmanRequest
+              }
+              await store.p2pSend(message, linkmanPeerId)
             }
-            let message = {
-              messageType: unSentReceive.messageType,
-              content: linkmanRequest
-            }
-            await store.p2pSend(message, linkmanPeerId)
           } else {
             let unSentGroupMessages = await chatComponent.loadMessage({
               ownerPeerId: myself.myselfPeerClient.peerId,
@@ -835,10 +836,10 @@ export default {
           }, 100)
         }
       })
-      if(message._id){
+      if (message._id) {
         delete message._id
       }
-      if(message._rev){
+      if (message._rev) {
         delete message._rev
       }
       await chatComponent.insert(ChatDataType.MESSAGE, message, messages)
