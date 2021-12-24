@@ -5,7 +5,7 @@
         q-toolbar.header-toolbar.bg-c-grey-message(:class="$store.state.currentChat.subjectId ? '' : 'hidden'")
           q-btn(:class="ifMobileSize || $store.state.ifMobileStyle ? '' : 'hidden'" flat round icon="keyboard_arrow_left" @click="$store.toggleDrawer(false)")
           q-toolbar-title(align="center" :style="ifMobileSize || $store.state.ifMobileStyle ? '' : 'padding-left:54px'") {{ ChatTitle($store.state.currentChat) }}
-          q-btn.text-primary(flat round icon="more_horiz" @click="subKind = $store.state.currentChat.subjectType + 'Details'")
+          q-btn.text-primary(flat round icon="more_horiz" @click="enterDetail")
         q-separator.c-separator-message.header-mar-top(style="height:1px;margin-left:0px;margin-right:0px")
         #talk.q-pa-md.bg-c-grey-message.row.justify-center.scroll.q-chat-message(:class="!(ifMobileSize || $store.state.ifMobileStyle)?'talk-height-pc':(keyboardMode?(ifMobileSize?'talk-height-mobileSize1':'talk-height-mobileStyle1'):(ifMobileSize?'talk-height-mobileSize2':'talk-height-mobileStyle2'))")
           q-infinite-scroll(style="width:100%" @load="load_message" debounce="100" reverse :offset="50")

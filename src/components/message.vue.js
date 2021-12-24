@@ -143,6 +143,7 @@ export default {
       selectGroupChatMemberFlag: null, // removeGroupChatMember, ownershipHandover, selectedGroupCallMember, searchMessage
       selectedGroupChatMembers: [], // removeGroupChatMember, selectedGroupCallMember
       selectedGroupChatMemberPeerId: null, // ownershipHandover
+      peerClientInMembersMap:{},
       groupChatMemberfilter: null,
       groupChatData: {
         name: null,
@@ -337,6 +338,8 @@ export default {
             let linkman = store.state.linkmanMap[groupChatMember.memberPeerId]
             if (linkman) {
               linkmans.push(linkman)
+            }else if(_that.peerClientInMembersMap[groupChatMember.memberPeerId]){
+                linkmans.push(_that.peerClientInMembersMap[groupChatMember.memberPeerId])
             }
           }
           let groupChatMemberfilter = _that.groupChatMemberfilter
@@ -1843,7 +1846,7 @@ export default {
       store.selectContactsEntry = _that.subKind // CHATDetails - addGroupChatAndMember
       _that.subKind = 'selectContacts'
     },
-    showSelectGroupChatMember() {
+    async showSelectGroupChatMember() {
       let linkmans = this.$store.state.linkmans // 实际选择的不是GroupChatMember，而是对应的linkman
       if (linkmans && linkmans.length > 0) {
         for (let linkman of linkmans) {
@@ -1855,6 +1858,24 @@ export default {
       this.selectedGroupChatMemberPeerId = null
       this.selectGroupChatMemberFlag = 'removeGroupChatMember'
       this.subKind = 'selectGroupChatMember'
+    },
+    async getMembersInPeerClient(){
+      let _that = this
+      let store = _that.$store
+      let groupChat = store.state.groupChatMap[store.state.currentChat.subjectId]
+      for (let groupChatMember of groupChat.groupMembers) {
+        let peerId = groupChatMember.memberPeerId
+        if (peerId!== myself.myselfPeerClient.peerId){
+          let linkman = store.state.linkmanMap[peerId]
+          if (!linkman) {
+            linkman = {}
+            linkman = await peerClientService.findPeerClient(null, peerId, null)
+            linkman.selected = false
+            linkman.existing = false
+            _that.peerClientInMembersMap[peerId] = linkman
+          }
+        }
+      }
     },
     showOwnershipHandover() {
       let _that = this
@@ -2354,6 +2375,14 @@ export default {
           }
         }
       }
+    },
+    enterDetail(){
+      let _that = this
+      let store = _that.$store
+      if(store.state.currentChat.subjectType === SubjectType.GROUP_CHAT){
+        _that.getMembersInPeerClient()
+      }
+      _that.subKind = store.state.currentChat.subjectType + 'Details'
     },
     async showContacts(peerId) {
       let _that = this
