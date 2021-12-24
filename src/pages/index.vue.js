@@ -696,9 +696,8 @@ export default {
       if (unSentReceives && unSentReceives.length > 0) {
         for (let unSentReceive of unSentReceives) {
           if (unSentReceive.subjectType === SubjectType.LINKMAN_REQUEST) {
-            // 删除联系人/加入黑名单系统消息重发前检查：如果联系人存在/不在黑名单，则不重发
-            if ((unSentReceive.messageType === P2pChatMessageType.DROP_LINKMAN && store.state.linkmanMap[unSentReceive.receiverPeerId])
-              || (unSentReceive.messageType === P2pChatMessageType.BLACK_LINKMAN && (!store.state.linkmanMap[unSentReceive.receiverPeerId] || store.state.linkmanMap[unSentReceive.receiverPeerId].status !== LinkmanStatus.BLACKED))) {
+            // 删除联系人系统消息重发前检查：如果联系人存在，则不重发
+            if (unSentReceive.messageType === P2pChatMessageType.DROP_LINKMAN && store.state.linkmanMap[unSentReceive.receiverPeerId]) {
               unSentReceive.receiveTime = new Date().getTime()
               await chatComponent.update(ChatDataType.RECEIVE, unSentReceive, null)
             } else {
