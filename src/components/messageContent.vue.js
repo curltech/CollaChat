@@ -34,7 +34,7 @@ export default {
     isSent(message) {
       return (message.senderPeerId == this.$store.state.myselfPeerClient.peerId && this.entry === 'message') ? true : false
     },
-    getAvatar(message) {
+    async getAvatar(message) {
       let state = this.$store.state
       let avatar = this.$store.defaultActiveAvatar
       if (message.senderPeerId === state.myselfPeerClient.peerId) {
@@ -48,7 +48,7 @@ export default {
             avatar = senderPeer.avatar
           }
         } else {
-          let peerClient = peerClientService.getPeerClientFromCache(message.senderPeerId)
+          let peerClient = await peerClientService.getCachedPeerClient(message.senderPeerId)
           if (peerClient && peerClient.avatar) {
             avatar = peerClient.avatar
           }
@@ -73,7 +73,7 @@ export default {
         return ''
       }
     },
-    getName(message) {
+    async getName(message) {
       let state = this.$store.state
       let name = ''
       if (message.subjectType !== SubjectType.CHAT || this.entry !== 'message') {
@@ -100,7 +100,7 @@ export default {
             if (senderPeer) {
               name = senderPeer.givenName ? senderPeer.givenName : senderPeer.name
             } else {
-              let peerClient = peerClientService.getPeerClientFromCache(message.senderPeerId)
+              let peerClient = await peerClientService.getCachedPeerClient(message.senderPeerId)
               if (peerClient && peerClient.name) {
                 name = peerClient.name
               }

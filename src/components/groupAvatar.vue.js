@@ -14,7 +14,7 @@ export default {
     pasteCapture(evt) {
       debugger
     },
-    groupChatMemeberAvatar(groupChatMember) {
+    async groupChatMemeberAvatar(groupChatMember) {
       let _that = this
       let store = _that.$store
       let state = store.state
@@ -31,7 +31,7 @@ export default {
             avatar = linkman.avatar
           }
         } else {
-          let peerClient = peerClientService.getPeerClientFromCache(memberPeerId)
+          let peerClient = await peerClientService.getCachedPeerClient(memberPeerId)
           if (peerClient && peerClient.avatar) {
             avatar = peerClient.avatar
           }
