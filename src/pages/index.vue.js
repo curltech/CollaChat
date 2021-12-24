@@ -732,7 +732,7 @@ export default {
     async insertReceivedMessage(message) {
       let _that = this
       let store = _that.$store
-      if((message.subjectType === SubjectType.CHAT && !store.state.linkmanMap[message.senderPeerId]) ||(message.subjectType === SubjectType.GROUP_CHAT && !store.state.groupChatMap[message.subjectId])){
+      if ((message.subjectType === SubjectType.CHAT && !store.state.linkmanMap[message.senderPeerId]) || (message.subjectType === SubjectType.GROUP_CHAT && !store.state.groupChatMap[message.subjectId])) {
         return
       }
       if (message.messageType == P2pChatMessageType.CHAT_LINKMAN || message.messageType == P2pChatMessageType.CALL_REQUEST) {
