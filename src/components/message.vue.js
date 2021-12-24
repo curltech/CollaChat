@@ -143,7 +143,7 @@ export default {
       selectGroupChatMemberFlag: null, // removeGroupChatMember, ownershipHandover, selectedGroupCallMember, searchMessage
       selectedGroupChatMembers: [], // removeGroupChatMember, selectedGroupCallMember
       selectedGroupChatMemberPeerId: null, // ownershipHandover
-      peerClientInMembersMap:{},
+      peerClientInMembersMap: {},
       groupChatMemberfilter: null,
       groupChatData: {
         name: null,
@@ -338,8 +338,8 @@ export default {
             let linkman = store.state.linkmanMap[groupChatMember.memberPeerId]
             if (linkman) {
               linkmans.push(linkman)
-            }else if(_that.peerClientInMembersMap[groupChatMember.memberPeerId]){
-                linkmans.push(_that.peerClientInMembersMap[groupChatMember.memberPeerId])
+            } else if (_that.peerClientInMembersMap[groupChatMember.memberPeerId]) {
+              linkmans.push(_that.peerClientInMembersMap[groupChatMember.memberPeerId])
             }
           }
           let groupChatMemberfilter = _that.groupChatMemberfilter
@@ -446,7 +446,7 @@ export default {
       let store = _that.$store
       let editor = _that.$refs.editor
       let emojiVal = emoji.data
-      let selectionStart = editor.$refs.input?editor.$refs.input.selectionStart:null
+      let selectionStart = editor.$refs.input ? editor.$refs.input.selectionStart : null
       if (selectionStart == null) {
         selectionStart = 0
       }
@@ -1306,9 +1306,9 @@ export default {
             inserted.collectionType = CollectionType.NOTE
           }
           else if (message.contentType === ChatContentType.CHAT) {
-            if(_that.messageMultiSelectedVal.length === 1 && _that.messageMultiSelectedVal[0].contentType ===  ChatContentType.CARD){
+            if (_that.messageMultiSelectedVal.length === 1 && _that.messageMultiSelectedVal[0].contentType === ChatContentType.CARD) {
               inserted.collectionType = CollectionType.CARD
-            }else{
+            } else {
               inserted.collectionType = CollectionType.CHAT
             }
           }
@@ -1320,7 +1320,7 @@ export default {
             inserted.collectionType = CollectionType.VIDEO
           } else if (message.contentType === ChatContentType.AUDIO) {
             inserted.collectionType = CollectionType.AUDIO
-          }  
+          }
           else if (message.contentType === ChatContentType.VOICE) {
             inserted.collectionType = CollectionType.VOICE
           } else if (message.contentType === ChatContentType.FILE) {
@@ -1859,13 +1859,13 @@ export default {
       this.selectGroupChatMemberFlag = 'removeGroupChatMember'
       this.subKind = 'selectGroupChatMember'
     },
-    async getMembersInPeerClient(){
+    async getMembersInPeerClient() {
       let _that = this
       let store = _that.$store
       let groupChat = store.state.groupChatMap[store.state.currentChat.subjectId]
       for (let groupChatMember of groupChat.groupMembers) {
         let peerId = groupChatMember.memberPeerId
-        if (peerId!== myself.myselfPeerClient.peerId){
+        if (peerId !== myself.myselfPeerClient.peerId) {
           let linkman = store.state.linkmanMap[peerId]
           if (!linkman) {
             linkman = {}
@@ -2376,10 +2376,10 @@ export default {
         }
       }
     },
-    enterDetail(){
+    enterDetail() {
       let _that = this
       let store = _that.$store
-      if(store.state.currentChat.subjectType === SubjectType.GROUP_CHAT){
+      if (store.state.currentChat.subjectType === SubjectType.GROUP_CHAT) {
         _that.getMembersInPeerClient()
       }
       _that.subKind = store.state.currentChat.subjectType + 'Details'
