@@ -2376,11 +2376,11 @@ export default {
         }
       }
     },
-    enterDetail() {
+    async enterDetail() {
       let _that = this
       let store = _that.$store
       if (store.state.currentChat.subjectType === SubjectType.GROUP_CHAT) {
-        _that.getMembersInPeerClient()
+        await _that.getMembersInPeerClient()
       }
       _that.subKind = store.state.currentChat.subjectType + 'Details'
     },
