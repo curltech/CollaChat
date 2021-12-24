@@ -1846,7 +1846,7 @@ export default {
       store.selectContactsEntry = _that.subKind // CHATDetails - addGroupChatAndMember
       _that.subKind = 'selectContacts'
     },
-    async showSelectGroupChatMember() {
+    showSelectGroupChatMember() {
       let linkmans = this.$store.state.linkmans // 实际选择的不是GroupChatMember，而是对应的linkman
       if (linkmans && linkmans.length > 0) {
         for (let linkman of linkmans) {
