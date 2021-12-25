@@ -2,7 +2,7 @@ import { Platform } from 'quasar'
 import Vue from 'vue'
 import { myself } from 'libcolla'
 import { webrtcPeerPool } from 'libcolla'
-import { CollaUtil } from 'libcolla'
+import { CollaUtil, peerClientService } from 'libcolla'
 
 import { systemAudioComponent, mediaStreamComponent } from '@/libs/base/colla-media'
 //import { localNotificationComponent } from '@/libs/base/colla-cordova'
@@ -79,7 +79,7 @@ export default {
       return function (peerId) {
         let state = store.state
         let name
-        if (message.senderPeerId === state.myselfPeerClient.peerId) {
+        if (peerId === state.myselfPeerClient.peerId) {
           name = state.myselfPeerClient.name
         } else {
           let group = state.groupChatMap[store.state.currentCallChat.subjectId]
@@ -99,7 +99,7 @@ export default {
             if (linkman) {
               name = linkman.givenName ? linkman.givenName : linkman.name
             } else {
-              let peerClient = peerClientService.getPeerClientFromCache(message.senderPeerId)
+              let peerClient = peerClientService.getPeerClientFromCache(peerId)
               if (peerClient && peerClient.name) {
                 name = peerClient.name
               }
@@ -350,8 +350,8 @@ export default {
       if (message.subjectType === SubjectType.CHAT) {
         let currentTime = new Date().getTime()
         //大于1分钟的请求忽略掉
-        if(((currentTime - message.createDate) / 1000 > 60)){
-            return;
+        if (((currentTime - message.createDate) / 1000 > 60)) {
+          return;
         }
         if (store.state.currentCallChat && store.state.currentCallChat.subjectId && store.state.videoDialog) {
           await _that.sendCallCloseMessage(subjectId, ChatContentType.MEDIA_BUSY, '')
