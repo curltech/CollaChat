@@ -78,8 +78,34 @@ export default {
       let store = _that.$store
       return function (peerId) {
         let state = store.state
-        let peer = state.linkmanMap[peerId]
-        let name = peer && peer.givenName ? peer.givenName : peer.name
+        let name
+        if (message.senderPeerId === state.myselfPeerClient.peerId) {
+          name = state.myselfPeerClient.name
+        } else {
+          let group = state.groupChatMap[store.state.currentCallChat.subjectId]
+          let groupChatMembers = group.groupMembers
+          if (groupChatMembers && groupChatMembers.length > 0) {
+            for (let groupChatMember of groupChatMembers) {
+              if (groupChatMember.memberPeerId === peerId) {
+                if (groupChatMember.memberAlias) {
+                  name = groupChatMember.memberAlias
+                }
+                break
+              }
+            }
+          }
+          if (!name) {
+            let linkman = state.linkmanMap[peerId]
+            if (linkman) {
+              name = linkman.givenName ? linkman.givenName : linkman.name
+            } else {
+              let peerClient = peerClientService.getPeerClientFromCache(message.senderPeerId)
+              if (peerClient && peerClient.name) {
+                name = peerClient.name
+              }
+            }
+          }
+        }
         return name
       }
     },
