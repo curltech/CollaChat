@@ -3124,7 +3124,7 @@ export default {
       }
       _that.getMessageFileAndOpen(message)
     },
-    async groupChatMemberName(groupChatMember) {
+    groupChatMemberName(groupChatMember) {
       let _that = this
       let store = _that.$store
       let groupChatMemberName = ''
@@ -3142,7 +3142,7 @@ export default {
         if (groupChatMember.memberAlias) {
           groupChatMemberName = groupChatMember.memberAlias.length > 3 ? groupChatMember.memberAlias.substr(0, 3) + '...' : groupChatMember.memberAlias
         } else {
-          let peerClient = await peerClientService.getCachedPeerClient(memberPeerId)
+          let peerClient = peerClientService.getPeerClientFromCache(memberPeerId)
           if (peerClient && peerClient.name) {
             groupChatMemberName = peerClient.name.length > 3 ? peerClient.name.substr(0, 3) + '...' : peerClient.name
           }
@@ -3150,7 +3150,7 @@ export default {
       }
       return groupChatMemberName
     },
-    async groupChatOwnerName() {
+    groupChatOwnerName() {
       let _that = this
       let store = _that.$store
       let groupChatOwnerName = ''
@@ -3177,7 +3177,7 @@ export default {
               if (linkman) {
                 groupChatOwnerName = linkman.givenName ? linkman.givenName : linkman.name
               } else {
-                let peerClient = await peerClientService.getCachedPeerClient(group.groupOwnerPeerId)
+                let peerClient = peerClientService.getPeerClientFromCache(group.groupOwnerPeerId)
                 if (peerClient && peerClient.name) {
                   groupChatOwnerName = peerClient.name
                 }
@@ -3188,7 +3188,7 @@ export default {
       }
       return groupChatOwnerName
     },
-    async groupChatMemeberAvatar(groupChatMember) {
+    groupChatMemeberAvatar(groupChatMember) {
       let _that = this
       let store = _that.$store
       let groupChatMemeberAvatar = store.defaultActiveAvatar
@@ -3199,7 +3199,7 @@ export default {
           groupChatMemeberAvatar = linkman.avatar
         }
       } else {
-        let peerClient = await peerClientService.getCachedPeerClient(memberPeerId)
+        let peerClient = peerClientService.getPeerClientFromCache(memberPeerId)
         if (peerClient && peerClient.avatar) {
           groupChatMemeberAvatar = peerClient.avatar
         }
