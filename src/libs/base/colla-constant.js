@@ -83,12 +83,12 @@ const connectAddressOptionsZH = [
     {
       label: '中国-杭州',
       //value: 'hz.curltech.com.cn:8089' // 47.111.251.160:8081
-      value: '/dns4/hz.curltech.com.cn/tcp/5720/wss/p2p/12D3KooWDTYWJ7bHXJFcEwq1NBJ2majgRjrY2xHjoMzSedkS3jgN'
+      value: '/dns4/hz.curltech.com.cn/tcp/5720/wss/p2p/12D3KooWKoXVn8sGmcww6Wkt1taKfZfsoJVr2Sq3btwiaN8pXQX5'
     },
     {
       label: '韩国',
       //value: 'kr.curltech.cc:8089' // 52.231.153.1:8081
-      value: '/dns4/kr.curltech.cc/tcp/5720/wss/p2p/12D3KooWJk2AP2JcawJgScGPqtHXMaDwYUDBxNMjyGEEwPH3ghrD'
+      value: '/dns4/kr.curltech.cc/tcp/5720/wss/p2p/12D3KooWFU3LmeS3NZ9n5iUihT3D1r2mYGzJACPaogAc7pirAQE6'
     }
   ]
 const connectAddressOptionsTW = [
@@ -104,12 +104,12 @@ const connectAddressOptionsTW = [
     {
       label: '中國-杭州',
       //value: 'hz.curltech.com.cn:8089' // 47.111.251.160:8081
-      value: '/dns4/hz.curltech.com.cn/tcp/5720/wss/p2p/12D3KooWDTYWJ7bHXJFcEwq1NBJ2majgRjrY2xHjoMzSedkS3jgN'
+      value: '/dns4/hz.curltech.com.cn/tcp/5720/wss/p2p/12D3KooWKoXVn8sGmcww6Wkt1taKfZfsoJVr2Sq3btwiaN8pXQX5'
     },
     {
       label: '韓國',
       //value: 'kr.curltech.cc:8089' // 52.231.153.1:8081
-      value: '/dns4/kr.curltech.cc/tcp/5720/wss/p2p/12D3KooWJk2AP2JcawJgScGPqtHXMaDwYUDBxNMjyGEEwPH3ghrD'
+      value: '/dns4/kr.curltech.cc/tcp/5720/wss/p2p/12D3KooWFU3LmeS3NZ9n5iUihT3D1r2mYGzJACPaogAc7pirAQE6'
     }
   ]
 const connectAddressOptionsEN = [
@@ -125,12 +125,12 @@ const connectAddressOptionsEN = [
     {
       label: 'China-Hangzhou',
       //value: 'hz.curltech.com.cn:8089' // 47.111.251.160:8081
-      value: '/dns4/hz.curltech.com.cn/tcp/5720/wss/p2p/12D3KooWDTYWJ7bHXJFcEwq1NBJ2majgRjrY2xHjoMzSedkS3jgN'
+      value: '/dns4/hz.curltech.com.cn/tcp/5720/wss/p2p/12D3KooWKoXVn8sGmcww6Wkt1taKfZfsoJVr2Sq3btwiaN8pXQX5'
     },
     {
       label: 'South Korea',
       //value: 'kr.curltech.cc:8089' // 52.231.153.1:8081
-      value: '/dns4/kr.curltech.cc/tcp/5720/wss/p2p/12D3KooWJk2AP2JcawJgScGPqtHXMaDwYUDBxNMjyGEEwPH3ghrD'
+      value: '/dns4/kr.curltech.cc/tcp/5720/wss/p2p/12D3KooWFU3LmeS3NZ9n5iUihT3D1r2mYGzJACPaogAc7pirAQE6'
     }
   ]
 const connectAddressOptionsJA = [
@@ -146,12 +146,12 @@ const connectAddressOptionsJA = [
     {
       label: '中国-杭州',
       //value: 'hz.curltech.com.cn:8089' // 47.111.251.160:8081
-      value: '/dns4/hz.curltech.com.cn/tcp/5720/wss/p2p/12D3KooWDTYWJ7bHXJFcEwq1NBJ2majgRjrY2xHjoMzSedkS3jgN'
+      value: '/dns4/hz.curltech.com.cn/tcp/5720/wss/p2p/12D3KooWKoXVn8sGmcww6Wkt1taKfZfsoJVr2Sq3btwiaN8pXQX5'
     },
     {
       label: '韓国',
       //value: 'kr.curltech.cc:8089' // 52.231.153.1:8081
-      value: '/dns4/kr.curltech.cc/tcp/5720/wss/p2p/12D3KooWJk2AP2JcawJgScGPqtHXMaDwYUDBxNMjyGEEwPH3ghrD'
+      value: '/dns4/kr.curltech.cc/tcp/5720/wss/p2p/12D3KooWFU3LmeS3NZ9n5iUihT3D1r2mYGzJACPaogAc7pirAQE6'
     }
   ]
 const connectAddressOptionsKO = [
@@ -167,12 +167,12 @@ const connectAddressOptionsKO = [
     {
       label: '중국 - 항주',
       //value: 'hz.curltech.com.cn:8089' // 47.111.251.160:8081
-      value: '/dns4/hz.curltech.com.cn/tcp/5720/wss/p2p/12D3KooWDTYWJ7bHXJFcEwq1NBJ2majgRjrY2xHjoMzSedkS3jgN'
+      value: '/dns4/hz.curltech.com.cn/tcp/5720/wss/p2p/12D3KooWKoXVn8sGmcww6Wkt1taKfZfsoJVr2Sq3btwiaN8pXQX5'
     },
     {
       label: '한국',
       //value: 'kr.curltech.cc:8089' // 52.231.153.1:8081
-      value: '/dns4/kr.curltech.cc/tcp/5720/wss/p2p/12D3KooWJk2AP2JcawJgScGPqtHXMaDwYUDBxNMjyGEEwPH3ghrD'
+      value: '/dns4/kr.curltech.cc/tcp/5720/wss/p2p/12D3KooWFU3LmeS3NZ9n5iUihT3D1r2mYGzJACPaogAc7pirAQE6'
     }
   ]
 export const connectAddressOptionsISO = {
