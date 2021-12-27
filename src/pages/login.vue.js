@@ -612,14 +612,16 @@ export default {
     versionUpdate() {
       let _that = this
       let store = _that.$store
+      let iosUrl = 'https://apps.apple.com/cn/app/collachat/id1546363298'
+      let androidUrl = 'https://curltech.io/#/collachat/downloadapps'
       if (store.ios === true) {
-        let inAppBrowser = inAppBrowserComponent.open('https://apps.apple.com/cn/app/collachat/id1546363298', '_system', 'location=no')
+        inAppBrowserComponent.open(iosUrl, '_system', 'location=no')
       } else if (store.android === true) {
-        let inAppBrowser = inAppBrowserComponent.open('https://curltech.io/#/CollaChatDownload', '_system', 'location=no')
+        inAppBrowserComponent.open(androidUrl, '_system', 'location=no')
       } else if (store.safari === true) {
-        window.open('https://apps.apple.com/cn/app/collachat/id1546363298', '_system')
+        window.open(iosUrl, '_system')
       } else {
-        window.open('https://curltech.io/#/CollaChatDownload', '_system')
+        window.open(androidUrl, '_system')
       }
     },
     upgradeVersion(flag) {
