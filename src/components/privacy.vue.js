@@ -50,6 +50,7 @@ export default {
     },
     changeSwitch: async function (kind, value) {
       this.$q.loading.show()
+      let backupMobile = null
       try {
         let currentDate = new Date()
         let myselfPeerClient = myself.myselfPeerClient
@@ -76,17 +77,12 @@ export default {
         myselfPeer = await myselfPeerService.update(myselfPeer)
         myself.myselfPeer = myselfPeer
 
-        let backupMobile = null
         if (kind === 'mobileNumber' && !value) {
           backupMobile = myselfPeerClient.mobile
           myselfPeerClient.mobile = ''
           myselfPeer.mobile = ''
         }
         let result = await peerClientService.putPeerClient(null, 'Up')
-        if (kind === 'mobileNumber' && !value) {
-          myselfPeerClient.mobile = backupMobile
-          myselfPeer.mobile = backupMobile
-        }
         console.log(result)
         if (result === 'OK') {
           this.$q.notify({
@@ -106,6 +102,10 @@ export default {
       } catch (error) {
         console.error(error)
       } finally {
+        if (backupMobile && kind === 'mobileNumber' && !value) {
+          myselfPeerClient.mobile = backupMobile
+          myselfPeer.mobile = backupMobile
+        }
         this.$q.loading.hide()
       }
     },

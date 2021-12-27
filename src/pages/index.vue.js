@@ -470,10 +470,14 @@ export default {
         myselfPeerClient.mobile = ''
         myselfPeer.mobile = ''
       }
-      let peers = await peerClientService.connect()
-      if (myselfPeerClient.visibilitySetting && myselfPeerClient.visibilitySetting.substring(1, 2) === 'N') {
-        myselfPeerClient.mobile = backupMobile
-        myselfPeer.mobile = backupMobile
+      let peers = null
+      try {
+        peers = await peerClientService.connect()
+      } finally {
+        if (backupMobile && myselfPeerClient.visibilitySetting && myselfPeerClient.visibilitySetting.substring(1, 2) === 'N') {
+          myselfPeerClient.mobile = backupMobile
+          myselfPeer.mobile = backupMobile
+        }
       }
       console.log(peers)
       if (peers === 'mobileOccupied') {

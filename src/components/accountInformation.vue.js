@@ -192,6 +192,7 @@ export default {
     changeAvatar: async function () {
       if (this.avatarBase64) {
         this.$q.loading.show()
+        let backupMobile = null
         try {
           let currentDate = new Date()
           let myselfPeerClient = myself.myselfPeerClient
@@ -216,17 +217,12 @@ export default {
           await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
           this.$store.state.linkmanMap[linkmanPeerId] = linkman
 
-          let backupMobile = null
           if (myselfPeerClient.visibilitySetting && myselfPeerClient.visibilitySetting.substring(1, 2) === 'N') {
             backupMobile = myselfPeerClient.mobile
             myselfPeerClient.mobile = ''
             myselfPeer.mobile = ''
           }
           let result = await peerClientService.putPeerClient(null, 'Up')
-          if (myselfPeerClient.visibilitySetting && myselfPeerClient.visibilitySetting.substring(1, 2) === 'N') {
-            myselfPeerClient.mobile = backupMobile
-            myselfPeer.mobile = backupMobile
-          }
           console.log(result)
           if (result === 'OK') {
             this.$q.notify({
@@ -246,6 +242,10 @@ export default {
         } catch (error) {
           console.error(error)
         } finally {
+          if (backupMobile && myselfPeerClient.visibilitySetting && myselfPeerClient.visibilitySetting.substring(1, 2) === 'N') {
+            myselfPeerClient.mobile = backupMobile
+            myselfPeer.mobile = backupMobile
+          }
           this.$q.loading.hide()
           this.subKind = 'default'
         }
@@ -253,6 +253,7 @@ export default {
     },
     changeName: async function () {
       this.$q.loading.show()
+      let backupMobile = null
       try {
         let currentDate = new Date()
         let myselfPeerClient = myself.myselfPeerClient
@@ -278,17 +279,12 @@ export default {
         await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
         this.$store.state.linkmanMap[linkmanPeerId] = linkman
 
-        let backupMobile = null
         if (myselfPeerClient.visibilitySetting && myselfPeerClient.visibilitySetting.substring(1, 2) === 'N') {
           backupMobile = myselfPeerClient.mobile
           myselfPeerClient.mobile = ''
           myselfPeer.mobile = ''
         }
         let result = await peerClientService.putPeerClient(null, 'Up')
-        if (myselfPeerClient.visibilitySetting && myselfPeerClient.visibilitySetting.substring(1, 2) === 'N') {
-          myselfPeerClient.mobile = backupMobile
-          myselfPeer.mobile = backupMobile
-        }
         console.log(result)
         if (result === 'OK') {
           this.$q.notify({
@@ -308,6 +304,10 @@ export default {
       } catch (error) {
         console.error(error)
       } finally {
+        if (backupMobile && myselfPeerClient.visibilitySetting && myselfPeerClient.visibilitySetting.substring(1, 2) === 'N') {
+          myselfPeerClient.mobile = backupMobile
+          myselfPeer.mobile = backupMobile
+        }
         this.$q.loading.hide()
         this.subKind = 'default'
       }
@@ -323,6 +323,7 @@ export default {
       }
       if (isPhoneNumberValid) {
         this.$q.loading.show()
+        let backupMobile = null
         try {
           let mobile = MobileNumberUtil.formatE164(this.mobile_, MobileNumberUtil.getRegionCodeForCountryCode(this.code_))
           myselfPeerClient.mobile = mobile
@@ -345,17 +346,12 @@ export default {
           await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
           this.$store.state.linkmanMap[linkmanPeerId] = linkman
 
-          let backupMobile = null
           if (myselfPeerClient.visibilitySetting && myselfPeerClient.visibilitySetting.substring(1, 2) === 'N') {
             backupMobile = myselfPeerClient.mobile
             myselfPeerClient.mobile = ''
             myselfPeer.mobile = ''
           }
           let result = await peerClientService.putPeerClient(null, 'Up')
-          if (myselfPeerClient.visibilitySetting && myselfPeerClient.visibilitySetting.substring(1, 2) === 'N') {
-            myselfPeerClient.mobile = backupMobile
-            myselfPeer.mobile = backupMobile
-          }
           console.log(result)
           if (result === 'OK') {
             this.$q.notify({
@@ -375,6 +371,10 @@ export default {
         } catch (error) {
           console.error(error)
         } finally {
+          if (backupMobile && myselfPeerClient.visibilitySetting && myselfPeerClient.visibilitySetting.substring(1, 2) === 'N') {
+            myselfPeerClient.mobile = backupMobile
+            myselfPeer.mobile = backupMobile
+          }
           this.$q.loading.hide()
           this.subKind = 'default'
         }
