@@ -134,32 +134,28 @@ import { P2pChatMessageType } from '@/libs/biz/colla-chat'
             }
           } else if (src.substring(0, 10) === 'data:audio') {
             type = 'audio'
-            if (!current['firstAudioDuration'] && currentFirstAudioDuration == 0) {
-              if (window.device && (window.device.platform === 'Android' || window.device.platform === 'iOS')) {
-                let dirEntry = await fileComponent.getRootDirEntry('tmp')
-                let dirPath = dirEntry.toInternalURL()
-                let fileName = (current['_id'] ? current['_id'] : new Date().getTime()) + 'firstAudio' + '.' + src.substring(11, src.indexOf(';', 11))
-                let localURL = dirPath + fileName
-                let fileEntry = await fileComponent.createNewFileEntry(fileName, dirPath)
-                let blob = BlobUtil.base64ToBlob(src)
-                await fileComponent.writeFile(fileEntry, blob, false).then(async function () {
-                  let audioMedia = audioMediaComponent.create(localURL)
-                  audioMediaComponent.play(audioMedia)
-                  let counter = 0
-                  while (currentFirstAudioDuration === 0 && counter < 5) {
-                    let dur = await audioMediaComponent.getDurationAsync(audioMedia)
-                    console.log(new Date().getTime() + '-getDuration-' + counter + '-' + dur)
-                    if (dur > 0) {
-                      currentFirstAudioDuration = dur
-                    }
-                    counter++
+            if (window.device && (window.device.platform === 'Android' || window.device.platform === 'iOS')) {
+              let dirEntry = await fileComponent.getRootDirEntry('tmp')
+              let dirPath = dirEntry.toInternalURL()
+              let fileName = (current['_id'] ? current['_id'] : new Date().getTime()) + 'firstAudio' + '.' + src.substring(11, src.indexOf(';', 11))
+              let localURL = dirPath + fileName
+              let fileEntry = await fileComponent.createNewFileEntry(fileName, dirPath)
+              let blob = BlobUtil.base64ToBlob(src)
+              await fileComponent.writeFile(fileEntry, blob, false).then(async function () {
+                let audioMedia = audioMediaComponent.create(localURL)
+                audioMediaComponent.play(audioMedia)
+                let counter = 0
+                while (currentFirstAudioDuration === 0 && counter < 5) {
+                  let dur = await audioMediaComponent.getDurationAsync(audioMedia)
+                  console.log(new Date().getTime() + '-getDuration-' + counter + '-' + dur)
+                  if (dur > 0) {
+                    currentFirstAudioDuration = dur
                   }
-                  audioMediaComponent.stop(audioMedia)
-                  audioMediaComponent.release(audioMedia)
-                })
-              } else {
-                currentFirstAudioDuration = 0
-              }
+                  counter++
+                }
+                audioMediaComponent.stop(audioMedia)
+                audioMediaComponent.release(audioMedia)
+              })
             }
           }
           if (type) {
@@ -218,11 +214,9 @@ import { P2pChatMessageType } from '@/libs/biz/colla-chat'
     }
     current['contentBody'] = contentBody.replace(/\&nbsp\;/g, '')
     current['firstFileInfo'] = currentFirstFileInfo
-    if (!current['firstAudioDuration']) {
-      current['firstAudioDuration'] = CollaUtil.formatSeconds(currentFirstAudioDuration)
-      current['contentAAmount'] = contentAAmount
-    }
+    current['firstAudioDuration'] = CollaUtil.formatSeconds(currentFirstAudioDuration)
     console.log('***********************firstAudioDuration:' + current['firstAudioDuration'] + '***********************')
+    current['contentAAmount'] = contentAAmount
     current['contentIVAmount'] = contentIVAmount
     // 临时用以兼容旧数据，否则导致预览封面不显示图片视频、音频、其它文件数量-start
     if (!current['attachIVAmount']) {
@@ -308,12 +302,12 @@ import { P2pChatMessageType } from '@/libs/biz/colla-chat'
       }
       if (content) {
         if (type === 'image') {
-          insertHtml += '<p><br></p>' + '<img src="' + content + '" style="max-width:50%;width:100%;"/>' + '<p><br></p>'
+          insertHtml += '<p><br></p>' + '<img src="' + content + '" style="max-width:50%;width:100%;"></img>' + '<p><br></p>'
         } else if (type === 'video') {
           let thumbnail = await mediaComponent.createVideoThumbnailByBase64(content)
-          insertHtml += '<p><br></p>' + '<video src="' + content + '" poster="' + thumbnail + '" style="max-width:50%;width:100%;" controls webkit-playsinline playsinline x5-playsinline x-webkit-airplay="allow"/>' + '<p><br></p>'
+          insertHtml += '<p><br></p>' + '<video src="' + content + '" poster="' + thumbnail + '" style="max-width:50%;width:100%;" controls webkit-playsinline playsinline x5-playsinline x-webkit-airplay="allow"></video>' + '<p><br></p>'
         } else if (type === 'audio') {
-          insertHtml += '<p><br></p>' + '<audio src="' + content + '" style="max-width:100%;width:100%;" controls/>' + '<p><br></p>'
+          insertHtml += '<p><br></p>' + '<audio src="' + content + '" style="max-width:100%;width:100%;" controls></audio>' + '<p><br></p>'
         } else {
           insertHtml += '<p><br></p>' + '<p>' + content + '</p>' + '<p><br></p>'
         }

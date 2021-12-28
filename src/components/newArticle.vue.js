@@ -173,7 +173,7 @@ export default {
           _that.showFullscreen(selectedVideo)
         }
         editor.customConfig.onAudioSelected = (selectedAudio) => {
-          //_that.showFullscreen(selectedAudio)
+          _that.showFullscreen(selectedAudio)
         }
         editor.customConfig.captureImage = () => {
           _that.capture('image')

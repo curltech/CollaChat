@@ -2623,11 +2623,12 @@ Video.prototype = {
         var width50 = getRandom('width-50');
         var width100 = getRandom('width-100');
         var delBtn = getRandom('del-btn');
+        var previewBtn = getRandom('preview-btn');
 
         // tab 配置
         var tabsConfig = [{
             title: '视频显示',
-            tpl: '<div>\n                    <div class="w-e-button-container" style="border-bottom:1px solid #f1f1f1;padding-bottom:5px;margin-bottom:5px;">\n                        <span style="float:left;font-size:14px;margin:4px 5px 0 5px;color:#333;">\u6700\u5927\u5BBD\u5EA6\uFF1A</span>\n                        <button id="' + width30 + '" class="left">30%</button>\n                        <button id="' + width50 + '" class="left">50%</button>\n                        <button id="' + width100 + '" class="left">100%</button>\n                    </div>\n                    <div class="w-e-button-container">\n                        <button id="' + delBtn + '" class="gray left">\u5220\u9664\u89c6\u9891</button>\n                    </dv>\n                </div>',
+            tpl: '<div>\n                    <div class="w-e-button-container" style="border-bottom:1px solid #f1f1f1;padding-bottom:5px;margin-bottom:5px;">\n                        <span style="float:left;font-size:14px;margin:4px 5px 0 5px;color:#333;">\u6700\u5927\u5BBD\u5EA6\uFF1A</span>\n                        <button id="' + width30 + '" class="left">30%</button>\n                        <button id="' + width50 + '" class="left">50%</button>\n                        <button id="' + width100 + '" class="left">100%</button>\n                    </div>\n                    <div class="w-e-button-container">\n                        <button id="' + previewBtn + '" class="left" style="font-size:14px;padding-left:4px;">\u9884\u89c8\u89c6\u9891</button>\n                    <button id="' + delBtn + '" class="left" style="font-size:14px;padding-left:4px;padding-left:4px;">\u5220\u9664\u89c6\u9891</button>\n                    </dv>\n                </div>',
             events: [{
                 selector: '#' + width30,
                 type: 'click',
@@ -2635,6 +2636,8 @@ Video.prototype = {
                     var $video = editor._selectedVideo;
                     if ($video) {
                         $video.css('max-width', '30%');
+                        // 触发 onchange
+                        editor.change && editor.change();
                     }
                     // 返回 true，表示该事件执行完之后，panel 要关闭。否则 panel 不会关闭
                     return true;
@@ -2646,6 +2649,8 @@ Video.prototype = {
                     var $video = editor._selectedVideo;
                     if ($video) {
                         $video.css('max-width', '50%');
+                        // 触发 onchange
+                        editor.change && editor.change();
                     }
                     // 返回 true，表示该事件执行完之后，panel 要关闭。否则 panel 不会关闭
                     return true;
@@ -2657,6 +2662,8 @@ Video.prototype = {
                     var $video = editor._selectedVideo;
                     if ($video) {
                         $video.css('max-width', '100%');
+                        // 触发 onchange
+                        editor.change && editor.change();
                     }
                     // 返回 true，表示该事件执行完之后，panel 要关闭。否则 panel 不会关闭
                     return true;
@@ -2668,6 +2675,22 @@ Video.prototype = {
                     var $video = editor._selectedVideo;
                     if ($video) {
                         $video.remove();
+                        // 触发 onchange
+                        editor.change && editor.change();
+                    }
+                    // 返回 true，表示该事件执行完之后，panel 要关闭。否则 panel 不会关闭
+                    return true;
+                }
+            }, {
+                selector: '#' + previewBtn,
+                type: 'click',
+                fn: function fn() {
+                    var $video = editor._selectedVideo;
+                    if ($video) {
+                        var onVideoSelected = editor.config.onVideoSelected;
+                        if (onVideoSelected && typeof onVideoSelected === 'function') {
+                            onVideoSelected($video);
+                        }
                     }
                     // 返回 true，表示该事件执行完之后，panel 要关闭。否则 panel 不会关闭
                     return true;
@@ -2857,11 +2880,12 @@ Image.prototype = {
         var width50 = getRandom('width-50');
         var width100 = getRandom('width-100');
         var delBtn = getRandom('del-btn');
+        var previewBtn = getRandom('preview-btn');
 
         // tab 配置
         var tabsConfig = [{
             title: '图片显示',
-            tpl: '<div>\n                    <div class="w-e-button-container" style="border-bottom:1px solid #f1f1f1;padding-bottom:5px;margin-bottom:5px;">\n                        <span style="float:left;font-size:14px;margin:4px 5px 0 5px;color:#333;">\u6700\u5927\u5BBD\u5EA6\uFF1A</span>\n                        <button id="' + width30 + '" class="left">30%</button>\n                        <button id="' + width50 + '" class="left">50%</button>\n                        <button id="' + width100 + '" class="left">100%</button>\n                    </div>\n                    <div class="w-e-button-container">\n                        <button id="' + delBtn + '" class="gray left">\u5220\u9664\u56FE\u7247</button>\n                    </dv>\n                </div>',
+            tpl: '<div>\n                    <div class="w-e-button-container" style="border-bottom:1px solid #f1f1f1;padding-bottom:5px;margin-bottom:5px;">\n                        <span style="float:left;font-size:14px;margin:4px 5px 0 5px;color:#333;">\u6700\u5927\u5BBD\u5EA6\uFF1A</span>\n                        <button id="' + width30 + '" class="left">30%</button>\n                        <button id="' + width50 + '" class="left">50%</button>\n                        <button id="' + width100 + '" class="left">100%</button>\n                    </div>\n                    <div class="w-e-button-container">\n                        <button id="' + previewBtn + '" class="left" style="font-size:14px;padding-left:4px;">\u9884\u89c8\u56FE\u7247</button>\n                    <button id="' + delBtn + '" class="left" style="font-size:14px;padding-left:4px;padding-left:4px;">\u5220\u9664\u56FE\u7247</button>\n                    </dv>\n                </div>',
             events: [{
                 selector: '#' + width30,
                 type: 'click',
@@ -2869,6 +2893,8 @@ Image.prototype = {
                     var $img = editor._selectedImg;
                     if ($img) {
                         $img.css('max-width', '30%');
+                        // 触发 onchange
+                        editor.change && editor.change();
                     }
                     // 返回 true，表示该事件执行完之后，panel 要关闭。否则 panel 不会关闭
                     return true;
@@ -2880,6 +2906,8 @@ Image.prototype = {
                     var $img = editor._selectedImg;
                     if ($img) {
                         $img.css('max-width', '50%');
+                        // 触发 onchange
+                        editor.change && editor.change();
                     }
                     // 返回 true，表示该事件执行完之后，panel 要关闭。否则 panel 不会关闭
                     return true;
@@ -2891,6 +2919,8 @@ Image.prototype = {
                     var $img = editor._selectedImg;
                     if ($img) {
                         $img.css('max-width', '100%');
+                        // 触发 onchange
+                        editor.change && editor.change();
                     }
                     // 返回 true，表示该事件执行完之后，panel 要关闭。否则 panel 不会关闭
                     return true;
@@ -2902,6 +2932,22 @@ Image.prototype = {
                     var $img = editor._selectedImg;
                     if ($img) {
                         $img.remove();
+                        // 触发 onchange
+                        editor.change && editor.change();
+                    }
+                    // 返回 true，表示该事件执行完之后，panel 要关闭。否则 panel 不会关闭
+                    return true;
+                }
+            }, {
+                selector: '#' + previewBtn,
+                type: 'click',
+                fn: function fn() {
+                    var $img = editor._selectedImg;
+                    if ($img) {
+                        var onImgSelected = editor.config.onImgSelected;
+                        if (onImgSelected && typeof onImgSelected === 'function') {
+                            onImgSelected($img);
+                        }
                     }
                     // 返回 true，表示该事件执行完之后，panel 要关闭。否则 panel 不会关闭
                     return true;
@@ -3095,7 +3141,7 @@ Audio.prototype = {
         // tab 配置
         var tabsConfig = [{
             title: '音频显示',
-            tpl: '<div>\n                    <div class="w-e-button-container" style="border-bottom:1px solid #f1f1f1;padding-bottom:5px;margin-bottom:5px;">\n                        <span style="float:left;font-size:14px;margin:4px 5px 0 5px;color:#333;">\u6700\u5927\u5BBD\u5EA6\uFF1A</span>\n                        <button id="' + width30 + '" class="left">30%</button>\n                        <button id="' + width50 + '" class="left">50%</button>\n                        <button id="' + width100 + '" class="left">100%</button>\n                    </div>\n                    <div class="w-e-button-container">\n                        <button id="' + delBtn + '" class="gray left">\u5220\u9664\u97f3\u9891</button>\n                    </dv>\n                </div>',
+            tpl: '<div>\n                    <div class="w-e-button-container" style="border-bottom:1px solid #f1f1f1;padding-bottom:5px;margin-bottom:5px;">\n                        <span style="float:left;font-size:14px;margin:4px 5px 0 5px;color:#333;">\u6700\u5927\u5BBD\u5EA6\uFF1A</span>\n                        <button id="' + width30 + '" class="left">30%</button>\n                        <button id="' + width50 + '" class="left">50%</button>\n                        <button id="' + width100 + '" class="left">100%</button>\n                    </div>\n                    <div class="w-e-button-container">\n                        <button id="' + delBtn + '" class="left" style="font-size:14px;padding-left:4px;padding-left:4px;">\u5220\u9664\u97f3\u9891</button>\n                    </dv>\n                </div>',
             events: [{
                 selector: '#' + width30,
                 type: 'click',
@@ -3103,6 +3149,8 @@ Audio.prototype = {
                     var $audio = editor._selectedAudio;
                     if ($audio) {
                         $audio.css('max-width', '30%');
+                        // 触发 onchange
+                        editor.change && editor.change();
                     }
                     // 返回 true，表示该事件执行完之后，panel 要关闭。否则 panel 不会关闭
                     return true;
@@ -3114,6 +3162,8 @@ Audio.prototype = {
                     var $audio = editor._selectedAudio;
                     if ($audio) {
                         $audio.css('max-width', '50%');
+                        // 触发 onchange
+                        editor.change && editor.change();
                     }
                     // 返回 true，表示该事件执行完之后，panel 要关闭。否则 panel 不会关闭
                     return true;
@@ -3125,6 +3175,8 @@ Audio.prototype = {
                     var $audio = editor._selectedAudio;
                     if ($audio) {
                         $audio.css('max-width', '100%');
+                        // 触发 onchange
+                        editor.change && editor.change();
                     }
                     // 返回 true，表示该事件执行完之后，panel 要关闭。否则 panel 不会关闭
                     return true;
@@ -3136,6 +3188,8 @@ Audio.prototype = {
                     var $audio = editor._selectedAudio;
                     if ($audio) {
                         $audio.remove();
+                        // 触发 onchange
+                        editor.change && editor.change();
                     }
                     // 返回 true，表示该事件执行完之后，panel 要关闭。否则 panel 不会关闭
                     return true;
@@ -4088,7 +4142,7 @@ Text.prototype = {
             var config = editor.config;
             var onImgSelected = config.onImgSelected;
             if (onImgSelected && typeof onImgSelected === 'function') {
-                onImgSelected($img);
+                //onImgSelected($img);
             }
             // Added by wf
         });
@@ -4127,7 +4181,7 @@ Text.prototype = {
             var config = editor.config;
             var onVideoSelected = config.onVideoSelected;
             if (onVideoSelected && typeof onVideoSelected === 'function') {
-                onVideoSelected($video);
+                //onVideoSelected($video);
             }
             // Added by wf
         });
@@ -4167,7 +4221,7 @@ Text.prototype = {
             var config = editor.config;
             var onAudioSelected = config.onAudioSelected;
             if (onAudioSelected && typeof onAudioSelected === 'function') {
-                onAudioSelected($audio);
+                //onAudioSelected($audio);
             }
             // Added by wf
         });
