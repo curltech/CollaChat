@@ -297,10 +297,10 @@ export default {
               }, 1000)
               let iceServer = [
                 {
-                  urls: `stun:${connectAddress}:3478`
+                  urls: `stun:${connectAddress}:3479`
                 },
                 {
-                  urls: `turn:${connectAddress}:3478`,
+                  urls: `turn:${connectAddress}:3479`,
                   username: myselfPeerClient.peerId,
                   credential: myselfPeerClient.peerPublicKey
                 }
@@ -648,10 +648,10 @@ export default {
       let _connectAddress = myselfPeerClient.connectPeerId.match(/\/dns4\/(\S*)\/tcp/)[1]
       let iceServer = [
         {
-          urls: `stun:${_connectAddress}:3478`
+          urls: `stun:${_connectAddress}:3479`
         },
         {
-          urls: `turn:${_connectAddress}:3478`,
+          urls: `turn:${_connectAddress}:3479`,
           username: myselfPeerClient.peerId,
           credential: myselfPeerClient.peerPublicKey
         }
@@ -4620,7 +4620,7 @@ export default {
       store.collectionWorkerEnabler = false
     }
     store.useNativeAndroid = false // 是否使用Android原生拍照、拍摄、相册等功能
-    store.displayActiveStatus = true // 是否显示在线状态
+    store.displayActiveStatus = false // 是否显示在线状态
     let linkmanRequestDBItems = await contactComponent.loadLinkmanRequest({
       ownerPeerId: myself.myselfPeerClient.peerId,
       requestType: RequestType.ADD_LINKMAN,
