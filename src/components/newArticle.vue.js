@@ -378,7 +378,6 @@ export default {
     },
     async insertEditor(files) {
       let insertHtml = await collectionUtil.getInsertHtml(files)
-      console.log('insertHtml:' + insertHtml)
       let html = this.$store.state.articleData.content
       html = html.replace('([{PHFI}])', insertHtml)
       this.$store.state.articleData.content = html

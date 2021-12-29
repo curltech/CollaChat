@@ -775,7 +775,6 @@ export default {
       let current = this.myCollections.c_meta.current
       if (current) {
         let insertHtml = await collectionUtil.getInsertHtml(files)
-        console.log('insertHtml:' + insertHtml)
         let html = this.myCollections.c_meta.current.content
         html = html.replace('([{PHFI}])', insertHtml)
         this.myCollections.c_meta.current.content = html
@@ -1320,14 +1319,65 @@ export default {
           //'fullscreen' // 全屏
           'audio' //音频
         ]
-        editor.customConfig.lang = {
-          //'设置标题': 'title',
-          //'正文': 'p',
-          //'链接文字': 'link text',
-          //'链接': 'link',
-          //'上传图片': 'upload image',
-          //'上传': 'upload',
-          //'创建': 'init'
+        let language = myself.myselfPeerClient && myself.myselfPeerClient.language ? myself.myselfPeerClient.language : _that.$i18n.locale
+        if (language === 'zh-tw') {
+          editor.customConfig.lang = {
+            '设置标题': '設置標題',
+            '正文': '正文',
+            '设置列表': '設置列表',
+            '数字编码': '數字編碼',
+            '项目符号': '項目符號',
+            '分割横线': '分割橫線',
+            '链接文字': '鏈接文字',
+            '图片链接': '圖片鏈接',
+            '视频链接': '視頻鏈接',
+            '音频链接': '音頻鏈接',
+            '插入链接': '插入鏈接',
+            '删除链接': '刪除鏈接',
+            '链接': '鏈接',
+            '图片显示': '圖片顯示',
+            '视频显示': '視頻顯示',
+            '音频显示': '音頻顯示',
+            '最大宽度': '最大寬度',
+            '预览图片': '預覽圖片',
+            '删除图片': '刪除圖片',
+            '预览视频': '預覽視頻',
+            '删除视频': '刪除視頻',
+            '图片': '圖片',
+            '视频': '視頻',
+            '音频': '音頻',
+            '插入': '插入',
+            '格式如': '格式如'
+          }
+        } else if (language !== 'zh-hans') {
+          editor.customConfig.lang = {
+            '设置标题': 'Title',
+            '正文': 'P',
+            '设置列表': 'List',
+            '数字编码': 'Numbering',
+            '项目符号': 'Bullet List',
+            '分割横线': 'Split Line',
+            '链接文字': 'Link Text',
+            '图片链接': 'Image Link',
+            '视频链接': 'Video Link',
+            '音频链接': 'Audio Link',
+            '插入链接': 'Insert',
+            '删除链接': 'Delete',
+            '链接': 'Link',
+            '图片显示': 'Image Display',
+            '视频显示': 'Video Display',
+            '音频显示': 'Audio Display',
+            '最大宽度': 'Width',
+            '预览图片': 'Preview',
+            '删除图片': 'Delete',
+            '预览视频': 'Preview',
+            '删除视频': 'Delete',
+            '图片': 'Image',
+            '视频': 'Video',
+            '音频': 'Audio',
+            '插入': 'Insert',
+            '格式如': 'Format'
+          }
         }
         editor.customConfig.uploadImgShowBase64 = true // 使用 base64 保存图片、视频、音频
         editor.customConfig.ifMobile = store.ifMobile() // 是否移动客户端

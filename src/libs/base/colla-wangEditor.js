@@ -1407,7 +1407,7 @@ Link.prototype = {
                 // tab 的标题
                 title: '链接',
                 // 模板
-                tpl: '<div>\n                            <input id="' + inputTextId + '" type="text" class="block" value="' + text + '" placeholder="\u94FE\u63A5\u6587\u5B57"/></td>\n                            <input id="' + inputLinkId + '" type="text" class="block" value="' + link + '" placeholder="http://..."/></td>\n                            <div class="w-e-button-container">\n                                <button id="' + btnOkId + '" class="right">\u63D2\u5165</button>\n                                <button id="' + btnDelId + '" class="gray right" style="display:' + delBtnDisplay + '">\u5220\u9664\u94FE\u63A5</button>\n                            </div>\n                        </div>',
+                tpl: '<div>\n                            <input id="' + inputTextId + '" type="text" class="block" value="' + text + '" placeholder="\u94FE\u63A5\u6587\u5B57"/></td>\n                            <input id="' + inputLinkId + '" type="text" class="block" value="' + link + '" placeholder="http://..."/></td>\n                            <div class="w-e-button-container">\n                                <button id="' + btnOkId + '" class="right">\u63D2\u5165\u94FE\u63A5</button>\n                                <button id="' + btnDelId + '" class="right" style="display:' + delBtnDisplay + '">\u5220\u9664\u94FE\u63A5</button>\n                            </div>\n                        </div>',
                 // 事件绑定
                 events: [
                 // 插入链接
@@ -3224,8 +3224,9 @@ Audio.prototype = {
         var tabsConfig = [{
             title: '音频',
             tpl: //'<div class="w-e-up-img-container">\n                    <div id="' + upTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-upload1"></i>\n                    </div>\n                    <div id="' + captureTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-capture-audio"></i>\n                    </div>\n                    <div style="display:none;">\n                        <input id="' + upFileId + '" type="file" multiple="multiple" accept="audio/mp3,audio/wav,audio/webm"/>\n                    </div>\n                </div>',
-                 '<div class="w-e-up-img-container">\n                    <div id="' + upTriggerId + '" class="w-e-up-btn">\n                        <label for="' + upFileId + '" class="w-e-icon-upload1"></label>\n                    <input id="' + upFileId + '" type="file" multiple="multiple" accept="audio/mp3,audio/wav,audio/webm" class="visually-hidden"/>\n                    </div>\n                    <div id="' + captureTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-capture-audio"></i>\n                    <input id="placeholder" type="file" multiple="multiple" accept="audio/mp3,audio/wav,audio/webm" class="visually-hidden"/>\n                    </div>',
-            events: [/*{
+                 //'<div class="w-e-up-img-container">\n                    <div id="' + upTriggerId + '" class="w-e-up-btn">\n                        <label for="' + upFileId + '" class="w-e-icon-upload1"></label>\n                    <input id="' + upFileId + '" type="file" multiple="multiple" accept="audio/mp3,audio/wav,audio/webm" class="visually-hidden"/>\n                    </div>\n                    <div id="' + captureTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-capture-audio"></i>\n                    <input id="placeholder" type="file" multiple="multiple" accept="audio/mp3,audio/wav,audio/webm" class="visually-hidden"/>\n                    </div>',
+                 '<div class="w-e-up-img-container">\n                    <div id="' + upTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-upload1"></i>\n                    </div>\n                    <div id="' + captureTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-capture-audio"></i>\n                    </div>\n                    <div style="display:none;">\n                        <input id="' + upFileId + '" type="file" multiple="multiple" accept="audio/mp3,audio/wav,audio/webm"/>\n                    </div>\n                </div>',
+            events: [{
                 // 触发选择音频
                 selector: '#' + upTriggerId,
                 type: 'click',
@@ -3248,7 +3249,7 @@ Audio.prototype = {
                         }
                     }
                 }
-            }, */{
+            }, {
                 // 选择音频完毕
                 selector: '#' + upFileId,
                 type: 'change',
@@ -4701,7 +4702,7 @@ UploadImg.prototype = {
             img.onerror = function () {
                 img = null;
                 // 无法成功下载图片
-                _this2._alert('插入图片错误', 'wangEditor: \u63D2\u5165\u56FE\u7247\u51FA\u9519\uFF0C\u56FE\u7247\u94FE\u63A5\u662F "' + link + '"\uFF0C\u4E0B\u8F7D\u8BE5\u94FE\u63A5\u5931\u8D25');
+                _this2._alert('插入图片错误', 'wangEditor: \u63D2\u5165\u56FE\u7247\u51FA\u9519\uFF0C\u56FE\u7247\u94FE\u63A5\u662F"' + link + '"\uFF0C\u4E0B\u8F7D\u8BE5\u94FE\u63A5\u5931\u8D25');
                 return;
             };
             img.onabort = function () {
