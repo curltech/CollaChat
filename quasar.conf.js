@@ -274,7 +274,7 @@ module.exports = function (ctx) {
           gatekeeperAssess: false,
           entitlements: 'src-electron/entitlements.mas.plist',
           entitlementsInherit: 'src-electron/entitlements.mas.inherit.plist',
-          provisioningProfile: 'src-electron/CollaPPMACStore20201029.provisionprofile',
+          provisioningProfile: 'src-electron/CollaPPMACStore20211230.provisionprofile',
           asarUnpack: [],
           extendInfo: {
             NSMicrophoneUsageDescription: 'This App needs microphone access to record sounds in videos/audios, have video/audio calls.',
