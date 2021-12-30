@@ -914,7 +914,7 @@ export default {
       store.latestVersion = null
       let configItem = 'nodeList'
       let worker = _that.initGetConfigWorker(configItem)
-      worker.postMessage(configItem + 'ISO' + '-prod')
+      worker.postMessage(configItem + 'ISO')
       configItem = 'versionHistory'
       worker = _that.initGetConfigWorker(configItem)
       let type = 'others'
@@ -926,7 +926,7 @@ export default {
         type = 'safari'
       }
       console.log('type:' + type)
-      worker.postMessage(configItem + '-' + type + '-prod')
+      worker.postMessage(configItem + '-' + type)
 
       // 查询本地身份记录
       let myselfPeer = null
