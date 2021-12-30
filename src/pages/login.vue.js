@@ -632,7 +632,7 @@ export default {
     upgradeVersion(flag) {
       let _that = this
       let store = _that.$store
-      store.currentVersion = '0.2.70'
+      store.currentVersion = '0.2.71'
       store.mandatory = false
       if (_that.versionHistory && _that.versionHistory.length > 0) {
         let no = 1
@@ -919,7 +919,7 @@ export default {
       store.latestVersion = null
       let configItem = 'nodeList'
       let worker = _that.initGetConfigWorker(configItem)
-      worker.postMessage(configItem + 'ISO')
+      worker.postMessage(configItem + 'ISO' + '-prod')
       configItem = 'versionHistory'
       worker = _that.initGetConfigWorker(configItem)
       let type = 'others'
@@ -931,7 +931,7 @@ export default {
         type = 'safari'
       }
       console.log('type:' + type)
-      worker.postMessage(configItem + '-' + type)
+      worker.postMessage(configItem + '-' + type + '-prod')
 
       // 查询本地身份记录
       let myselfPeer = null
