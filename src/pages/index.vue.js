@@ -2023,7 +2023,9 @@ export default {
           }
         }
       } else if (type === ChatMessageType.LOGOUT) {
-        await store.logout(data)
+        if (data && data.srcClientDevice === myselfPeerClient.clientDevice) {
+          await store.logout(data)
+        }
       } else if (type === ChatMessageType.MIGRATE) { // unreachable
         console.log('MIGRATE')
         _that.initMigrateDialog = false

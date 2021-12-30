@@ -12,7 +12,7 @@
           q-item-section
             q-item-label {{ linkmanRequest.name }}
             q-item-label(caption lines="1") {{ $t('Mobile: ') + linkmanRequest.mobile }}
-            q-item-label(caption lines="2") {{ $t('PeerId: ') + linkmanRequest.receiverPeerId }}
+            q-item-label(caption lines="3" style="word-break:break-all") {{ $t('PeerId: ') + linkmanRequest.receiverPeerId }}
             q-item-label(caption lines="10") {{ $t('InviteMessage: ') + linkmanRequest.message }}
             q-item-label(caption lines="1") {{ $t('CreateDate: ') + date.formatDate(linkmanRequest.createDate, 'YYYY-MM-DD HH:mm:ss') }}
           q-item-section(side :class="(linkmanRequest.status === RequestStatus.SENT || linkmanRequest.status === RequestStatus.RECEIVED) ? 'hidden' : ''")

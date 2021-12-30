@@ -88,7 +88,7 @@
           q-item-section
             q-item-label {{ $store.findLinkman.name ? $store.findLinkman.name : '' }}
             //q-item-label(caption lines="1") {{ $t('Mobile: ') + ($store.findLinkman.mobile ? $store.findLinkman.mobile : '') }}
-            q-item-label(caption, lines="2") {{ $t('PeerId: ') + ($store.findLinkman.peerId ? $store.findLinkman.peerId : '') }}
+            q-item-label(caption, lines="3", style="word-break:break-all") {{ $t('PeerId: ') + ($store.findLinkman.peerId ? $store.findLinkman.peerId : '') }}
         q-separator.c-separator(
           v-if="$store.findLinkman && ($store.state.findLinkmanResult === 3 || $store.state.findLinkmanResult === 4)",
           style="height:8px;margin-left:0px;margin-right:0px"
@@ -125,7 +125,7 @@
           q-item-section
             q-item-label {{ linkman ? linkman.name : '' }}
             //q-item-label(caption lines="1") {{ $t('Mobile: ') + (linkman ? linkman.mobile : '') }}
-            q-item-label(caption, lines="2") {{ $t('PeerId: ') + (linkman ? linkman.peerId : '') }}
+            q-item-label(caption, lines="3", style="word-break:break-all") {{ $t('PeerId: ') + (linkman ? linkman.peerId : '') }}
         q-separator.c-separator(
           style="height:8px;margin-left:0px;margin-right:0px"
         )

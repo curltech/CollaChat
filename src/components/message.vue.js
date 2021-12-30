@@ -216,12 +216,10 @@ export default {
     isRecallTimeLimit() {
       let _that = this
       let store = _that.$store
-
       return function (message) {
         if (message.senderPeerId !== store.state.myselfPeerClient.peerId) {
           return true
         }
-        let result = false
         let recallTimeLimit
         if (message.subjectType === SubjectType.CHAT) {
           let linkman = store.state.linkmanMap[message.subjectId]

@@ -316,8 +316,11 @@ export default {
         newLinkman.locked = false
         newLinkman.notAlert = false
         newLinkman.top = false
+        newLinkman.recallTimeLimit = true
+        newLinkman.recallAlert = true
+        newLinkman.myselfRecallTimeLimit = true
+        newLinkman.myselfRecallAlert = true
         await contactComponent.insert(ContactDataType.LINKMAN, newLinkman, store.state.linkmans)
-
         let mobile = myself.myselfPeer.mobile
         if (mobile) {
           let mobileObject = MobileNumberUtil.parse(mobile)
@@ -444,6 +447,8 @@ export default {
       newLinkman.top = false
       newLinkman.recallTimeLimit = true
       newLinkman.recallAlert = true
+      newLinkman.myselfRecallTimeLimit = true
+      newLinkman.myselfRecallAlert = true
       await contactComponent.insert(ContactDataType.LINKMAN, newLinkman, store.state.linkmans)
       _that.loginData.countryRegion_ = _that.registerData.countryRegion_
       _that.loginData.code_ = _that.registerData.code_
