@@ -632,7 +632,7 @@ export default {
     upgradeVersion(flag) {
       let _that = this
       let store = _that.$store
-      store.currentVersion = '0.2.71'
+      store.currentVersion = '0.2.72'
       store.mandatory = false
       if (_that.versionHistory && _that.versionHistory.length > 0) {
         let no = 1
