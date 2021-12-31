@@ -79,9 +79,9 @@
                     //q-btn-group(flat stretch)
                       q-btn.text-primary.btnMessage(flat stack no-caps :label="$t('File')" icon="folder" @click="$refs.messageUpload.pickFiles()")
                     form#messageUploadForm
-                      label(for="messageUpload" class="notranslate material-icons q-icon btnIcon" aria-hidden="true" style="font-size: 32px;") folder
-                      input#messageUpload(type="file" class="visually-hidden" @change="uploadMessageFileMobile()")
-                      label(for="messageUpload" class="btnIcon" style="font-size: 12px;padding-left: 4px;") {{ $t('File') }}
+                      label(for="messageUpload" class="notranslate material-icons q-icon text-primary" aria-hidden="true" style="font-size: 32px;") folder
+                      input#messageUpload(type="file" class="visually-hidden" @change="uploadMessageFileMobile()" accept="")
+                      label(for="messageUpload" class="text-primary" style="font-size: 12px;padding-left: 4px;") {{ $t('File') }}
               .col-12.text-center
                 .audio-touch#audio-touch(@touchstart="audioTouchStart" @touchmove="audioTouchMove" @touchend="audioTouchEnd")
                   q-icon(size="16px" name="mic" style="vertical-align: text-top;")
@@ -330,7 +330,7 @@
           q-toolbar-title(align="center" :style="ifIAmGroupOwner($store.state.currentChat) ? '' : 'padding-right:54px'") {{ $t('Group File') + '(' + GroupFileFilteredList.length + ')' }}
           q-btn.text-primary(v-if="ifIAmGroupOwner($store.state.currentChat) && !(ifMobileSize || $store.state.ifMobileStyle)" flat round icon="add_circle_outline" @click="$refs.groupFileUpload.pickFiles()")
           form#groupFileUploadForm(v-if="ifIAmGroupOwner($store.state.currentChat) && (ifMobileSize || $store.state.ifMobileStyle)")
-            label(for="groupFileUpload" class="notranslate material-icons q-icon btnIcon" aria-hidden="true" style="font-size: 27px;") add_circle_outline
+            label(for="groupFileUpload" class="notranslate material-icons q-icon text-primary" aria-hidden="true" style="font-size: 27px;") add_circle_outline
             input#groupFileUpload(type="file" class="visually-hidden" @change="uploadGroupFileMobile()")
         div.scroll.header-mar-top(id="scroll-target-default" :class="ifMobileSize || $store.state.ifMobileStyle ? (ifMobileSize ? 'scrollHeightMobileSize-editor' : 'scrollHeightMobileStyle-editor') : 'scrollHeightStyle'")
           q-toolbar(insert class="q-px-xs")
