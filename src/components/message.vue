@@ -67,7 +67,16 @@
                       q-btn.text-primary.btnMessage(flat stack no-caps :label="$t('Destroy')" icon="alarm" :disable ='!(!ifSelfChat && activeStatus($store.state.currentChat) && ($store.state.currentChat && $store.state.currentChat.subjectType === SubjectType.CHAT))' @click="destroyClock = true")
                         q-popup-edit(v-model="destroyClock" content-class="" style='width:100px')
                           q-option-group(:options="clockOptions" label="Notification" type="radio" v-model="$store.state.currentChat.destroyTime")
-                      q-btn.text-primary.btnMessage(flat stack no-caps :label="$t('Album')" icon="image" @click="uploadMobileMessageImage")
+                      q-btn.text-primary.btnMessage
+                        form#messageUploadForm(style="margin-top:-15px")
+                          label(for="messageUpload" class="notranslate material-icons q-icon text-primary" aria-hidden="true" style="font-size: 32px;") folder
+                          input#messageUpload(type="file" class="visually-hidden" @change="uploadMessageFileMobile()" accept="")
+                          label(for="messageUpload" class="text-primary" style="font-size: 12px;padding-left: 4px;") {{ $t('File') }}
+                        //- form#imageLibraryUploadForm(style="margin-top:-15px")
+                        //-   label(for="imageLibraryUpload" class="notranslate material-icons q-icon text-primary" aria-hidden="true" style="font-size: 32px;") image
+                        //-   input#imageLibraryUpload(type="file" :multiple="$store.uploadMultiLimit" class="visually-hidden" @change="imageLibraryUpload()" accept="image/jpg,image/jpeg,image/png,image/gif,image/bmp,image/heic,video/mp4,video/mov")
+                        //-   label(for="imageLibraryUpload" class="text-primary" style="font-size: 12px;padding-left: 4px;") {{ $t('Album') }}
+                      input#imageLibraryUpload(type="file" class="visually-hidden" @change="uploadMessageFileMobile()" accept="image/jpg,image/jpeg,image/png,image/gif,image/bmp,image/heic,video/mp4,video/mov")
                       q-btn.text-primary.btnMessage(flat stack no-caps :label="$t('Take Photo')" icon="photo_camera" @click="capture('image')")
                       q-btn.text-primary.btnMessage(flat stack no-caps :label="$t('Take Video')" icon="camera" @click="capture('video')")
                     q-btn-group(flat spread stretch)
@@ -75,13 +84,7 @@
                       q-btn.text-primary.btnMessage(flat stack no-caps :label="$t('Video Call')" icon="videocam"  :disable="ifSelfChat"   @click="initiateCallRequest('video')")
                       q-btn.text-primary.btnMessage(flat stack no-caps :label="$t('Collection')" icon="bookmarks" @click="openCollection")
                       q-btn.text-primary.btnMessage(flat stack no-caps :label="$t('Contact Card')" icon="account_box" @click="selectLinkmanCard")
-                  q-carousel-slide(name="slide2" class="q-pa-md")
-                    //q-btn-group(flat stretch)
-                      q-btn.text-primary.btnMessage(flat stack no-caps :label="$t('File')" icon="folder" @click="$refs.messageUpload.pickFiles()")
-                    form#messageUploadForm
-                      label(for="messageUpload" class="notranslate material-icons q-icon text-primary" aria-hidden="true" style="font-size: 32px;") folder
-                      input#messageUpload(type="file" class="visually-hidden" @change="uploadMessageFileMobile()" accept="")
-                      label(for="messageUpload" class="text-primary" style="font-size: 12px;padding-left: 4px;") {{ $t('File') }}
+                  //q-carousel-slide(name="slide2" class="q-pa-md")
               .col-12.text-center
                 .audio-touch#audio-touch(@touchstart="audioTouchStart" @touchmove="audioTouchMove" @touchend="audioTouchEnd")
                   q-icon(size="16px" name="mic" style="vertical-align: text-top;")

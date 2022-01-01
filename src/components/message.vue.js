@@ -877,9 +877,9 @@ export default {
     async uploadMessageFile(file) {
       let _that = this
       let store = _that.$store
-      if (file.size > 2097152 * 100) { // 2M
+      if (file.size > 1048576 * store.uploadFileSizeLimit) {
         _that.$q.notify({
-          message: `${_that.$i18n.t("Upload file cannot exceed")} 200M`,
+          message: `${_that.$i18n.t("Upload file cannot exceed")} ${store.uploadFileSizeLimit}M`,
           timeout: 3000,
           type: "warning",
           color: "warning",
@@ -918,7 +918,26 @@ export default {
       }
       _that.$refs.messageUpload.reset()
     },
-    uploadMessageFileMobile(file) {
+    imageLibraryUpload(){
+      let _that = this
+      let store = _that.$store
+      if (!_that.preCheck()) {
+        return
+      }
+      _that.$nextTick(async () => {
+        let imageLibraryUpload = document.getElementById('imageLibraryUpload')
+        if (imageLibraryUpload && imageLibraryUpload.files && imageLibraryUpload.files.length > 0) {
+          for(let file of imageLibraryUpload.files){
+            await _that.uploadMessageFile(file)
+          }
+          let form = document.getElementById('imageLibraryUploadForm')
+          if (form) {
+            form.reset()
+          }
+        }
+      })
+    },
+    uploadMessageFileMobile() {
       let _that = this
       let store = _that.$store
       if (!_that.preCheck()) {
@@ -937,33 +956,6 @@ export default {
           }
         }
       })
-    },
-    uploadMobileMessageImage: async function () {
-      let _that = this
-      let store = _that.$store
-      let medias = await mediaPickerComponent.getMedias()
-      if (medias && medias.length > 0) {
-        for (let i = 0; i < medias.length; i++) {
-          let media = medias[i]
-          let type;
-          MediaPicker.fileToBlob(media.path, async function (data) {
-            let blob, fileData;
-            if (media.mediaType === 'image') {
-              blob = new Blob([data], { "type": "image/jpeg" });
-              type = ChatContentType.IMAGE
-            } else {
-              blob = new Blob([data], { "type": "video/mp4" });
-              type = ChatContentType.VIDEO
-            }
-            let fileReader = new FileReader();
-            fileReader.onload = async function (e) {
-              fileData = e.target.result;
-              await store.saveFileAndSendMessage(store.state.currentChat, fileData, type)
-            }
-            fileReader.readAsDataURL(blob);
-          }, function (e) { console.log(e) });
-        }
-      }
     },
     mobileTakePhoto() {
       let _that = this

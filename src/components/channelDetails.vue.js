@@ -508,7 +508,7 @@ export default {
       if (store.channelDetailsChannelEntry === 'article') {
         _that.subKind = 'view'
       } else {
-        $store.toggleDrawer(false)
+        store.toggleDrawer(false)
       }
       store.channelDetailsChannelEntry = null
     },
