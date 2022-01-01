@@ -667,8 +667,11 @@ var config = {
     // 上传图片，是否显示 base64 格式
     uploadImgShowBase64: false,
 
-    // 是否移动客户端
-    ifMobile: false,
+    // 是否ios
+    ios: false,
+
+    // 同时上传文件数量限制
+    multiLimit: 10,
 
     // 上传图片，server 地址（如果有值，则 base64 格式的配置则失效）
     // uploadImgServer: '/upload',
@@ -2713,6 +2716,7 @@ Video.prototype = {
         var editor = this.editor;
         var uploadImg = editor.uploadImg;
         var config = editor.config;
+        var multiLimit = config.multiLimit;
 
         // id
         var upTriggerId = getRandom('up-trigger');
@@ -2724,15 +2728,15 @@ Video.prototype = {
         // tabs 的配置
         var tabsConfig = [{
             title: '视频',
-            tpl: '<div class="w-e-up-img-container">\n                    <div id="' + upTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-upload1"></i>\n                    </div>\n                    <div id="' + captureTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-capture-video"></i>\n                    </div>\n                    <div style="display:none;">\n                        <input id="' + upFileId + '" type="file" multiple="multiple" accept="video/mp4,video/mov"/>\n                    </div>\n                </div>',
+            tpl: '<div class="w-e-up-img-container">\n                    <div id="' + upTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-upload1"></i>\n                    </div>\n                    <div id="' + captureTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-capture-video"></i>\n                    </div>\n                    <div style="display:none;">\n                        <input id="' + upFileId + '" type="file" multiple="' + multiLimit + '" accept="video/mp4,video/mov"/>\n                    </div>\n                </div>',
             events: [{
                 // 触发选择视频
                 selector: '#' + upTriggerId,
                 type: 'click',
                 fn: function fn() {
                     var selectVideo = config.selectVideo;
-                    var ifMobile = config.ifMobile;
-                    if (selectVideo && typeof selectVideo === 'function' && ifMobile) {
+                    var ios = config.ios;
+                    if (selectVideo && typeof selectVideo === 'function' && ios === true) {
                         editor.cmd.do('insertHTML', '([{PHFI}])');
                         selectVideo();
                         return true;
@@ -2970,6 +2974,7 @@ Image.prototype = {
         var editor = this.editor;
         var uploadImg = editor.uploadImg;
         var config = editor.config;
+        var multiLimit = config.multiLimit;
 
         // id
         var upTriggerId = getRandom('up-trigger');
@@ -2981,15 +2986,15 @@ Image.prototype = {
         // tabs 的配置
         var tabsConfig = [{
             title: '图片',
-            tpl: '<div class="w-e-up-img-container">\n                    <div id="' + upTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-upload1"></i>\n                    </div>\n                    <div id="' + captureTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-capture-image"></i>\n                    </div>\n                    <div style="display:none;">\n                        <input id="' + upFileId + '" type="file" multiple="multiple" accept="image/jpg,image/jpeg,image/png,image/gif,image/bmp,image/heic"/>\n                    </div>\n                </div>',
+            tpl: '<div class="w-e-up-img-container">\n                    <div id="' + upTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-upload1"></i>\n                    </div>\n                    <div id="' + captureTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-capture-image"></i>\n                    </div>\n                    <div style="display:none;">\n                        <input id="' + upFileId + '" type="file" multiple="' + multiLimit + '" accept="image/jpg,image/jpeg,image/png,image/gif,image/bmp,image/heic"/>\n                    </div>\n                </div>',
             events: [{
                 // 触发选择图片
                 selector: '#' + upTriggerId,
                 type: 'click',
                 fn: function fn() {
                     var selectImage = config.selectImage;
-                    var ifMobile = config.ifMobile;
-                    if (selectImage && typeof selectImage === 'function' && ifMobile) {
+                    var ios = config.ios;
+                    if (selectImage && typeof selectImage === 'function' && ios === true) {
                         editor.cmd.do('insertHTML', '([{PHFI}])');
                         selectImage();
                         return true;
@@ -3212,6 +3217,7 @@ Audio.prototype = {
         var editor = this.editor;
         var uploadImg = editor.uploadImg;
         var config = editor.config;
+        var multiLimit = config.multiLimit;
 
         // id
         var upTriggerId = getRandom('up-trigger');
@@ -3225,7 +3231,7 @@ Audio.prototype = {
             title: '音频',
             tpl: //'<div class="w-e-up-img-container">\n                    <div id="' + upTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-upload1"></i>\n                    </div>\n                    <div id="' + captureTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-capture-audio"></i>\n                    </div>\n                    <div style="display:none;">\n                        <input id="' + upFileId + '" type="file" multiple="multiple" accept="audio/mp3,audio/wav,audio/webm"/>\n                    </div>\n                </div>',
                  //'<div class="w-e-up-img-container">\n                    <div id="' + upTriggerId + '" class="w-e-up-btn">\n                        <label for="' + upFileId + '" class="w-e-icon-upload1"></label>\n                    <input id="' + upFileId + '" type="file" multiple="multiple" accept="audio/mp3,audio/wav,audio/webm" class="visually-hidden"/>\n                    </div>\n                    <div id="' + captureTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-capture-audio"></i>\n                    <input id="placeholder" type="file" multiple="multiple" accept="audio/mp3,audio/wav,audio/webm" class="visually-hidden"/>\n                    </div>',
-                 '<div class="w-e-up-img-container">\n                    <div id="' + upTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-upload1"></i>\n                    </div>\n                    <div id="' + captureTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-capture-audio"></i>\n                    </div>\n                    <div style="display:none;">\n                        <input id="' + upFileId + '" type="file" multiple="multiple" accept="audio/mp3,audio/wav,audio/webm"/>\n                    </div>\n                </div>',
+                 '<div class="w-e-up-img-container">\n                    <div id="' + upTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-upload1"></i>\n                    </div>\n                    <div id="' + captureTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-capture-audio"></i>\n                    </div>\n                    <div style="display:none;">\n                        <input id="' + upFileId + '" type="file" multiple="' + multiLimit + '" accept="audio/mp3,audio/wav,audio/webm"/>\n                    </div>\n                </div>',
             events: [{
                 // 触发选择音频
                 selector: '#' + upTriggerId,
@@ -3233,8 +3239,8 @@ Audio.prototype = {
                 fn: function fn() {
                     console.log('trigger click')
                     var selectAudio = config.selectAudio;
-                    var ifMobile = config.ifMobile;
-                    if (selectAudio && typeof selectAudio === 'function' && ifMobile) {
+                    var ios = config.ios;
+                    if (selectAudio && typeof selectAudio === 'function' && ios === true) {
                         editor.cmd.do('insertHTML', '([{PHFI}])');
                         selectAudio();
                         return true;

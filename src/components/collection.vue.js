@@ -1380,7 +1380,8 @@ export default {
           }
         }
         editor.customConfig.uploadImgShowBase64 = true // 使用 base64 保存图片、视频、音频
-        editor.customConfig.ifMobile = store.ifMobile() // 是否移动客户端
+        editor.customConfig.ios = store.ios // 是否ios
+        editor.customConfig.multiLimit = store.uploadFileMultiLimit // 同时上传文件数量限制
         editor.customConfig.onImgSelected = (selectedImg) => {
           _that.showFullscreen(selectedImg)
         }

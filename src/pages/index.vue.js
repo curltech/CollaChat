@@ -4622,8 +4622,8 @@ export default {
       store.collectionWorkerEnabler = false
     }
     store.useNativeAndroid = false // 是否使用Android原生拍照、拍摄、相册等功能
-    store.uploadFileSizeLimit = 100 //上传文件限制M
-    store.uploadMultiLimit = 10 //同时上传文件数量限制
+    store.uploadFileSizeLimit = 100 // 上传文件大小限制（单位：M）
+    store.uploadFileMultiLimit = 10 // 同时上传文件数量限制
     store.displayActiveStatus = true // 是否显示在线状态
     let linkmanRequestDBItems = await contactComponent.loadLinkmanRequest({
       ownerPeerId: myself.myselfPeerClient.peerId,

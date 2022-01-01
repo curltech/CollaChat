@@ -874,6 +874,83 @@ export default {
         store.state.imageMessageViewDialog = false
       }
     },
+    /*uploadMobileMessageImage: async function () {
+      let _that = this
+      let store = _that.$store
+      let medias = await mediaPickerComponent.getMedias()
+      if (medias && medias.length > 0) {
+        for (let i = 0; i < medias.length; i++) {
+          let media = medias[i]
+          let type;
+          MediaPicker.fileToBlob(media.path, async function (data) {
+            let blob, fileData;
+            if (media.mediaType === 'image') {
+              blob = new Blob([data], { "type": "image/jpeg" });
+              type = ChatContentType.IMAGE
+            } else {
+              blob = new Blob([data], { "type": "video/mp4" });
+              type = ChatContentType.VIDEO
+            }
+            let fileReader = new FileReader();
+            fileReader.onload = async function (e) {
+              fileData = e.target.result;
+              await store.saveFileAndSendMessage(store.state.currentChat, fileData, type)
+            }
+            fileReader.readAsDataURL(blob);
+          }, function (e) { console.log(e) });
+        }
+      }
+    },*/
+    /*imageLibraryUpload(){
+      let _that = this
+      let store = _that.$store
+      if (!_that.preCheck()) {
+        return
+      }
+      _that.$nextTick(async () => {
+        let imageLibraryUpload = document.getElementById('imageLibraryUpload')
+        if (imageLibraryUpload && imageLibraryUpload.files && imageLibraryUpload.files.length > 0) {
+          for(let file of imageLibraryUpload.files){
+            await _that.uploadMessageFile(file)
+          }
+          let form = document.getElementById('imageLibraryUploadForm')
+          if (form) {
+            form.reset()
+          }
+        }
+      })
+    },*/
+    async uploadMessageFilePC(file) {
+      let _that = this
+      let store = _that.$store
+      if (!_that.preCheck()) {
+        return
+      }
+      if (file) {
+        await _that.uploadMessageFile(file)
+      }
+      _that.$refs.messageUpload.reset()
+    },
+    uploadMessageFileMobile() {
+      let _that = this
+      let store = _that.$store
+      if (!_that.preCheck()) {
+        return
+      }
+      _that.$nextTick(async () => {
+        let messageUpload = document.getElementById('messageUpload')
+        if (messageUpload && messageUpload.files) {
+          let file = messageUpload.files[0]
+          if (file) {
+            await _that.uploadMessageFile(file)
+          }
+          let form = document.getElementById('messageUploadForm')
+          if (form) {
+            form.reset()
+          }
+        }
+      })
+    },
     async uploadMessageFile(file) {
       let _that = this
       let store = _that.$store
@@ -906,56 +983,6 @@ export default {
       name = file.name
       fileSize = file.size
       await store.saveFileAndSendMessage(store.state.currentChat, fileData, type, name)
-    },
-    async uploadMessageFilePC(file) {
-      let _that = this
-      let store = _that.$store
-      if (!_that.preCheck()) {
-        return
-      }
-      if (file) {
-        await _that.uploadMessageFile(file)
-      }
-      _that.$refs.messageUpload.reset()
-    },
-    imageLibraryUpload(){
-      let _that = this
-      let store = _that.$store
-      if (!_that.preCheck()) {
-        return
-      }
-      _that.$nextTick(async () => {
-        let imageLibraryUpload = document.getElementById('imageLibraryUpload')
-        if (imageLibraryUpload && imageLibraryUpload.files && imageLibraryUpload.files.length > 0) {
-          for(let file of imageLibraryUpload.files){
-            await _that.uploadMessageFile(file)
-          }
-          let form = document.getElementById('imageLibraryUploadForm')
-          if (form) {
-            form.reset()
-          }
-        }
-      })
-    },
-    uploadMessageFileMobile() {
-      let _that = this
-      let store = _that.$store
-      if (!_that.preCheck()) {
-        return
-      }
-      _that.$nextTick(async () => {
-        let messageUpload = document.getElementById('messageUpload')
-        if (messageUpload && messageUpload.files) {
-          let file = messageUpload.files[0]
-          if (file) {
-            await _that.uploadMessageFile(file)
-          }
-          let form = document.getElementById('messageUploadForm')
-          if (form) {
-            form.reset()
-          }
-        }
-      })
     },
     mobileTakePhoto() {
       let _that = this
