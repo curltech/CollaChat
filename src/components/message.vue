@@ -70,12 +70,8 @@
                       q-btn.text-primary.btnMessage
                         form#messageUploadForm(style="margin-top:-15px")
                           label(for="messageUpload" class="notranslate material-icons q-icon text-primary" aria-hidden="true" style="font-size: 32px;") folder
-                          input#messageUpload(type="file" :multiple="$store.uploadFileMultiLimit" class="visually-hidden" @change="uploadMessageFileMobile()" accept="")
+                          input#messageUpload(type="file" multiple="multiple" class="visually-hidden" @change="uploadMessageFileMobile()" accept="")
                           label(for="messageUpload" class="text-primary" style="font-size: 12px;padding-left: 4px;") {{ $t('File') }}
-                        //- form#imageLibraryUploadForm(style="margin-top:-15px")
-                        //-   label(for="imageLibraryUpload" class="notranslate material-icons q-icon text-primary" aria-hidden="true" style="font-size: 32px;") image
-                        //-   input#imageLibraryUpload(type="file" :multiple="$store.uploadFileMultiLimit" class="visually-hidden" @change="imageLibraryUpload()" accept="image/jpg,image/jpeg,image/png,image/gif,image/bmp,image/heic,video/mp4,video/mov")
-                        //-   label(for="imageLibraryUpload" class="text-primary" style="font-size: 12px;padding-left: 4px;") {{ $t('Album') }}
                       q-btn.text-primary.btnMessage(flat stack no-caps :label="$t('Take Photo')" icon="photo_camera" @click="capture('image')")
                       q-btn.text-primary.btnMessage(flat stack no-caps :label="$t('Take Video')" icon="camera" @click="capture('video')")
                     q-btn-group(flat spread stretch)
@@ -420,8 +416,8 @@
                   img(:src="$store.state.linkmanMap[groupMember.memberPeerId] && $store.state.linkmanMap[groupMember.memberPeerId].avatar ? $store.state.linkmanMap[groupMember.memberPeerId].avatar : $store.defaultActiveAvatar")
               q-item-section(@click="selectedFocusGroupMember(groupMember)")
                 q-item-label {{$store.state.linkmanMap[groupMember.memberPeerId].givenName?$store.state.linkmanMap[groupMember.memberPeerId].givenName:$store.state.linkmanMap[groupMember.memberPeerId].name }}
-    q-uploader(style="display:none" ref="messageUpload" @added="files => uploadMessageFilePC(files[0])")
-    q-uploader(style="display:none" ref="groupFileUpload" @added="files => uploadGroupFilePC(files[0])")
+    q-uploader(style="display:none" ref="messageUpload" multiple batch @added="files => uploadMessageFilePC(files)")
+    q-uploader(style="display:none" ref="groupFileUpload" multiple batch @added="files => uploadGroupFilePC(files)")
     mergeMessageDialog
     noteMessageDialog
 </template>

@@ -901,93 +901,95 @@ export default {
         }
       }
     },*/
-    /*imageLibraryUpload(){
+    async uploadMessageFilePC(files) {
       let _that = this
       let store = _that.$store
-      if (!_that.preCheck()) {
-        return
-      }
-      _that.$nextTick(async () => {
-        let imageLibraryUpload = document.getElementById('imageLibraryUpload')
-        if (imageLibraryUpload && imageLibraryUpload.files && imageLibraryUpload.files.length > 0) {
-          for(let file of imageLibraryUpload.files){
-            await _that.uploadMessageFile(file)
-          }
-          let form = document.getElementById('imageLibraryUploadForm')
-          if (form) {
-            form.reset()
+      if (_that.preCheck()) {
+        if (files && files.length > 0) {
+          if (files.length > store.uploadFileMultiLimit) {
+            _that.$q.notify({
+              message: _that.$i18n.t("The number of files exceeds the limit ") + store.uploadFileMultiLimit,
+              timeout: 3000,
+              type: "warning",
+              color: "warning",
+            })
+          } else {
+            _that.$q.loading.show()
+            for (let file of files) {
+              if (file) {
+                await _that.uploadMessageFile(file)
+              }
+            }
+            _that.$q.loading.hide()
           }
         }
-      })
-    },*/
-    async uploadMessageFilePC(file) {
-      let _that = this
-      let store = _that.$store
-      if (!_that.preCheck()) {
-        return
-      }
-      if (file) {
-        await _that.uploadMessageFile(file)
       }
       _that.$refs.messageUpload.reset()
     },
     uploadMessageFileMobile() {
       let _that = this
       let store = _that.$store
-      if (!_that.preCheck()) {
-        return
-      }
       _that.$nextTick(async () => {
-        let messageUpload = document.getElementById('messageUpload')
-        if (messageUpload && messageUpload.files) {
-          let file = messageUpload.files[0]
-          if (file) {
-            await _that.uploadMessageFile(file)
+        if (_that.preCheck()) {
+          let messageUpload = document.getElementById('messageUpload')
+          if (messageUpload && messageUpload.files && messageUpload.files.length > 0) {
+            if (messageUpload.files.length > store.uploadFileMultiLimit) {
+              _that.$q.notify({
+                message: _that.$i18n.t("The number of files exceeds the limit ") + store.uploadFileMultiLimit,
+                timeout: 3000,
+                type: "warning",
+                color: "warning",
+              })
+            } else {
+              _that.$q.loading.show()
+              for (let file of messageUpload.files) {
+                if (file) {
+                  await _that.uploadMessageFile(file)
+                }
+              }
+              _that.$q.loading.hide()
+            }
           }
-          let form = document.getElementById('messageUploadForm')
-          if (form) {
-            form.reset()
-          }
+        }
+        let form = document.getElementById('messageUploadForm')
+        if (form) {
+          form.reset()
         }
       })
     },
     async uploadMessageFile(file) {
       let _that = this
       let store = _that.$store
-      if (file.size > 1048576 * store.uploadFileSizeLimit) {
+      if (file.size > 1024 * 1024 * store.uploadFileSizeLimit) {
         _that.$q.notify({
-          message: `${_that.$i18n.t("Upload file cannot exceed")} ${store.uploadFileSizeLimit}M`,
+          message: '[' + file.name + ']' + _that.$i18n.t(" file size exceeds limit ") + store.uploadFileSizeLimit + 'M',
           timeout: 3000,
           type: "warning",
           color: "warning",
         })
-        _that.$refs.messageUpload.reset()
-        return
-      }
-      let fileType
-      if (file.name) {
-        let index = file.name.lastIndexOf(".")
-        fileType = file.name.substr(index + 1)
-      }
-      let fileData = await BlobUtil.fileObjectToBase64(file)
-      let type, name, fileSize;
-      if (mediaComponent.isAssetTypeAnImage(fileType)) {
-        type = ChatContentType.IMAGE
-      } else if (mediaComponent.isAssetTypeAVideo(fileType)) {
-        type = ChatContentType.VIDEO
-      } else if (mediaComponent.isAssetTypeAnAudio(fileType)) {
-        type = ChatContentType.AUDIO
       } else {
-        type = ChatContentType.FILE
+        let fileType
+        if (file.name) {
+          let index = file.name.lastIndexOf(".")
+          fileType = file.name.substr(index + 1)
+        }
+        let fileData = await BlobUtil.fileObjectToBase64(file)
+        let type
+        if (mediaComponent.isAssetTypeAnImage(fileType)) {
+          type = ChatContentType.IMAGE
+        } else if (mediaComponent.isAssetTypeAVideo(fileType)) {
+          type = ChatContentType.VIDEO
+        } else if (mediaComponent.isAssetTypeAnAudio(fileType)) {
+          type = ChatContentType.AUDIO
+        } else {
+          type = ChatContentType.FILE
+        }
+        await store.saveFileAndSendMessage(store.state.currentChat, fileData, type, file.name)
       }
-      name = file.name
-      fileSize = file.size
-      await store.saveFileAndSendMessage(store.state.currentChat, fileData, type, name)
     },
     mobileTakePhoto() {
       let _that = this
       let store = _that.$store
-      let peerId = store.state.currentChat.subjectId
       let message = {}
       message.messageId = UUID.string(null, null)
       message.messageType = P2pChatMessageType.CHAT_LINKMAN
@@ -2988,59 +2990,26 @@ export default {
       }
       console.log('groupFileList:' + JSON.stringify(_that.groupFileList))
     },
-    async uploadGroupFile(file) {
+    async uploadGroupFilePC(files) {
       let _that = this
       let store = _that.$store
-      _that.$q.loading.show()
-      let peerId = store.state.currentChat.subjectId
-      let fileType
-      if (file.name) {
-        let index = file.name.lastIndexOf(".")
-        fileType = file.name.substr(index + 1)
-      }
-      let fileData = await BlobUtil.fileObjectToBase64(file)
-      let type, name, fileSize
-      if (mediaComponent.isAssetTypeAnImage(fileType)) {
-        /*if (file.size > 2097152) { // 2M
+      if (files && files.length > 0) {
+        if (files.length > store.uploadFileMultiLimit) {
           _that.$q.notify({
-            message: _that.$i18n.t("Restricted to images, size less than 2M"),
+            message: _that.$i18n.t("The number of files exceeds the limit ") + store.uploadFileMultiLimit,
             timeout: 3000,
             type: "warning",
             color: "warning",
           })
-          _that.$refs.groupFileUpload.reset()
-          return
-        }*/
-        type = ChatContentType.IMAGE
-      } else if (mediaComponent.isAssetTypeAVideo(fileType)) {
-        type = ChatContentType.VIDEO
-      } else if (mediaComponent.isAssetTypeAnAudio(fileType)) {
-        type = ChatContentType.AUDIO
-      } else {
-        type = ChatContentType.FILE
-      }
-      name = file.name
-      fileSize = file.size
-      let chat = store.state.currentChat
-      let message = {}
-      message.ownerPeerId = myself.myselfPeerClient.peerId
-      message.messageId = UUID.string(null, null)
-      message.messageType = P2pChatMessageType.GROUP_FILE
-      message.subjectId = peerId
-      message.fileSize = StringUtil.getSize(fileData)
-      message.contentType = type
-      // 云端保存
-      await store.saveFileInMessage(chat, message, fileData, type, name, message.messageId)
-      // 群主新增群文件后保存本地不发送
-      await chatComponent.insert(ChatDataType.MESSAGE, message)
-      await _that.getGroupFileList()
-      _that.$q.loading.hide()
-    },
-    async uploadGroupFilePC(file) {
-      let _that = this
-      let store = _that.$store
-      if (file) {
-        await _that.uploadGroupFile(file)
+        } else {
+          _that.$q.loading.show()
+          for (let file of files) {
+            if (file) {
+              await _that.uploadGroupFile(file)
+            }
+          }
+          _that.$q.loading.hide()
+        }
       }
       _that.$refs.groupFileUpload.reset()
     },
@@ -3049,17 +3018,72 @@ export default {
       let store = _that.$store
       _that.$nextTick(async () => {
         let groupFileUpload = document.getElementById('groupFileUpload')
-        if (groupFileUpload && groupFileUpload.files) {
-          let file = groupFileUpload.files[0]
-          if (file) {
-            await _that.uploadGroupFile(file)
-          }
-          let form = document.getElementById('groupFileUploadForm')
-          if (form) {
-            form.reset()
+        if (groupFileUpload && groupFileUpload.files && groupFileUpload.files.length > 0) {
+          if (groupFileUpload.files.length > store.uploadFileMultiLimit) {
+            _that.$q.notify({
+              message: _that.$i18n.t("The number of files exceeds the limit ") + store.uploadFileMultiLimit,
+              timeout: 3000,
+              type: "warning",
+              color: "warning",
+            })
+          } else {
+            _that.$q.loading.show()
+            for (let file of groupFileUpload.files) {
+              if (file) {
+                await _that.uploadGroupFile(file)
+              }
+            }
+            _that.$q.loading.hide()
           }
         }
+        let form = document.getElementById('groupFileUploadForm')
+        if (form) {
+          form.reset()
+        }
       })
+    },
+    async uploadGroupFile(file) {
+      let _that = this
+      let store = _that.$store
+      if (file.size > 1024 * 1024 * store.uploadFileSizeLimit) {
+        _that.$q.notify({
+          message: '[' + file.name + ']' + _that.$i18n.t(" file size exceeds limit ") + store.uploadFileSizeLimit + 'M',
+          timeout: 3000,
+          type: "warning",
+          color: "warning",
+        })
+      } else {
+        let fileType
+        if (file.name) {
+          let index = file.name.lastIndexOf(".")
+          fileType = file.name.substr(index + 1)
+        }
+        let fileData = await BlobUtil.fileObjectToBase64(file)
+        let type
+        if (mediaComponent.isAssetTypeAnImage(fileType)) {
+          type = ChatContentType.IMAGE
+        } else if (mediaComponent.isAssetTypeAVideo(fileType)) {
+          type = ChatContentType.VIDEO
+        } else if (mediaComponent.isAssetTypeAnAudio(fileType)) {
+          type = ChatContentType.AUDIO
+        } else {
+          //type = ChatContentType.FILE
+          return
+        }
+        let chat = store.state.currentChat
+        let message = {}
+        message.ownerPeerId = myself.myselfPeerClient.peerId
+        message.messageId = UUID.string(null, null)
+        message.messageType = P2pChatMessageType.GROUP_FILE
+        message.subjectId = store.state.currentChat.subjectId
+        message.fileSize = StringUtil.getSize(fileData)
+        message.contentType = type
+        // 云端保存
+        await store.saveFileInMessage(chat, message, fileData, type, file.name, message.messageId)
+        // 群主新增群文件后保存本地不发送
+        await chatComponent.insert(ChatDataType.MESSAGE, message)
+        await _that.getGroupFileList()
+      }
     },
     confirmRemoveGroupFile(groupFile) {
       let _that = this
