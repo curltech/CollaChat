@@ -1381,7 +1381,26 @@ export default {
         }
         editor.customConfig.uploadImgShowBase64 = true // 使用 base64 保存图片、视频、音频
         editor.customConfig.ios = store.ios // 是否ios
-        editor.customConfig.multiLimit = store.uploadFileMultiLimit // 同时上传文件数量限制
+        editor.customConfig.uploadImgMaxSize = store.uploadFileSizeLimit * 1024 * 1024 // 上传文件大小限制（单位：M）
+        editor.customConfig.uploadImgMaxLength = store.uploadFileNumLimit // 同时上传文件数量限制
+        editor.customConfig.customAlert = (alertInfo) => {
+          let message
+          let arr = alertInfo.split(',')
+          let key = arr[0]
+          if (key === 'uploadFileSizeLimit') {
+            message = '[' + arr[1] + ']' + _that.$i18n.t(' file size exceeds limit ') + store.uploadFileSizeLimit + 'M'
+          } else if (key === 'uploadFileNumLimit') {
+            message = _that.$i18n.t('The number of files exceeds the limit ') + store.uploadFileNumLimit
+          }
+          if (message) {
+            _that.$q.notify({
+              message: message,
+              timeout: 3000,
+              type: "warning",
+              color: "warning",
+            })
+          }
+        }
         editor.customConfig.onImgSelected = (selectedImg) => {
           _that.showFullscreen(selectedImg)
         }

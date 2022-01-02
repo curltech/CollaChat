@@ -658,20 +658,17 @@ var config = {
         // console.log(url)  // url 即插入图片的地址
     },
 
-    // 默认上传图片 max size: 5M
-    uploadImgMaxSize: 15 * 1024 * 1024,
+    // 默认上传图片 max size: 100M
+    uploadImgMaxSize: 100 * 1024 * 1024,
 
     // 配置一次最多上传几个图片
-    uploadImgMaxLength: 5,
+    uploadImgMaxLength: 10,
 
     // 上传图片，是否显示 base64 格式
     uploadImgShowBase64: false,
 
     // 是否ios
     ios: false,
-
-    // 同时上传文件数量限制
-    multiLimit: 10,
 
     // 上传图片，server 地址（如果有值，则 base64 格式的配置则失效）
     // uploadImgServer: '/upload',
@@ -2716,7 +2713,6 @@ Video.prototype = {
         var editor = this.editor;
         var uploadImg = editor.uploadImg;
         var config = editor.config;
-        var multiLimit = config.multiLimit;
 
         // id
         var upTriggerId = getRandom('up-trigger');
@@ -2728,7 +2724,7 @@ Video.prototype = {
         // tabs 的配置
         var tabsConfig = [{
             title: '视频',
-            tpl: '<div class="w-e-up-img-container">\n                    <div id="' + upTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-upload1"></i>\n                    </div>\n                    <div id="' + captureTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-capture-video"></i>\n                    </div>\n                    <div style="display:none;">\n                        <input id="' + upFileId + '" type="file" multiple="' + multiLimit + '" accept="video/mp4,video/mov"/>\n                    </div>\n                </div>',
+            tpl: '<div class="w-e-up-img-container">\n                    <div id="' + upTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-upload1"></i>\n                    </div>\n                    <div id="' + captureTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-capture-video"></i>\n                    </div>\n                    <div style="display:none;">\n                        <input id="' + upFileId + '" type="file" multiple="multiple" accept="video/mp4,video/mov,video/ogg,video/webm"/>\n                    </div>\n                </div>',
             events: [{
                 // 触发选择视频
                 selector: '#' + upTriggerId,
@@ -2974,7 +2970,6 @@ Image.prototype = {
         var editor = this.editor;
         var uploadImg = editor.uploadImg;
         var config = editor.config;
-        var multiLimit = config.multiLimit;
 
         // id
         var upTriggerId = getRandom('up-trigger');
@@ -2986,7 +2981,7 @@ Image.prototype = {
         // tabs 的配置
         var tabsConfig = [{
             title: '图片',
-            tpl: '<div class="w-e-up-img-container">\n                    <div id="' + upTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-upload1"></i>\n                    </div>\n                    <div id="' + captureTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-capture-image"></i>\n                    </div>\n                    <div style="display:none;">\n                        <input id="' + upFileId + '" type="file" multiple="' + multiLimit + '" accept="image/jpg,image/jpeg,image/png,image/gif,image/bmp,image/heic"/>\n                    </div>\n                </div>',
+            tpl: '<div class="w-e-up-img-container">\n                    <div id="' + upTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-upload1"></i>\n                    </div>\n                    <div id="' + captureTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-capture-image"></i>\n                    </div>\n                    <div style="display:none;">\n                        <input id="' + upFileId + '" type="file" multiple="multiple" accept="image/jpg,image/jpeg,image/png,image/gif,image/bmp,image/heic,image/webp,image/svg,image/tiff"/>\n                    </div>\n                </div>',
             events: [{
                 // 触发选择图片
                 selector: '#' + upTriggerId,
@@ -3217,7 +3212,6 @@ Audio.prototype = {
         var editor = this.editor;
         var uploadImg = editor.uploadImg;
         var config = editor.config;
-        var multiLimit = config.multiLimit;
 
         // id
         var upTriggerId = getRandom('up-trigger');
@@ -3231,7 +3225,7 @@ Audio.prototype = {
             title: '音频',
             tpl: //'<div class="w-e-up-img-container">\n                    <div id="' + upTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-upload1"></i>\n                    </div>\n                    <div id="' + captureTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-capture-audio"></i>\n                    </div>\n                    <div style="display:none;">\n                        <input id="' + upFileId + '" type="file" multiple="multiple" accept="audio/mp3,audio/wav,audio/webm"/>\n                    </div>\n                </div>',
                  //'<div class="w-e-up-img-container">\n                    <div id="' + upTriggerId + '" class="w-e-up-btn">\n                        <label for="' + upFileId + '" class="w-e-icon-upload1"></label>\n                    <input id="' + upFileId + '" type="file" multiple="multiple" accept="audio/mp3,audio/wav,audio/webm" class="visually-hidden"/>\n                    </div>\n                    <div id="' + captureTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-capture-audio"></i>\n                    <input id="placeholder" type="file" multiple="multiple" accept="audio/mp3,audio/wav,audio/webm" class="visually-hidden"/>\n                    </div>',
-                 '<div class="w-e-up-img-container">\n                    <div id="' + upTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-upload1"></i>\n                    </div>\n                    <div id="' + captureTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-capture-audio"></i>\n                    </div>\n                    <div style="display:none;">\n                        <input id="' + upFileId + '" type="file" multiple="' + multiLimit + '" accept="audio/mp3,audio/wav,audio/webm"/>\n                    </div>\n                </div>',
+                 '<div class="w-e-up-img-container">\n                    <div id="' + upTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-upload1"></i>\n                    </div>\n                    <div id="' + captureTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-capture-audio"></i>\n                    </div>\n                    <div style="display:none;">\n                        <input id="' + upFileId + '" type="file" multiple="multiple" accept="audio/mp3,audio/wav,audio/webm,audio/acc"/>\n                    </div>\n                </div>',
             events: [{
                 // 触发选择音频
                 selector: '#' + upTriggerId,
@@ -4757,6 +4751,7 @@ UploadImg.prototype = {
         // ------------------------------ 验证文件信息 ------------------------------
         var resultFiles = [];
         var errInfo = [];
+        var errMessage = '';
         arrForEach(files, function (file) {
             var name = file.name;
             var size = file.size;
@@ -4766,7 +4761,7 @@ UploadImg.prototype = {
                 return;
             }
 
-            if (/\.(jpg|jpeg|png|bmp|gif|webp)$/i.test(name) === true) {
+            if (/\.(jpg|jpeg|png|bmp|gif|webp|heic|svg|tiff)$/i.test(name) === true) {
                 if (!type) {
                     type = 'image'
                 } else if (type !== 'image') {
@@ -4774,7 +4769,7 @@ UploadImg.prototype = {
                     errInfo.push('\u3010' + name + '\u3011\u4e0d\u662f\u5141\u8bb8\u7684\u56fe\u7247\u683c\u5f0f');
                     return;
                 }
-            } else if (/\.(mp4)$/i.test(name) === true) {
+            } else if (/\.(mp4|mov|webm|ogg)$/i.test(name) === true) {
                 if (!type) {
                     type = 'video'
                 } else if (type !== 'video') {
@@ -4782,7 +4777,7 @@ UploadImg.prototype = {
                     errInfo.push('\u3010' + name + '\u3011\u4e0d\u662f\u5141\u8bb8\u7684\u89c6\u9891\u683c\u5f0f');
                     return;
                 }
-            } else if (/\.(mp3)$/i.test(name) === true) {
+            } else if (/\.(mp3|wav|webm|acc)$/i.test(name) === true) {
                 if (!type) {
                     type = 'audio'
                 } else if (type !== 'audio') {
@@ -4797,7 +4792,8 @@ UploadImg.prototype = {
             }
             if (maxSize < size) {
                 // 上传图片过大
-                errInfo.push('\u3010' + name + '\u3011\u5927\u4E8E ' + maxSizeM + 'M');
+                errInfo.push('[' + name + ']' + '\u6587\u4ef6\u5927\u5c0f\u8d85\u8fc7\u9650\u5236' + maxSizeM + 'M');
+                errMessage = 'uploadFileSizeLimit' + ',' +  name;
                 return;
             }
 
@@ -4805,12 +4801,16 @@ UploadImg.prototype = {
             resultFiles.push(file);
         });
         // 抛出验证信息
-        if (errInfo.length) {
-            this._alert('验证未通过: \n' + errInfo.join('\n'));
+        /*if (errInfo.length) {
+            this._alert('验证未通过: \n' + errInfo.join('\n'));*/
+        if (errMessage) {
+            this._alert(errMessage);
             return;
         }
         if (resultFiles.length > maxLength) {
-            this._alert('超出单次最大上传数：' + maxLength);
+            //this._alert('超出单次最大上传数：' + maxLength);
+            //this._alert('\u6587\u4ef6\u6570\u91cf\u8d85\u8fc7\u9650\u5236' + maxLength);
+            this._alert('uploadFileNumLimit');
             return;
         }
 

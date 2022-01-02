@@ -1068,13 +1068,13 @@ class MediaComponent {
     return [
       'png', 'jpg', 'jpeg', 'bmp', 'gif', 'webp', 'svg', 'tiff', 'heic'].indexOf(ext.toLowerCase()) !== -1;
   }
-  isAssetTypeAnAudio(ext) {
-    if (!ext) return
-    return ['wav', 'mp3', 'acc', 'webm'].indexOf(ext.toLowerCase()) !== -1;
-  }
   isAssetTypeAVideo(ext) {
     if (!ext) return
     return ['ogg', 'mp4', 'webm', 'mov'].indexOf(ext.toLowerCase()) !== -1;
+  }
+  isAssetTypeAnAudio(ext) {
+    if (!ext) return
+    return ['wav', 'mp3', 'acc'/*, 'webm'*/].indexOf(ext.toLowerCase()) !== -1;
   }
   compress(file, quality = 0.1) {
     return new Promise((resolve, reject) => {

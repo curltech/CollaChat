@@ -906,9 +906,9 @@ export default {
       let store = _that.$store
       if (_that.preCheck()) {
         if (files && files.length > 0) {
-          if (files.length > store.uploadFileMultiLimit) {
+          if (files.length > store.uploadFileNumLimit) {
             _that.$q.notify({
-              message: _that.$i18n.t("The number of files exceeds the limit ") + store.uploadFileMultiLimit,
+              message: _that.$i18n.t("The number of files exceeds the limit ") + store.uploadFileNumLimit,
               timeout: 3000,
               type: "warning",
               color: "warning",
@@ -933,9 +933,9 @@ export default {
         if (_that.preCheck()) {
           let messageUpload = document.getElementById('messageUpload')
           if (messageUpload && messageUpload.files && messageUpload.files.length > 0) {
-            if (messageUpload.files.length > store.uploadFileMultiLimit) {
+            if (messageUpload.files.length > store.uploadFileNumLimit) {
               _that.$q.notify({
-                message: _that.$i18n.t("The number of files exceeds the limit ") + store.uploadFileMultiLimit,
+                message: _that.$i18n.t("The number of files exceeds the limit ") + store.uploadFileNumLimit,
                 timeout: 3000,
                 type: "warning",
                 color: "warning",
@@ -1047,14 +1047,24 @@ export default {
       let editorContent = store.state.currentChat.tempText
       if (store.state.currentChat.subjectType === SubjectType.CHAT) {
         if (store.state.linkmanMap[store.state.currentChat.subjectId].blackedMe === true) {
-          alert(_that.$i18n.t("You are in your opponent's blacklist."))
+          _that.$q.notify({
+            message: _that.$i18n.t("You are in your opponent's blacklist."),
+            timeout: 3000,
+            type: "warning",
+            color: "warning",
+          })
           if (editorContent && editorContent.substr(editorContent.length - 1, editorContent.length) === '\n') {
             store.state.currentChat.tempText = editorContent.substr(0, editorContent.length - 1)
           }
           return false
         }
         if (store.state.linkmanMap[store.state.currentChat.subjectId].droppedMe === true) {
-          alert(_that.$i18n.t("You are no longer your opponent's contacts."))
+          _that.$q.notify({
+            message: _that.$i18n.t("You are no longer your opponent's contacts."),
+            timeout: 3000,
+            type: "warning",
+            color: "warning",
+          })
           if (editorContent && editorContent.substr(editorContent.length - 1, editorContent.length) === '\n') {
             store.state.currentChat.tempText = editorContent.substr(0, editorContent.length - 1)
           }
@@ -1072,7 +1082,12 @@ export default {
           }
         }
         if (ret) {
-          alert(_that.$i18n.t('You have been removed from this group chat.'))
+          _that.$q.notify({
+            message: _that.$i18n.t('You have been removed from this group chat.'),
+            timeout: 3000,
+            type: "warning",
+            color: "warning",
+          })
           if (editorContent && editorContent.substr(editorContent.length - 1, editorContent.length) === '\n') {
             store.state.currentChat.tempText = editorContent.substr(0, editorContent.length - 1)
           }
@@ -2994,9 +3009,9 @@ export default {
       let _that = this
       let store = _that.$store
       if (files && files.length > 0) {
-        if (files.length > store.uploadFileMultiLimit) {
+        if (files.length > store.uploadFileNumLimit) {
           _that.$q.notify({
-            message: _that.$i18n.t("The number of files exceeds the limit ") + store.uploadFileMultiLimit,
+            message: _that.$i18n.t("The number of files exceeds the limit ") + store.uploadFileNumLimit,
             timeout: 3000,
             type: "warning",
             color: "warning",
@@ -3019,9 +3034,9 @@ export default {
       _that.$nextTick(async () => {
         let groupFileUpload = document.getElementById('groupFileUpload')
         if (groupFileUpload && groupFileUpload.files && groupFileUpload.files.length > 0) {
-          if (groupFileUpload.files.length > store.uploadFileMultiLimit) {
+          if (groupFileUpload.files.length > store.uploadFileNumLimit) {
             _that.$q.notify({
-              message: _that.$i18n.t("The number of files exceeds the limit ") + store.uploadFileMultiLimit,
+              message: _that.$i18n.t("The number of files exceeds the limit ") + store.uploadFileNumLimit,
               timeout: 3000,
               type: "warning",
               color: "warning",
