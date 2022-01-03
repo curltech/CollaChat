@@ -38,6 +38,22 @@ export default {
       return {
         height: `${this.$q.screen.height}px`
       }
+    },
+    GetAddressLabel() {
+      let _that = this
+      return function (address) {
+        let label = ''
+        for (let connectAddressOption of CollaConstant.connectAddressOptionsISO[myself.myselfPeerClient.language]) {
+          if (connectAddressOption.value === address) {
+            label = connectAddressOption.label
+            break
+          }
+        }
+        if (!label) {
+          label = _that.$i18n.t("Use Custom Node") + ' (' + address + ')'
+        }
+        return label
+      }
     }
   },
   methods: {
