@@ -4751,11 +4751,11 @@ export default {
         payload.blackedMe = true
       }
       //await chatAction.chat(null, payload, peerId)
-      let message = {
+      let msg = {
         messageType: ChatMessageType.ADD_LINKMAN, // change to use p2pChatAction instead of chatAction
         content: payload
       }
-      await store.p2pSend(message, peerId)
+      await store.p2pSend(msg, peerId)
       _that.$q.notify({
         message: _that.$i18n.t("Send contacts request successfully"),
         timeout: 3000,
@@ -4910,7 +4910,7 @@ export default {
     store.useNativeAndroid = false // 是否使用Android原生拍照、拍摄、相册等功能
     store.uploadFileSizeLimit = 100 // 上传文件大小限制（单位：M）
     store.uploadFileNumLimit = 10 // 同时上传文件数量限制
-    store.displayActiveStatus = false // 是否显示在线状态
+    store.displayActiveStatus = true // 是否显示在线状态
     let linkmanRequestDBItems = await contactComponent.loadLinkmanRequest({
       ownerPeerId: myself.myselfPeerClient.peerId,
       requestType: RequestType.ADD_LINKMAN,
