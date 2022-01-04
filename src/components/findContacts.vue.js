@@ -302,7 +302,12 @@ export default {
       payload.srcClientId = myselfPeerClient.clientId
       payload.srcPeerId = myselfPeerClient.peerId
       payload.acceptTime = currentTime
-      await chatAction.chat(null, payload, peerId)
+      //await chatAction.chat(null, payload, peerId)
+      let message = {
+        messageType: ChatMessageType.ADD_LINKMAN_REPLY, // change to use p2pChatAction instead of chatAction
+        content: payload
+      }
+      await store.p2pSend(message, peerId)
       //webrtcPeerPool.create(peerId)
       _that.$q.notify({
         message: _that.$i18n.t("Accept contacts request and add contacts successfully"),
