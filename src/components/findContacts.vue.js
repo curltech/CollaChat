@@ -2,9 +2,8 @@ import jsQR from 'jsqr'
 import jimp from 'jimp'
 
 import { EntityState } from 'libcolla'
-import { chatAction, myself } from 'libcolla'
+import { myself } from 'libcolla'
 import { webrtcPeerPool } from 'libcolla'
-import { ChatMessageType } from 'libcolla'
 import { MobileNumberUtil } from 'libcolla'
 
 import pinyinUtil from '@/libs/base/colla-pinyin'
@@ -280,31 +279,12 @@ export default {
         }
       }
 
-      // 发送Accept收条（可以省略）
-      /*let targetPeerClient = new PeerClient()
-      targetPeerClient.peerId = peerId
-      let srcPeerClient = new PeerClient()
-      srcPeerClient.peerId = myselfPeerClient.peerId
-      srcPeerClient.name = myselfPeerClient.name
-      srcPeerClient.mobile = myselfPeerClient.mobile
-      srcPeerClient.avatar = myselfPeerClient.avatar
-      srcPeerClient.publicKey = myselfPeerClient.publicKey
       let payload = {}
-      payload.acceptTime = currentTime
-      await store.socketSend({
-        messageType: ChatMessageType.ADD_LINKMAN_REPLY,
-        targetPeerClient: targetPeerClient,
-        srcPeerClient: srcPeerClient,
-        payload: payload
-      })*/
-      let payload = {}
-      payload.type = ChatMessageType.ADD_LINKMAN_REPLY
       payload.srcClientId = myselfPeerClient.clientId
       payload.srcPeerId = myselfPeerClient.peerId
       payload.acceptTime = currentTime
-      //await chatAction.chat(null, payload, peerId)
       let message = {
-        messageType: ChatMessageType.ADD_LINKMAN_REPLY, // change to use p2pChatAction instead of chatAction
+        messageType: P2pChatMessageType.ADD_LINKMAN_REPLY,
         content: payload
       }
       await store.p2pSend(message, peerId)

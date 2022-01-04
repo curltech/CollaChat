@@ -61,6 +61,8 @@
  
  // 消息类型（messageType）
  export let P2pChatMessageType = {
+   'ADD_LINKMAN': 'ADD_LINKMAN', // 新增联系人请求
+   'ADD_LINKMAN_REPLY': 'ADD_LINKMAN_REPLY', // 新增联系人请求的回复
    'SYNC_LINKMAN_INFO': 'SYNC_LINKMAN_INFO', // 联系人基本信息同步
    'DROP_LINKMAN': 'DROP_LINKMAN', // 从好友中删除
    'DROP_LINKMAN_RECEIPT': 'DROP_LINKMAN_RECEIPT', // 删除好友通知回复
