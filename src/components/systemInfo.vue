@@ -14,13 +14,14 @@
           q-item-label(caption, lines="1") {{ $t('cordova: ') + device.cordova }}
           q-item-label(caption, lines="1") {{ $t('touch: ') + device.touch }}
           q-item-label(caption, lines="1") {{ $t('webStorage: ') + device.webStorage }}
-          q-item-label(caption, lines="4") {{ $t('userAgent: ') + device.userAgent }}
+          q-item-label(caption, lines="10", style="word-break:break-all") {{ $t('userAgent: ') + device.userAgent }}
       q-item
         q-item-section
           q-item-label.text-h6 {{ $t('MediaDevice') }}
           q-item-label(
             caption,
             lines="4",
+            style="word-break:break-all",
             v-for="(mediaDevice, index) in mediaDevices",
             :key="index"
           ) {{ mediaDevice.kind + ': ' + mediaDevice.label }}
@@ -33,13 +34,14 @@
       q-item
         q-item-section
           q-item-label.text-h6 {{ $t('Constraints') }}
-          q-item-label(caption, lines="4") {{ constraints }}
+          q-item-label(caption, lines="20", style="word-break:break-all") {{ constraints }}
       q-item
         q-item-section
           q-item-label.text-h6 {{ $t('MimeType') }}
           q-item-label(
             caption,
             lines="4",
+            style="word-break:break-all",
             v-for="(mimeType, index) in mimeTypes",
             :key="index"
           ) {{ mimeType }}

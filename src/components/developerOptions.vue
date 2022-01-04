@@ -17,8 +17,8 @@
               q-item-label {{$t('Debug Level')}}
             q-item-section
               q-select.c-field(style="width: 120px" filled dense v-model="logLevel" emit-value map-options :options="logLevelOptions")
-          q-separator.c-separator(v-if="logLevel !== 'none'" style="margin-left:16px;width:calc(100% - 16px)")
-          q-item(v-if="logLevel !== 'none'" clickable v-ripple @click="subKind = 'debugInfo'")
+          q-separator.c-separator(style="margin-left:16px;width:calc(100% - 16px)")
+          q-item(clickable v-ripple @click="subKind = 'debugInfo'")
             q-item-section
               q-item-label {{$t('Debug Info')}}
             q-item-section(avatar)

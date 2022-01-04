@@ -737,11 +737,10 @@ export default {
           let simPermission = true
           if (window.device.platform === 'Android') {
             simPermission = await simComponent.hasReadPermission()
-            console.info(simPermission)
             if (!simPermission) {
               simPermission = await simComponent.requestReadPermission()
-              console.info(simPermission)
             }
+            console.info('android simPermission:' + simPermission)
           }
           if (simPermission) {
             try {
@@ -758,27 +757,11 @@ export default {
             }
           }
           if (countryCode) {
-            console.log('countryCode:' + countryCode)
-            _that.loginData.code_ = MobileNumberUtil.getCountryCodeForRegion(countryCode.toUpperCase()) + ''
-            if (!_that.registerData.code_) {
-              _that.registerData.code_ = _that.loginData.code_
-            }
+            
+            _that.registerData.code_ = MobileNumberUtil.getCountryCodeForRegion(countryCode.toUpperCase()) + ''
             if (phoneNumber) {
               let mobile = MobileNumberUtil.formatE164(phoneNumber, countryCode.toUpperCase())
-              let nationalNumber = MobileNumberUtil.parse(mobile).getNationalNumber() + ''
-              console.log('mobile1:' + nationalNumber)
-              if (pcs && pcs.length > 0) {
-                for (let pc of pcs) {
-                  if (pc.mobile === mobile) {
-                    myselfPeer = pc
-                    _that.loginData.mobile_ = nationalNumber
-                    break
-                  }
-                }
-              }
-              if (!_that.registerData.mobile_) {
-                _that.registerData.mobile_ = nationalNumber
-              }
+              _that.registerData.mobile_ = MobileNumberUtil.parse(mobile).getNationalNumber() + ''
             }
           }
 
@@ -814,9 +797,9 @@ export default {
                 // data.additionalData
                 console.log('push-notification', data)
               })
-              push.on('error', (e) => {
+              push.on('error', async (e) => {
                 // e.message
-                console.error('push-error', e)
+                await logService.log(e, 'push-error', 'error')
               })
             }
           } else if (store.android === true) {
@@ -834,8 +817,8 @@ export default {
                     console.log("hms getToken result", result)
                     store.deviceToken = result
                   })
-                  .catch((error) => {
-                    console.error("hms getToken error", error)
+                  .catch(async (error) => {
+                    await logService.log(error, 'hms-getToken-error', 'error')
                   })
                 HmsPushEvent.onTokenReceived((ret) => {
                   if (ret) {
@@ -848,8 +831,8 @@ export default {
               xiaomiPush.register(function (token) {
                 console.log('Xiaomi push register token', token)
                 store.deviceToken = token
-              }, function (err) {
-                console.error('Xiaomi push register error', err)
+              }, async function (err) {
+                await logService.log(err, 'Xiaomi-push-register-error', 'error')
               }, [])
               xiaomiPush.onNewToken(function (token) {
                 console.log('Xiaomi push onNewToken token', token) // 会多次接收到token
@@ -862,8 +845,8 @@ export default {
               oppoPush.register(function (token) {
                 console.log('OPPO push register token', token)
                 store.deviceToken = token
-              }, function (err) {
-                console.error('OPPO push register error', err)
+              }, async function (err) {
+                await logService.log(err, 'OPPO-push-register-error', 'error')
               }, [])
               oppoPush.onNewToken(function (token) {
                 console.log('OPPO push onNewToken token', token) // 会多次接收到token
@@ -924,7 +907,7 @@ export default {
       condition['status'] = EntityStatus[EntityStatus.Effective]
       condition['updateDate'] = { $gt: null }
       let pcs = await myselfPeerService.find(condition, [{ updateDate: 'desc' }], null)
-      if (!myselfPeer && pcs && pcs.length > 0) {
+      if (pcs && pcs.length > 0) {
         myselfPeer = pcs[0]
       }
       let peerProfile = null
@@ -947,25 +930,28 @@ export default {
             colors.setBrand('secondary', peerProfile.secondaryColor)
           }
         }
-        if (myselfPeer.mobile && !_that.loginData.mobile_) {
+        if (myselfPeer.mobile) {
           try {
             let mobileObject = MobileNumberUtil.parse(myselfPeer.mobile)
-            _that.loginData.code_ = mobileObject.getCountryCode() + ''
-            if (!_that.registerData.code_) {
-              _that.registerData.code_ = _that.loginData.code_
+            if (!_that.loginData.code_) {
+              _that.loginData.code_ = mobileObject.getCountryCode() + ''
             }
-            _that.loginData.mobile_ = mobileObject.getNationalNumber() + ''
-            console.log('mobile2:' + _that.loginData.mobile_)
+            if (!_that.registerData.code_) {
+              _that.registerData.code_ = mobileObject.getCountryCode() + ''
+            }
+            if (!_that.loginData.mobile_) {
+              _that.loginData.mobile_ = mobileObject.getNationalNumber() + ''
+            }
           } catch (e) {
             console.error(e)
           }
         }
       }
+      if (!_that.registerData.code_) {
+        _that.registerData.code_ = '86'
+      }
       if (!_that.loginData.code_) {
         _that.loginData.code_ = '86'
-        if (!_that.registerData.code_) {
-          _that.registerData.code_ = _that.loginData.code_
-        }
       }
       // 在区号已设置后、设置语言（根据区号和语言设置国家地区）
       if (peerProfile && peerProfile.language) {
