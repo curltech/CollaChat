@@ -38,12 +38,8 @@
         q-card-section(align="center" class="q-py-none")
           q-card(flat class="fixed-center background-color: transparent")
             q-card-section(align="center")
-              q-img(src="@/assets/colla.png" style="height: 120px; width: 137px" @click="switchTestMode")
+              q-img(src="@/assets/colla.png" style="height: 120px; width: 137px")
               div(class="text-center text-h6") {{$t('Secure Your Collaboration')}}
-              q-item-label(v-if="testMode" class="text-red") {{$t('(Test Mode)')}}
-              q-btn(v-if="testMode" :label="$t('Test-queryDB')" color="red" @click="testQueryDB" flat no-caps)
-              q-btn(v-if="testMode" :label="$t('Test-dropDB')" color="red" @click="testDropDB" flat no-caps)
-              q-btn(v-if="testMode" :label="$t('Test-recreateDB')" color="red" @click="testRecreateDB" flat no-caps)
             q-card-section(align="center")
               q-form(ref="frmLogin" @submit="login" class="q-pa-none")
                 q-select.c-field(style="width:280px;padding-bottom:5px" filled dense v-model="loginData.countryRegion_" :options="options" :label="$t('Country/Region')"

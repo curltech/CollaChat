@@ -91,8 +91,7 @@ export default {
       connectAddress: null,
       customConnectAddress: null,
       light: false,
-      bgNo: 11,
-      testMode: false
+      bgNo: 11
     }
   },
   validations: {
@@ -970,57 +969,6 @@ export default {
           _that.loginData.password_ = openpgp.uint8ArrayToStr(openpgp.decodeBase64(myselfPeer.password))
           await _that.login(true)
         }
-      }
-    },
-    switchTestMode() {
-      let _that = this
-      _that.testMode = !_that.testMode
-    },
-    async testQueryDB() {
-      let _that = this
-      let loginData = _that.loginData
-      let code_ = loginData.code_
-      let mobile_ = loginData.mobile_
-      let mobile = null
-      if (code_ && mobile_) {
-        let isPhoneNumberValid = false
-        try {
-          isPhoneNumberValid = MobileNumberUtil.isPhoneNumberValid(mobile_, MobileNumberUtil.getRegionCodeForCountryCode(code_))
-        } catch (e) {
-          alert(e)
-        }
-        if (!isPhoneNumberValid) {
-          alert('InvalidMobileNumber')
-        }
-        mobile = MobileNumberUtil.formatE164(mobile_, MobileNumberUtil.getRegionCodeForCountryCode(code_))
-      }
-      let condition = { status: EntityStatus[EntityStatus.Effective] }
-      if (mobile) {
-        condition.mobile = mobile
-      }
-      try {
-        let myselfPeer = await myselfPeerService.findOne(condition, null, null)
-        if (!myselfPeer) {
-          alert('AccountNotExists')
-        } else {
-          alert(JSON.stringify(myselfPeer))
-        }
-      } catch (e) {
-        alert(e)
-      }
-    },
-    async testDropDB() {
-      try {
-        await pounchDb.drop('blc_myselfPeer')
-      } catch (e) {
-        alert(e)
-      }
-    },
-    async testRecreateDB() {
-      try {
-        await pounchDb.create('blc_myselfPeer', ['endDate', 'peerId', 'mobile', 'status', 'updateDate'], null)
-      } catch (e) {
-        alert(e)
       }
     }
   },
