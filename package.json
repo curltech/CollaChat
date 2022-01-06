@@ -57,6 +57,7 @@
     "alloyfinger": "^0.1.16",
     "compressorjs": "^1.0.6",
     "css3transform": "^1.2.3",
+    "heic2any": "0.0.3",
     "html2canvas": "^1.0.0-rc.7",
     "jimp": "^0.16.1",
     "jsqr": "^1.4.0",

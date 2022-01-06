@@ -976,6 +976,9 @@ export default {
         let fileData = await BlobUtil.fileObjectToBase64(file)
         let type
         if (mediaComponent.isAssetTypeAnImage(fileType)) {
+          if(fileType === 'heic'){
+            fileData = await mediaComponent.heicToPNG(fileData)
+          }
           type = ChatContentType.IMAGE
         } else if (mediaComponent.isAssetTypeAVideo(fileType)) {
           type = ChatContentType.VIDEO
@@ -3076,6 +3079,9 @@ export default {
         let fileData = await BlobUtil.fileObjectToBase64(file)
         let type
         if (mediaComponent.isAssetTypeAnImage(fileType)) {
+          if(fileType === 'heic'){
+            fileData = await mediaComponent.heicToPNG(fileData)
+          }
           type = ChatContentType.IMAGE
         } else if (mediaComponent.isAssetTypeAVideo(fileType)) {
           type = ChatContentType.VIDEO

@@ -19,14 +19,13 @@ export default {
       chatMic: true,
       audioToggle: 'speaker',
       addStreamCount: 0,
-      showMore: false,
       localCloneStream: {},
       SubjectType: SubjectType,
       ActiveStatus: ActiveStatus,
       fullSize: false,
       ChatContentType: ChatContentType,
       P2pChatMessageType: P2pChatMessageType,
-      iosFlatDisplay: true
+      groupFocusNum: 0
     }
   },
   computed: {
@@ -135,6 +134,7 @@ export default {
           }
         }
       }
+      _that.$forceUpdate()
     },
     changeAudioToggle() {
       let _that = this
@@ -314,7 +314,7 @@ export default {
         _that.$forceUpdate()
         _that.$nextTick(() => {
           if (localStream.getVideoTracks().length > 0) {//video
-            let currentVideoDom = _that.$refs[`memberVideo${ownerPeerId}`][0]
+            let currentVideoDom = _that.$refs[`memberVideo${ownerPeerId}`]
             currentVideoDom.srcObject = localStream
           } else {//audio
             if (!store.state.currentCallChat.audio) {
@@ -450,7 +450,6 @@ export default {
     async acceptGroupCall(message) {
       let _that = this
       let store = _that.$store
-      let subjectId = store.state.currentChat.subjectId
       let messages = store.state.currentChat.messages
       let latestInvitationMessage;
       for (let i = messages.length - 1; i > -1; i--) {
@@ -500,6 +499,10 @@ export default {
         _that.$nextTick(() => {
           if (localStream.getVideoTracks().length > 0) {//video
             if (!Platform.is.ios) {
+              let currentVideoDom = _that.$refs.zoomVideo
+              currentVideoDom.srcObject = localStream
+              currentVideoDom.muted = true
+            } else {
               let currentVideoDom = _that.$refs[`memberVideo${store.state.currentCallChat.ownerPeerId}`][0]
               currentVideoDom.srcObject = localStream
               currentVideoDom.muted = true
@@ -522,6 +525,8 @@ export default {
           contentType: ChatContentType.CALL_JOIN_REQUEST
         }
         await store.sendChatMessage(store.state.currentChat, _message)
+        //todo ios
+        _that.iosGroupVideoFocus()
       })
     },
     async receiveJoinGroupCallRequest(message) {
@@ -566,7 +571,7 @@ export default {
         _that.$nextTick(() => {
           setTimeout(function () {
             if (stream.getVideoTracks().length > 0 && _that.$refs[`memberVideo${peerId}`]) {//video
-              let currentVideoDom = _that.$refs[`memberVideo${peerId}`][0]
+              let currentVideoDom = _that.$refs[`memberVideo${peerId}`]
               currentVideoDom.srcObject = stream
             } else {//audio
               if (!store.state.currentCallChat.audio) {
@@ -786,70 +791,45 @@ export default {
         }
       }
     },
-    showMoreChange() {
-      this.showMore = !this.showMore
-    },
     zoomVideoChange() {
       let _that = this
       let store = _that.$store
       let callChat = store.state.currentCallChat
       let currentVideoDom = _that.$refs.currentVideo
       let zoomVideoDom = _that.$refs.zoomVideo
-      if (Platform.is.ios && _that.iosFlatDisplay) {
-        _that.iosFlatDisplay = false
-        _that.$nextTick(() => {
-          currentVideoDom.srcObject = callChat.streamMap[callChat.ownerPeerId].stream
-        })
-        return
-      }
       if (currentVideoDom.srcObject === callChat.streamMap[callChat.ownerPeerId].stream) {
         if (zoomVideoDom) {
           zoomVideoDom.srcObject = callChat.streamMap[callChat.ownerPeerId].stream
         }
         currentVideoDom.srcObject = callChat.streamMap[callChat.subjectId].stream
       } else {
-        if (Platform.is.ios && !_that.iosFlatDisplay) {
-          _that.iosFlatDisplay = true
-          _that.$nextTick(() => {
-            zoomVideoDom = _that.$refs.zoomVideo
-            if (zoomVideoDom) {
-              zoomVideoDom.srcObject = callChat.streamMap[callChat.subjectId].stream
-            }
-            currentVideoDom.srcObject = callChat.streamMap[callChat.ownerPeerId].stream
-          })
-        } else {
-          if (zoomVideoDom) {
-            zoomVideoDom.srcObject = callChat.streamMap[callChat.subjectId].stream
-          }
-          currentVideoDom.srcObject = callChat.streamMap[callChat.ownerPeerId].stream
+        if (zoomVideoDom) {
+          zoomVideoDom.srcObject = callChat.streamMap[callChat.subjectId].stream
         }
-
+        currentVideoDom.srcObject = callChat.streamMap[callChat.ownerPeerId].stream
       }
-
-
     },
-    iosGroupVideoFocus(memberPeerId) {
+    iosGroupVideoFocus() {
       let _that = this
       let store = _that.$store
       let callChat = store.state.currentCallChat
-      if (Platform.is.ios && callChat.streamMap && callChat.streamMap[memberPeerId]) {
-        if (!callChat.streamMap[memberPeerId].focus) {
-          callChat.streamMap[memberPeerId].focus = true
-          _that.$forceUpdate()
-          _that.$nextTick(() => {
-            if (_that.$refs[`memberVideo${memberPeerId}`]) {//video
-              let currentVideoDom = _that.$refs[`memberVideo${memberPeerId}`][0]
-              currentVideoDom.srcObject = callChat.streamMap[memberPeerId].stream
-              if (memberPeerId === callChat.ownerPeerId) {
-                currentVideoDom.muted = true
-              }
-            }
-          })
-        } else {
-          callChat.streamMap[memberPeerId].focus = false
-        }
+      let content = callChat.callMessage.content
+      if (_that.groupFocusNum === content.length) {
+        _that.groupFocusNum = 1
+      } else {
+        _that.groupFocusNum++
       }
-
+      _that.$forceUpdate
+      let memberPeerId = content[_that.groupFocusNum - 1]
+      _that.$nextTick(() => {
+        if (_that.$refs[`memberVideo${memberPeerId}`]) {//video
+          let currentVideoDom = _that.$refs[`memberVideo${memberPeerId}`][0]
+          currentVideoDom.srcObject = callChat.streamMap[memberPeerId].stream
+          if (memberPeerId === callChat.ownerPeerId) {
+            currentVideoDom.muted = true
+          }
+        }
+      })
     },
     canCall() {
       let _that = this
