@@ -1042,8 +1042,8 @@ body.body--dark.bgc {
 #videoDialog video{
   transform: rotateY(180deg)
 }
-.linkman-video .linkman-video-toolbar ,.linkman-video .group-video-toolbar{
-  position absolute
+.linkman-video .linkman-video-toolbar{
+  position absolute;
   bottom:0px
   z-index : 9999
   //background :rgba(31,31,31,0.2)
@@ -1115,6 +1115,9 @@ body.body--dark.bgc {
   width:100%;
   display :block
 }
+.current-video-section-ios,.current-video-section-ios video{
+  height:70vh !important;
+}
 .current-linkman-video{
   //max-width :18vw
 }
@@ -1136,12 +1139,25 @@ body.body--dark.bgc {
   top:0;
   padding:0;
 }
-.linkman-video .media-timer,.ios-linkman-video .media-timer{
+.linkman-video .media-timer,.ios-linkman-video .media-timer,.group-video-toolbar .media-timer{
   margin-left: -20px;
   font-size:16px;
   top: -30px;
   left: 50%;
   position: absolute;
+}
+.group-video-toolbar{
+  padding-top:5px
+}
+.pc-group-video-toolbar{
+  position relative;
+}
+.media-timer-ios-group{
+  position:fixed !important;
+  top:15px !important;
+  left:50%;
+  margin-left: -20px;
+  z-index:999;
 }
 .linkman-avatar-section{
   width: 100%;
@@ -1165,6 +1181,7 @@ body.body--dark.bgc {
 }
 .zoom-video-section-ios{
   position:relative;
+  height:20vh;
 }
 .video-operate-section{
   position:absolute;

@@ -314,8 +314,17 @@ export default {
         _that.$forceUpdate()
         _that.$nextTick(() => {
           if (localStream.getVideoTracks().length > 0) {//video
-            let currentVideoDom = _that.$refs[`memberVideo${ownerPeerId}`]
-            currentVideoDom.srcObject = localStream
+            if (Platform.is.ios) {
+              let currentVideoDom = _that.$refs.zoomVideo
+              currentVideoDom.srcObject = localStream
+              currentVideoDom.muted = true
+              _that.iosGroupVideoFocus()
+            } else{
+              if(_that.$refs[`memberVideo${ownerPeerId}`]){
+              let currentVideoDom = _that.$refs[`memberVideo${ownerPeerId}`].length?_that.$refs[`memberVideo${ownerPeerId}`][0]:_that.$refs[`memberVideo${ownerPeerId}`]
+              currentVideoDom.srcObject = localStream
+              }
+            }
           } else {//audio
             if (!store.state.currentCallChat.audio) {
               store.state.currentCallChat.audio = {}
@@ -498,14 +507,18 @@ export default {
         _that.$forceUpdate()
         _that.$nextTick(() => {
           if (localStream.getVideoTracks().length > 0) {//video
-            if (!Platform.is.ios) {
+            if (Platform.is.ios) {
               let currentVideoDom = _that.$refs.zoomVideo
               currentVideoDom.srcObject = localStream
               currentVideoDom.muted = true
             } else {
-              let currentVideoDom = _that.$refs[`memberVideo${store.state.currentCallChat.ownerPeerId}`][0]
-              currentVideoDom.srcObject = localStream
-              currentVideoDom.muted = true
+              let memberVideoDom = _that.$refs[`memberVideo${store.state.currentCallChat.ownerPeerId}`]
+              if(memberVideoDom){
+                let currentVideoDom = memberVideoDom.length ? memberVideoDom[0] : memberVideoDom
+                currentVideoDom.srcObject = localStream
+                currentVideoDom.muted = true
+              }
+              
             }
           } else {//audio
             if (!store.state.currentCallChat.audio) {
@@ -526,7 +539,9 @@ export default {
         }
         await store.sendChatMessage(store.state.currentChat, _message)
         //todo ios
-        _that.iosGroupVideoFocus()
+        if (Platform.is.ios) {
+          _that.iosGroupVideoFocus()
+        }
       })
     },
     async receiveJoinGroupCallRequest(message) {
@@ -571,7 +586,8 @@ export default {
         _that.$nextTick(() => {
           setTimeout(function () {
             if (stream.getVideoTracks().length > 0 && _that.$refs[`memberVideo${peerId}`]) {//video
-              let currentVideoDom = _that.$refs[`memberVideo${peerId}`]
+              let dom = _that.$refs[`memberVideo${peerId}`]
+              let currentVideoDom = dom.length ? dom[0] : dom
               currentVideoDom.srcObject = stream
             } else {//audio
               if (!store.state.currentCallChat.audio) {
@@ -808,6 +824,7 @@ export default {
         }
         currentVideoDom.srcObject = callChat.streamMap[callChat.ownerPeerId].stream
       }
+      _that.$forceUpdate()
     },
     iosGroupVideoFocus() {
       let _that = this
