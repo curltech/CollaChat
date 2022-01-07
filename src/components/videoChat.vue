@@ -89,13 +89,12 @@
             q-toolbar.group-video-toolbar.pc-group-video-toolbar
                 q-toolbar-title.media-timer(:class="Platform.is.ios?'media-timer-ios-group':''" align="center")
                     span(ref="mediaTimer")
-                q-btn.text-primary(v-if = "!(ifMobileSize || $store.state.ifMobileStyle) && $store.state.currentCallChat.stream && $store.state.currentCallChat.stream.length > 1" unelevated round :icon="audioToggle === 'speaker'?'volume_off':'volume_up'" @click="changeAudioToggle")
                 q-fab(color="primary" push :icon="chatMute ?'volume_off':(audioToggle === 'speaker'?'speaker':'volume_up')" v-if = "(ifMobileSize || $store.state.ifMobileStyle) && $store.state.currentCallChat.stream && $store.state.currentCallChat.stream.length > 1 " direction="right" padding="xs")
                     q-fab-action(color="primary" @click="changeDropdownChatMute('mute')" icon="volume_off")
                     q-fab-action(color="primary" @click="changeDropdownChatMute('speaker')" icon="speaker")
                     q-fab-action(color="primary" @click="changeDropdownChatMute('earpiece')" icon="volume_up")
                 q-btn.text-primary(v-if = "!(ifMobileSize || $store.state.ifMobileStyle) && $store.state.currentCallChat.stream && $store.state.currentCallChat.stream.length > 1" color="primary" unelevated round :icon="chatMute?'volume_off':'volume_up'" @click="changeChatMute")
-                q-space(v-if = "(ifMobileSize || $store.state.ifMobileStyle) || ($store.state.currentCallChat.stream && $store.state.currentCallChat.stream.length > 1)")
+                q-space
                 q-btn(unelevated round color="red" icon="call_end" v-close-popup @click="closeCall")
                 q-space
                 q-btn.text-primary(v-if = "$store.state.currentCallChat.stream && $store.state.currentCallChat.stream.length > 1" unelevated round  color="primary" :icon="chatMic?'mic':'mic_off'" @click="changeChatMic")
