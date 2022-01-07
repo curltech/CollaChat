@@ -31,7 +31,7 @@
           q-separator.c-separator(style="margin-left:16px;width:calc(100% - 16px)")
           q-item(clickable v-ripple)
             q-item-section(side)
-              q-item-label {{$t('Peer Id')}}
+              q-item-label.text-c-black {{$t('Peer Id')}}
             q-item-section
               q-item-label(caption lines="3" style="word-break:break-all") {{ $store.state.myselfPeerClient ? $store.state.myselfPeerClient.peerId : '' }}
             q-item-section(side)
