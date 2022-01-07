@@ -15,7 +15,7 @@ import audioMessageSendAudioSrc from '@/assets/media/audioMessageSend.mp3'
 import mediaCloseAudioSrc from '@/assets/media/mediaClose.mp3'
 import mediaInvitationAudioSrc from '@/assets/media/mediaInvitation.mp3'
 import scanAudioSrc from '@/assets/media/scan.mp3'
-
+import heic2any from "heic2any";
 /**
  * 本类的功能可以适用于所有的App和浏览器，处理相片
  */
@@ -1338,6 +1338,15 @@ class MediaComponent {
       url = repairFragment + urlArray[1]
     }
     return url
+  }
+  async heicToPNG(heicBase64){
+    let blob = BlobUtil.base64ToBlob(heicBase64)
+    let jpegBlob = await  heic2any({
+			blob,
+			toType: "image/png",
+			quality: 1,
+    })
+    return BlobUtil.blobToBase64(jpegBlob)
   }
 }
 export let mediaComponent = new MediaComponent()

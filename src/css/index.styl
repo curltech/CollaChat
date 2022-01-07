@@ -1042,8 +1042,8 @@ body.body--dark.bgc {
 #videoDialog video{
   transform: rotateY(180deg)
 }
-.linkman-video .linkman-video-toolbar ,.linkman-video .group-video-toolbar{
-  position absolute
+.linkman-video .linkman-video-toolbar{
+  position absolute;
   bottom:0px
   z-index : 9999
   //background :rgba(31,31,31,0.2)
@@ -1107,17 +1107,6 @@ body.body--dark.bgc {
 .ios-linkman-video .current-video-section video{
   height:85vh;
 }
-.ios-flat-display video {
-    width: 50% !important;
-    display:inline-block !important;
-    height:66.5vw !important
-}
-.chatmute-dropdown .q-btn__wrapper:before{
-  box-shadow: none;
-}
-//.group-video-list:nth-child(odd) video{
-//padding-left:1px
-//}
 .current-video-section{
   width:100%;height:100%;
   padding:0;
@@ -1125,6 +1114,9 @@ body.body--dark.bgc {
 .current-video-section video{
   width:100%;
   display :block
+}
+.current-video-section-ios,.current-video-section-ios video{
+  height:70vh !important;
 }
 .current-linkman-video{
   //max-width :18vw
@@ -1147,12 +1139,25 @@ body.body--dark.bgc {
   top:0;
   padding:0;
 }
-.linkman-video .media-timer,.ios-linkman-video .media-timer{
+.linkman-video .media-timer,.ios-linkman-video .media-timer,.group-video-toolbar .media-timer{
   margin-left: -20px;
   font-size:16px;
   top: -30px;
   left: 50%;
   position: absolute;
+}
+.group-video-toolbar{
+  padding-top:5px
+}
+.pc-group-video-toolbar{
+  position relative;
+}
+.media-timer-ios-group{
+  position:fixed !important;
+  top:15px !important;
+  left:50%;
+  margin-left: -20px;
+  z-index:999;
 }
 .linkman-avatar-section{
   width: 100%;
@@ -1167,11 +1172,16 @@ body.body--dark.bgc {
   position:absolute;
   top:0px;
   right:0px;
+  z-index:99;
 
 }
 .zoom-video-section video{
   width:100px;
   display:block
+}
+.zoom-video-section-ios{
+  position:relative;
+  height:20vh;
 }
 .video-operate-section{
   position:absolute;
