@@ -330,12 +330,14 @@ export default {
     back() {
       let _that = this
       let store = _that.$store
-      if (store.selectContactsEntry === 'addGroupChat' || store.selectContactsEntry === 'linkmanCard') {
+      if (store.selectContactsEntry === 'addGroupChat') {
         if (_that.ifMobileSize || store.state.ifMobileStyle) {
           store.toggleDrawer(false)
         } else {
           store.changeKind('message')
         }
+      } else if (store.selectContactsEntry === 'linkmanCard') {
+        store.changeKind('message')
       } else if (store.selectContactsEntry === 'CHATDetails' || store.selectContactsEntry === 'GROUP_CHATDetails') {
         store.changeMessageSubKind(store.selectContactsEntry)
       } else if (store.selectContactsEntry === 'contactsTagList') {

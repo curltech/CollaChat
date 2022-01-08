@@ -5,7 +5,7 @@ import { webrtcPeerPool } from 'libcolla'
 import { CollaUtil, peerClientService } from 'libcolla'
 
 import { systemAudioComponent, mediaStreamComponent } from '@/libs/base/colla-media'
-//import { localNotificationComponent } from '@/libs/base/colla-cordova'
+import { statusBarComponent/*, localNotificationComponent*/ } from '@/libs/base/colla-cordova'
 import { ActiveStatus } from '@/libs/biz/colla-contact'
 import { ChatContentType, P2pChatMessageType, SubjectType } from '@/libs/biz/colla-chat'
 
@@ -278,10 +278,10 @@ export default {
       store.state.currentCallChat.options = options
       if (store.state.currentCallChat.subjectType === SubjectType.CHAT) {
         await _that.sendCallMessage()
-        store.state.videoDialog = true
+        _that.showVideoDialog(true)
         systemAudioComponent.mediaInvitationAudioPlay()
       }
-      //initiateGroupCallRequest
+      // initiateGroupCallRequest
       else if (store.state.currentCallChat.subjectType === SubjectType.GROUP_CHAT) {
         let linkmans = store.state.linkmans // 实际选择的不是GroupChatMember，而是对应的linkman
         if (linkmans && linkmans.length > 0) {
@@ -300,7 +300,7 @@ export default {
       store.state.currentCallChat = store.state.currentChat
       store.state.currentCallChat.callMessage = {}
       store.state.currentCallChat.callMessage.senderPeerId = ownerPeerId
-      store.state.videoDialog = true
+      _that.showVideoDialog(true)
       _that.$nextTick(async () => {
         let localStream = await mediaStreamComponent.openUserMedia(store.state.currentCallChat.options)
         _that.saveStream(ownerPeerId, localStream)
@@ -390,7 +390,7 @@ export default {
         }
         store.state.currentCallChat.callMessage = message
         systemAudioComponent.mediaInvitationAudioPlay()
-        store.state.videoDialog = true
+        _that.showVideoDialog(true)
       }
       else {
         if (message.contentType === ChatContentType.CALL_JOIN_REQUEST) {
@@ -499,8 +499,7 @@ export default {
           }, audio: true
         }
       }
-
-      store.state.videoDialog = true
+      _that.showVideoDialog(true)
       _that.$nextTick(async () => {
         let localStream = await mediaStreamComponent.openUserMedia(options)
         _that.saveStream(store.state.currentCallChat.ownerPeerId, localStream)
@@ -715,13 +714,13 @@ export default {
         await _that.removeStream()
         //close miniButton which is in index.vue
         store.state.miniVideoDialog = false
-        clearInterval(_that.mediaTimer);
+        clearInterval(_that.mediaTimer)
         _that.mediaTimer = null
         _that.mediaMemberList = []
         store.state.currentCallChat.audio = null
         store.state.currentCallChat = null
         _that.$nextTick(() => {
-          store.state.videoDialog = false;
+          _that.showVideoDialog(false)
           _that.chatMute = false
           _that.chatMic = true
         })
@@ -773,7 +772,6 @@ export default {
         _that.closeCall(true)
       }
     },
-
     async changeMediaType() {
       let _that = this
       let store = _that.$store
@@ -853,6 +851,17 @@ export default {
       let store = _that.$store
       return store.state.currentCallChat && !store.state.currentCallChat.stream && store.state.currentCallChat.callMessage && (store.state.currentCallChat.callMessage.senderPeerId !== store.state.currentCallChat.ownerPeerId)
     },
+    showVideoDialog(ifShow) {
+      let _that = this
+      let store = _that.$store
+      if (ifShow) {
+        store.state.videoDialog = true
+        statusBarComponent.hide()
+      } else {
+        store.state.videoDialog = false
+        statusBarComponent.show(false)
+      }
+    }
   },
   mounted() {
     let _that = this

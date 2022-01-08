@@ -16,9 +16,9 @@
                 messageContent(v-if='message.messageType === P2pChatMessageType.CHAT_LINKMAN || message.messageType === P2pChatMessageType.CALL_REQUEST' v-bind:message = "message" entry = "message" v-bind:showContacts='showContacts')
                 q-menu(touch-position context-menu v-if='message.messageType === P2pChatMessageType.CHAT_LINKMAN && message.status === ChatMessageStatus.NORMAL')
                   q-list(dense style="min-width: 100px")
-                    q-item(v-if='message.contentType === ChatContentType.TEXT && !message.countDown' clickable  @click="copyMessage(message,index)" v-close-popup)
+                    q-item(v-if='message.contentType === ChatContentType.TEXT && !message.countDown' clickable @click="copyMessage(message,index)" v-close-popup)
                       q-item-section {{$t('Copy')}}
-                    q-item(clickable  @click="deleteMessage(message,index)" v-close-popup)
+                    q-item(clickable @click="deleteMessage(message,index)" v-close-popup)
                       q-item-section {{$t('Delete')}}
                     q-item(clickable v-if="!isRecallTimeLimit(message)" @click="recallMessage(message,index)" v-close-popup)
                       q-item-section {{$t('Recall')}}
@@ -26,7 +26,7 @@
                       q-item-section {{$t('Forward')}}
                     q-item(clickable v-if='!message.countDown' @click="collectMessage(message, index)" v-close-popup)
                       q-item-section {{$t('Collection')}}
-                    q-item(v-if='message.contentType === ChatContentType.TEXT && !message.countDown' clickable  @click="quoteMessage(message,index)" v-close-popup)
+                    q-item(v-if='message.contentType === ChatContentType.TEXT && !message.countDown' clickable @click="quoteMessage(message,index)" v-close-popup)
                       q-item-section {{$t('Quote')}}
                     q-item(clickable v-if='!message.countDown' @click="openMessageMultiSelect" v-close-popup)
                       q-item-section {{$t('MultiSelect')}}
@@ -35,7 +35,7 @@
         .message-editor-wrap(:class="ifMobileSize || $store.state.ifMobileStyle ? 'bg-c-grey-message-editor' : 'bg-c-grey-message-editor-pc'")
           .message-editor-area
             q-toolbar.row(style="height:40px;min-height:40px" v-if="!(ifMobileSize || $store.state.ifMobileStyle) && !messageMultiSelectMode")
-              q-btn.text-primary.q-mr-sm(round flat icon="alarm" :disable ='!(!ifSelfChat && activeStatus($store.state.currentChat) && ($store.state.currentChat && $store.state.currentChat.subjectType === SubjectType.CHAT))' @click='destroyClock = true')
+              q-btn.text-primary.q-mr-sm(round flat icon="alarm" :disable ='!(!ifSelfChat && $store.state.currentChat && $store.state.currentChat.subjectType === SubjectType.CHAT)' @click='destroyClock = true')
                 q-popup-edit(v-model="destroyClock" content-class="" style='width:100px')
                   q-option-group(:options="clockOptions" label="Notifications" type="radio" v-model="$store.state.currentChat.destroyTime")
               q-btn.text-primary.q-mr-sm(round flat icon="insert_emoticon" @click="switchEmoji")
@@ -64,7 +64,7 @@
                 q-carousel(v-model="slide" swipeable animated padding control-text-color="c-grey" style="height: 210px")
                   q-carousel-slide(name="slide1" class="q-pa-md")
                     q-btn-group(flat spread stretch)
-                      q-btn.text-primary.btnMessage(flat stack no-caps :label="$t('Destroy')" icon="alarm" :disable ='!(!ifSelfChat && activeStatus($store.state.currentChat) && ($store.state.currentChat && $store.state.currentChat.subjectType === SubjectType.CHAT))' @click="destroyClock = true")
+                      q-btn.text-primary.btnMessage(flat stack no-caps :label="$t('Destroy')" icon="alarm" :disable ='!(!ifSelfChat && $store.state.currentChat && $store.state.currentChat.subjectType === SubjectType.CHAT)' @click="destroyClock = true")
                         q-popup-edit(v-model="destroyClock" content-class="" style='width:100px')
                           q-option-group(:options="clockOptions" label="Notification" type="radio" v-model="$store.state.currentChat.destroyTime")
                       q-btn.text-primary.btnMessage
@@ -75,8 +75,8 @@
                       q-btn.text-primary.btnMessage(flat stack no-caps :label="$t('Take Photo')" icon="photo_camera" @click="capture('image')")
                       q-btn.text-primary.btnMessage(flat stack no-caps :label="$t('Take Video')" icon="camera" @click="capture('video')")
                     q-btn-group(flat spread stretch)
-                      q-btn.text-primary.btnMessage(flat stack no-caps :label="$t('Voice Call')" icon="call"  :disable="ifSelfChat"   @click="initiateCallRequest('audio')")
-                      q-btn.text-primary.btnMessage(flat stack no-caps :label="$t('Video Call')" icon="videocam"  :disable="ifSelfChat"   @click="initiateCallRequest('video')")
+                      q-btn.text-primary.btnMessage(flat stack no-caps :label="$t('Voice Call')" icon="call" :disable="ifSelfChat" @click="initiateCallRequest('audio')")
+                      q-btn.text-primary.btnMessage(flat stack no-caps :label="$t('Video Call')" icon="videocam" :disable="ifSelfChat" @click="initiateCallRequest('video')")
                       q-btn.text-primary.btnMessage(flat stack no-caps :label="$t('Collection')" icon="bookmarks" @click="openCollection")
                       q-btn.text-primary.btnMessage(flat stack no-caps :label="$t('Contact Card')" icon="account_box" @click="selectLinkmanCard")
                   //q-carousel-slide(name="slide2" class="q-pa-md")
@@ -350,7 +350,7 @@
       q-tab-panel(name="selectGroupChatMember" style="padding:0px 0px")
         q-toolbar
           q-btn(flat round icon="keyboard_arrow_left" @click="selectGroupChatMemberBack")
-          q-toolbar-title(align="center") {{ selectGroupChatMemberFlag  === 'removeGroupChatMember' ? $t('Remove Group Member') : $t('Select Group Member') }}
+          q-toolbar-title(align="center") {{ selectGroupChatMemberFlag === 'removeGroupChatMember' ? $t('Remove Group Member') : $t('Select Group Member') }}
           q-btn(flat round icon="check" :disable="selectedGroupChatMembers.length < 1 && !selectedGroupChatMemberPeerId" :label="(selectedGroupChatMembers.length > 0 ? '(' + selectedGroupChatMembers.length + ')' : '')" :class="selectedGroupChatMembers.length > 0 || selectedGroupChatMemberPeerId ? 'text-primary' : 'c-grey-0'" @click="doneSelectGroupChatMember")
         q-toolbar(insert)
           q-input.c-field(debounce="100" filled dense v-model="groupChatMemberfilter" :placeholder="placeholder" input-class="text-center iconfont")
@@ -371,8 +371,8 @@
             // 实际选择的不是GroupChatMember，而是对应的linkman，所以属性为peerId、不是memberPeerId
             q-item(clickable v-ripple @click="selectGroupChatMember(groupChatMember)")
               q-item-section(side)
-                q-checkbox(v-if="selectGroupChatMemberFlag  === 'removeGroupChatMember' || selectGroupChatMemberFlag  === 'initiateGroupCall'" dense v-model="groupChatMember.selected" color="primary" @input="selectGroupChatMember(groupChatMember, true)")
-                q-radio(v-if="selectGroupChatMemberFlag  === 'ownershipHandover' || selectGroupChatMemberFlag  === 'searchMessage'" dense v-model="selectedGroupChatMemberPeerId" :val="groupChatMember.peerId" color="primary")
+                q-checkbox(v-if="selectGroupChatMemberFlag === 'removeGroupChatMember' || selectGroupChatMemberFlag === 'initiateGroupCall'" dense v-model="groupChatMember.selected" color="primary" @input="selectGroupChatMember(groupChatMember, true)")
+                q-radio(v-if="selectGroupChatMemberFlag === 'ownershipHandover' || selectGroupChatMemberFlag === 'searchMessage'" dense v-model="selectedGroupChatMemberPeerId" :val="groupChatMember.peerId" color="primary")
               q-item-section(avatar)
                 q-avatar
                   img(:src="groupChatMember.avatar ? groupChatMember.avatar : $store.defaultActiveAvatar")
