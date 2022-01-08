@@ -66,9 +66,14 @@ export default {
       let store = _that.$store
       return function (subjectId) {
         if (store.state.linkmanMap[subjectId]) {
-          return store.state.linkmanMap[store.state.currentCallChat.subjectId].avatar ? store.state.linkmanMap[store.state.currentCallChat.subjectId].avatar : store.defaultActiveAvatar;
-        } else if (store.state.currentPhoneContact) {
-          return store.state.currentPhoneContact.avatar ? store.state.currentPhoneContact.avatar : store.defaultActiveAvatar;
+          return store.state.linkmanMap[subjectId].avatar ? store.state.linkmanMap[subjectId].avatar : store.defaultActiveAvatar;
+        } else {
+          let peerClient = peerClientService.getPeerClientFromCache(subjectId)
+          if (peerClient && peerClient.avatar) {
+            return peerClient.avatar
+          }else{
+            return store.defaultActiveAvatar;
+          }
         }
       }
     },
@@ -318,7 +323,7 @@ export default {
               let currentVideoDom = _that.$refs.zoomVideo
               currentVideoDom.srcObject = localStream
               currentVideoDom.muted = true
-              _that.iosGroupVideoFocus()
+              _that.iosGroupVideoFocus(0)
             } else{
               if(_that.$refs[`memberVideo${ownerPeerId}`]){
               let currentVideoDom = _that.$refs[`memberVideo${ownerPeerId}`].length?_that.$refs[`memberVideo${ownerPeerId}`][0]:_that.$refs[`memberVideo${ownerPeerId}`]
@@ -537,9 +542,8 @@ export default {
           contentType: ChatContentType.CALL_JOIN_REQUEST
         }
         await store.sendChatMessage(store.state.currentChat, _message)
-        //todo ios
         if (Platform.is.ios) {
-          _that.iosGroupVideoFocus()
+          _that.iosGroupVideoFocus(0)
         }
       })
     },
@@ -824,21 +828,18 @@ export default {
       }
       _that.$forceUpdate()
     },
-    iosGroupVideoFocus() {
+    iosGroupVideoFocus(index) {
       let _that = this
       let store = _that.$store
       let callChat = store.state.currentCallChat
       let content = callChat.callMessage.content
-      if (_that.groupFocusNum === content.length) {
-        _that.groupFocusNum = 1
-      } else {
-        _that.groupFocusNum++
-      }
+      _that.groupFocusNum = index
       _that.$forceUpdate
-      let memberPeerId = content[_that.groupFocusNum - 1]
+      let memberPeerId = content[index]
       _that.$nextTick(() => {
-        if (_that.$refs[`memberVideo${memberPeerId}`]) {//video
-          let currentVideoDom = _that.$refs[`memberVideo${memberPeerId}`][0]
+        let memberVideoDom = _that.$refs[`memberVideo${memberPeerId}`]
+        if (memberVideoDom) {//video
+          let currentVideoDom = memberVideoDom.length ? memberVideoDom[0] : memberVideoDom
           currentVideoDom.srcObject = callChat.streamMap[memberPeerId].stream
           if (memberPeerId === callChat.ownerPeerId) {
             currentVideoDom.muted = true

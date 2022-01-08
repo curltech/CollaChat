@@ -1139,30 +1139,47 @@ body.body--dark.bgc {
   top:0;
   padding:0;
 }
-.linkman-video .media-timer,.ios-linkman-video .media-timer,.group-video-toolbar .media-timer{
+.group-video-mini-btn{
+  width:100%
+  background:#fff;
+  opacity:0.7;
+}
+.linkman-video .media-timer,.ios-linkman-video .media-timer{
   margin-left: -20px;
   font-size:16px;
   top: -30px;
   left: 50%;
   position: absolute;
 }
+.single-video-media-timer,.media-timer-group-video{
+  margin-left: -20px;
+  font-size:16px;
+  top: 10px !important;
+  left: 50%;
+  position: absolute;
+  z-index:9999;
+}
 .media-timer span{
     background: #fff;
     opacity: 0.7;
     padding: 3px;
 }
+.media-timer-group-video span{
+   background:none;
+    opacity: 0.7;
+    padding: 3px;
+    color:#333;
+}
 .group-video-toolbar{
   padding-top:5px
 }
 .pc-group-video-toolbar{
-  position relative;
+  position:absolute !important;
+  bottom:0;
+  z-index:999;
 }
 .media-timer-ios-group{
-  position:fixed !important;
-  top:15px !important;
-  left:50%;
-  margin-left: -20px;
-  z-index:999;
+  text-align:center
 }
 .linkman-avatar-section{
   width: 100%;
@@ -1196,6 +1213,11 @@ body.body--dark.bgc {
 }
 .group-operate-section{
 
+}
+.single-audio-toolbar{
+  position:absolute !important;
+  bottom:0;
+  z-index:99;
 }
 .expend-video-sticky{
   z-index:99999;
