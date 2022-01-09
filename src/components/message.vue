@@ -371,7 +371,7 @@
             // 实际选择的不是GroupChatMember，而是对应的linkman，所以属性为peerId、不是memberPeerId
             q-item(clickable v-ripple @click="selectGroupChatMember(groupChatMember)")
               q-item-section(side)
-                q-checkbox(v-if="selectGroupChatMemberFlag === 'removeGroupChatMember' || selectGroupChatMemberFlag === 'initiateGroupCall'" dense v-model="groupChatMember.selected" color="primary" @input="selectGroupChatMember(groupChatMember, true)")
+                q-checkbox(v-if="selectGroupChatMemberFlag === 'removeGroupChatMember' || selectGroupChatMemberFlag === 'selectedGroupCallMember'" dense v-model="groupChatMember.selected" color="primary" @input="selectGroupChatMember(groupChatMember, true)")
                 q-radio(v-if="selectGroupChatMemberFlag === 'ownershipHandover' || selectGroupChatMemberFlag === 'searchMessage'" dense v-model="selectedGroupChatMemberPeerId" :val="groupChatMember.peerId" color="primary")
               q-item-section(avatar)
                 q-avatar

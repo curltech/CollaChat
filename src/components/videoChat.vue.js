@@ -292,13 +292,6 @@ export default {
       }
       // initiateGroupCallRequest
       else if (store.state.currentCallChat.subjectType === SubjectType.GROUP_CHAT) {
-        let linkmans = store.state.linkmans // 实际选择的不是GroupChatMember，而是对应的linkman
-        if (linkmans && linkmans.length > 0) {
-          for (let linkman of linkmans) {
-            linkman.selected = false
-            linkman.existing = false
-          }
-        }
         store.groupMediaSelect()
       }
     },
