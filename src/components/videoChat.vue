@@ -42,9 +42,9 @@
         //group video or audio
         q-card.message-dialog-card(v-if="$store.state.currentCallChat && $store.state.currentCallChat.subjectType === SubjectType.GROUP_CHAT")
             q-card-section.group-video-section
-                //ios-video
-                q-toolbar-title.media-timer.media-timer-group-video(v-if="!Platform.is.ios || $store.state.currentCallChat.callType == 'audio'")
+                q-toolbar-title.media-timer-group(v-if="!Platform.is.ios || $store.state.currentCallChat.callType == 'audio'")
                     span.text-c-grey-10(ref="mediaTimer")
+                //ios-video
                 q-card(flat v-if="Platform.is.ios && $store.state.currentCallChat.callType == 'video' && $store.state.currentCallChat && $store.state.currentCallChat.stream")
                     q-card-section.row.zoom-video-section.zoom-video-section-ios(v-show = "$store.state.currentCallChat && $store.state.currentCallChat.stream")
                         .col-8
