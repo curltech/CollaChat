@@ -208,16 +208,16 @@ export default {
     changeAvatar: async function () {
       if (this.avatarBase64) {
         this.$q.loading.show()
+        let myselfPeerClient = myself.myselfPeerClient
+        let myselfPeer = myself.myselfPeer
         let backupMobile = null
         try {
           let currentDate = new Date()
-          let myselfPeerClient = myself.myselfPeerClient
           myselfPeerClient.avatar = this.avatarBase64
           console.log('myselfPeerClient.avatar length: ' + this.avatarBase64.length)
           myselfPeerClient.lastUpdateTime = currentDate
           this.$store.state.myselfPeerClient = myselfPeerClient
 
-          let myselfPeer = myself.myselfPeer
           myselfPeer.avatar = this.avatarBase64
           myselfPeer.updateDate = currentDate
           myselfPeer.lastUpdateTime = currentDate
@@ -269,15 +269,15 @@ export default {
     },
     changeName: async function () {
       this.$q.loading.show()
+      let myselfPeerClient = myself.myselfPeerClient
+      let myselfPeer = myself.myselfPeer
       let backupMobile = null
       try {
         let currentDate = new Date()
-        let myselfPeerClient = myself.myselfPeerClient
         myselfPeerClient.name = this.name
         myselfPeerClient.lastUpdateTime = currentDate
         this.$store.state.myselfPeerClient = myselfPeerClient
 
-        let myselfPeer = myself.myselfPeer
         myselfPeer.name = this.name
         myselfPeer.updateDate = currentDate
         myselfPeer.lastUpdateTime = currentDate
@@ -329,8 +329,6 @@ export default {
       }
     },
     changeMobile: async function () {
-      let currentDate = new Date()
-      let myselfPeerClient = myself.myselfPeerClient
       let isPhoneNumberValid = false
       try {
         isPhoneNumberValid = MobileNumberUtil.isPhoneNumberValid(this.mobile_, MobileNumberUtil.getRegionCodeForCountryCode(this.code_))
@@ -339,14 +337,16 @@ export default {
       }
       if (isPhoneNumberValid) {
         this.$q.loading.show()
+        let myselfPeerClient = myself.myselfPeerClient
+        let myselfPeer = myself.myselfPeer
         let backupMobile = null
         try {
+          let currentDate = new Date()
           let mobile = MobileNumberUtil.formatE164(this.mobile_, MobileNumberUtil.getRegionCodeForCountryCode(this.code_))
           myselfPeerClient.mobile = mobile
           myselfPeerClient.lastUpdateTime = currentDate
           this.$store.state.myselfPeerClient = myselfPeerClient
 
-          let myselfPeer = myself.myselfPeer
           myselfPeer.mobile = mobile
           myselfPeer.updateDate = currentDate
           myselfPeer.lastUpdateTime = currentDate

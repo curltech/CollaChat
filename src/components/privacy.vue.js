@@ -50,10 +50,11 @@ export default {
     },
     changeSwitch: async function (kind, value) {
       this.$q.loading.show()
+      let myselfPeerClient = myself.myselfPeerClient
+      let myselfPeer = myself.myselfPeer
       let backupMobile = null
       try {
         let currentDate = new Date()
-        let myselfPeerClient = myself.myselfPeerClient
         let visibilitySetting = myselfPeerClient.visibilitySetting ? myselfPeerClient.visibilitySetting : 'YYYYY'
         if (kind === 'peerId') {
           visibilitySetting = (value ? 'Y' : 'N') + visibilitySetting.substring(1, 5)
@@ -70,7 +71,6 @@ export default {
         myselfPeerClient.lastUpdateTime = currentDate
         this.$store.state.myselfPeerClient = myselfPeerClient
 
-        let myselfPeer = myself.myselfPeer
         myselfPeer.visibilitySetting = visibilitySetting
         myselfPeer.updateDate = currentDate
         myselfPeer.lastUpdateTime = currentDate

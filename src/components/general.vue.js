@@ -81,10 +81,11 @@ export default {
     },
     changeLanguage: async function () {
       this.$q.loading.show()
+      let myselfPeerClient = myself.myselfPeerClient
+      let myselfPeer = myself.myselfPeer
       let backupMobile = null
       try {
         let currentDate = new Date()
-        let myselfPeerClient = myself.myselfPeerClient
         myselfPeerClient.language = this.language
         this.$store.state.myselfPeerClient = myselfPeerClient
 
