@@ -3847,7 +3847,7 @@ export default {
             }, [{ _id: 'desc' }], null, 10
           )
           if (_messages && _messages.length > 0) {
-            CollaUtil.sortByKey(_messages, 'receiveTime', 'asc');
+            CollaUtil.sortByKey(_messages, 'receiveTime', 'asc')
             needInsertMessageChat.messages = _messages
           } else {
             needInsertMessageChat.noMoreMessageTag = true
@@ -4355,13 +4355,13 @@ export default {
           let aPy = a.pyGivenName ? a.pyGivenName : a.pyName
           let bPy = b.pyGivenName ? b.pyGivenName : b.pyName
           if (aPy < bPy) {
-            return -1;
+            return -1
           } else if (aPy == bPy) {
-            return 0;
+            return 0
           } else {
-            return 1;
+            return 1
           }
-        });
+        })
         let tag = ''
         let linkmanTagLinkmans = []
         for (let findLinkmanDataTagName of linkmanData.tagNames) {
@@ -4510,7 +4510,7 @@ export default {
         }
       })
       if (AudioToggle) {
-        AudioToggle.setAudioMode(AudioToggle.EARPIECE);
+        AudioToggle.setAudioMode(AudioToggle.EARPIECE)
       }
       /*cordova.plugins.backgroundMode.enable()
       cordova.plugins.backgroundMode.on('activate', function() {

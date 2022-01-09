@@ -21,10 +21,10 @@ export default {
   },
   methods: {
     allRight: function (htmlStr) {
-      console.log("markdown is parsed !");
+      console.log("markdown is parsed!")
     },
     tocAllRight: function (tocHtmlStr) {
-      console.log("toc is parsed: ", tocHtmlStr);
+      console.log("toc is parsed: ", tocHtmlStr)
     }
   },
   computed: {

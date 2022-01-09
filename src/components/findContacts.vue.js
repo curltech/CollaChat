@@ -215,13 +215,13 @@ export default {
           let aPy = a.pyGivenName ? a.pyGivenName : a.pyName
           let bPy = b.pyGivenName ? b.pyGivenName : b.pyName
           if (aPy < bPy) {
-            return -1;
+            return -1
           } else if (aPy == bPy) {
-            return 0;
+            return 0
           } else {
-            return 1;
+            return 1
           }
-        });
+        })
         let tag = ''
         let linkmanTagLinkmans = []
         for (let findLinkmanDataTagName of _that.acceptFindLinkmanData.tagNames) {

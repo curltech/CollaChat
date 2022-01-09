@@ -197,16 +197,16 @@ export default {
         return
       }
       _that.exportDialog = false
-      let json = JSON.stringify(_that.peerTrans);
+      let json = JSON.stringify(_that.peerTrans)
       console.log(json)
-      let element = document.createElement('a');
-      element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(json));
+      let element = document.createElement('a')
+      element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(json))
       let filename = _that.$i18n.t('MyCollaCoinBill') + '(' + date.formatDate(_that.transactionTimeStart, 'YYYY-MM-DD') + '-' + date.formatDate(_that.transactionTimeEnd, 'YYYY-MM-DD') + ').db'
-      element.setAttribute('download', filename);
-      element.style.display = 'none';
-      document.body.appendChild(element);
-      element.click();
-      document.body.removeChild(element);
+      element.setAttribute('download', filename)
+      element.style.display = 'none'
+      document.body.appendChild(element)
+      element.click()
+      document.body.removeChild(element)
     }
   },
   async created() {

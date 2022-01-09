@@ -189,7 +189,7 @@ export default {
       let _that = this
       let store = _that.$store
       return function (message) {
-        return message.senderPeerId == store.state.myselfPeerClient.peerId ? (store.state.myselfPeerClient.avatar ? store.state.myselfPeerClient.avatar : store.defaultActiveAvatar) : (store.state.linkmanMap[message.senderPeerId].avatar ? store.state.linkmanMap[message.senderPeerId].avatar : store.defaultActiveAvatar);
+        return message.senderPeerId == store.state.myselfPeerClient.peerId ? (store.state.myselfPeerClient.avatar ? store.state.myselfPeerClient.avatar : store.defaultActiveAvatar) : (store.state.linkmanMap[message.senderPeerId].avatar ? store.state.linkmanMap[message.senderPeerId].avatar : store.defaultActiveAvatar)
       }
     },
     ChatTitle() {
@@ -250,11 +250,11 @@ export default {
       let store = _that.$store
       return function (currentChat) {
         if (!currentChat) {
-          return false;
+          return false
         } else if (currentChat.subjectType === SubjectType.CHAT) {
-          return store.state.linkmanMap[currentChat.subjectId] && store.state.linkmanMap[currentChat.subjectId].activeStatus === ActiveStatus.UP;
+          return store.state.linkmanMap[currentChat.subjectId] && store.state.linkmanMap[currentChat.subjectId].activeStatus === ActiveStatus.UP
         } else if (currentChat.subjectType === SubjectType.GROUP_CHAT) {
-          return store.state.groupChatMap[currentChat.subjectId] && store.state.groupChatMap[currentChat.subjectId].activeStatus === ActiveStatus.UP;
+          return store.state.groupChatMap[currentChat.subjectId] && store.state.groupChatMap[currentChat.subjectId].activeStatus === ActiveStatus.UP
         }
       }
     },
@@ -331,7 +331,7 @@ export default {
           let linkmans = []
           for (let groupChatMember of groupChat.groupMembers) {
             if (groupChatMember.memberPeerId === currentChat.ownerPeerId && _that.selectGroupChatMemberFlag !== 'searchMessage') {
-              continue;
+              continue
             }
             let linkman = store.state.linkmanMap[groupChatMember.memberPeerId]
             if (linkman) {
@@ -494,7 +494,9 @@ export default {
     async load_message(done) {
       let _that = this
       let store = _that.$store
-      if (!store.state.currentChat || !store.state.currentChat.messages || store.state.currentChat.messages.length == 0) return;
+      if (!store.state.currentChat || !store.state.currentChat.messages || store.state.currentChat.messages.length == 0) {
+        return
+      }
       let messages = await chatComponent.loadMessage(
         {
           ownerPeerId: myself.myselfPeerClient.peerId,
@@ -502,7 +504,7 @@ export default {
           //messageType: P2pChatMessageType.CHAT_LINKMAN,
         }, [{ _id: 'desc' }], store.state.currentChat.messages.length > 0 ? store.state.currentChat.messages[0].receiveTime : null, 10
       )
-      CollaUtil.sortByKey(messages, 'receiveTime', 'asc');
+      CollaUtil.sortByKey(messages, 'receiveTime', 'asc')
       if (messages && messages.length > 0) {
         store.state.currentChat.messages = messages.concat(store.state.currentChat.messages)
       } else {
@@ -604,7 +606,7 @@ export default {
             blob = u
             if (blob.substring(0, 10) === 'data:audio') {
               _that.audioUrl = blob
-              await _that.audioMessageSend();
+              await _that.audioMessageSend()
             } else if (blob.substring(0, 10) === 'data:video') {
               _that.videoUrl = blob
               await store.saveFileAndSendMessage(store.state.currentChat, _that.videoUrl, ChatContentType.VIDEO)
@@ -622,12 +624,12 @@ export default {
       if (!_that.preCheck()) {
         return
       }
-      let audio = new FileReader();
+      let audio = new FileReader()
       audio.onload = async function (e) {
-        _that.audioUrl = e.target.result;
-        await _that.audioMessageSend();
+        _that.audioUrl = e.target.result
+        await _that.audioMessageSend()
       }
-      audio.readAsDataURL(blob);
+      audio.readAsDataURL(blob)
     },
     async audioMessageSend() {
       let _that = this
@@ -641,13 +643,13 @@ export default {
     videoBlobMessageHandle(blob) {
       let _that = this
       let store = _that.$store
-      let video = new FileReader();
+      let video = new FileReader()
       video.onload = async function (e) {
-        _that.videoUrl = e.target.result;
+        _that.videoUrl = e.target.result
         _that.videoUrl = mediaComponent.fixVideoUrl(_that.videoUrl)
-        await _that.videoMessageSend();
+        await _that.videoMessageSend()
       }
-      video.readAsDataURL(blob);
+      video.readAsDataURL(blob)
     },
     async videoMessageSend() {
       let _that = this
@@ -675,19 +677,19 @@ export default {
           }
         }
       }
-      let stream = await mediaStreamComponent.openUserMedia(mediaProperty.options);
-      let videoTrack = stream.getVideoTracks()[0];
+      let stream = await mediaStreamComponent.openUserMedia(mediaProperty.options)
+      let videoTrack = stream.getVideoTracks()[0]
       for (let peerId of targetPeerIdArray) {
         let PCsItem
-        // let PCsItem = webrtcComponent.peerConnections[peerId]
+        //let PCsItem = webrtcComponent.peerConnections[peerId]
 
         PCsItem.forEach(function (pc) {
           let sender = pc.getSenders().find(function (s) {
-            return s.track.kind == videoTrack.kind;
-          });
-          console.log('found sender:', sender);
-          sender.replaceTrack(videoTrack);
-        });
+            return s.track.kind == videoTrack.kind
+          })
+          console.log('found sender:', sender)
+          sender.replaceTrack(videoTrack)
+        })
       }
     },
     groupMediaSelect() {
@@ -805,7 +807,6 @@ export default {
           store.state.audioRecordMessageViewDialog = true
         })
       } else if (message.contentType === ChatContentType.VIDEO) {
-
         if (window.device && window.device.platform === 'iOS' && fileData.indexOf('data:video/webm;base64,') > -1) {
           _that.$q.notify({
             message: _that.$i18n.t("Can not play this video"),
@@ -858,12 +859,12 @@ export default {
               view: window,
               bubbles: true,
               cancelable: true
-            });
-          hyperlink.href = fileData;
-          hyperlink.target = '_blank';
-          hyperlink.download = message.content;
-          hyperlink.dispatchEvent(mouseEvent);
-          (window.URL || window.webkitURL).revokeObjectURL(hyperlink.href);
+            })
+          hyperlink.href = fileData
+          hyperlink.target = '_blank'
+          hyperlink.download = message.content
+          hyperlink.dispatchEvent(mouseEvent)
+          (window.URL || window.webkitURL).revokeObjectURL(hyperlink.href)
         }
       }
     },
@@ -881,23 +882,23 @@ export default {
       if (medias && medias.length > 0) {
         for (let i = 0; i < medias.length; i++) {
           let media = medias[i]
-          let type;
+          let type
           MediaPicker.fileToBlob(media.path, async function (data) {
-            let blob, fileData;
+            let blob, fileData
             if (media.mediaType === 'image') {
-              blob = new Blob([data], { "type": "image/jpeg" });
+              blob = new Blob([data], { "type": "image/jpeg" })
               type = ChatContentType.IMAGE
             } else {
-              blob = new Blob([data], { "type": "video/mp4" });
+              blob = new Blob([data], { "type": "video/mp4" })
               type = ChatContentType.VIDEO
             }
-            let fileReader = new FileReader();
+            let fileReader = new FileReader()
             fileReader.onload = async function (e) {
-              fileData = e.target.result;
+              fileData = e.target.result
               await store.saveFileAndSendMessage(store.state.currentChat, fileData, type)
             }
-            fileReader.readAsDataURL(blob);
-          }, function (e) { console.log(e) });
+            fileReader.readAsDataURL(blob)
+          }, function (e) { console.log(e) })
         }
       }
     },*/
@@ -1017,13 +1018,13 @@ export default {
         setTimeout(function () {
           _that.sending = false
         }, 100)
-        return;
+        return
       }
       _that.sending = true
-      editorContent = editorContent.replace(/^\s*|\s*$/g, "");
+      editorContent = editorContent.replace(/^\s*|\s*$/g, '')
       if (!editorContent) {
         store.state.currentChat.tempText = ''
-        return;
+        return
       }
       let message = {
         content: editorContent,
@@ -1033,7 +1034,7 @@ export default {
 
       store.state.currentChat.tempText = ''
       _that.sending = false
-      editor.focus();
+      editor.focus()
       store.sendChatMessage(store.state.currentChat, message)
       _that.$nextTick(() => {
         let container = document.getElementById('talk')
@@ -1437,12 +1438,12 @@ export default {
     },
     copyMessage(message, index) {
       let _that = this
-      var aux = document.createElement("input");
-      aux.setAttribute("value", message.content.replace(/<[^>]*>|/g, ""));
-      document.body.appendChild(aux);
-      aux.select();
-      document.execCommand("copy");
-      document.body.removeChild(aux);
+      var aux = document.createElement("input")
+      aux.setAttribute("value", message.content.replace(/<[^>]*>|/g, ""))
+      document.body.appendChild(aux)
+      aux.select()
+      document.execCommand("copy")
+      document.body.removeChild(aux)
       _that.$q.notify({
         message: _that.$i18n.t("Copy successfully"),
         timeout: 3000,
@@ -1479,9 +1480,9 @@ export default {
                   clearInterval(countDownInterval)
                   console.log(JSON.stringify(currentMes))
                   await chatComponent.remove(ChatDataType.MESSAGE, currentMes, messages)
-                  return;
+                  return
                 }
-                currentMes.countDown--;
+                currentMes.countDown--
                 console.log(currentMes.countDown)
               }, 1000)
             }
@@ -2254,7 +2255,7 @@ export default {
         selector,
         [{ createDate: 'desc' }], null, 10
       )
-      CollaUtil.sortByKey(messages, 'createDate', 'asc');
+      CollaUtil.sortByKey(messages, 'createDate', 'asc')
       console.log(messages)
       if (messages && messages.length > 0) {
         _that.chatMessageResultList = messages.concat(_that.chatMessageResultList)
@@ -2597,11 +2598,11 @@ export default {
       let _that = this
       e.preventDefault()
       let _voiceObj = document.getElementById('audio-touch-text')
-      _that.difftime = new Date();
-      //if(!_that.isDrag) return;
-      //_that.isDrag = false;
-      _that.eY1 = e.targetTouches[0].pageY;
-      _voiceObj.innerText = _that.$i18n.t("Release to stop");
+      _that.difftime = new Date()
+      //if(!_that.isDrag) return
+      //_that.isDrag = false
+      _that.eY1 = e.targetTouches[0].pageY
+      _voiceObj.innerText = _that.$i18n.t("Release to stop")
       _that.audioTouchDialog = true
       _that.$nextTick(async () => {
         if (!_that.mediaTimer) {
@@ -2614,8 +2615,8 @@ export default {
       let _that = this
       let store = _that.$store
       let _voiceObj = document.getElementById('audio-touch-text')
-      e.preventDefault();
-      _that.eY2 = e.changedTouches[0].pageY;
+      e.preventDefault()
+      _that.eY2 = e.changedTouches[0].pageY
       _voiceObj.innerText = _that.$i18n.t("Hold to talk")
       if (new Date() - _that.difftime < 1000) {
         // tooltip
@@ -2633,20 +2634,20 @@ export default {
           _that.cancel()
         }
       }
-      //_that.isDrag = true;
+      //_that.isDrag = true
       _that.audioTouchDialog = false
-      clearInterval(_that.mediaTimer);
+      clearInterval(_that.mediaTimer)
       _that.mediaTimer = null
     },
     audioTouchMove(e) {
       let _that = this
       e.preventDefault()
       let _voiceObj = document.getElementById('audio-touch-text')
-      _that.eY3 = e.targetTouches[0].pageY;
+      _that.eY3 = e.targetTouches[0].pageY
       if (_that.eY1 - _that.eY3 < 150) {
-        _voiceObj.innerText = _that.$i18n.t("Release to stop");
+        _voiceObj.innerText = _that.$i18n.t("Release to stop")
       } else {
-        _voiceObj.innerText = _that.$i18n.t("Release your finger and cancel send");
+        _voiceObj.innerText = _that.$i18n.t("Release your finger and cancel send")
       }
     },
     editorKeyup(e) {
@@ -2672,15 +2673,15 @@ export default {
     },
     editorPaste(e) {
       let _that = this
-      //e.preventDefault();
-      let clipboardData = e.clipboardData;
-      let clipboardDataValue = clipboardData.getData('text/plain');
+      //e.preventDefault()
+      let clipboardData = e.clipboardData
+      let clipboardDataValue = clipboardData.getData('text/plain')
       if (clipboardDataValue) {
-        clipboardData.setData('text/plain', clipboardDataValue);
+        clipboardData.setData('text/plain', clipboardDataValue)
       }
     },
     async editorDrop(e) {
-      e.preventDefault();
+      e.preventDefault()
       let _that = this
       if (e.dataTransfer && e.dataTransfer.files) {
         for (let file of e.dataTransfer.files) {
@@ -2689,7 +2690,7 @@ export default {
       }
     },
     mediaHold() {
-      let _that = this;
+      let _that = this
       let store = _that.$store
       _that.$q.bottomSheet({
         actions: [
@@ -3267,7 +3268,7 @@ export default {
         _that.audioBlobMessageHandle(blob)
         _that.stopStream()
         _that.audioTouchDialog = false
-        clearInterval(_that.mediaTimer);
+        clearInterval(_that.mediaTimer)
         _that.mediaTimer = null
       }
     }
@@ -3300,7 +3301,7 @@ export default {
       _that.searching = true
     }
     store.saveChatMediaFile = _that.saveChatMediaFile
-    //audioCaptureComponent.initialize();
+    //audioCaptureComponent.initialize()
   },
   watch: {
     subKind(val) {

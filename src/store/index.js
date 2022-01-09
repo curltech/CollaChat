@@ -3,7 +3,6 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex)
 
-
 function deepClone (obj) {
   var newObj = obj instanceof Array ? [] : {}
   for (var i in obj) {
@@ -25,7 +24,7 @@ let stateObj = {
   lockContactsSwitch: true,
   // selectContacts
   includedLinkmans: [],
-  //selectChatRecord
+  // selectChatRecord
   includedChatRecords: [],
   // findContacts
   findContactsSubKind: 'default',
@@ -85,12 +84,11 @@ const store = new Vuex.Store({
     }
   },
   actions: {
-
   },
   modules: {
-
   },
-  getters: {}
-});
+  getters: {
+  }
+})
 
-export default store;
+export default store

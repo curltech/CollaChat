@@ -5,8 +5,9 @@ import QrCodeWithLogo from 'qr-code-with-logo'
 import { getThumbnails } from 'video-metadata-thumbnails'
 import Transform from 'css3transform'
 import AlloyFinger from 'alloyfinger'
+import heic2any from 'heic2any'
 
-import { BlobUtil,TypeUtil, UUID } from 'libcolla'
+import { BlobUtil, TypeUtil, UUID } from 'libcolla'
 
 import { fileComponent } from '@/libs/base/colla-cordova'
 
@@ -15,7 +16,7 @@ import audioMessageSendAudioSrc from '@/assets/media/audioMessageSend.mp3'
 import mediaCloseAudioSrc from '@/assets/media/mediaClose.mp3'
 import mediaInvitationAudioSrc from '@/assets/media/mediaInvitation.mp3'
 import scanAudioSrc from '@/assets/media/scan.mp3'
-import heic2any from "heic2any";
+
 /**
  * 本类的功能可以适用于所有的App和浏览器，处理相片
  */
@@ -56,7 +57,7 @@ class CameraComponent {
    */
   getPicture(srcType, params) {
     if (!srcType) {
-      srcType = Camera.PictureSourceType.CAMERA // Camera.PictureSourceType.PHOTOLIBRARY,Camera.PictureSourceType.SAVEDPHOTOALBUM;
+      srcType = Camera.PictureSourceType.CAMERA // Camera.PictureSourceType.PHOTOLIBRARY,Camera.PictureSourceType.SAVEDPHOTOALBUM
     }
     let options = this.setOptions(srcType)
     if (params && param.quality) {
@@ -148,7 +149,7 @@ class MediaCaptureComponent {
       navigator.device.capture.captureVideo(
         function captureSuccess(mediaFiles) {
           console.info(mediaFiles)
-        resolve(mediaFiles)
+          resolve(mediaFiles)
         }, function captureError(error) {
           console.error('Capture Error code: ' + error.code)
           if (error.code !== 3) {
@@ -702,7 +703,7 @@ class MediaRecorderComponent {
   getPicture(video, width, height, format = 'base64', imageFormat = 'image/jpeg') {
     let canvas = document.createElement('canvas')
     let context = canvas.getContext('2d')
-    canvas.style = 'position: absolute; top: 0; left: 0; opacity: 0; margin-top: -9999999999; margin-left: -9999999999; top: -9999999999; left: -9999999999; z-index: -1;';
+    canvas.style = 'position: absolute; top: 0; left: 0; opacity: 0; margin-top: -9999999999; margin-left: -9999999999; top: -9999999999; left: -9999999999; z-index: -1;'
     document.body.appendChild(canvas)
     canvas.width = width
     canvas.height = height
@@ -725,11 +726,11 @@ class MediaStreamComponent {
   }
   supportMediaRecorder() {
     if (typeof MediaRecorder === 'undefined') {
-      return false;
+      return false
     }
     return true
 
-    let supported = navigator.mediaDevices.getSupportedConstraints();
+    let supported = navigator.mediaDevices.getSupportedConstraints()
   }
   getSupportedConstraints() {
     return navigator.mediaDevices.getSupportedConstraints()
@@ -910,8 +911,8 @@ class MediaStreamComponent {
     let video = document.createElement('video')
     video.autoplay = true
     video.playsinline = true
-    video.style.display = 'none';
-    (document.body || document.documentElement).appendChild(video)
+    video.style.display = 'none'
+      (document.body || document.documentElement).appendChild(video)
 
     return video
   }
@@ -1066,15 +1067,15 @@ class MediaComponent {
   isAssetTypeAnImage(ext) {
     if (!ext) return
     return [
-      'png', 'jpg', 'jpeg', 'bmp', 'gif', 'webp', 'svg', 'tiff', 'heic'].indexOf(ext.toLowerCase()) !== -1;
+      'png', 'jpg', 'jpeg', 'bmp', 'gif', 'webp', 'svg', 'tiff', 'heic'].indexOf(ext.toLowerCase()) !== -1
   }
   isAssetTypeAVideo(ext) {
     if (!ext) return
-    return ['ogg', 'mp4', 'webm', 'mov'].indexOf(ext.toLowerCase()) !== -1;
+    return ['ogg', 'mp4', 'webm', 'mov'].indexOf(ext.toLowerCase()) !== -1
   }
   isAssetTypeAnAudio(ext) {
     if (!ext) return
-    return ['wav', 'mp3', 'acc'/*, 'webm'*/].indexOf(ext.toLowerCase()) !== -1;
+    return ['wav', 'mp3', 'acc'/*, 'webm'*/].indexOf(ext.toLowerCase()) !== -1
   }
   compress(file, quality = 0.1) {
     return new Promise((resolve, reject) => {
@@ -1094,7 +1095,9 @@ class MediaComponent {
     //最小与最大旋转方向，图片旋转4次后回到原方向
     const min_step = 0
     const max_step = 3
-    if (img == null) return;
+    if (img == null) {
+      return
+    }
     //img的高度和宽度不能在img元素隐藏后获取，否则会出错
     let height = img.height
     let width = img.width
@@ -1113,7 +1116,7 @@ class MediaComponent {
       step < min_step && (step = max_step)
     }
     //旋转角度以弧度值为参数
-    let degree = step * 90 * Math.PI / 180;
+    let degree = step * 90 * Math.PI / 180
     let ctx = canvas.getContext("2d")
     switch (step) {
       case 0:
@@ -1161,7 +1164,7 @@ class MediaComponent {
     }
   }
   image2canvas(img) {
-    let canvas = document.createElement('canvas');
+    let canvas = document.createElement('canvas')
     let ctx = canvas.getContext('2d')
     let imgWidth = img.width
     let imgHeight = img.height
@@ -1249,56 +1252,56 @@ class MediaComponent {
     })
   }
   async compressImage(imageBase64) {
-		return await new Promise(function (resolve, reject) {
-			let newImage = new Image()
-			newImage.src = imageBase64
-			newImage.setAttribute('crossOrigin', 'Anonymous') //url为外域时需要
-			let imgWidth, imgHeight
+    return await new Promise(function (resolve, reject) {
+      let newImage = new Image()
+      newImage.src = imageBase64
+      newImage.setAttribute('crossOrigin', 'Anonymous') //url为外域时需要
+      let imgWidth, imgHeight
 
-			newImage.onload = function () {
-				imgWidth = this.width
-				imgHeight = this.height
-				let canvas = document.createElement('canvas')
-				let ctx = canvas.getContext('2d')
-				// 缩小图片尺寸：短边128px
-				console.log('imgWidth: ' + imgWidth + ', imgHeight: ' + imgHeight)
-				let w = 128
-				if (Math.max(imgWidth, imgHeight) > w) {
-				if (imgWidth > imgHeight) {
-					canvas.width = w
-					canvas.height = w * imgHeight / imgWidth
-				} else {
-					canvas.height = w
-					canvas.width = w * imgWidth / imgHeight
-				}
-				} else {
-				canvas.width = imgWidth
-				canvas.height = imgHeight
-				}
-				console.log('canvasWidth: ' + canvas.width + ', canvasHeight: ' + canvas.height)
-				ctx.clearRect(0, 0, canvas.width, canvas.height)
-				ctx.drawImage(newImage, 0, 0, canvas.width, canvas.height)
-				// 压缩图片大小：长度20k以下
-				console.log('imageBase64.length: ' + imageBase64.length)
-				let quality = 1.0
-				let arr = imageBase64.split(',')
-				let mime = arr[0].match(/:(.*?);/)[1]
-				mime = (mime === 'image/png' ? 'image/jpeg' : mime)
-				while (imageBase64.length / 1024 > 10) {
-				let length = imageBase64.length
-				quality -= 0.01
-				imageBase64 = canvas.toDataURL(mime, quality)
-				if (imageBase64.length === length) {
-					console.log('no effect')
-				}
-				}
-				resolve(imageBase64)
-			}
-			newImage.onerror = function () {
-				reject(new Error('Could not load image'));
-			};
-		})
-	}
+      newImage.onload = function () {
+        imgWidth = this.width
+        imgHeight = this.height
+        let canvas = document.createElement('canvas')
+        let ctx = canvas.getContext('2d')
+        // 缩小图片尺寸：短边128px
+        console.log('imgWidth: ' + imgWidth + ', imgHeight: ' + imgHeight)
+        let w = 128
+        if (Math.max(imgWidth, imgHeight) > w) {
+          if (imgWidth > imgHeight) {
+            canvas.width = w
+            canvas.height = w * imgHeight / imgWidth
+          } else {
+            canvas.height = w
+            canvas.width = w * imgWidth / imgHeight
+          }
+        } else {
+          canvas.width = imgWidth
+          canvas.height = imgHeight
+        }
+        console.log('canvasWidth: ' + canvas.width + ', canvasHeight: ' + canvas.height)
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+        ctx.drawImage(newImage, 0, 0, canvas.width, canvas.height)
+        // 压缩图片大小：长度20k以下
+        console.log('imageBase64.length: ' + imageBase64.length)
+        let quality = 1.0
+        let arr = imageBase64.split(',')
+        let mime = arr[0].match(/:(.*?);/)[1]
+        mime = (mime === 'image/png' ? 'image/jpeg' : mime)
+        while (imageBase64.length / 1024 > 10) {
+          let length = imageBase64.length
+          quality -= 0.01
+          imageBase64 = canvas.toDataURL(mime, quality)
+          if (imageBase64.length === length) {
+            console.log('no effect')
+          }
+        }
+        resolve(imageBase64)
+      }
+      newImage.onerror = function () {
+        reject(new Error('Could not load image'))
+      }
+    })
+  }
   async createVideoThumbnailByBase64(base64) {
     let thumbnail = null
     if (window.device && (window.device.platform === 'Android' || window.device.platform === 'iOS')) {
@@ -1325,26 +1328,26 @@ class MediaComponent {
     return thumbnail
   }
   //
-  fixVideoUrl(url){
+  fixVideoUrl(url) {
     // let videoUrlFragment = ['data:video/quicktime;base64,','data:video/x-matroska;codecs=avc1,opus;base64,',
     //   'data:video/webm;codecs=vp8,opus;base64,','data:video/webm;codecs=h264,opus;base64,',
     //   'data:video/webm;base64,']
     let repairFragment = 'data:video/mp4;base64,'
     let pcRepairFragment = 'data:video/webm;base64,'
     let urlArray = url.split(';base64,')
-    if(url.indexOf('data:video/x-matroska;codecs=avc1,opus;base64,') > -1){
+    if (url.indexOf('data:video/x-matroska;codecs=avc1,opus;base64,') > -1) {
       url = pcRepairFragment + urlArray[1]
-    }else{
+    } else {
       url = repairFragment + urlArray[1]
     }
     return url
   }
-  async heicToPNG(heicBase64){
+  async heicToPNG(heicBase64) {
     let blob = BlobUtil.base64ToBlob(heicBase64)
-    let jpegBlob = await  heic2any({
-			blob,
-			toType: "image/png",
-			quality: 1,
+    let jpegBlob = await heic2any({
+      blob,
+      toType: "image/png",
+      quality: 1,
     })
     return BlobUtil.blobToBase64(jpegBlob)
   }
@@ -1363,195 +1366,195 @@ class PaletteComponent {
     moveCallback
   }
   ) {
-    this.canvas = canvas;
-    this.width = canvas.width; // 宽
-    this.height = canvas.height; // 高
-    this.paint = canvas.getContext('2d');
-    this.isClickCanvas = false; // 是否点击canvas内部
-    this.isMoveCanvas = false; // 鼠标是否有移动
-    this.imgData = []; // 存储上一次的图像，用于撤回
-    this.index = 0; // 记录当前显示的是第几帧
-    this.x = 0; // 鼠标按下时的 x 坐标
-    this.y = 0; // 鼠标按下时的 y 坐标
-    this.last = [this.x, this.y]; // 鼠标按下及每次移动后的坐标
-    this.drawType = drawType; // 绘制形状
-    this.drawColor = drawColor; // 绘制颜色
-    this.lineWidth = lineWidth; // 线条宽度
-    this.sides = sides; // 多边形边数
-    this.allowCallback = allowCallback || function () { }; // 允许操作的回调
-    this.moveCallback = moveCallback || function () { }; // 鼠标移动的回调
-    this.bindMousemove = function () { }; // 解决 eventlistener 不能bind
-    this.bindMousedown = function () { }; // 解决 eventlistener 不能bind
-    this.bindMouseup = function () { }; // 解决 eventlistener 不能bind
+    this.canvas = canvas
+    this.width = canvas.width // 宽
+    this.height = canvas.height // 高
+    this.paint = canvas.getContext('2d')
+    this.isClickCanvas = false // 是否点击canvas内部
+    this.isMoveCanvas = false // 鼠标是否有移动
+    this.imgData = [] // 存储上一次的图像，用于撤回
+    this.index = 0 // 记录当前显示的是第几帧
+    this.x = 0 // 鼠标按下时的 x 坐标
+    this.y = 0 // 鼠标按下时的 y 坐标
+    this.last = [this.x, this.y] // 鼠标按下及每次移动后的坐标
+    this.drawType = drawType // 绘制形状
+    this.drawColor = drawColor // 绘制颜色
+    this.lineWidth = lineWidth // 线条宽度
+    this.sides = sides // 多边形边数
+    this.allowCallback = allowCallback || function () { } // 允许操作的回调
+    this.moveCallback = moveCallback || function () { } // 鼠标移动的回调
+    this.bindMousemove = function () { } // 解决 eventlistener 不能bind
+    this.bindMousedown = function () { } // 解决 eventlistener 不能bind
+    this.bindMouseup = function () { } // 解决 eventlistener 不能bind
 
-    this.paint.fillStyle = '#fff';
-    this.paint.fillRect(0, 0, this.width, this.height);
-    this.gatherImage();
-    this.bindMousemove = this.onmousemove.bind(this); // 解决 eventlistener 不能bind
-    this.bindMousedown = this.onmousedown.bind(this);
-    this.bindMouseup = this.onmouseup.bind(this);
-    this.canvas.addEventListener('mousedown', this.bindMousedown);
-    document.addEventListener('mouseup', this.bindMouseup);
+    this.paint.fillStyle = '#fff'
+    this.paint.fillRect(0, 0, this.width, this.height)
+    this.gatherImage()
+    this.bindMousemove = this.onmousemove.bind(this) // 解决 eventlistener 不能bind
+    this.bindMousedown = this.onmousedown.bind(this)
+    this.bindMouseup = this.onmouseup.bind(this)
+    this.canvas.addEventListener('mousedown', this.bindMousedown)
+    document.addEventListener('mouseup', this.bindMouseup)
   }
   onmousedown(e) { // 鼠标按下
-    this.isClickCanvas = true;
-    this.x = e.offsetX;
-    this.y = e.offsetY;
-    this.last = [this.x, this.y];
-    this.canvas.addEventListener('mousemove', this.bindMousemove);
+    this.isClickCanvas = true
+    this.x = e.offsetX
+    this.y = e.offsetY
+    this.last = [this.x, this.y]
+    this.canvas.addEventListener('mousemove', this.bindMousemove)
   }
   gatherImage() { // 采集图像
-    this.imgData = this.imgData.slice(0, this.index + 1); // 每次鼠标抬起时，将储存的imgdata截取至index处
-    let imgData = this.paint.getImageData(0, 0, this.width, this.height);
-    this.imgData.push(imgData);
-    this.index = this.imgData.length - 1; // 储存完后将 index 重置为 imgData 最后一位
-    this.allowCallback(this.index > 0, this.index < this.imgData.length - 1);
+    this.imgData = this.imgData.slice(0, this.index + 1) // 每次鼠标抬起时，将储存的imgdata截取至index处
+    let imgData = this.paint.getImageData(0, 0, this.width, this.height)
+    this.imgData.push(imgData)
+    this.index = this.imgData.length - 1 // 储存完后将 index 重置为 imgData 最后一位
+    this.allowCallback(this.index > 0, this.index < this.imgData.length - 1)
   }
   reSetImage() { // 重置为上一帧
-    this.paint.clearRect(0, 0, this.width, this.height);
+    this.paint.clearRect(0, 0, this.width, this.height)
     if (this.imgData.length >= 1) {
-      this.paint.putImageData(this.imgData[this.index], 0, 0);
+      this.paint.putImageData(this.imgData[this.index], 0, 0)
     }
   }
   onmousemove(e) { // 鼠标移动
-    this.isMoveCanvas = true;
-    let endx = e.offsetX;
-    let endy = e.offsetY;
-    let width = endx - this.x;
-    let height = endy - this.y;
-    let now = [endx, endy]; // 当前移动到的位置
+    this.isMoveCanvas = true
+    let endx = e.offsetX
+    let endy = e.offsetY
+    let width = endx - this.x
+    let height = endy - this.y
+    let now = [endx, endy] // 当前移动到的位置
     switch (this.drawType) {
       case 'line': {
-        let params = [this.last, now, this.lineWidth, this.drawColor];
-        this.moveCallback('line', ...params);
-        this.line(...params);
+        let params = [this.last, now, this.lineWidth, this.drawColor]
+        this.moveCallback('line', ...params)
+        this.line(...params)
       }
-        break;
+        break
       case 'rect': {
-        let params = [this.x, this.y, width, height, this.lineWidth, this.drawColor];
-        this.moveCallback('rect', ...params);
-        this.rect(...params);
+        let params = [this.x, this.y, width, height, this.lineWidth, this.drawColor]
+        this.moveCallback('rect', ...params)
+        this.rect(...params)
       }
-        break;
+        break
       case 'polygon': {
-        let params = [this.x, this.y, this.sides, width, height, this.lineWidth, this.drawColor];
-        this.moveCallback('polygon', ...params);
-        this.polygon(...params);
+        let params = [this.x, this.y, this.sides, width, height, this.lineWidth, this.drawColor]
+        this.moveCallback('polygon', ...params)
+        this.polygon(...params)
       }
-        break;
+        break
       case 'arc': {
-        let params = [this.x, this.y, width, height, this.lineWidth, this.drawColor];
-        this.moveCallback('arc', ...params);
-        this.arc(...params);
+        let params = [this.x, this.y, width, height, this.lineWidth, this.drawColor]
+        this.moveCallback('arc', ...params)
+        this.arc(...params)
       }
-        break;
+        break
       case 'eraser': {
-        let params = [endx, endy, this.width, this.height, this.lineWidth];
-        this.moveCallback('eraser', ...params);
-        this.eraser(...params);
+        let params = [endx, endy, this.width, this.height, this.lineWidth]
+        this.moveCallback('eraser', ...params)
+        this.eraser(...params)
       }
-        break;
+        break
     }
   }
   onmouseup() { // 鼠标抬起
     if (this.isClickCanvas) {
-      this.isClickCanvas = false;
-      this.canvas.removeEventListener('mousemove', this.bindMousemove);
+      this.isClickCanvas = false
+      this.canvas.removeEventListener('mousemove', this.bindMousemove)
       if (this.isMoveCanvas) { // 鼠标没有移动不保存
-        this.isMoveCanvas = false;
-        this.moveCallback('gatherImage');
-        this.gatherImage();
+        this.isMoveCanvas = false
+        this.moveCallback('gatherImage')
+        this.gatherImage()
       }
     }
   }
   line(last, now, lineWidth, drawColor) { // 绘制线性
-    this.paint.beginPath();
-    this.paint.lineCap = "round"; // 设定线条与线条间接合处的样式
-    this.paint.lineJoin = "round";
-    this.paint.lineWidth = lineWidth;
-    this.paint.strokeStyle = drawColor;
-    this.paint.moveTo(last[0], last[1]);
-    this.paint.lineTo(now[0], now[1]);
-    this.paint.closePath();
-    this.paint.stroke(); // 进行绘制
-    this.last = now;
+    this.paint.beginPath()
+    this.paint.lineCap = "round" // 设定线条与线条间接合处的样式
+    this.paint.lineJoin = "round"
+    this.paint.lineWidth = lineWidth
+    this.paint.strokeStyle = drawColor
+    this.paint.moveTo(last[0], last[1])
+    this.paint.lineTo(now[0], now[1])
+    this.paint.closePath()
+    this.paint.stroke() // 进行绘制
+    this.last = now
   }
   rect(x, y, width, height, lineWidth, drawColor) { // 绘制矩形
-    this.reSetImage();
-    this.paint.lineWidth = lineWidth;
-    this.paint.strokeStyle = drawColor;
-    this.paint.strokeRect(x, y, width, height);
+    this.reSetImage()
+    this.paint.lineWidth = lineWidth
+    this.paint.strokeStyle = drawColor
+    this.paint.strokeRect(x, y, width, height)
   }
   polygon(x, y, sides, width, height, lineWidth, drawColor) { // 绘制多边形
-    this.reSetImage();
-    let n = sides;
-    let ran = 360 / n;
-    let rn = Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2));
-    this.paint.beginPath();
-    this.paint.strokeStyle = drawColor;
-    this.paint.lineWidth = lineWidth;
+    this.reSetImage()
+    let n = sides
+    let ran = 360 / n
+    let rn = Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2))
+    this.paint.beginPath()
+    this.paint.strokeStyle = drawColor
+    this.paint.lineWidth = lineWidth
     for (let i = 0; i < n; i++) {
-      this.paint.lineTo(x + Math.sin((i * ran + 45) * Math.PI / 180) * rn, y + Math.cos((i * ran + 45) * Math.PI / 180) * rn);
+      this.paint.lineTo(x + Math.sin((i * ran + 45) * Math.PI / 180) * rn, y + Math.cos((i * ran + 45) * Math.PI / 180) * rn)
     }
-    this.paint.closePath();
-    this.paint.stroke();
+    this.paint.closePath()
+    this.paint.stroke()
   }
   arc(x, y, width, height, lineWidth, drawColor) { // 绘制圆形
-    this.reSetImage();
-    this.paint.beginPath();
-    this.paint.lineWidth = lineWidth;
-    let r = Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2));
-    this.paint.arc(x, y, r, 0, Math.PI * 2, false);
-    this.paint.strokeStyle = drawColor;
-    this.paint.closePath();
-    this.paint.stroke();
+    this.reSetImage()
+    this.paint.beginPath()
+    this.paint.lineWidth = lineWidth
+    let r = Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2))
+    this.paint.arc(x, y, r, 0, Math.PI * 2, false)
+    this.paint.strokeStyle = drawColor
+    this.paint.closePath()
+    this.paint.stroke()
   }
   eraser(endx, endy, width, height, lineWidth) { // 橡皮擦
-    this.paint.save();
-    this.paint.beginPath();
-    this.paint.arc(endx, endy, lineWidth / 2, 0, 2 * Math.PI);
-    this.paint.closePath();
-    this.paint.clip();
-    this.paint.clearRect(0, 0, width, height);
-    this.paint.fillStyle = '#fff';
-    this.paint.fillRect(0, 0, width, height);
-    this.paint.restore();
+    this.paint.save()
+    this.paint.beginPath()
+    this.paint.arc(endx, endy, lineWidth / 2, 0, 2 * Math.PI)
+    this.paint.closePath()
+    this.paint.clip()
+    this.paint.clearRect(0, 0, width, height)
+    this.paint.fillStyle = '#fff'
+    this.paint.fillRect(0, 0, width, height)
+    this.paint.restore()
   }
   cancel() { // 撤回
     if (--this.index < 0) {
-      this.index = 0;
-      return;
+      this.index = 0
+      return
     }
-    this.allowCallback(this.index > 0, this.index < this.imgData.length - 1);
-    this.paint.putImageData(this.imgData[this.index], 0, 0);
+    this.allowCallback(this.index > 0, this.index < this.imgData.length - 1)
+    this.paint.putImageData(this.imgData[this.index], 0, 0)
   }
   go() { // 前进
     if (++this.index > this.imgData.length - 1) {
-      this.index = this.imgData.length - 1;
-      return;
+      this.index = this.imgData.length - 1
+      return
     }
-    this.allowCallback(this.index > 0, this.index < this.imgData.length - 1);
-    this.paint.putImageData(this.imgData[this.index], 0, 0);
+    this.allowCallback(this.index > 0, this.index < this.imgData.length - 1)
+    this.paint.putImageData(this.imgData[this.index], 0, 0)
   }
   clear() { // 清屏
-    this.imgData = [];
-    this.paint.clearRect(0, 0, this.width, this.height);
-    this.paint.fillStyle = '#fff';
-    this.paint.fillRect(0, 0, this.width, this.height);
-    this.gatherImage();
+    this.imgData = []
+    this.paint.clearRect(0, 0, this.width, this.height)
+    this.paint.fillStyle = '#fff'
+    this.paint.fillRect(0, 0, this.width, this.height)
+    this.gatherImage()
   }
   changeWay({ type, color, lineWidth, sides }) { // 绘制条件
-    this.drawType = type !== 'color' && type || this.drawType; // 绘制形状
-    this.drawColor = color || this.drawColor; // 绘制颜色
-    this.lineWidth = lineWidth || this.lineWidth; // 线宽
-    this.sides = sides || this.sides; // 边数
+    this.drawType = type !== 'color' && type || this.drawType // 绘制形状
+    this.drawColor = color || this.drawColor // 绘制颜色
+    this.lineWidth = lineWidth || this.lineWidth // 线宽
+    this.sides = sides || this.sides // 边数
   }
   destroy() {
-    this.clear();
-    this.canvas.removeEventListener('mousedown', this.bindMousedown);
-    document.removeEventListener('mouseup', this.bindMouseup);
-    this.canvas = null;
-    this.paint = null;
+    this.clear()
+    this.canvas.removeEventListener('mousedown', this.bindMousedown)
+    document.removeEventListener('mouseup', this.bindMouseup)
+    this.canvas = null
+    this.paint = null
   }
 }
 export let paletteComponent = new PaletteComponent()
@@ -1604,7 +1607,7 @@ class SystemAudioComponent {
     this.mediaCloseAudio = new Audio()
     this.mediaCloseAudio.src = mediaCloseAudioSrc
 
-    
+
 
     this.scanAudio = new Audio()
     this.scanAudio.src = scanAudioSrc
@@ -1637,9 +1640,9 @@ class SystemAudioComponent {
     this.mediaInvitationAudio.play()
   }
   mediaInvitationAudioStop() {
-    if(this.mediaInvitationAudio){
-     this.mediaInvitationAudio.pause()
-    this.mediaInvitationAudio = null 
+    if (this.mediaInvitationAudio) {
+      this.mediaInvitationAudio.pause()
+      this.mediaInvitationAudio = null
     }
   }
   scanAudioPlay() {

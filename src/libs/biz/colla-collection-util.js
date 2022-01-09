@@ -6,15 +6,15 @@ import { pounchDb } from 'libcolla'
 import pinyinUtil from '@/libs/base/colla-pinyin'
 import { mediaComponent, audioMediaComponent } from '@/libs/base/colla-media'
 import { fileComponent } from '@/libs/base/colla-cordova'
-import { collectionComponent, CollectionType} from '@/libs/biz/colla-collection'
+import { collectionComponent, CollectionType } from '@/libs/biz/colla-collection'
 import { P2pChatMessageType } from '@/libs/biz/colla-chat'
 
 /**
  * message和collection复用功能
  */
- export class CollectionUtil {
+export class CollectionUtil {
   constructor() {
-	}
+  }
   async buildAttachs(collectionId, files, thumbnails) {
     let attachs = []
     let i = 0
@@ -209,7 +209,7 @@ import { P2pChatMessageType } from '@/libs/biz/colla-chat'
     }
     current['thumbType'] = currentThumbType
     current['thumbnail'] = currentThumbnail
-    if(current['collectionType'] !== CollectionType.CHAT && current['collectionType'] !== CollectionType.CARD){
+    if (current['collectionType'] !== CollectionType.CHAT && current['collectionType'] !== CollectionType.CARD) {
       current['contentTitle'] = contentTitle.replace(/\&nbsp\;/g, '')
     }
     current['contentBody'] = contentBody.replace(/\&nbsp\;/g, '')
@@ -244,18 +244,18 @@ import { P2pChatMessageType } from '@/libs/biz/colla-chat'
       // 考虑到新增场景，需先保存collection，再保存attach
       console.log('collection before preview length:' + JSON.stringify(entity).length)
       let start = new Date().getTime()
-      if(entity['collectionType'] !== CollectionType.FILE && entity['collectionType'] !== CollectionType.VOICE){
-        await this.setCollectionPreview(entity) 
+      if (entity['collectionType'] !== CollectionType.FILE && entity['collectionType'] !== CollectionType.VOICE) {
+        await this.setCollectionPreview(entity)
       }
       let end = new Date().getTime()
       console.log('collection preview time:' + (end - start))
-      console.log('collection after preview length:' + JSON.stringify(entity).length)
+      //console.log('collection after preview length:' + JSON.stringify(entity).length)
       entity.versionFlag = 'local'
       if (myself.myselfPeerClient.localDataCryptoSwitch !== true) {
         entity.plainContent = entity.content.replace(/<[^>]+>/g, '').replace(/^\s*/g, '').replace(/\&nbsp\;/g, '')
         entity.pyPlainContent = pinyinUtil.getPinyin(entity.plainContent)
       }
-      console.log('collection after pyPlainContent length:' + JSON.stringify(entity).length)
+      //console.log('collection after pyPlainContent length:' + JSON.stringify(entity).length)
       await collectionComponent.saveCollection(entity, null) // 新增时手工从头部插入，故不传parent参数，否则底层API会从尾部插入
       if (!type || type === 'attach') {
         await collectionComponent.saveAttach(entity) // 需要确保所有的附件都已经加载到attachs中
@@ -344,7 +344,7 @@ import { P2pChatMessageType } from '@/libs/biz/colla-chat'
       parentBusinessNumber = bizObj.channelId
     }
     if (!expireDate) {
-      expireDate = new Date().getTime() + 3600*24*365*100 // 100 years
+      expireDate = new Date().getTime() + 3600 * 24 * 365 * 100 // 100 years
     }
     let payload = { payload: CollaUtil.clone(bizObj), metadata: bizObj.metadata ? bizObj.metadata : bizObj.tag, expireDate: expireDate }
     if (blockType === BlockType.GroupFile) {
@@ -359,14 +359,14 @@ import { P2pChatMessageType } from '@/libs/biz/colla-chat'
       payload.description = bizObj.abstract
     }
     let dataBlock = DataBlockService.create(blockId, parentBusinessNumber, businessNumber, blockType, bizObj.updateDate, payload, peers)
-    console.log('collection dataBlock length:' + JSON.stringify(dataBlock).length)
-    let start = new Date().getTime()
+    //console.log('collection dataBlock length:' + JSON.stringify(dataBlock).length)
+    //let start = new Date().getTime()
     await dataBlockService.encrypt(dataBlock)
-    let end = new Date().getTime()
-    console.log('collection dataBlock encrypt time:' + (end - start))
+    //let end = new Date().getTime()
+    //console.log('collection dataBlock encrypt time:' + (end - start))
     let dataBlocks = await DataBlockService.slice(dataBlock)
-    let end2 = new Date().getTime()
-    console.log('collection dataBlock slice time:' + (end2 - end))
+    //let end2 = new Date().getTime()
+    //console.log('collection dataBlock slice time:' + (end2 - end))
     let dbLogs = []
     for (let dataBlock of dataBlocks) {
       let dbLog = { ownerPeerId: myself.myselfPeer.peerId, blockId: dataBlock.blockId, createTimestamp: dataBlock.createTimestamp, dataBlock: dataBlock, sliceNumber: dataBlock.sliceNumber, state: EntityState.New }
@@ -376,13 +376,13 @@ import { P2pChatMessageType } from '@/libs/biz/colla-chat'
       // 存储待上传云端的分片粒度的blockLog记录
       await blockLogComponent.save(dbLogs, null, null)
     }
-    let end3 = new Date().getTime()
-    console.log('collection blockLog save time:' + (end3 - end2))
+    //let end3 = new Date().getTime()
+    //console.log('collection blockLog save time:' + (end3 - end2))
     if (ifUpload === true) {
       dbLogs = await this.upload(dbLogs, blockType, 'saveBlock')
     }
-    let end4 = new Date().getTime()
-    console.log('collection upload time:' + (end4 - end3))
+    //let end4 = new Date().getTime()
+    //console.log('collection upload time:' + (end4 - end3))
     return dbLogs
   }
   /**
@@ -430,7 +430,7 @@ import { P2pChatMessageType } from '@/libs/biz/colla-chat'
    * @param {*} opType: saveBlock or deleteBlock
    */
   async upload(dbLogs, blockType, opType) {
-    console.log("upload time:" + new Date())
+    let start = new Date().getTime()
     if (dbLogs && dbLogs.length > 0) {
       let ps = []
       for (let dbLog of dbLogs) {
@@ -450,7 +450,6 @@ import { P2pChatMessageType } from '@/libs/biz/colla-chat'
         console.error(err)
         ifFailed = true
       } finally {
-        let start = new Date().getTime()
         if (responses && responses.length > 0) {
           for (let i = 0; i < responses.length; ++i) {
             let response = responses[i]
@@ -475,7 +474,7 @@ import { P2pChatMessageType } from '@/libs/biz/colla-chat'
           }
         }
         let end = new Date().getTime()
-        console.log('collection upload blockLog save time:' + (end - start))
+        console.log('upload time:' + (end - start))
       }
     }
     return dbLogs
@@ -485,26 +484,26 @@ import { P2pChatMessageType } from '@/libs/biz/colla-chat'
 	 *
 	 * @param {*} downloadList: 分片粒度的block记录
 	 */
-	async download(downloadList) {
-		let responses = null
-		if (downloadList && downloadList.length > 0) {
-			let ps = []
-			for (let download of downloadList) {
-				let blockId = download['blockId']
+  async download(downloadList) {
+    let responses = null
+    if (downloadList && downloadList.length > 0) {
+      let ps = []
+      for (let download of downloadList) {
+        let blockId = download['blockId']
         let primaryPeerId = download['primaryPeerId']
         // use null instead of primaryPeerId to avoid single point of failure
-				let promise = dataBlockService.findTxPayload(null, blockId)
-				ps.push(promise)
-			}
-			try {
-				responses = await Promise.all(ps)
-			} catch (err) {
-				console.error(err)
-			} finally {
-			}
-		}
-		return responses
-	}
+        let promise = dataBlockService.findTxPayload(null, blockId)
+        ps.push(promise)
+      }
+      try {
+        responses = await Promise.all(ps)
+      } catch (err) {
+        console.error(err)
+      } finally {
+      }
+    }
+    return responses
+  }
   async _saveMedia(url, ios, android, fn) {
     let urls = []
     if (!TypeUtil.isArray(url)) {
@@ -578,32 +577,32 @@ import { P2pChatMessageType } from '@/libs/biz/colla-chat'
 export let collectionUtil = new CollectionUtil()
 
 export class BlockLogComponent {
-	constructor() {
-		pounchDb.create('blockLog', ['businessNumber'])
-	}
-	async get(id) {
-		return await pounchDb.get('blockLog', id)
-	}
-	async load(condition, sort, fields, from, limit) {
-		let data
-		if (limit) {
-			let page = await pounchDb.findPage('blockLog', condition, sort, fields, from, limit)
-			data = page.result
-		} else {
-			data = await pounchDb.find('blockLog', condition, sort, fields)
-		}
+  constructor() {
+    pounchDb.create('blockLog', ['businessNumber'])
+  }
+  async get(id) {
+    return await pounchDb.get('blockLog', id)
+  }
+  async load(condition, sort, fields, from, limit) {
+    let data
+    if (limit) {
+      let page = await pounchDb.findPage('blockLog', condition, sort, fields, from, limit)
+      data = page.result
+    } else {
+      data = await pounchDb.find('blockLog', condition, sort, fields)
+    }
 
-		return data
-	}
-	async save(entities, ignore, parent) {
-		if (!entities) {
-			return
-		}
-		if (!TypeUtil.isArray(entities)) {
-			return await pounchDb.run('blockLog', entities, ignore, parent)
-		} else {
-			return await pounchDb.execute('blockLog', entities, ignore, parent)
-		}
-	}
+    return data
+  }
+  async save(entities, ignore, parent) {
+    if (!entities) {
+      return
+    }
+    if (!TypeUtil.isArray(entities)) {
+      return await pounchDb.run('blockLog', entities, ignore, parent)
+    } else {
+      return await pounchDb.execute('blockLog', entities, ignore, parent)
+    }
+  }
 }
 export let blockLogComponent = new BlockLogComponent()

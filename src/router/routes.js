@@ -3,7 +3,7 @@ const page403 = {
   path: '/403',
   name: '403',
   component: () => import('@/pages/403')
-};
+}
 // 作为workspace组件的子页面展示但是不在左侧菜单显示的路由写在rootRouter里(children至少包含一个子路由)
 const rootRouter = {
   path: '/',
@@ -14,7 +14,7 @@ const rootRouter = {
     name: 'index',
     component: () => import('@/pages/index')
   }]
-};
+}
 // 作为layout组件的子页面展示并且在左侧菜单显示的路由写在menuRouter里(children至少包含一个子路由)
 const blockChainRouter = {
   path: '/blockChain',
@@ -32,4 +32,4 @@ export const routes = [
   blockChainChatRouter,
   page403,
   rootRouter
-];
+]

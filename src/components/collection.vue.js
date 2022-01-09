@@ -31,7 +31,7 @@ export default {
     pdf,
     selectChat: SelectChat,
     captureMedia: CaptureMedia,
-    notePreview:NotePreview,
+    notePreview: NotePreview,
     mobileAudio: MobileAudio,
     messageContent: MessageContent
   },
@@ -201,7 +201,7 @@ export default {
         store.changeKind('message')
       } else {
         //if (_that.collectionTypeIndex === 0) {
-          store.toggleDrawer(false)
+        store.toggleDrawer(false)
         /*} else {
           _that.collectionTypeIndex = 0
           _that.collectionType = _that.collectionTypes[_that.collectionTypeIndex].value
@@ -419,10 +419,10 @@ export default {
               worker.postMessage(['one', dbLogs, myself.myselfPeerClient, options.privateKey])*/
             } else {
               let old = CollaUtil.clone(current)
-              let start = new Date().getTime()
+              //let start = new Date().getTime()
               dbLogs = await collectionUtil.deleteBlock(old, true, blockType)
-              let end = new Date().getTime()
-              console.log('collection deleteBlock time:' + (end - start))
+              //let end = new Date().getTime()
+              //console.log('collection deleteBlock time:' + (end - start))
               // 刷新syncFailed标志
               let newDbLogMap = CollaUtil.clone(store.state.dbLogMap)
               if (dbLogs && dbLogs.length > 0) {
@@ -440,10 +440,10 @@ export default {
             current.blockId = UUID.string(null, null)
           }
           // 本地保存
-          let start = new Date().getTime()
+          //let start = new Date().getTime()
           await collectionUtil.save(type, current, _that.myCollections)
-          let end = new Date().getTime()
-          console.log('collection save time:' + (end - start))
+          //let end = new Date().getTime()
+          //console.log('collection save time:' + (end - start))
           _that.backupContent = current['blockId'] + ':' + current['content']
           // 云端保存
           if (store.collectionWorkerEnabler) {
@@ -454,10 +454,10 @@ export default {
             let worker = _that.initCollectionUploadWorker()
             worker.postMessage(['one', dbLogs, myself.myselfPeerClient, options.privateKey])*/
           } else {
-            let start = new Date().getTime()
+            //let start = new Date().getTime()
             dbLogs = await collectionUtil.saveBlock(current, true, blockType)
-            let end = new Date().getTime()
-            console.log('collection saveBlock time:' + (end - start))
+            //let end = new Date().getTime()
+            //console.log('collection saveBlock time:' + (end - start))
             // 刷新syncFailed标志
             let newDbLogMap = CollaUtil.clone(store.state.dbLogMap)
             if (dbLogs && dbLogs.length > 0) {
@@ -484,53 +484,52 @@ export default {
         }
       }
     },
-    async fileCollectionDownload(){
+    async fileCollectionDownload() {
       let collection = this.myCollections.c_meta.current
       let filename = collection.firstFileInfo.slice(collection.firstFileInfo.indexOf(' ') + 1)
-        if (store.ios === true || store.android === true) {
-          let storageLocation = ''
-          if (window.device) {
-            if (window.device.platform === 'Android') {
-              storageLocation = 'file:///storage/emulated/0/'
-            } else if (window.device.platform === 'iOS') {
-              storageLocation = cordova.file.documentsDirectory //cordova.file.applicationStorageDirectory, dataDirectory
-            }
+      if (store.ios === true || store.android === true) {
+        let storageLocation = ''
+        if (window.device) {
+          if (window.device.platform === 'Android') {
+            storageLocation = 'file:///storage/emulated/0/'
+          } else if (window.device.platform === 'iOS') {
+            storageLocation = cordova.file.documentsDirectory //cordova.file.applicationStorageDirectory, dataDirectory
           }
-          console.log('storageLocation:' + storageLocation)
-          let dirEntry = await fileComponent.getDirEntry(storageLocation)
-          await fileComponent.createDirectory(dirEntry, 'Colla')
-          let dirPath = storageLocation + 'Colla/'
-          let fileEntry = await fileComponent.createNewFileEntry(filename, dirPath)
-          fileComponent.writeFile(fileEntry, BlobUtil.base64ToBlob(collection.content), false).then(function () {
-            _that.$q.notify({
-              message: "save success",
-              timeout: 3000,
-              type: "info",
-              color: "info",
-            })
-          }).catch(function (err) {
-            console.error(JSON.stringify(err))
-            _that.$q.notify({
-              message: "save failure",
-              timeout: 3000,
-              type: "warning",
-              color: "warning",
-            })
+        }
+        console.log('storageLocation:' + storageLocation)
+        let dirEntry = await fileComponent.getDirEntry(storageLocation)
+        await fileComponent.createDirectory(dirEntry, 'Colla')
+        let dirPath = storageLocation + 'Colla/'
+        let fileEntry = await fileComponent.createNewFileEntry(filename, dirPath)
+        fileComponent.writeFile(fileEntry, BlobUtil.base64ToBlob(collection.content), false).then(function () {
+          _that.$q.notify({
+            message: "save success",
+            timeout: 3000,
+            type: "info",
+            color: "info",
           })
-        } else {
-          let hyperlink = document.createElement("a"),
+        }).catch(function (err) {
+          console.error(JSON.stringify(err))
+          _that.$q.notify({
+            message: "save failure",
+            timeout: 3000,
+            type: "warning",
+            color: "warning",
+          })
+        })
+      } else {
+        let hyperlink = document.createElement("a"),
           mouseEvent = new MouseEvent('click', {
             view: window,
             bubbles: true,
             cancelable: true
-          });
-          hyperlink.href = collection.content;
-          hyperlink.target = '_blank';
-          hyperlink.download = filename;
-          hyperlink.dispatchEvent(mouseEvent);
-          (window.URL || window.webkitURL).revokeObjectURL(hyperlink.href);
-        }
-      
+          })
+        hyperlink.href = collection.content
+        hyperlink.target = '_blank'
+        hyperlink.download = filename
+        hyperlink.dispatchEvent(mouseEvent)
+          (window.URL || window.webkitURL).revokeObjectURL(hyperlink.href)
+      }
     },
     async refresh() {
       this.myCollections.splice(0)
@@ -574,10 +573,10 @@ export default {
             meta['from'] = new Date().getTime()
             console.log('first from:' + meta['from'])
           }
-          let start = new Date().getTime()
+          //let start = new Date().getTime()
           data = await collectionComponent.load(ownerPeerId, this.collectionType, this.searchTag, this.searchText, meta['from'], meta['rowsPerPage'])
-          let end = new Date().getTime()
-          console.log('collection load time:' + (end - start))
+          //let end = new Date().getTime()
+          //console.log('collection load time:' + (end - start))
         } else if (this.source === 'cloud') {
           let metadata = this.searchText // TODO
           if (!meta['from']) {
@@ -668,7 +667,7 @@ export default {
         //   store.state.currentMergeMessage = message
         // }
       } else {*/
-        _that.subKind = 'view'
+      _that.subKind = 'view'
       //}
     },
     doneSelectCollectionItem() {
@@ -811,9 +810,9 @@ export default {
         _that.subKind = 'captureMedia'
       } else if (store.safari === true) {
         //if (type === 'image') {
-          store.captureMediaEntry = 'collection'
-          store.captureType = type
-          _that.subKind = 'captureMedia'
+        store.captureMediaEntry = 'collection'
+        store.captureType = type
+        _that.subKind = 'captureMedia'
         /*} else {
           console.error('Not support browser safari!')
         }*/
@@ -1131,21 +1130,21 @@ export default {
           label: _that.$i18n.t('Edit'),
           icon: 'edit',
           id: 'edit'
-        },{})
+        }, {})
       }
       if (collection.collectionType !== CollectionType.NOTE && collection.collectionType !== CollectionType.VOICE && collection.collectionType !== CollectionType.FILE) {
         actions.unshift({
           label: _that.$i18n.t('Save as Note'),
           icon: 'notes',
           id: 'saveAsNote'
-        },{})
+        }, {})
       }
       if (collection.collectionType !== CollectionType.VOICE) {
         actions.unshift({
           label: _that.$i18n.t('Forward'),
           icon: 'forward',
           id: 'forward'
-        },{})
+        }, {})
       }
       _that.$q.bottomSheet({
         actions: actions
@@ -1605,7 +1604,7 @@ export default {
                 let promise = dataBlockService.findTxPayload(null, download['blockId'])
                 ps.push(promise)
               }
-              CollaUtil.asyncPool(10, ps, async function(result) {
+              CollaUtil.asyncPool(10, ps, async function (result) {
                 let collections = await result
                 if (collections && collections.length > 0) {
                   let collection = collections[0]

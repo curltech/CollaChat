@@ -51,7 +51,7 @@ export default {
       let store = _that.$store
       return function (chat) {
         if (!chat) {
-          return false;
+          return false
         } else if (chat.subjectType === SubjectType.CHAT) {
           return store.state.linkmanMap[chat.subjectId] && store.state.linkmanMap[chat.subjectId].activeStatus === ActiveStatus.UP
         } else if (chat.subjectType === SubjectType.GROUP_CHAT) {
@@ -64,11 +64,11 @@ export default {
       let store = _that.$store
       return function (chat) {
         if (!chat) {
-          return false;
+          return false
         } else if (chat.subjectType === SubjectType.CHAT) {
-          return store.state.linkmanMap[chat.subjectId] && store.state.linkmanMap[chat.subjectId].notAlert;
+          return store.state.linkmanMap[chat.subjectId] && store.state.linkmanMap[chat.subjectId].notAlert
         } else if (chat.subjectType === SubjectType.GROUP_CHAT) {
-          return store.state.groupChatMap[chat.subjectId] && store.state.groupChatMap[chat.subjectId].notAlert;
+          return store.state.groupChatMap[chat.subjectId] && store.state.groupChatMap[chat.subjectId].notAlert
         }
       }
     },
@@ -304,7 +304,7 @@ export default {
         }, null, store.state.chats.length > 0 ? store.state.chats[0].updateTime : null, null, true)
         if (data && data.length > 0) {
           for (let chat of data) {
-            let subjectType;
+            let subjectType
             if (store.state.linkmanMap[chat.subjectId]) {
               subjectType = SubjectType.CHAT
             } else if (store.state.groupChatMap[chat.subjectId]) {

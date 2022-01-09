@@ -199,11 +199,11 @@ export class CollectionComponent {
 		if (qs.length > 0) {
 			condition['$and'] = qs
 		}
-		console.log('will load more data, collectionType:' + collectionType + ';searchText' + searchText)
-		let start = new Date().getTime()
+		console.log('will load more data, collectionType:' + collectionType + ', searchText:' + searchText)
+		//let start = new Date().getTime()
 		let page = await pounchDb.findPage('myCollection', condition, [{ updateDate: 'desc' }], null, null, limit)
-		let end = new Date().getTime()
-		console.log('collection findPage time:' + (end - start))
+		//let end = new Date().getTime()
+		//console.log('collection findPage time:' + (end - start))
 		let data = page.result
 		if (data && data.length > 0) {
 			let securityParams = {}
@@ -361,10 +361,10 @@ export class CollectionComponent {
 			}]
 		}
 		let ignore = ['attachs', 'content']
-		let start = new Date().getTime()
+		//let start = new Date().getTime()
 		await pounchDb.run('myCollection', current, ignore, parent)
-		let end = new Date().getTime()
-        console.log('collection save run time:' + (end - start))
+		//let end = new Date().getTime()
+        //console.log('collection save run time:' + (end - start))
 		await this.saveAttach(current)
 		delete current['content_']
 		delete current['thumbnail_']
@@ -413,10 +413,10 @@ export class CollectionComponent {
 			if (myself.myselfPeerClient.localDataCryptoSwitch === true) {
 				ignore = ['content']
 			}
-			let start = new Date().getTime()
+			//let start = new Date().getTime()
 			await pounchDb.execute('myAttach', current.attachs, ignore, null)
-			let end = new Date().getTime()
-        	console.log('collection attachs save run time:' + (end - start))
+			//let end = new Date().getTime()
+        	//console.log('collection attachs save run time:' + (end - start))
 			for (let attach of current.attachs) {
 				delete attach['content_']
 			}

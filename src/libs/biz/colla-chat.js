@@ -598,55 +598,55 @@ export let ChatMessageStatus = {
      }
    }
    getChatContent(contentType, content) {
-     let result;
+     let result
      switch (contentType) {
        case ChatContentType.TEXT:
          if (content) {
            content = content.replace(/<\/?.+?>/g, '')
          }
          result = content
-         break;
+         break
        // case ChatContentType.FILE:
        //   result = `[${Vue.$i18n.t("file")}]`
-       //   break;
+       //   break
        // case ChatContentType.IMAGE:
        //   result = `[${Vue.$i18n.t("image")}]`
-       //   break;
+       //   break
        // case ChatContentType.AUDIO_INVITATION:
        //   result = `[${Vue.$i18n.t("audioInvitation")}]`
-       //   break;
+       //   break
        // case ChatContentType.VIDEO_INVITATION:
        //   result = `[${Vue.$i18n.t("videoInvitation")}]`
-       //   break;
+       //   break
        // case ChatContentType.AUDIO_RECORD:
        //   result = `[${Vue.$i18n.t("audio")}]`
-       //   break;
+       //   break
        // case ChatContentType.VIDEO_RECORD:
        //   result = `[${Vue.$i18n.t("video")}]`
        case ChatContentType.FILE:
          result = `[file]`
-         break;
+         break
        case ChatContentType.IMAGE:
          result = `[image]`
-         break;
+         break
        case ChatContentType.AUDIO_INVITATION:
          result = `[audioInvitation]`
-         break;
+         break
        case ChatContentType.VIDEO_INVITATION:
          result = `[videoInvitation]`
-         break;
+         break
        case ChatContentType.VOICE:
          result = `[voice]`
-         break;
+         break
        case ChatContentType.VIDEO:
          result = `[video]`
-         break;
+         break
        case ChatContentType.CARD:
          result = `[card]`
-         break;
+         break
        case ChatContentType.NOTE:
          result = `[note]`
-         break;
+         break
        default:
          result = content
      }

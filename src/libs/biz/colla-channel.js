@@ -252,10 +252,10 @@ export class ChannelComponent {
             await this.saveAttach(current)
         }
         let ignore = ['attachs', 'content']
-        let start = new Date().getTime()
+        //let start = new Date().getTime()
         await pounchDb.run('myChannelArticle', current, ignore, parent)
-        let end = new Date().getTime()
-        console.log('channelArticle save run time:' + (end - start))
+        //let end = new Date().getTime()
+        //console.log('channelArticle save run time:' + (end - start))
         if (EntityState.Deleted !== state) {
             current.attachs = [{content: content}]
             await this.saveAttach(current)
@@ -305,10 +305,10 @@ export class ChannelComponent {
             if (myself.myselfPeerClient.localDataCryptoSwitch === true) {
                 ignore = ['content']
             }
-            let start = new Date().getTime()
+            //let start = new Date().getTime()
             await pounchDb.execute('myArticleAttach', current.attachs, ignore, current.attachs)
-            let end = new Date().getTime()
-            console.log('channelArticle attachs save run time:' + (end - start))
+            //let end = new Date().getTime()
+            //console.log('channelArticle attachs save run time:' + (end - start))
             for (let attach of current.attachs) {
                 delete attach['content_']
             }

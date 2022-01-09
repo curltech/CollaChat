@@ -241,14 +241,14 @@ class StatusBarComponent {
                 `@supports(top:constant(safe-area-inset-top)){--safe-area-inset-top:constant(safe-area-inset-top);--safe-area-inset-right:constant(safe-area-inset-right);` +
                 `--safe-area-inset-bottom:constant(safe-area-inset-bottom);--safe-area-inset-left:constant(safe-area-inset-left)}` +
                 `@supports(top:env(safe-area-inset-top)){--safe-area-inset-top:env(safe-area-inset-top);--safe-area-inset-right:env(safe-area-inset-right);` +
-                `--safe-area-inset-bottom:env(safe-area-inset-bottom);--safe-area-inset-left:env(safe-area-inset-left)}}`;
+                `--safe-area-inset-bottom:env(safe-area-inset-bottom);--safe-area-inset-left:env(safe-area-inset-left)}}`
             console.log('code:' + code)
-            const style = document.createElement('style');
-            style.type = 'text/css';
-            style.rel = 'stylesheet';
-            style.appendChild(document.createTextNode(code));
-            const head = document.getElementsByTagName('head')[0];
-            head.appendChild(style);
+            const style = document.createElement('style')
+            style.type = 'text/css'
+            style.rel = 'stylesheet'
+            style.appendChild(document.createTextNode(code))
+            const head = document.getElementsByTagName('head')[0]
+            head.appendChild(style)
         }
       })
     }*/
@@ -807,25 +807,25 @@ class PhotoLibraryComponent {
         return new Promise(function (resolve, reject) {
             cordova.plugins.photoLibrary.getLibrary(
                 function (result) {
-                    let library = result.library;
-                    let isLastChunk = result.isLastChunk;
+                    let library = result.library
+                    let isLastChunk = result.isLastChunk
                     // Here we have the library as array
                     resolve(result)
                     // library.forEach(function (libraryItem) {
-                    //     console.log(libraryItem.id);          // ID of the photo
-                    //     console.log(libraryItem.photoURL);    // Cross-platform access to photo
-                    //     console.log(libraryItem.thumbnailURL);// Cross-platform access to thumbnail
-                    //     console.log(libraryItem.fileName);
-                    //     console.log(libraryItem.width);
-                    //     console.log(libraryItem.height);
-                    //     console.log(libraryItem.creationDate);
-                    //     console.log(libraryItem.latitude);
-                    //     console.log(libraryItem.longitude);
-                    //     console.log(libraryItem.albumIds);    // array of ids of appropriate AlbumItem, only of includeAlbumsData was used
+                    //     console.log(libraryItem.id)           // ID of the photo
+                    //     console.log(libraryItem.photoURL)     // Cross-platform access to photo
+                    //     console.log(libraryItem.thumbnailURL) // Cross-platform access to thumbnail
+                    //     console.log(libraryItem.fileName)
+                    //     console.log(libraryItem.width)
+                    //     console.log(libraryItem.height)
+                    //     console.log(libraryItem.creationDate)
+                    //     console.log(libraryItem.latitude)
+                    //     console.log(libraryItem.longitude)
+                    //     console.log(libraryItem.albumIds)     // array of ids of appropriate AlbumItem, only of includeAlbumsData was used
                     // })
                 },
                 function (err) {
-                    console.log('Error occured');
+                    console.log('Error occured')
                     reject(err)
                 }, options
                 // {
@@ -847,8 +847,8 @@ class PhotoLibraryComponent {
                 function (albums) {
                     resolve(albums)
                     // albums.forEach(function (album) {
-                    //     console.log(album.id);
-                    //     console.log(album.title);
+                    //     console.log(album.id)
+                    //     console.log(album.title)
                     // })
                 },
                 function (err) { reject(err) }
@@ -1006,7 +1006,7 @@ class LocalNotificationComponent {
           text: text,
           data:data,
           foreground: true
-        });
+        })
       }
     }
     initialize(callback){
@@ -1030,7 +1030,7 @@ class CalendarComponent {
         calOptions.recurrence = options.recurrence
         calOptions.recurrenceEndDate = options.recurrenceEndDate
         calOptions.recurrenceInterval = options.recurrenceInterval
-        var cal = window.plugins.calendar;
+        var cal = window.plugins.calendar
 
         return new Promise(function (resolve, reject) {
             cal.createEventWithOptions(options.title,
@@ -1053,14 +1053,14 @@ class CalendarComponent {
         window.plugins.calendar.hasReadWritePermission(
             function (result) {
                 // if this is 'false' you probably want to call 'requestReadWritePermission' now
-                alert(result);
+                alert(result)
             }
         )
     }
 
     requestReadWritePermission() {
         // no callbacks required as this opens a popup which returns async
-        window.plugins.calendar.requestReadWritePermission();
+        window.plugins.calendar.requestReadWritePermission()
     }
 }
 export let calendarComponent = new CalendarComponent()

@@ -36,7 +36,7 @@ Router.beforeEach(async (to, from, next) => {
       next()
       return
     }
-    let token = store.state.myselfPeerClient;
+    let token = store.state.myselfPeerClient
     // 已经登录连接成功
     if (token) {
       next()
@@ -44,10 +44,10 @@ Router.beforeEach(async (to, from, next) => {
       next('/')
     }
   }
-  /*let token = store.state.authToken.token;
+  /*let token = store.state.authToken.token
   // 已经登录
   if (token && token.username) {
-    let currentUser = store.state.user.currentUser;
+    let currentUser = store.state.user.currentUser
     // 存在当前用户
     if (currentUser && currentUser.loginName) {
       next()
@@ -57,12 +57,12 @@ Router.beforeEach(async (to, from, next) => {
   } else { // 没有登录
     next('/login')
   }
-  //let menu = MenuUtil.getMenuByName(to.name, store.getters.accessMenu);
-  MenuUtil.title(to.name);*/
-});
+  //let menu = MenuUtil.getMenuByName(to.name, store.getters.accessMenu)
+  MenuUtil.title(to.name)*/
+})
 
 Router.afterEach((to) => {
-  window.scrollTo(0, 0);
-});
+  window.scrollTo(0, 0)
+})
 
 export default Router
