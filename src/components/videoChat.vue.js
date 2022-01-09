@@ -71,7 +71,7 @@ export default {
           let peerClient = peerClientService.getPeerClientFromCache(subjectId)
           if (peerClient && peerClient.avatar) {
             return peerClient.avatar
-          }else{
+          } else {
             return store.defaultActiveAvatar;
           }
         }
@@ -324,10 +324,10 @@ export default {
               currentVideoDom.srcObject = localStream
               currentVideoDom.muted = true
               _that.iosGroupVideoFocus(0)
-            } else{
-              if(_that.$refs[`memberVideo${ownerPeerId}`]){
-              let currentVideoDom = _that.$refs[`memberVideo${ownerPeerId}`].length?_that.$refs[`memberVideo${ownerPeerId}`][0]:_that.$refs[`memberVideo${ownerPeerId}`]
-              currentVideoDom.srcObject = localStream
+            } else {
+              if (_that.$refs[`memberVideo${ownerPeerId}`]) {
+                let currentVideoDom = _that.$refs[`memberVideo${ownerPeerId}`].length ? _that.$refs[`memberVideo${ownerPeerId}`][0] : _that.$refs[`memberVideo${ownerPeerId}`]
+                currentVideoDom.srcObject = localStream
               }
             }
           } else {//audio
@@ -517,12 +517,12 @@ export default {
               currentVideoDom.muted = true
             } else {
               let memberVideoDom = _that.$refs[`memberVideo${store.state.currentCallChat.ownerPeerId}`]
-              if(memberVideoDom){
+              if (memberVideoDom) {
                 let currentVideoDom = memberVideoDom.length ? memberVideoDom[0] : memberVideoDom
                 currentVideoDom.srcObject = localStream
                 currentVideoDom.muted = true
               }
-              
+
             }
           } else {//audio
             if (!store.state.currentCallChat.audio) {
@@ -721,6 +721,7 @@ export default {
         clearInterval(_that.mediaTimer)
         _that.mediaTimer = null
         _that.mediaMemberList = []
+        _that.groupFocusNum = 0
         store.state.currentCallChat.audio = null
         store.state.currentCallChat = null
         _that.$nextTick(() => {
@@ -857,10 +858,14 @@ export default {
       let store = _that.$store
       if (ifShow) {
         store.state.videoDialog = true
-        statusBarComponent.hide()
+        if (store.ifMobile()) {
+          statusBarComponent.hide()
+        }
       } else {
         store.state.videoDialog = false
-        statusBarComponent.show(false)
+        if (store.ifMobile()) {
+          statusBarComponent.show(false)
+        }
       }
     }
   },
