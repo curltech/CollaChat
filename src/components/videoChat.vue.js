@@ -53,11 +53,11 @@ export default {
       let store = _that.$store
       return function (currentChat) {
         if (!currentChat) {
-          return false
+          return false;
         } else if (currentChat.subjectType === SubjectType.CHAT) {
-          return store.state.linkmanMap[currentChat.subjectId] && store.state.linkmanMap[currentChat.subjectId].activeStatus === ActiveStatus.UP
+          return store.state.linkmanMap[currentChat.subjectId] && store.state.linkmanMap[currentChat.subjectId].activeStatus === ActiveStatus.UP;
         } else if (currentChat.subjectType === SubjectType.GROUP_CHAT) {
-          return store.state.groupChatMap[currentChat.subjectId] && store.state.groupChatMap[currentChat.subjectId].activeStatus === ActiveStatus.UP
+          return store.state.groupChatMap[currentChat.subjectId] && store.state.groupChatMap[currentChat.subjectId].activeStatus === ActiveStatus.UP;
         }
       }
     },
@@ -66,13 +66,13 @@ export default {
       let store = _that.$store
       return function (subjectId) {
         if (store.state.linkmanMap[subjectId]) {
-          return store.state.linkmanMap[subjectId].avatar ? store.state.linkmanMap[subjectId].avatar : store.defaultActiveAvatar
+          return store.state.linkmanMap[subjectId].avatar ? store.state.linkmanMap[subjectId].avatar : store.defaultActiveAvatar;
         } else {
           let peerClient = peerClientService.getPeerClientFromCache(subjectId)
           if (peerClient && peerClient.avatar) {
             return peerClient.avatar
           } else {
-            return store.defaultActiveAvatar
+            return store.defaultActiveAvatar;
           }
         }
       }
@@ -132,10 +132,10 @@ export default {
         if (AudioToggle && type !== _that.audioToggle) {
           if (_that.audioToggle === "speaker") {
             _that.audioToggle = "earpiece"
-            AudioToggle.setAudioMode(AudioToggle.EARPIECE)
+            AudioToggle.setAudioMode(AudioToggle.EARPIECE);
           } else {
             _that.audioToggle = "speaker"
-            AudioToggle.setAudioMode(AudioToggle.SPEAKER)
+            AudioToggle.setAudioMode(AudioToggle.SPEAKER);
           }
         }
       }
@@ -147,10 +147,10 @@ export default {
       if (AudioToggle) {
         if (_that.audioToggle === "speaker") {
           _that.audioToggle = "earpiece"
-          AudioToggle.setAudioMode(AudioToggle.EARPIECE)
+          AudioToggle.setAudioMode(AudioToggle.EARPIECE);
         } else {
           _that.audioToggle = "speaker"
-          AudioToggle.setAudioMode(AudioToggle.SPEAKER)
+          AudioToggle.setAudioMode(AudioToggle.SPEAKER);
         }
       }
     },
@@ -204,18 +204,14 @@ export default {
     async removeStream(peerId) {
       let _that = this
       let callChat = store.state.currentCallChat
-      if (!callChat) {
-        return
-      }
+      if (!callChat) return
       let streams = store.state.currentCallChat.stream
-      if (!streams) {
-        return
-      }
+      if (!streams) return
       for (let i = streams.length - 1; i >= 0; i--) {
         let streamItem = streams[i]
         let _peerId = streamItem.peerId
         if (!peerId || _peerId === peerId) {
-          streams.splice(i, 1)
+          streams.splice(i, 1);
           let webrtcPeers = await webrtcPeerPool.get(_peerId)
           if (webrtcPeers && webrtcPeers.length > 0) {
             for (let webrtcPeer of webrtcPeers) {
@@ -224,8 +220,8 @@ export default {
           }
           if (_peerId === myself.myselfPeerClient.peerId && callChat.streamMap[_peerId] && callChat.streamMap[_peerId].stream) {
             callChat.streamMap[_peerId].stream.getTracks().forEach((track) => {
-              track.stop()
-            })
+              track.stop();
+            });
           }
           if (callChat.subjectType === SubjectType.GROUP_CHAT) {
             if (callChat.callMessage.hasAddStream && callChat.callMessage.hasAddStream[_peerId]) {
@@ -234,8 +230,8 @@ export default {
           }
           if (_that.localCloneStream[_peerId]) {
             _that.localCloneStream[_peerId].getTracks().forEach((track) => {
-              track.stop()
-            })
+              track.stop();
+            });
           }
           callChat.streamMap[_peerId] = null
           _that.$forceUpdate()
@@ -269,7 +265,7 @@ export default {
       store.state.currentCallChat.callType = type
       let options = {}
       if (type == "video") {
-        let ideal
+        let ideal;
         if (store.state.ifMobileStyle) {
           ideal = 1.33
         } else {
@@ -317,10 +313,12 @@ export default {
         _that.$nextTick(() => {
           if (localStream.getVideoTracks().length > 0) {//video
             if (Platform.is.ios) {
-              let currentVideoDom = _that.$refs.zoomVideo
-              currentVideoDom.srcObject = localStream
-              currentVideoDom.muted = true
-              _that.iosGroupVideoFocus(0)
+              setTimeout(() => {
+                let currentVideoDom = _that.$refs.zoomVideo
+                currentVideoDom.srcObject = localStream
+                currentVideoDom.muted = true
+                _that.iosGroupVideoFocus(0)
+              }, 500);
             } else {
               if (_that.$refs[`memberVideo${ownerPeerId}`]) {
                 let currentVideoDom = _that.$refs[`memberVideo${ownerPeerId}`].length ? _that.$refs[`memberVideo${ownerPeerId}`][0] : _that.$refs[`memberVideo${ownerPeerId}`]
@@ -334,7 +332,7 @@ export default {
             let audioItem = new Audio()
             audioItem.muted = true
             audioItem.srcObject = localStream
-            audioItem.play()
+            audioItem.play();
             store.state.currentCallChat.audio[ownerPeerId] = audioItem
           }
         })
@@ -362,13 +360,13 @@ export default {
         let currentTime = new Date().getTime()
         //大于1分钟的请求忽略掉
         if (((currentTime - message.createDate) / 1000 > 60)) {
-          return
+          return;
         }
         if (store.state.currentCallChat && store.state.currentCallChat.subjectId && store.state.videoDialog) {
           await _that.sendCallCloseMessage(subjectId, ChatContentType.MEDIA_BUSY, '')
-          return
+          return;
         }
-        let name
+        let name;
         if (store.state.linkmanMap[subjectId]) {
           let chat = await store.getChat(subjectId)
           store.state.currentCallChat = chat
@@ -411,7 +409,7 @@ export default {
       let callMessage = store.state.currentCallChat.callMessage
       if (callMessage.contentType === ChatContentType.VIDEO_INVITATION) {
         store.state.currentCallChat.callType = "video"
-        let ideal
+        let ideal;
         // if(store.state.ifMobileStyle){
         //   ideal = 1.77
         // }else{
@@ -437,7 +435,7 @@ export default {
         options = { video: false, audio: true }
       }
       _that.$nextTick(async () => {
-        let localStream = await mediaStreamComponent.openUserMedia(options)
+        let localStream = await mediaStreamComponent.openUserMedia(options);
         _that.saveStream(store.state.currentCallChat.ownerPeerId, localStream)
         if (callMessage.contentType === ChatContentType.VIDEO_INVITATION) {
           let currentVideoDom = _that.$refs.currentVideo
@@ -462,13 +460,13 @@ export default {
       let _that = this
       let store = _that.$store
       let messages = store.state.currentChat.messages
-      let latestInvitationMessage
+      let latestInvitationMessage;
       for (let i = messages.length - 1; i > -1; i--) {
         let message_n = messages[i]
         if (message_n.contentType === ChatContentType.AUDIO_INVITATION || message_n.contentType === ChatContentType.VIDEO_INVITATION) //if latest
         {
           latestInvitationMessage = message_n
-          break
+          break;
         }
       }
       if (latestInvitationMessage.messageId !== message.messageId) {
@@ -478,7 +476,7 @@ export default {
           type: "warning",
           color: "warning",
         })
-        return
+        return;
       }
       store.state.currentCallChat = store.state.currentChat
       store.state.currentCallChat.callMessage = message
@@ -488,7 +486,7 @@ export default {
         options = { video: false, audio: true }
       } else {
         store.state.currentCallChat.callType = "video"
-        let ideal
+        let ideal;
         if (store.state.ifMobileStyle) {
           ideal = 1.33
         } else {
@@ -509,9 +507,11 @@ export default {
         _that.$nextTick(() => {
           if (localStream.getVideoTracks().length > 0) {//video
             if (Platform.is.ios) {
-              let currentVideoDom = _that.$refs.zoomVideo
-              currentVideoDom.srcObject = localStream
-              currentVideoDom.muted = true
+              setTimeout(() => {
+                let currentVideoDom = _that.$refs.zoomVideo
+                currentVideoDom.srcObject = localStream
+                currentVideoDom.muted = true
+              }, 500);
             } else {
               let memberVideoDom = _that.$refs[`memberVideo${store.state.currentCallChat.ownerPeerId}`]
               if (memberVideoDom) {
@@ -528,7 +528,7 @@ export default {
             let audioItem = new Audio()
             audioItem.muted = true
             audioItem.srcObject = localStream
-            audioItem.play()
+            audioItem.play();
             store.state.currentCallChat.audio[store.state.currentCallChat.ownerPeerId] = audioItem
 
           }
@@ -568,7 +568,7 @@ export default {
       let store = _that.$store
       let callChat = store.state.currentCallChat
       if (!callChat) {
-        return
+        return;
       }
       if (callChat.subjectType === SubjectType.GROUP_CHAT) {
         if (!(callChat.callMessage.hasAddStream && callChat.callMessage.hasAddStream[peerId]) || (callChat.streamMap && callChat.streamMap[peerId] && callChat.streamMap[peerId].pending)) {//发起方--这里需要addStream给对方
@@ -586,22 +586,24 @@ export default {
         _that.$nextTick(() => {
           setTimeout(function () {
             if (stream.getVideoTracks().length > 0 && _that.$refs[`memberVideo${peerId}`]) {//video
-              let dom = _that.$refs[`memberVideo${peerId}`]
-              let currentVideoDom = dom.length ? dom[0] : dom
-              currentVideoDom.srcObject = stream
+              setTimeout(function () {
+                let dom = _that.$refs[`memberVideo${peerId}`]
+                let currentVideoDom = dom.length ? dom[0] : dom
+                currentVideoDom.srcObject = stream
+              }, 500)
             } else {//audio
               if (!store.state.currentCallChat.audio) {
                 store.state.currentCallChat.audio = {}
               }
               let audioItem = new Audio()
-              audioItem.srcObject = stream
-              audioItem.play()
+              audioItem.srcObject = stream;
+              audioItem.play();
               store.state.currentCallChat.audio[peerId] = audioItem
             }
             if (!_that.mediaTimer) {
               _that.startMediaTimer()
             }
-            _that.addStreamCount++
+            _that.addStreamCount++;
           }, 200)
         }
         )
@@ -634,32 +636,30 @@ export default {
         _that.$nextTick(() => {
           setTimeout(function () {
             if (store.state.currentCallChat.callMessage.contentType === ChatContentType.VIDEO_INVITATION) {
-              let zoomVideoDom = _that.$refs.zoomVideo
+              let zoomVideoDom = _that.$refs.zoomVideo;
               if (zoomVideoDom) {
-                zoomVideoDom.srcObject = stream
+                zoomVideoDom.srcObject = stream;
               }
             } else {
               store.state.currentCallChat.audio = new Audio()
-              store.state.currentCallChat.audio.srcObject = stream
-              store.state.currentCallChat.audio.play()
+              store.state.currentCallChat.audio.srcObject = stream;
+              store.state.currentCallChat.audio.play();
             }
 
             if (!_that.mediaTimer) {
               _that.startMediaTimer()
             }
-            _that.addStreamCount++
+            _that.addStreamCount++;
           }, 200)
         })
       }
-      _that.addStreamCount++
+      _that.addStreamCount++;
     },
     async pendingCall(peerId) {
       let _that = this
       let store = _that.$store
       let currentCallChat = store.state.currentCallChat
-      if (!currentCallChat || !currentCallChat.streamMap || !currentCallChat.streamMap[peerId] || currentCallChat.streamMap[peerId].pending) {
-        return
-      }
+      if (!currentCallChat || !currentCallChat.streamMap || !currentCallChat.streamMap[peerId] || currentCallChat.streamMap[peerId].pending) return
       currentCallChat.streamMap[peerId].pending = true
       _that.$forceUpdate()
       let pendingCallTimeOut = setTimeout(async function () {
@@ -680,9 +680,7 @@ export default {
       let store = _that.$store
       try {
         let callChat = store.state.currentCallChat
-        if (!callChat) {
-          return
-        }
+        if (!callChat) return
         systemAudioComponent.mediaInvitationAudioStop()
         systemAudioComponent.mediaCloseAudioPlay()
         if (callChat.subjectType === SubjectType.CHAT) {
@@ -757,13 +755,11 @@ export default {
       if (callChat && callChat.subjectType === SubjectType.CHAT) {
         message.subjectId = message.senderPeerId
       }
-      if (!callChat || !store.state.videoDialog || message.subjectId !== callChat.subjectId) {
-        return
-      }
+      if (!callChat || !store.state.videoDialog || message.subjectId !== callChat.subjectId) return;
       if (callChat.subjectType === SubjectType.GROUP_CHAT) {
         await _that.removeStream(senderPeerId)
       } else if (callChat.subjectType === SubjectType.CHAT) {
-        let text
+        let text;
         if (message.contentType === ChatContentType.MEDIA_CLOSE) {
           text = _that.$i18n.t('Chat already ended')
         } else if (message.contentType === ChatContentType.MEDIA_REJECT) {
@@ -794,21 +790,21 @@ export default {
       _that.saveStream(callChat.ownerPeerId, localStream)
       let videoTrack = null
       if (localStream.getVideoTracks().length > 0) {
-        videoTrack = localStream.getVideoTracks()[0]
+        videoTrack = localStream.getVideoTracks()[0];
       }
       for (let streamObj of callChat.stream) {
         if (streamObj.peerId === callChat.ownerPeerId) {
-          continue
+          continue;
         }
         if (localStream.getVideoTracks().length > 0) {
           webrtcPeerPool.addTrack(videoTrack, localStream)
         }
         else {
           let sender = pc.getSenders().find(function (s) {
-            return s.track.kind === 'video'
-          })
+            return s.track.kind == 'video';
+          });
           if (sender) {
-            webrtcPeerPool.removeTrack(sender)
+            webrtcPeerPool.removeTrack(sender);
           }
         }
       }
@@ -843,11 +839,13 @@ export default {
       _that.$nextTick(() => {
         let memberVideoDom = _that.$refs[`memberVideo${memberPeerId}`]
         if (memberVideoDom) {//video
-          let currentVideoDom = memberVideoDom.length ? memberVideoDom[0] : memberVideoDom
-          currentVideoDom.srcObject = callChat.streamMap[memberPeerId].stream
-          if (memberPeerId === callChat.ownerPeerId) {
-            currentVideoDom.muted = true
-          }
+          setTimeout(() => {
+            let currentVideoDom = memberVideoDom.length ? memberVideoDom[0] : memberVideoDom
+            currentVideoDom.srcObject = callChat.streamMap[memberPeerId].stream
+            if (memberPeerId === callChat.ownerPeerId) {
+              currentVideoDom.muted = true
+            }
+          }, 500);
         }
       })
     },
