@@ -50,7 +50,7 @@
                         .col-9
                             q-toolbar-title.media-timer-ios-group
                                 span.text-c-grey-10(ref="mediaTimer")
-                            div.scroll(style="height:16vh;width:66vw;")
+                            div.scroll(style="height:16vh;width:74vw;")
                                 q-list(flat v-if="$store.state.currentCallChat")
                                     template(v-for="(memberPeerId, index) in $store.state.currentCallChat.callMessage.content")
                                         q-item.text-c-grey-10(clickable v-ripple @click="iosGroupVideoFocus(index)")
