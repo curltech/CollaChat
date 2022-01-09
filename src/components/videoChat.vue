@@ -42,9 +42,9 @@
         //group video or audio
         q-card.message-dialog-card(v-if="$store.state.currentCallChat && $store.state.currentCallChat.subjectType === SubjectType.GROUP_CHAT")
             q-card-section.group-video-section
-                //ios-video
-                q-toolbar-title.media-timer.media-timer-group-video(v-if="!Platform.is.ios || $store.state.currentCallChat.callType == 'audio'")
+                q-toolbar-title.media-timer-group(v-if="!Platform.is.ios || $store.state.currentCallChat.callType == 'audio'")
                     span.text-c-grey-10(ref="mediaTimer")
+                //ios-video
                 q-card(flat v-if="Platform.is.ios && $store.state.currentCallChat.callType == 'video' && $store.state.currentCallChat && $store.state.currentCallChat.stream")
                     q-card-section.row.zoom-video-section.zoom-video-section-ios(v-show = "$store.state.currentCallChat && $store.state.currentCallChat.stream")
                         .col-8
@@ -135,7 +135,7 @@
                 q-space(v-if = "(canCall()===true) || $store.state.currentCallChat.stream")
                 q-btn.text-primary(v-if = "$store.state.currentCallChat.stream"  unelevated round color="primary" :icon="chatMic?'mic':'mic_off'"  @click="changeChatMic")
                 q-btn.text-primary(unelevated round icon="call" @click="acceptSingleCall" color="primary" v-if="canCall()===true")
-            q-card-section.mini-btn-section(v-if = "!Platform.is.ios && $store.state.currentCallChat.stream" )
+            q-card-section.mini-btn-section.mini-single-audio-btn-section(v-if = "!Platform.is.ios && $store.state.currentCallChat.stream" )
                 q-btn.text-primary(flat round icon="remove_circle" @click="changeMiniVideoDialog")
             q-card-section.call-pending-section(v-if = '$store.state.currentCallChat.streamMap && $store.state.currentCallChat.streamMap[$store.state.currentCallChat.subjectId] && $store.state.currentCallChat.streamMap[$store.state.currentCallChat.subjectId].pending')
                 q-spinner-dots(size="2rem")
