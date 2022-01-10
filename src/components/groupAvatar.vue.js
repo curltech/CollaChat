@@ -2,7 +2,7 @@ import { peerClientService } from 'libcolla'
 
 export default {
   name: "groupAvatar",
-  props: ['group_members','unReadCount','avatar_width'],
+  props: ['group_members','unReadCount','avatar_width','bgClass'],
   data() {
     return {
       messageText: null,

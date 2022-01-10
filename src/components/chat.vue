@@ -46,7 +46,7 @@
                   q-avatar(v-if='chat.subjectType === SubjectType.CHAT')
                     img(:src="$store.state.linkmanMap[chat.subjectId].avatar ? $store.state.linkmanMap[chat.subjectId].avatar : $store.defaultActiveAvatar")
                     q-badge(v-if="IfAlertUnReadCount(chat)" color="red" floating) {{ chat.unReadCount }}
-                  groupAvatar(v-if="chat.subjectType === SubjectType.GROUP_CHAT" v-bind:group_members="$store.state.groupChatMap[chat.subjectId].groupMembers" v-bind:avatar_width="40" v-bind:unReadCount="GroupChatUnReadCount(chat)")
+                  groupAvatar(v-if="chat.subjectType === SubjectType.GROUP_CHAT" v-bind:group_members="$store.state.groupChatMap[chat.subjectId].groupMembers" v-bind:avatar_width="40" v-bind:unReadCount="GroupChatUnReadCount(chat)" v-bind:bgClass="($store.state.currentChat && chat.subjectId == $store.state.currentChat.subjectId) || chat.top === true ? (ifMobileSize || $store.state.ifMobileStyle ? 'bg-c-grey-1' : 'bg-c-grey-2') : ''")
                 q-item-section
                   q-item-label(lines="1") {{ ChatName(chat) }}
                   q-item-label(caption lines="1")

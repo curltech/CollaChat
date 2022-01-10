@@ -1,5 +1,5 @@
 <template lang="pug">
-  q-card.avatar1-card.bg-c-grey-1(flat :style="`width:${avatar_width}px;height:${avatar_width}px`")
+  q-card.avatar1-card(flat :style="`width:${avatar_width}px;height:${avatar_width}px`" :class="bgClass ? bgClass : 'bg-c-grey-1'")
     q-card-section(style="padding:0px 0px" align="center" :class="group_members && group_members.length < 5 ? '' : 'hidden'")
       q-avatar(:style="`width:${(avatar_width-2)/2}px;height:${(avatar_width-2)/2}px`" :class="group_members && group_members[3] ? '' : 'hidden'")
         img(:src="group_members && group_members[3] ? groupChatMemeberAvatar(group_members[3]) : ''")

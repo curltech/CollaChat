@@ -8,8 +8,8 @@ import { webrtcPeerPool } from 'libcolla'
 import { signalProtocol } from 'libcolla'
 import { config, myselfPeerService, peerProfileService, ClientDevice, EntityStatus, myself } from 'libcolla'
 import { logService } from 'libcolla'
-import { pounchDb } from 'libcolla'
 import { openpgp } from 'libcolla'
+import { CollaUtil } from 'libcolla'
 
 import * as CollaConstant from '@/libs/base/colla-constant'
 import pinyinUtil from '@/libs/base/colla-pinyin'
@@ -134,9 +134,11 @@ export default {
     async login(autoLogin) {
       let _that = this
       let store = _that.$store
-      while (!store.latestVersion) {
+      let loop = 0
+      while (!store.latestVersion && loop < 5) {
         console.log('sleep 100')
-        sleep(100)
+        CollaUtil.sleep(100)
+        loop++
       }
       _that.upgradeVersion('login')
       if (store.latestVersion !== store.currentVersion && store.mandatory) {
