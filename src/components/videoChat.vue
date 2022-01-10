@@ -50,17 +50,17 @@
                         .col-9
                             q-toolbar-title.media-timer-ios-group
                                 span.text-primary(ref="mediaTimer")
-                            div.scroll(style="height:16vh;width:74vw;")
+                            div.scroll(style="height:17vh;width:74vw;")
                                 q-list(flat v-if="$store.state.currentCallChat")
                                     template(v-for="(memberPeerId, index) in $store.state.currentCallChat.callMessage.content")
-                                        q-item.text-c-grey-10(clickable v-ripple @click="iosGroupVideoFocus(index)")
+                                        q-item.text-c-grey-10(clickable v-ripple @click="iosGroupVideoFocus(index)" :class="index === 0 ? 'q-pt-none' : ''")
                                             q-item-section(avatar)
                                                 q-avatar
                                                     img(:src="Avatar(memberPeerId)" style="width:35px;height:35px")
                                             q-item-section(style='text-align:left')
                                                 q-item-label(lines="1") {{ getName(memberPeerId) }}
                                             q-item-section(side style="padding-left:0px")
-                                                q-icon(name="videocam" color="primary" v-if="groupFocusNum === index && $store.state.currentCallChat.streamMap && $store.state.currentCallChat.streamMap[memberPeerId]")
+                                                q-icon(name="videocam" color="secondary" v-if="groupFocusNum === index && $store.state.currentCallChat.streamMap && $store.state.currentCallChat.streamMap[memberPeerId]")
                                                 q-icon(name="person" v-else :color="($store.state.currentCallChat.streamMap && $store.state.currentCallChat.streamMap[memberPeerId]) ? 'secondary' : 'c-grey'")
                             //q-btn.text-primary(unelevated round  style="padding-top:5px;padding-left:10px"  icon="cached" @click="iosGroupVideoFocus" v-if="$store.state.currentCallChat.stream")
                             //q-toolbar-title(align="center" class="text-c-grey-10") {{`${groupFocusNum}/${$store.state.currentCallChat.callMessage.content.length}`}}
