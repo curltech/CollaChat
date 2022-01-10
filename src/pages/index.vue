@@ -230,7 +230,7 @@ q-layout
         //q-btn(dense flat icon="close" v-close-popup)
       q-card-section(class="q-pa-lg")
         q-item-label {{$t('Please confirm to receive the migration from another mobile')}}
-      q-card-actions(align="center")
+      q-card-actions(align="around")
         q-btn.text-primary(unelevated :label="$t('Confirm')" no-caps @click="acceptMigrate")
         q-btn.text-primary(unelevated :label="$t('Cancel')" no-caps @click="closeMigrate")
   q-dialog(v-model="initBackupDialog" persistent)
@@ -253,7 +253,7 @@ q-layout
         q-item-label {{$t('Please confirm to receive the backup from your mobile')}}
       q-card-section(class="q-pb-lg")
         q-item-label(class="text-primary") {{$t('TIP: ') + $t('This function uses self-signed ssl certificate, when you first time use it, a Not secure error page will be prompted, please click Advanced button and Proceed to ... link.')}}
-      q-card-actions(align="center")
+      q-card-actions(align="around")
         q-btn.text-primary(unelevated :label="$t('Confirm')" no-caps @click="acceptBackup")
         q-btn.text-primary(unelevated :label="$t('Cancel')" no-caps @click="closeBackup('Cancel')")
   q-dialog(v-model="restoreDialog" persistent)
@@ -264,7 +264,7 @@ q-layout
         //q-btn(dense flat icon="close" v-close-popup)
       q-card-section(class="q-pa-lg")
         q-item-label {{$t('Please confirm to restore using the backup from your PC')}}
-      q-card-actions(align="center")
+      q-card-actions(align="around")
         q-btn.text-primary(unelevated :label="$t('Confirm')" no-caps @click="acceptRestore")
         q-btn.text-primary(unelevated :label="$t('Cancel')" no-caps @click="closeRestore")
 </template>
