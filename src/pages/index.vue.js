@@ -1792,8 +1792,8 @@ export default {
               console.log('post result:' + JSON.stringify(result))
               let newPayload = {}
               newPayload.type = ChatMessageType.RESTORE
-              newPayload.srcClientId = myself.myselfPeerClient.clientId
-              newPayload.srcPeerId = clientPeerId
+              newPayload.srcClientId = myselfPeerClient.clientId
+              newPayload.srcPeerId = myselfPeerClient.peerId
               newPayload.filename = store.restoreFile.name
               await chatAction.chat(null, newPayload, myselfPeerClient.peerId)
             }
