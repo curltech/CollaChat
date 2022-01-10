@@ -100,11 +100,11 @@
                                 video(:ref='`memberVideo${memberPeerId}`' autoplay = 'autoplay' style="height:92vh")
                         q-separator.c-separator-message(style="height:1px;margin-left:0px;margin-right:0px" v-if="index %2 !== 0") 
             q-card-section.mini-btn-section.group-video-mini-btn.row(v-if = "!Platform.is.ios && $store.state.currentCallChat.stream")
-                .col-2
-                    q-btn.text-primary(flat round icon="close_fullscreen" style="font-size:12px" @click="changeMiniVideoDialog")
+                //.col-2
+                q-btn.text-primary(flat round icon="close_fullscreen" style="font-size:12px" @click="changeMiniVideoDialog")
                     //q-btn(flat round color="primary" icon="fullscreen" @click="fullSize = true" v-if="!ifMobileSize && $store.state.currentCallChat && $store.state.currentCallChat.stream && $store.state.currentCallChat.stream.length > 1 && !fullSize")
                     //q-btn(flat round color="primary" icon="fullscreen_exit" @click="fullSize = false" v-if="!ifMobileSize && $store.state.currentCallChat && $store.state.currentCallChat.stream && $store.state.currentCallChat.stream.length > 1 && fullSize")
-                .col-10
+                //.col-10
             q-toolbar.group-video-toolbar.pc-group-video-toolbar
                 q-fab(color="primary" unelevated round push :icon="chatMute ?'volume_off':(audioToggle === 'speaker'?'volume_up':'hearing')" v-if = "(ifMobileSize || $store.state.ifMobileStyle) && $store.state.currentCallChat.stream && $store.state.currentCallChat.stream.length > 1 " direction="right" padding="9px")
                     q-fab-action(color="primary" @click="changeDropdownChatMute('mute')" icon="volume_off" v-if="!chatMute")
