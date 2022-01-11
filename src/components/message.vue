@@ -67,7 +67,7 @@
                       q-btn.text-primary.btnMessage(flat stack no-caps :label="$t('Destroy')" icon="alarm" :disable ='!(!ifSelfChat && $store.state.currentChat && $store.state.currentChat.subjectType === SubjectType.CHAT)' @click="destroyClock = true")
                         q-popup-edit(v-model="destroyClock" content-class="" style='width:100px')
                           q-option-group(:options="clockOptions" label="Notification" type="radio" v-model="$store.state.currentChat.destroyTime")
-                      q-btn.text-primary.btnMessage
+                      q-btn.text-primary.btnMessage(no-caps)
                         form#messageUploadForm(style="margin-top:-15px")
                           label(for="messageUpload" class="notranslate material-icons q-icon text-primary" aria-hidden="true" style="font-size: 32px;") folder
                           input#messageUpload(type="file" multiple="multiple" class="visually-hidden" @change="uploadMessageFileMobile()" accept="")
