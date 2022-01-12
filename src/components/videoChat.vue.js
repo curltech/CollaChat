@@ -42,12 +42,6 @@ export default {
         }
       }
     },
-    dialogSizeClass() {
-      let _that = this
-      let store = _that.$store
-      let styleClass = Platform.is.ios ? 'ios-linkman-video' : (_that.ifMobileSize || store.state.ifMobileStyle ? 'linkman-video' : 'linkman-video pc-video-card')
-      return styleClass
-    },
     activeStatus() {
       let _that = this
       let store = _that.$store
