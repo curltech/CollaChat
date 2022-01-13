@@ -604,16 +604,16 @@ export default {
     versionUpdate() {
       let _that = this
       let store = _that.$store
-      let iosUrl = 'https://apps.apple.com/cn/app/collachat/id1546363298'
-      let androidUrl = 'https://curltech.io/#/collachat/downloadapps'
+      let appleUrl = 'https://apps.apple.com/cn/app/collachat/id1546363298'
+      let downloadUrl = 'https://curltech.io/#/collachat/downloadapps'
       if (store.ios === true) {
-        inAppBrowserComponent.open(iosUrl, '_system', 'location=no')
+        inAppBrowserComponent.open(appleUrl, '_system', 'location=no')
       } else if (store.android === true) {
-        inAppBrowserComponent.open(androidUrl, '_system', 'location=no')
+        inAppBrowserComponent.open(downloadUrl, '_system', 'location=no')
       } else if (store.safari === true) {
-        window.open(iosUrl, '_system')
+        window.open(appleUrl, '_system')
       } else {
-        window.open(androidUrl, '_system')
+        window.open(downloadUrl, '_system')
       }
     },
     upgradeVersion(flag) {
