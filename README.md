@@ -6,6 +6,8 @@
 [![use](https://img.shields.io/badge/use-openpgp-brightgreen.svg)](https://github.com/openpgpjs/openpgpjs)
 [![use](https://img.shields.io/badge/use-pion-orange.svg)](https://github.com/pion/ion-sdk-js)
 
+Learn more at https://curltech.io/#/collachat/.
+
 # License
 Copyright 2020-2021 CURL TECH PTE. LTD.
 
