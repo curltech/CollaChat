@@ -30,6 +30,7 @@ export default {
     return {
       subKind: 'default',
       loginData: {
+        name_: null,
         countryRegion_: null,
         code_: null,
         mobile_: null,
@@ -165,6 +166,7 @@ export default {
       let loginData = {
         code: _that.loginData.code_,
         credential: _that.loginData.mobile_,
+        name: _that.loginData.name_,
         password: _that.loginData.password_
       }
       try {
@@ -297,7 +299,10 @@ export default {
       let _that = this
       let store = _that.$store
       try {
-        await myselfPeerService.importID(json)
+        let ret = await myselfPeerService.importID(json)
+        if (ret) {
+          alert(_that.$i18n.t("Same name account exists") + _that.$i18n.t(", already renamed by adding a suffix"))
+        }
         //添加自己到联系人
         let newLinkman = {}
         newLinkman.ownerPeerId = myself.myselfPeer.peerId
@@ -328,13 +333,14 @@ export default {
           _that.loginData.code_ = mobileObject.getCountryCode() + ''
           _that.loginData.mobile_ = mobileObject.getNationalNumber() + ''
           _that.loginData.countryRegion_ = _that.options[CollaConstant.countryCodeISO[_that.language].indexOf(_that.loginData.code_)]
-          _that.$q.notify({
-            message: _that.$i18n.t("Import successfully"),
-            timeout: 3000,
-            type: "info",
-            color: "info",
-          })
         }
+        _that.loginData.name_ = myself.myselfPeer.name
+        _that.$q.notify({
+          message: _that.$i18n.t("Import successfully"),
+          timeout: 3000,
+          type: "info",
+          color: "info",
+        })
       } catch (e) {
         if (e.message === 'InvalidID') {
           _that.$q.notify({
@@ -396,9 +402,9 @@ export default {
             type: "warning",
             color: "warning",
           })
-        } else if (e.message === 'AccountExists') {
+        } else if (e.message === 'SameNameAccountExists') {
           _that.$q.notify({
-            message: _that.$i18n.t("Account already exists"),
+            message: _that.$i18n.t("Same name account exists"),
             timeout: 3000,
             type: "warning",
             color: "warning",
@@ -619,7 +625,7 @@ export default {
     upgradeVersion(flag) {
       let _that = this
       let store = _that.$store
-      store.currentVersion = '1.0.0'
+      store.currentVersion = "1.0.1"
       store.mandatory = false
       if (_that.versionHistory && _that.versionHistory.length > 0) {
         let no = 1
@@ -758,7 +764,6 @@ export default {
             }
           }
           if (countryCode) {
-            
             _that.registerData.code_ = MobileNumberUtil.getCountryCodeForRegion(countryCode.toUpperCase()) + ''
             if (phoneNumber) {
               let mobile = MobileNumberUtil.formatE164(phoneNumber, countryCode.toUpperCase())
@@ -946,6 +951,9 @@ export default {
           } catch (e) {
             console.error(e)
           }
+        }
+        if (myselfPeer.name) {
+          _that.loginData.name_ = myselfPeer.name
         }
       }
       if (!_that.registerData.code_) {

@@ -42,7 +42,8 @@
               div(class="text-center text-h6") {{$t('Secure Your Collaboration')}}
             q-card-section(align="center")
               q-form(ref="frmLogin" @submit="login" class="q-pa-none")
-                q-select.c-field(style="width:280px;padding-bottom:5px" filled dense v-model="loginData.countryRegion_" :options="options" :label="$t('Country/Region')"
+                q-input.c-field(style="width:280px" filled dense clearable v-model="loginData.name_" lazy-rules :rules="[val => val && val.length > 0 || $t('Please input Name')]" :label="$t('UserName')")
+                //q-select.c-field(style="width:280px;padding-bottom:5px" filled dense v-model="loginData.countryRegion_" :options="options" :label="$t('Country/Region')"
                   clearable
                   use-input
                   hide-selected
@@ -53,7 +54,7 @@
                   template(v-slot:no-option)
                     q-item
                       q-item-section {{$t('No results')}}
-                div(style="width:280px" class="row justify-between")
+                //div(style="width:280px" class="row justify-between")
                   div(class="col-4")
                     q-input.c-field(prefix="+" filled dense clearable v-model="loginData.code_" lazy-rules :rules="[val => val && val.length > 0 || $t('Code')]")
                       //template(v-slot:prepend)
@@ -76,7 +77,11 @@
           q-card(flat class="fixed-center background-color: transparent")
             q-card-section
               q-form(ref="frmRegister" @submit="register" class="q-pa-none")
-                q-select.c-field(style="width:280px;padding-bottom:5px" filled dense v-model="registerData.countryRegion_" :options="options" :label="$t('Country/Region')"
+                q-input.c-field(style="width:280px" filled dense clearable v-model="registerData.name_" lazy-rules :rules="[val => val && val.length > 0 || $t('Please input Name')]" :label="$t('UserName')")
+                q-input.c-field(style="width:280px" type="password" filled dense clearable v-model="registerData.password_" lazy-rules :rules="[val => val && val.length > 0 || $t('Please input Password')]" :label="$t('Password')")
+                q-input.c-field(style="width:280px" type="password" filled dense clearable v-model="registerData.repeatPassword_" lazy-rules :rules="[val => val && val.length > 0 || $t('Please input RepeatPassword')]" :label="$t('RepeatPassword')")
+                q-item-label.text-primary(caption align="left") {{$t("It's recommended to attach your mobile number so that your friends can reach you easier, of cause, you may do this later in Profile, and you may switch it off at any time in Privacy-Visibility Setting.")}}
+                q-select.c-field(style="width:280px;padding-top:15px;padding-bottom:5px" filled dense v-model="registerData.countryRegion_" :options="options" :label="$t('Country/Region')"
                   clearable
                   use-input
                   hide-selected
@@ -93,10 +98,7 @@
                       //template(v-slot:prepend)
                         q-icon(name="add" size="12px")
                   div(class="col-8 q-pl-md")
-                    q-input.c-field(filled dense clearable v-model="registerData.mobile_" lazy-rules :rules="[val => val && val.length > 0 || $t('Please input Mobile')]" :label="$t('Mobile')")
-                q-input.c-field(style="width:280px" type="password" filled dense clearable v-model="registerData.password_" lazy-rules :rules="[val => val && val.length > 0 || $t('Please input Password')]" :label="$t('Password')")
-                q-input.c-field(style="width:280px" type="password" filled dense clearable v-model="registerData.repeatPassword_" lazy-rules :rules="[val => val && val.length > 0 || $t('Please input RepeatPassword')]" :label="$t('RepeatPassword')")
-                q-input.c-field(style="width:280px" filled dense clearable v-model="registerData.name_" lazy-rules :rules="[val => val && val.length > 0 || $t('Please input Name')]" :label="$t('UserName')")
+                    q-input.c-field(filled dense clearable v-model="registerData.mobile_" lazy-rules :rules="[]" :label="$t('Mobile')")
                 q-btn(style="width:280px;height:40px" type="submit" unelevated color="primary" :label="$t('Register')" no-caps)
       q-card.grad(flat v-if="subKind==='setting'" class="full-height fixed-center" :style="cardStyle")
         q-card-section

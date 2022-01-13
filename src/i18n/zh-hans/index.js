@@ -555,8 +555,11 @@ export default {
   "Login failed": "登录失败",
   "Import successfully": "导入成功",
   "Account already exists": "身份已存在",
+  "Same name account exists": "存在同名身份",
+  ", already renamed by adding a suffix": "，已通过添加后缀重命名",
   "Inconsistent passwords": "密码不一致",
   "Registration failed": "新建身份失败",
+  "It's recommended to attach your mobile number so that your friends can reach you easier, of cause, you may do this later in Profile, and you may switch it off at any time in Privacy-Visibility Setting.": "建议附上您的手机号码，以便您的朋友可以更轻松地联系到您，当然，您可以稍后在个人资料中执行此操作，并且您可以随时在隐私-可见性设置中将其关闭。",
 
   "Coming Soon...": "敬请期待...",
   "Confirm": "确认",

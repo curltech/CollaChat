@@ -554,8 +554,11 @@
   "Login failed": "ログインに失敗しました",
   "Import successfully": "正常にインポートされました",
   "Account already exists": "アイデンティティはすでに存在します",
+  "Same name account exists": "同じ名前のIDがすでに存在します",
+  ", already renamed by adding a suffix": "，接尾辞を追加して名前を変更済み",
   "Inconsistent passwords": "一貫性のないパスワード",
   "Registration failed": "新しいIDの作成に失敗しました",
+  "It's recommended to attach your mobile number so that your friends can reach you easier, of cause, you may do this later in Profile, and you may switch it off at any time in Privacy-Visibility Setting.": "友達があなたに簡単に連絡できるように、携帯電話番号を添付することをお勧めします。これは、後でプロファイルで行うことができ、プライバシー-可視性設定でいつでもオフにすることができます。",
 
   "Coming Soon...": "お楽しみに…",
   "Confirm": "確認",

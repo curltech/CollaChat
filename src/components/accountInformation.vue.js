@@ -3,6 +3,7 @@ import AlloyCrop from 'alloycrop-curltech'
 
 import { myself, myselfPeerService, peerClientService } from 'libcolla'
 import { BlobUtil, MobileNumberUtil } from 'libcolla'
+import { EntityStatus } from 'libcolla'
 
 import * as CollaConstant from '@/libs/base/colla-constant'
 import pinyinUtil from '@/libs/base/colla-pinyin'
@@ -268,63 +269,79 @@ export default {
       }
     },
     changeName: async function () {
-      this.$q.loading.show()
       let myselfPeerClient = myself.myselfPeerClient
       let myselfPeer = myself.myselfPeer
       let backupMobile = null
-      try {
-        let currentDate = new Date()
-        myselfPeerClient.name = this.name
-        myselfPeerClient.lastUpdateTime = currentDate
-        this.$store.state.myselfPeerClient = myselfPeerClient
-
-        myselfPeer.name = this.name
-        myselfPeer.updateDate = currentDate
-        myselfPeer.lastUpdateTime = currentDate
-        myselfPeer = await myselfPeerService.update(myselfPeer)
-        myself.myselfPeer = myselfPeer
-
-        // 更新对应linkman
-        let linkmanPeerId = myselfPeerClient.peerId
-        let linkman = this.$store.state.linkmanMap[linkmanPeerId]
-        linkman.name = this.name
-        linkman.pyName = pinyinUtil.getPinyin(this.name)
-        let linkmanRecord = await contactComponent.get(ContactDataType.LINKMAN, linkman._id)
-        linkmanRecord.name = linkman.name
-        linkmanRecord.pyName = linkman.pyName
-        await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
-        this.$store.state.linkmanMap[linkmanPeerId] = linkman
-
-        if (myselfPeerClient.visibilitySetting && myselfPeerClient.visibilitySetting.substring(1, 2) === 'N') {
-          backupMobile = myselfPeerClient.mobile
-          myselfPeerClient.mobile = ''
-          myselfPeer.mobile = ''
-        }
-        let result = await peerClientService.putPeerClient(null, 'Up')
-        console.log(result)
-        if (result === 'OK') {
+      if (this.name !== myselfPeer.name) {
+        let condition = { status: EntityStatus[EntityStatus.Effective] }
+        condition.name = this.name
+        let result = await myselfPeerService.findOne(condition, null, null)
+        if (result) {
           this.$q.notify({
-            message: this.$i18n.t("Change name successfully"),
-            timeout: 3000,
-            type: "info",
-            color: "info"
-          })
-        } else {
-          this.$q.notify({
-            message: this.$i18n.t("Change name failed"),
+            message: this.$i18n.t("Same name account exists"),
             timeout: 3000,
             type: "warning",
-            color: "warning"
-          })
+            color: "warning",
+          })  
+        } else {
+          try {
+            this.$q.loading.show()
+            let currentDate = new Date()
+            myselfPeerClient.name = this.name
+            myselfPeerClient.lastUpdateTime = currentDate
+            this.$store.state.myselfPeerClient = myselfPeerClient
+
+            myselfPeer.name = this.name
+            myselfPeer.updateDate = currentDate
+            myselfPeer.lastUpdateTime = currentDate
+            myselfPeer = await myselfPeerService.update(myselfPeer)
+            myself.myselfPeer = myselfPeer
+
+            // 更新对应linkman
+            let linkmanPeerId = myselfPeerClient.peerId
+            let linkman = this.$store.state.linkmanMap[linkmanPeerId]
+            linkman.name = this.name
+            linkman.pyName = pinyinUtil.getPinyin(this.name)
+            let linkmanRecord = await contactComponent.get(ContactDataType.LINKMAN, linkman._id)
+            linkmanRecord.name = linkman.name
+            linkmanRecord.pyName = linkman.pyName
+            await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
+            this.$store.state.linkmanMap[linkmanPeerId] = linkman
+
+            if (myselfPeerClient.visibilitySetting && myselfPeerClient.visibilitySetting.substring(1, 2) === 'N') {
+              backupMobile = myselfPeerClient.mobile
+              myselfPeerClient.mobile = ''
+              myselfPeer.mobile = ''
+            }
+            let result = await peerClientService.putPeerClient(null, 'Up')
+            console.log(result)
+            if (result === 'OK') {
+              this.$q.notify({
+                message: this.$i18n.t("Change name successfully"),
+                timeout: 3000,
+                type: "info",
+                color: "info"
+              })
+            } else {
+              this.$q.notify({
+                message: this.$i18n.t("Change name failed"),
+                timeout: 3000,
+                type: "warning",
+                color: "warning"
+              })
+            }
+          } catch (error) {
+            console.error(error)
+          } finally {
+            if (backupMobile && myselfPeerClient.visibilitySetting && myselfPeerClient.visibilitySetting.substring(1, 2) === 'N') {
+              myselfPeerClient.mobile = backupMobile
+              myselfPeer.mobile = backupMobile
+            }
+            this.$q.loading.hide()
+            this.subKind = 'default'
+          }
         }
-      } catch (error) {
-        console.error(error)
-      } finally {
-        if (backupMobile && myselfPeerClient.visibilitySetting && myselfPeerClient.visibilitySetting.substring(1, 2) === 'N') {
-          myselfPeerClient.mobile = backupMobile
-          myselfPeer.mobile = backupMobile
-        }
-        this.$q.loading.hide()
+      } else {
         this.subKind = 'default'
       }
     },
@@ -336,62 +353,66 @@ export default {
         console.log(e)
       }
       if (isPhoneNumberValid) {
-        this.$q.loading.show()
         let myselfPeerClient = myself.myselfPeerClient
         let myselfPeer = myself.myselfPeer
         let backupMobile = null
-        try {
-          let currentDate = new Date()
-          let mobile = MobileNumberUtil.formatE164(this.mobile_, MobileNumberUtil.getRegionCodeForCountryCode(this.code_))
-          myselfPeerClient.mobile = mobile
-          myselfPeerClient.lastUpdateTime = currentDate
-          this.$store.state.myselfPeerClient = myselfPeerClient
+        let mobile = MobileNumberUtil.formatE164(this.mobile_, MobileNumberUtil.getRegionCodeForCountryCode(this.code_))
+        if (mobile !== myselfPeer.mobile) {
+          this.$q.loading.show()
+          try {
+            let currentDate = new Date()
+            myselfPeerClient.mobile = mobile
+            myselfPeerClient.lastUpdateTime = currentDate
+            this.$store.state.myselfPeerClient = myselfPeerClient
 
-          myselfPeer.mobile = mobile
-          myselfPeer.updateDate = currentDate
-          myselfPeer.lastUpdateTime = currentDate
-          myselfPeer = await myselfPeerService.update(myselfPeer)
-          myself.myselfPeer = myselfPeer
+            myselfPeer.mobile = mobile
+            myselfPeer.updateDate = currentDate
+            myselfPeer.lastUpdateTime = currentDate
+            myselfPeer = await myselfPeerService.update(myselfPeer)
+            myself.myselfPeer = myselfPeer
 
-          // 更新对应linkman
-          let linkmanPeerId = myselfPeerClient.peerId
-          let linkman = this.$store.state.linkmanMap[linkmanPeerId]
-          linkman.mobile = mobile
-          let linkmanRecord = await contactComponent.get(ContactDataType.LINKMAN, linkman._id)
-          linkmanRecord.mobile = mobile
-          await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
-          this.$store.state.linkmanMap[linkmanPeerId] = linkman
+            // 更新对应linkman
+            let linkmanPeerId = myselfPeerClient.peerId
+            let linkman = this.$store.state.linkmanMap[linkmanPeerId]
+            linkman.mobile = mobile
+            let linkmanRecord = await contactComponent.get(ContactDataType.LINKMAN, linkman._id)
+            linkmanRecord.mobile = mobile
+            await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
+            this.$store.state.linkmanMap[linkmanPeerId] = linkman
 
-          if (myselfPeerClient.visibilitySetting && myselfPeerClient.visibilitySetting.substring(1, 2) === 'N') {
-            backupMobile = myselfPeerClient.mobile
-            myselfPeerClient.mobile = ''
-            myselfPeer.mobile = ''
+            if (myselfPeerClient.visibilitySetting && myselfPeerClient.visibilitySetting.substring(1, 2) === 'N') {
+              backupMobile = myselfPeerClient.mobile
+              myselfPeerClient.mobile = ''
+              myselfPeer.mobile = ''
+            }
+            let result = await peerClientService.putPeerClient(null, 'Up')
+            console.log(result)
+            if (result === 'OK') {
+              this.$q.notify({
+                message: this.$i18n.t("Change mobile successfully"),
+                timeout: 3000,
+                type: "info",
+                color: "info"
+              })
+            } else {
+              this.$q.notify({
+                message: this.$i18n.t("Change mobile failed"),
+                timeout: 3000,
+                type: "warning",
+                color: "warning"
+              })
+            }
+          } catch (error) {
+            console.error(error)
+          } finally {
+            if (backupMobile && myselfPeerClient.visibilitySetting && myselfPeerClient.visibilitySetting.substring(1, 2) === 'N') {
+              myselfPeerClient.mobile = backupMobile
+              myselfPeer.mobile = backupMobile
+            }
+            this.$q.loading.hide()
+            this.subKind = 'default'
           }
-          let result = await peerClientService.putPeerClient(null, 'Up')
-          console.log(result)
-          if (result === 'OK') {
-            this.$q.notify({
-              message: this.$i18n.t("Change mobile successfully"),
-              timeout: 3000,
-              type: "info",
-              color: "info"
-            })
-          } else {
-            this.$q.notify({
-              message: this.$i18n.t("Change mobile failed"),
-              timeout: 3000,
-              type: "warning",
-              color: "warning"
-            })
-          }
-        } catch (error) {
-          console.error(error)
-        } finally {
-          if (backupMobile && myselfPeerClient.visibilitySetting && myselfPeerClient.visibilitySetting.substring(1, 2) === 'N') {
-            myselfPeerClient.mobile = backupMobile
-            myselfPeer.mobile = backupMobile
-          }
-          this.$q.loading.hide()
+        } else {
           this.subKind = 'default'
         }
       } else {
