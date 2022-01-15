@@ -720,6 +720,7 @@ export default {
           fileData = localAttachs[0].content
         } else {
           message.loading = true
+          _that.$q.loading.show()
           // 指定connectPeerId以优化速度
           let connectPeerId = message.connectPeerId
           let block = await dataBlockService.findTxPayload(connectPeerId, message.attachBlockId)
@@ -754,6 +755,7 @@ export default {
             }
           }
           message.loading = false
+          _that.$q.loading.hide()
         }
         chatComponent.localFileDataMap[message.attachBlockId] = fileData
       }

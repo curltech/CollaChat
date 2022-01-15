@@ -17,7 +17,7 @@ export default {
       mediaTimer: null,
       chatMute: false,
       chatMic: true,
-      audioToggle: 'speaker',
+      audioToggle: 'earpiece',
       addStreamCount: 0,
       localCloneStream: {},
       SubjectType: SubjectType,
@@ -123,13 +123,15 @@ export default {
         if (_that.chatMute) {
           _that.changeChatMute()
         }
-        if (AudioToggle && type !== _that.audioToggle) {
-          if (_that.audioToggle === "speaker") {
+        if (window.device && (window.device.platform === 'Android' || window.device.platform === 'iOS') && AudioToggle) {
+          if (type === "earpiece") {
             _that.audioToggle = "earpiece"
             AudioToggle.setAudioMode(AudioToggle.EARPIECE)
           } else {
-            _that.audioToggle = "speaker"
-            AudioToggle.setAudioMode(AudioToggle.SPEAKER)
+            setTimeout(() => {
+              _that.audioToggle = "speaker"
+              AudioToggle.setAudioMode(AudioToggle.SPEAKER)
+            }, 1000);
           }
         }
       }
@@ -319,6 +321,7 @@ export default {
                 currentVideoDom.srcObject = localStream
               }
             }
+            //_that.changeDropdownChatMute('speaker')
           } else { // audio
             if (!store.state.currentCallChat.audio) {
               store.state.currentCallChat.audio = {}
@@ -434,6 +437,7 @@ export default {
         if (callMessage.contentType === ChatContentType.VIDEO_INVITATION) {
           let currentVideoDom = _that.$refs.currentVideo
           currentVideoDom.srcObject = localStream
+          //_that.changeDropdownChatMute('speaker')
         }
         _that.addStreamCount++
         // let webrtcPeers = webrtcPeerPool.getConnected(peerId)
@@ -515,6 +519,7 @@ export default {
               }
 
             }
+            //_that.changeDropdownChatMute('speaker')
           } else { // audio
             if (!store.state.currentCallChat.audio) {
               store.state.currentCallChat.audio = {}
@@ -609,6 +614,7 @@ export default {
             if (store.state.currentCallChat.callType === 'video') {
               let currentVideoDom = _that.$refs.currentVideo
               currentVideoDom.srcObject = localStream
+              //_that.changeDropdownChatMute('speaker')
             } else { }
           })
           let webrtcPeers = await webrtcPeerPool.get(peerId)
@@ -648,6 +654,9 @@ export default {
         })
       }
       _that.addStreamCount++
+      if (store.state.currentCallChat.callType === 'video' && store.state.currentCallChat.stream.length === 2) {//视频默认外放
+        _that.changeDropdownChatMute('speaker')
+      }
     },
     async pendingCall(peerId) {
       let _that = this

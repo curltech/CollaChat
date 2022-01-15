@@ -29,10 +29,11 @@
             q-card-section.call-pending-section(v-if = '$store.state.currentCallChat.streamMap && $store.state.currentCallChat.streamMap[$store.state.currentCallChat.subjectId] && $store.state.currentCallChat.streamMap[$store.state.currentCallChat.subjectId].pending')
                 q-spinner-dots(size="2rem")
             q-toolbar.linkman-video-toolbar.justify-center
-                q-fab(color="primary" push :icon="chatMute ?'volume_off':(audioToggle === 'speaker'?'volume_up':'hearing')" v-if = "(ifMobileSize || $store.state.ifMobileStyle) && $store.state.currentCallChat.stream" direction="right" padding="9px")
+                //q-fab(color="primary" push :icon="chatMute ?'volume_off':(audioToggle === 'speaker'?'volume_up':'hearing')" v-if = "(ifMobileSize || $store.state.ifMobileStyle) && $store.state.currentCallChat.stream" direction="right" padding="9px")
                     q-fab-action(color="primary" @click="changeDropdownChatMute('mute')" icon="volume_off" v-if="!chatMute")
                     q-fab-action(color="primary" @click="changeDropdownChatMute('speaker')" icon="volume_up" v-if="audioToggle !== 'speaker' || chatMute")
                     q-fab-action(color="primary" @click="changeDropdownChatMute('earpiece')" icon="hearing"  v-if="audioToggle !== 'earpiece' || chatMute")
+                q-btn.text-primary(v-if = "(ifMobileSize || $store.state.ifMobileStyle) && $store.state.currentCallChat.stream" unelevated round :icon="audioToggle === 'speaker'?'volume_up':'volume_off'" color='primary' @click="changeAudioToggle")
                 q-btn.text-primary(v-if = "!(ifMobileSize || $store.state.ifMobileStyle) && $store.state.currentCallChat.stream" unelevated round :icon="chatMute?'volume_off':'volume_up'" color='primary' @click="changeChatMute")
                 q-space(v-if = "$store.state.currentCallChat.stream")
                 q-btn(unelevated round color="red" icon="call_end" @click="closeCall")
@@ -95,9 +96,6 @@
                                     q-icon(size="20px" name="person" :color="$store.state.currentCallChat.streamMap && $store.state.currentCallChat.streamMap[memberPeerId] ? 'secondary' : 'c-grey'")
                             q-item-section.call-pending-section(v-if = '$store.state.currentCallChat.streamMap && $store.state.currentCallChat.streamMap[memberPeerId] && $store.state.currentCallChat.streamMap[memberPeerId].pending')
                                 q-spinner-dots(size="2rem")
-                            q-item-section(v-if="Platform.is.ios && $store.state.currentCallChat.streamMap && $store.state.currentCallChat.streamMap[memberPeerId] && $store.state.currentCallChat.streamMap[memberPeerId].focus" style="position:fixed;width:100vw;z-index:99;height:100vh;background:#FFF;left:0;")
-                                q-btn.text-primary(flat round icon="close_fullscreen" @click="iosGroupVideoFocus")
-                                video(:ref='`memberVideo${memberPeerId}`' autoplay = 'autoplay' style="height:92vh")
                         q-separator.c-separator-message(style="height:1px;margin-left:0px;margin-right:0px" v-if="index %2 !== 0") 
             q-card-section.mini-btn-section.group-video-mini-btn.row(v-if = "!Platform.is.ios && $store.state.currentCallChat.stream")
                 //.col-2
@@ -106,10 +104,11 @@
                     //q-btn(flat round color="primary" icon="fullscreen_exit" @click="fullSize = false" v-if="!ifMobileSize && $store.state.currentCallChat && $store.state.currentCallChat.stream && $store.state.currentCallChat.stream.length > 1 && fullSize")
                 //.col-10
             q-toolbar.group-video-toolbar.pc-group-video-toolbar
-                q-fab(color="primary" unelevated round push :icon="chatMute ?'volume_off':(audioToggle === 'speaker'?'volume_up':'hearing')" v-if = "(ifMobileSize || $store.state.ifMobileStyle) && $store.state.currentCallChat.stream && $store.state.currentCallChat.stream.length > 1 " direction="right" padding="9px")
+                //q-fab(color="primary" unelevated round push :icon="chatMute ?'volume_off':(audioToggle === 'speaker'?'volume_up':'hearing')" v-if = "(ifMobileSize || $store.state.ifMobileStyle) && $store.state.currentCallChat.stream && $store.state.currentCallChat.stream.length > 1 " direction="right" padding="9px")
                     q-fab-action(color="primary" @click="changeDropdownChatMute('mute')" icon="volume_off" v-if="!chatMute")
                     q-fab-action(color="primary" @click="changeDropdownChatMute('speaker')" icon="volume_up" v-if="audioToggle !== 'speaker' || chatMute")
                     q-fab-action(color="primary" @click="changeDropdownChatMute('earpiece')" icon="hearing"  v-if="audioToggle !== 'earpiece' || chatMute")
+                q-btn.text-primary(v-if = "(ifMobileSize || $store.state.ifMobileStyle) && $store.state.currentCallChat.stream" unelevated round :icon="audioToggle === 'speaker'?'volume_up':'volume_off'" color='primary' @click="changeAudioToggle")
                 q-btn.text-primary(v-if = "!(ifMobileSize || $store.state.ifMobileStyle) && $store.state.currentCallChat.stream && $store.state.currentCallChat.stream.length > 1" color="primary" unelevated round :icon="chatMute?'volume_off':'volume_up'" @click="changeChatMute")
                 q-space(v-if = "$store.state.currentCallChat.stream")
                 q-btn(unelevated round color="red" icon="call_end" v-close-popup @click="closeCall")
@@ -125,10 +124,11 @@
                 q-item-section(style="display:none")
                     span {{addStreamCount}}
             q-toolbar.single-audio-toolbar.justify-center
-                q-fab(color="primary" push :icon="chatMute ?'volume_off':(audioToggle === 'speaker'?'volume_up':'hearing')" v-if = "(ifMobileSize || $store.state.ifMobileStyle) && $store.state.currentCallChat.stream" direction="right" padding="9px")
+                //q-fab(color="primary" push :icon="chatMute ?'volume_off':(audioToggle === 'speaker'?'volume_up':'hearing')" v-if = "(ifMobileSize || $store.state.ifMobileStyle) && $store.state.currentCallChat.stream" direction="right" padding="9px")
                     q-fab-action(color="primary" @click="changeDropdownChatMute('mute')" icon="volume_off" v-if="!chatMute")
                     q-fab-action(color="primary" @click="changeDropdownChatMute('speaker')" icon="volume_up" v-if="audioToggle !== 'speaker' || chatMute")
                     q-fab-action(color="primary" @click="changeDropdownChatMute('earpiece')" icon="hearing"  v-if="audioToggle !== 'earpiece' || chatMute")
+                q-btn.text-primary(v-if = "(ifMobileSize || $store.state.ifMobileStyle) && $store.state.currentCallChat.stream" unelevated round :icon="audioToggle === 'speaker'?'volume_up':'volume_off'" color='primary' @click="changeAudioToggle")
                 q-btn.text-primary(v-if = "!(ifMobileSize || $store.state.ifMobileStyle) && $store.state.currentCallChat.stream" unelevated round :icon="chatMute?'volume_off':'volume_up'" color='primary' @click="changeChatMute")
                 q-space(v-if = "$store.state.currentCallChat.stream")
                 q-btn(unelevated round color="red" icon="call_end" v-close-popup @click="closeCall")

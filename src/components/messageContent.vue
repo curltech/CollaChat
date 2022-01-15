@@ -54,7 +54,7 @@
         p {{$t('Chat Records')}}
       q-card.personal-card(v-if="message.contentType === ChatContentType.NOTE" @click="openNoteMessage(message)")
         notePreview(v-bind:item = "message" entry = "message")
-      q-spinner-dots(size="2rem" v-if = "(message.contentType === ChatContentType.IMAGE || message.contentType === ChatContentType.VIDEO || message.contentType === ChatContentType.FILE || message.contentType === ChatContentType.NOTE) && message.loading")
+      //q-spinner-dots(size="2rem" v-if = "(message.contentType === ChatContentType.IMAGE || message.contentType === ChatContentType.VIDEO || message.contentType === ChatContentType.FILE || message.contentType === ChatContentType.NOTE) && message.loading")
       q-badge.countdown-badge( style="bottom:-4px;top:unset" v-if="message.countDown") {{message.countDown}}
       q-badge(floating v-if = "(message.contentType === ChatContentType.IMAGE || message.contentType === ChatContentType.VIDEO || message.contentType === ChatContentType.FILE || message.contentType === ChatContentType.NOTE)") {{message.fileSize}}
       q-badge(floating style="bottom:-4px;top:unset" v-if="message.destroyTime && message.senderPeerId === $store.state.myselfPeerClient.peerId")
