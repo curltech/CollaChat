@@ -69,9 +69,9 @@
                           q-option-group(:options="clockOptions" label="Notification" type="radio" v-model="$store.state.currentChat.destroyTime")
                       q-btn.text-primary.btnMessage(no-caps)
                         form#messageUploadForm(style="margin-top:-15px")
-                          label(for="messageUpload" class="notranslate material-icons q-icon text-primary" aria-hidden="true" style="font-size: 32px;") folder
+                          label(for="messageUpload" class="notranslate material-icons q-icon text-primary" aria-hidden="true") folder
                           input#messageUpload(type="file" multiple="multiple" class="visually-hidden" @change="uploadMessageFileMobile()" accept="")
-                          label(for="messageUpload" class="text-primary" style="font-size: 12px;padding-left: 4px;") {{ $t('File') }}
+                          label(for="messageUpload" class="text-primary" style="font-size: 12px;font-weight: 500;") {{ $t('File') }}
                       q-btn.text-primary.btnMessage(flat stack no-caps :label="$t('Take Photo')" icon="photo_camera" @click="capture('image')")
                       q-btn.text-primary.btnMessage(flat stack no-caps :label="$t('Take Video')" icon="camera" @click="capture('video')")
                     q-btn-group(flat spread stretch)
@@ -90,12 +90,12 @@
           q-toolbar-title(align="center" style="padding-right:54px") {{$t('Chat Details')}}
         q-list
           q-item
-            q-item-section(avatar) {{$store.state.currentChat && $store.state.linkmanMap[$store.state.currentChat.subjectId] ? ($store.state.linkmanMap[$store.state.currentChat.subjectId].givenName ? $store.state.linkmanMap[$store.state.currentChat.subjectId].givenName : $store.state.linkmanMap[$store.state.currentChat.subjectId].name) : ''}}
+            q-item-section(avatar style="justify-content: flex-end;") {{$store.state.currentChat && $store.state.linkmanMap[$store.state.currentChat.subjectId] ? ($store.state.linkmanMap[$store.state.currentChat.subjectId].givenName ? $store.state.linkmanMap[$store.state.currentChat.subjectId].givenName : $store.state.linkmanMap[$store.state.currentChat.subjectId].name) : ''}}
               q-btn(dense flat round @click="showContacts($store.state.currentChat.subjectId)")
                 q-avatar(size="56px")
                   img(:src="$store.state.currentChat && $store.state.linkmanMap[$store.state.currentChat.subjectId] ? ($store.state.linkmanMap[$store.state.currentChat.subjectId].avatar ? $store.state.linkmanMap[$store.state.currentChat.subjectId].avatar : $store.defaultActiveAvatar) : null")
               q-icon(v-if="$store.displayActiveStatus" size="16px" name="person" :color="$store.state.currentChat && $store.state.linkmanMap[$store.state.currentChat.subjectId] && $store.state.linkmanMap[$store.state.currentChat.subjectId].activeStatus === ActiveStatus.UP ? 'secondary' : 'grey-1'")
-            q-item-section(avatar)
+            q-item-section(avatar style="justify-content: flex-end;")
               q-btn.text-primary(dense flat round size="28px" icon="add" @click="showAddGroupChatAndMember")
           q-separator.c-separator(style="height:8px;margin-left:0px;margin-right:0px")
           q-item(clickable v-ripple @click="showSearchChatHistory")
@@ -142,27 +142,27 @@
           q-toolbar-title(align="center" style="padding-right:54px") {{$t('Chat Details') + ($store.state.currentChat && $store.state.groupChatMap[$store.state.currentChat.subjectId] && $store.state.groupChatMap[$store.state.currentChat.subjectId].groupMembers ? '(' + $store.state.groupChatMap[$store.state.currentChat.subjectId].groupMembers.length + ')' : '')}}
         q-list
           q-item
-            q-item-section(avatar v-for="(groupChatMember, index) in ($store.state.groupChatMap[$store.state.currentChat.subjectId] ? $store.state.groupChatMap[$store.state.currentChat.subjectId].groupMembers : [])" v-if="groupChatMember.memberType === MemberType.OWNER && groupChatMember.memberPeerId === $store.state.myselfPeerClient.peerId" :key="groupChatMember.memberPeerId") {{$store.state.myselfPeerClient.name}}
+            q-item-section(avatar style="justify-content: flex-end;" v-for="(groupChatMember, index) in ($store.state.groupChatMap[$store.state.currentChat.subjectId] ? $store.state.groupChatMap[$store.state.currentChat.subjectId].groupMembers : [])" v-if="groupChatMember.memberType === MemberType.OWNER && groupChatMember.memberPeerId === $store.state.myselfPeerClient.peerId" :key="groupChatMember.memberPeerId") {{$store.state.myselfPeerClient.name}}
               q-avatar(size="56px")
                 img(:src="$store.state.myselfPeerClient.avatar ? $store.state.myselfPeerClient.avatar : $store.defaultActiveAvatar")
               q-icon(v-if="$store.displayActiveStatus" size="16px" name="person" color="secondary")
-            q-item-section(avatar v-for="(groupChatMember, index) in ($store.state.groupChatMap[$store.state.currentChat.subjectId] ? $store.state.groupChatMap[$store.state.currentChat.subjectId].groupMembers : [])" v-if="groupChatMember.memberType === MemberType.OWNER && groupChatMember.memberPeerId !== $store.state.myselfPeerClient.peerId" :key="groupChatMember.memberPeerId") {{ groupChatMemberName(groupChatMember) }}
+            q-item-section(avatar style="justify-content: flex-end;" v-for="(groupChatMember, index) in ($store.state.groupChatMap[$store.state.currentChat.subjectId] ? $store.state.groupChatMap[$store.state.currentChat.subjectId].groupMembers : [])" v-if="groupChatMember.memberType === MemberType.OWNER && groupChatMember.memberPeerId !== $store.state.myselfPeerClient.peerId" :key="groupChatMember.memberPeerId") {{ groupChatMemberName(groupChatMember) }}
               q-btn(dense flat round @click="showContacts(groupChatMember.memberPeerId)")
                 q-avatar(size="56px")
                   img(:src="groupChatMemeberAvatar(groupChatMember)")
               q-icon(v-if="$store.displayActiveStatus" size="16px" name="person" :color="groupChatMember.memberPeerId === $store.state.myselfPeerClient.peerId || ($store.state.linkmanMap[groupChatMember.memberPeerId] && $store.state.linkmanMap[groupChatMember.memberPeerId].activeStatus === ActiveStatus.UP) ? 'secondary' : 'grey-1'")
-            q-item-section(avatar v-for="(groupChatMember, index) in ($store.state.groupChatMap[$store.state.currentChat.subjectId] ? $store.state.groupChatMap[$store.state.currentChat.subjectId].groupMembers : [])" v-if="groupChatMember.memberType !== MemberType.OWNER && groupChatMember.memberPeerId === $store.state.myselfPeerClient.peerId" :key="groupChatMember.memberPeerId") {{$store.state.myselfPeerClient.name}}
+            q-item-section(avatar style="justify-content: flex-end;" v-for="(groupChatMember, index) in ($store.state.groupChatMap[$store.state.currentChat.subjectId] ? $store.state.groupChatMap[$store.state.currentChat.subjectId].groupMembers : [])" v-if="groupChatMember.memberType !== MemberType.OWNER && groupChatMember.memberPeerId === $store.state.myselfPeerClient.peerId" :key="groupChatMember.memberPeerId") {{$store.state.myselfPeerClient.name}}
               q-avatar(size="56px")
                 img(:src="$store.state.myselfPeerClient.avatar ? $store.state.myselfPeerClient.avatar : $store.defaultActiveAvatar")
               q-icon(v-if="$store.displayActiveStatus" size="16px" name="person" color="secondary")
-            q-item-section(avatar v-for="(groupChatMember, index) in ($store.state.groupChatMap[$store.state.currentChat.subjectId] ? $store.state.groupChatMap[$store.state.currentChat.subjectId].groupMembers : [])" v-if="groupChatMember.memberType !== MemberType.OWNER && groupChatMember.memberPeerId !== $store.state.myselfPeerClient.peerId" :key="groupChatMember.memberPeerId") {{ groupChatMemberName(groupChatMember) }}
+            q-item-section(avatar style="justify-content: flex-end;" v-for="(groupChatMember, index) in ($store.state.groupChatMap[$store.state.currentChat.subjectId] ? $store.state.groupChatMap[$store.state.currentChat.subjectId].groupMembers : [])" v-if="groupChatMember.memberType !== MemberType.OWNER && groupChatMember.memberPeerId !== $store.state.myselfPeerClient.peerId" :key="groupChatMember.memberPeerId") {{ groupChatMemberName(groupChatMember) }}
               q-btn(dense flat round @click="showContacts(groupChatMember.memberPeerId)")
                 q-avatar(size="56px")
                   img(:src="groupChatMemeberAvatar(groupChatMember)")
               q-icon(v-if="$store.displayActiveStatus" size="16px" name="person" :color="$store.state.linkmanMap[groupChatMember.memberPeerId] && $store.state.linkmanMap[groupChatMember.memberPeerId].activeStatus === ActiveStatus.UP ? 'secondary' : 'grey-1'")
-            q-item-section(avatar v-if="ifIAmGroupOwner($store.state.currentChat)")
+            q-item-section(avatar style="justify-content: flex-end;" v-if="ifIAmGroupOwner($store.state.currentChat)")
               q-btn.text-primary(dense flat round size="28px" icon="add" @click="showAddGroupChatMember")
-            q-item-section(avatar v-if="ifIAmGroupOwner($store.state.currentChat)")
+            q-item-section(avatar style="justify-content: flex-end;" v-if="ifIAmGroupOwner($store.state.currentChat)")
               q-btn.text-primary(dense flat round size="28px" icon="remove" @click="showSelectGroupChatMember")
           q-separator.c-separator.message-sep-2
           q-item(clickable v-ripple @click="showOwnershipHandover")
@@ -328,7 +328,7 @@
           q-toolbar-title(align="center" :style="ifIAmGroupOwner($store.state.currentChat) ? '' : 'padding-right:54px'") {{ $t('Group File') + '(' + GroupFileFilteredList.length + ')' }}
           q-btn.text-primary(v-if="ifIAmGroupOwner($store.state.currentChat) && !(ifMobileSize || $store.state.ifMobileStyle)" flat round icon="add_circle_outline" @click="$refs.groupFileUpload.pickFiles()")
           form#groupFileUploadForm(v-if="ifIAmGroupOwner($store.state.currentChat) && (ifMobileSize || $store.state.ifMobileStyle)")
-            label(for="groupFileUpload" class="notranslate material-icons q-icon text-primary" aria-hidden="true" style="font-size: 27px;") add_circle_outline
+            label(for="groupFileUpload" class="notranslate material-icons q-icon text-primary" aria-hidden="true" style="font-size: 1.715em;") add_circle_outline
             input#groupFileUpload(type="file" class="visually-hidden" @change="uploadGroupFileMobile()")
         div.scroll.header-mar-top(id="scroll-target-default" :class="ifMobileSize || $store.state.ifMobileStyle ? (ifMobileSize ? 'scrollHeightMobileSize-editor' : 'scrollHeightMobileStyle-editor') : 'scrollHeightStyle'")
           q-toolbar(insert class="q-px-xs")
