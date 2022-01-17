@@ -3,6 +3,7 @@ import jsQR from 'jsqr'
 import jimp from 'jimp'
 import axios from 'axios'
 import https from 'https'
+
 import { CollaUtil, StringUtil, UUID } from 'libcolla'
 import { webrtcPeerPool } from 'libcolla'
 import { signalProtocol } from 'libcolla'
@@ -11,6 +12,8 @@ import { libp2pClientPool, config, peerClientService, p2pPeer, myself, myselfPee
 import { BlockType, MsgType, PayloadType, dataBlockService, DataBlockService, queryValueAction } from 'libcolla'
 import { EntityState } from 'libcolla'
 import { SecurityPayload } from 'libcolla'
+import { MobileNumberUtil } from 'libcolla'
+
 import { permissionHelper } from '@/libs/base/colla-mobile'
 import pinyinUtil from '@/libs/base/colla-pinyin'
 import * as CollaConstant from '@/libs/base/colla-constant'
@@ -23,6 +26,7 @@ import { ChatDataType, ChatContentType, ChatMessageStatus, P2pChatMessageType, S
 import { ContactDataType, RequestType, RequestStatus, LinkmanStatus, ActiveStatus, contactComponent, MemberType } from '@/libs/biz/colla-contact'
 import { channelComponent, ChannelDataType, ChannelType, EntityType } from '@/libs/biz/colla-channel'
 import { collectionUtil, blockLogComponent } from '@/libs/biz/colla-collection-util'
+
 import Chat from '@/components/chat'
 import Contacts from '@/components/contacts'
 import ReceivedList from '@/components/receivedList'
@@ -1334,10 +1338,6 @@ export default {
         if (myselfPeerClient.peerId === peerId && findType !== 'card') {
           store.state.findLinkmanResult = 1
           store.state.findLinkmanTip = _that.$i18n.t("Can't add yourself into contacts list")
-          /*_that.$q.dialog({
-            message: store.state.findLinkmanTip,
-            persistent: true
-          })*/
         } else {
           let isPeerIdValid = false
           try {
@@ -1349,7 +1349,6 @@ export default {
             let linkman = store.state.linkmanMap[peerId]
             if (linkman && linkman.status !== LinkmanStatus.REQUESTED) {
               store.state.findLinkmanResult = 2
-              //store.state.findLinkmanTip = _that.$i18n.t('The contact is already in your contacts list')
               store.state.findLinkmanTip = ''
               store.findLinkman = linkman
               store.state.currentLinkman = linkman
@@ -1377,7 +1376,7 @@ export default {
                 }
               }
               if (!receivedRequest) {
-                store.findLinkman = await peerClientService.findPeerClient(null, peerId, null)
+                store.findLinkman = await peerClientService.findPeerClient(null, peerId, null, null)
                 if (store.findLinkman && store.findLinkman.visibilitySetting && ((findType === 'qrCode' && store.findLinkman.visibilitySetting.substring(3, 4) === 'N') || (findType === 'card' && store.findLinkman.visibilitySetting.substring(4, 5) === 'N'))) {
                   store.state.findLinkmanResult = 1
                   store.state.findLinkmanTip = _that.$i18n.t('The contact is invisible')
@@ -1408,7 +1407,31 @@ export default {
             } else {
               store.findLinkmans = []
             }
-            let peerClients = await peerClientService.getPeerClient(null, null, peerId)
+            let countryCode = null
+            try {
+              countryCode = MobileNumberUtil.parse(peerId).getCountryCode()
+            } catch (e) {
+              console.log(e)
+            }
+            if (!countryCode && myselfPeerClient.mobile) {
+              let myMobileCountryCode = MobileNumberUtil.parse(myselfPeerClient.mobile).getCountryCode()
+              console.log('myMobileCountryCode:' + myMobileCountryCode)
+              countryCode = myMobileCountryCode
+            }
+            let mobile = null
+            if (countryCode) {
+              let isPhoneNumberValid = false
+              try {
+                isPhoneNumberValid = MobileNumberUtil.isPhoneNumberValid(peerId, MobileNumberUtil.getRegionCodeForCountryCode(countryCode))
+              } catch (e) {
+                console.log(e)
+              }
+              if (isPhoneNumberValid) {
+                mobile = MobileNumberUtil.formatE164(peerId, MobileNumberUtil.getRegionCodeForCountryCode(countryCode))
+                console.log('formatE164:' + mobile)
+              }
+            }
+            let peerClients = await peerClientService.getPeerClient(null, null, mobile, peerId)
             if (peerClients && peerClients.length > 0) {
               let pcMap = {}
               for (let peerClient of peerClients) {

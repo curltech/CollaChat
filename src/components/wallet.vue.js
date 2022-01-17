@@ -57,7 +57,7 @@ export default {
         let clientPeerId = myselfPeerClient.peerId
         let lastSyncTime = myselfPeerClient.lastSyncTime
         // 查询balance
-        let myselfPC = await peerClientService.findPeerClient(null, peerId, null)
+        let myselfPC = await peerClientService.findPeerClient(null, peerId, null, null)
         console.log(myselfPC)
         if (myselfPC && myselfPC.balance) {
           _that.balance = myselfPC.balance

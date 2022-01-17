@@ -4,7 +4,6 @@ import jimp from 'jimp'
 import { EntityState } from 'libcolla'
 import { myself } from 'libcolla'
 import { webrtcPeerPool } from 'libcolla'
-import { MobileNumberUtil } from 'libcolla'
 
 import pinyinUtil from '@/libs/base/colla-pinyin'
 import { statusBarComponent } from '@/libs/base/colla-cordova'
@@ -64,7 +63,7 @@ export default {
         }
       })
     },
-    validate(val) {
+    /*validate(val) {
       let _that = this
       let store = _that.$store
       let isPeerIdValid = false
@@ -104,12 +103,12 @@ export default {
         }
         return isPhoneNumberValid
       }
-    },
+    },*/
     search() {
       let _that = this
       let store = _that.$store
       let val = store.state.findLinkmanData.peerId
-      if (val && val.length > 0 && _that.validate(val)) {
+      if (val && val.length > 0) {
         store.findContactsEntry = ''
         store.findContacts(null, null)
       }

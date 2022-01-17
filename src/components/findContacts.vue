@@ -27,9 +27,9 @@
             dense,
             clearable,
             v-model="$store.state.findLinkmanData.peerId",
-            :placeholder="$t('PeerId or Mobile')",
+            :placeholder="$t('PeerId or Mobile or Name')",
             input-class="text-center",
-            lazy-rules :rules="[val => val && val.length > 0 && validate(val) || $t('Invalid PeerId or Mobile')]"
+            lazy-rules :rules="[val => val && val.length > 0 || $t('Please input PeerId or Mobile or Name')]"
           )
             template(v-slot:after)
               q-btn.text-primary(

@@ -403,7 +403,7 @@ class ContactComponent {
     if (peerContact) {
       let mobileNumber = this.formatMobile(peerContact.mobile)
       if (mobileNumber) {
-        let peerClient = await peerClientService.findPeerClient(null, null, mobileNumber)
+        let peerClient = await peerClientService.findPeerClient(null, null, mobileNumber, null)
         if (peerClient) {
           console.info('find peerclient:' + peerClient)
           peerContact.peerId = peerClient.peerId
