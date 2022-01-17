@@ -115,12 +115,12 @@
       },
       "cordova-plugin-hms-push": {},
       "cordova-plugin-xiaomi-push": {
-        "APP_KEY": "5262011854084",
-        "APP_ID": "2882303761520118084"
+        "APP_KEY": "",
+        "APP_ID": ""
       },
       "cordova-plugin-oppo-push": {
-        "APP_KEY": "ef7f033bed5347ee98222743d0247394",
-        "APP_SECRET": "b2e6ccf1ccca4f909c1c50bad1447dd3"
+        "APP_KEY": "",
+        "APP_SECRET": ""
       }
     },
     "platforms": [
