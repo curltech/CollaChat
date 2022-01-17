@@ -1,7 +1,7 @@
 {
   "name": "io.curltech.colla",
   "displayName": "Colla",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "CollaChat",
   "leadMaintainer": "hujs888 <hujs@colla.cc>",
   "contributors": [
@@ -115,12 +115,12 @@
       },
       "cordova-plugin-hms-push": {},
       "cordova-plugin-xiaomi-push": {
-        "APP_KEY": "",
-        "APP_ID": ""
+        "APP_KEY": "5262011854084",
+        "APP_ID": "2882303761520118084"
       },
       "cordova-plugin-oppo-push": {
-        "APP_KEY": "",
-        "APP_SECRET": ""
+        "APP_KEY": "ef7f033bed5347ee98222743d0247394",
+        "APP_SECRET": "b2e6ccf1ccca4f909c1c50bad1447dd3"
       }
     },
     "platforms": [
