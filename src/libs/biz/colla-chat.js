@@ -85,7 +85,6 @@
    'CHAT_SYS': 'CHAT_SYS', // 系统预定义聊天消息，如群聊动态通知
    'CHAT_LINKMAN': 'CHAT_LINKMAN', // 联系人发送聊天消息
    'CHAT_RECEIVE_RECEIPT': 'CHAT_RECEIVE_RECEIPT', // 接收回复
-   'CHAT_READ_RECEIPT': 'CHAT_READ_RECEIPT', // 已阅回复
    'CALL_CLOSE': 'CALL_CLOSE',
    'CALL_REQUEST': 'CALL_REQUEST', // 通话请求
    'RECALL':'RECALL',

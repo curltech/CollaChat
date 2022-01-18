@@ -1,7 +1,7 @@
 import { Platform } from 'quasar'
 import Vue from 'vue'
 import { myself } from 'libcolla'
-import { webrtcPeerPool } from 'libcolla'
+import { webrtcPeerPool, UUID } from 'libcolla'
 import { CollaUtil, peerClientService } from 'libcolla'
 
 import { systemAudioComponent, mediaStreamComponent } from '@/libs/base/colla-media'
@@ -321,7 +321,6 @@ export default {
                 currentVideoDom.srcObject = localStream
               }
             }
-            //_that.changeDropdownChatMute('speaker')
           } else { // audio
             if (!store.state.currentCallChat.audio) {
               store.state.currentCallChat.audio = {}
@@ -339,7 +338,8 @@ export default {
     async sendCallMessage() {
       let message = {
         content: store.state.currentCallChat.subjectType === SubjectType.CHAT ? store.state.currentCallChat.subjectId : store.state.currentCallChat.callMessage.content,
-        messageType: P2pChatMessageType.CALL_REQUEST
+        messageType: P2pChatMessageType.CALL_REQUEST,
+        meetingId: UUID.string(null, null)
       }
       if (store.state.currentCallChat.callType === 'video') {
         message.contentType = ChatContentType.VIDEO_INVITATION
@@ -457,25 +457,25 @@ export default {
     async acceptGroupCall(message) {
       let _that = this
       let store = _that.$store
-      let messages = store.state.currentChat.messages
-      let latestInvitationMessage
-      for (let i = messages.length - 1; i > -1; i--) {
-        let message_n = messages[i]
-        if (message_n.contentType === ChatContentType.AUDIO_INVITATION || message_n.contentType === ChatContentType.VIDEO_INVITATION) //if latest
-        {
-          latestInvitationMessage = message_n
-          break
-        }
-      }
-      if (latestInvitationMessage.messageId !== message.messageId) {
-        _that.$q.notify({
-          message: _that.$i18n.t('Chat already ended'),
-          timeout: 3000,
-          type: "warning",
-          color: "warning",
-        })
-        return
-      }
+      //let messages = store.state.currentChat.messages
+      // let latestInvitationMessage
+      // for (let i = messages.length - 1; i > -1; i--) {
+      //   let message_n = messages[i]
+      //   if (message_n.contentType === ChatContentType.AUDIO_INVITATION || message_n.contentType === ChatContentType.VIDEO_INVITATION) //if latest
+      //   {
+      //     latestInvitationMessage = message_n
+      //     break
+      //   }
+      // }
+      // if (latestInvitationMessage.messageId !== message.messageId) {
+      //   _that.$q.notify({
+      //     message: _that.$i18n.t('Chat already ended'),
+      //     timeout: 3000,
+      //     type: "warning",
+      //     color: "warning",
+      //   })
+      //   return
+      // }
       store.state.currentCallChat = store.state.currentChat
       store.state.currentCallChat.callMessage = message
       let options = {}
@@ -535,7 +535,8 @@ export default {
         let _message = {
           content: message.content,
           messageType: P2pChatMessageType.CALL_REQUEST,
-          contentType: ChatContentType.CALL_JOIN_REQUEST
+          contentType: ChatContentType.CALL_JOIN_REQUEST,
+          meetingId: message.meetingId
         }
         await store.sendChatMessage(store.state.currentChat, _message)
         if (Platform.is.ios) {
@@ -548,7 +549,7 @@ export default {
       let store = _that.$store
       let callChat = store.state.currentCallChat
       let senderPeerId = message.senderPeerId
-      if (callChat && callChat.subjectId === message.subjectId) {
+      if (callChat && callChat.subjectId === message.subjectId && callChat.callMessage.meetingId === message.meetingId) {
         let option = {}
         _that.localCloneStream[senderPeerId] = callChat.streamMap[callChat.ownerPeerId].stream.clone()
         option.stream = _that.localCloneStream[senderPeerId]
@@ -853,6 +854,20 @@ export default {
           }, 500)
         }
       })
+    },
+    groupVideoOnplay(event) {
+      let dom = event.target
+      let targetWidth = dom.clientWidth
+      let targetHeight = dom.clientHeight
+      if (targetWidth > targetHeight) {
+        dom.parentElement.style.height = `${dom.parentElement.clientWidth}px`
+        dom.parentElement.style.position = `relative`
+        dom.style.position = `absolute`
+        dom.style.left = '50%'
+        dom.style.marginLeft = `-${targetWidth / 2}px`
+      } else {
+        dom.parentElement.style.height = `${targetWidth}px`
+      }
     },
     canCall() {
       let _that = this

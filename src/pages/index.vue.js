@@ -104,7 +104,9 @@ export default {
       restoreFilename: null,
       logoutData: null,
       _heartbeatTimer: null,
-      _cloudSyncTimer: null
+      _cloudSyncTimer: null,
+      fabPos: [ 18, 18 ],
+      draggingFab: false
     }
   },
   computed: {
@@ -163,8 +165,8 @@ export default {
       if (ev) {
         this.draggingFab = ev.isFirst !== true && ev.isFinal !== true
         this.fabPos = [
-          this.fabPos[0] + ev.delta.x,
-          this.fabPos[1] - ev.delta.y
+          this.fabPos[0] - ev.delta.x,
+          this.fabPos[1] + ev.delta.y
         ]
       }
     },
@@ -974,12 +976,7 @@ export default {
       if (subjectType === SubjectType.CHAT && subjectId !== myselfPeerId) {
         if (store.state.linkmanMap[subjectId].activeStatus === ActiveStatus.UP) {
           message.destroyTime = chat.destroyTime
-        } else {
-          chat.destroyTime = 0
         }
-        //if(_that.ifOnlySocketConnected(subjectId)){
-        //    message.actualReceiveTime = message.createDate
-        //}
         store.p2pSend(message, subjectId)
       } else if (subjectType === SubjectType.GROUP_CHAT) {
         let groupMembers
@@ -2621,9 +2618,6 @@ export default {
           await chatComponent.update(ChatDataType.RECEIVE, receives, null)
         }
       }
-      else if (messageType === P2pChatMessageType.CHAT_READ_RECEIPT) {
-        await store.handleReadCallback(message)
-      }
       else if (messageType === P2pChatMessageType.CALL_REQUEST) {
         await _that.receiveCallRequest(message)
       }
@@ -3231,7 +3225,7 @@ export default {
         await p2pChatAction.chat(null, dataBlock, peerId)
         //socket已连接，webrtc未连接且最后连接时间超过1分钟
         let linkman = store.state.linkmanMap[peerId]
-        if (linkman && store.state.networkStatus === 'CONNECTED' && linkman.activeStatus === ActiveStatus.DOWN && (!linkman.lastWebrtcRequestTime || (linkman.lastWebrtcRequestTime && (createTimestamp - linkman.lastWebrtcRequestTime) / 1000 > 60)) && message.messageType !== P2pChatMessageType.CALL_REQUEST) {
+        if (linkman && store.state.networkStatus === 'CONNECTED' && linkman.activeStatus === ActiveStatus.DOWN && (!linkman.lastWebrtcRequestTime || (linkman.lastWebrtcRequestTime && (createTimestamp - linkman.lastWebrtcRequestTime) / 1000 > 60)) && message.messageType !== P2pChatMessageType.CALL_REQUEST && message.messageType !== P2pChatMessageType.ADD_LINKMAN_REPLY  && message.messageType !== P2pChatMessageType.ADD_LINKMAN) {
           let option = {}
           option.config = {
             "iceServers": config.appParams.iceServer[0]

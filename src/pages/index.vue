@@ -204,10 +204,10 @@ q-layout
   videoChat
   q-page-sticky.expend-video-sticky(
     position="bottom-right",
-    :offset="[18, 18]",
+     :offset="fabPos",
     v-if="$store.state.miniVideoDialog"
   )
-    q-btn(fab, icon="settings_phone", color="red", @click="changeMiniVideoDialog")
+    q-btn(fab, :disable="draggingFab", v-touch-pan.prevent.mouse="moveFab", icon="settings_phone", color="red", @click="changeMiniVideoDialog")
   q-dialog(v-model="initMigrateDialog" persistent maximized)
     q-card(flat class="fixed-center q-pa-none")
       q-bar(class="bg-primary text-c-grey-0")

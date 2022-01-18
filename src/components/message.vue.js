@@ -1461,37 +1461,6 @@ export default {
       store.state.currentChat.tempText = messageText
       _that.$refs.editor.focus()
     },
-    //已不在接收已读回执
-    async handleReadCallback(mes) {
-      let _that = this
-      let store = _that.$store
-      if (store.state.chatMap[mes.senderPeerId]) {
-        let messages = store.state.chatMap[mes.senderPeerId].messages
-        if (messages && messages.length > 0) {
-          for (let i = messages.length; i--; i > -1) {
-            let currentMes = messages[i]
-            if (currentMes.messageId === mes.messageId) {
-              currentMes.readTime = mes.readTime
-              console.log(JSON.stringify(currentMes))
-              await chatComponent.update(ChatDataType.MESSAGE, currentMes, messages)
-              console.log(JSON.stringify(currentMes))
-              //count down
-              currentMes.countDown = currentMes.destroyTime / 1000
-              let countDownInterval = setInterval(async function () {
-                if (!currentMes.countDown) {
-                  clearInterval(countDownInterval)
-                  console.log(JSON.stringify(currentMes))
-                  await chatComponent.remove(ChatDataType.MESSAGE, currentMes, messages)
-                  return
-                }
-                currentMes.countDown--
-                console.log(currentMes.countDown)
-              }, 1000)
-            }
-          }
-        }
-      }
-    },
     // group chat ///////////////////////////////////////////////////////////////////////////////////
     showModifyGroupChat() {
       let _that = this
@@ -3255,7 +3224,6 @@ export default {
   async mounted() {
     let _that = this
     let store = _that.$store
-    store.handleReadCallback = _that.handleReadCallback
     store.groupMediaSelect = _that.groupMediaSelect
     store.selectedLinkmanCard = _that.selectedLinkmanCard
     store.receiveMergeMessage = _that.receiveMergeMessage
