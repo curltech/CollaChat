@@ -3,7 +3,7 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex)
 
-function deepClone (obj) {
+function deepClone(obj) {
   var newObj = obj instanceof Array ? [] : {}
   for (var i in obj) {
     newObj[i] = (!(obj instanceof Array) && obj[i] !== null && typeof obj[i] === 'object') ? deepClone(obj[i]) : obj[i]
@@ -28,6 +28,7 @@ let stateObj = {
   includedChatRecords: [],
   // findContacts
   findContactsSubKind: 'default',
+  countryCode: null,
   findLinkmanData: {
     peerId: null,
     message: null,
@@ -44,19 +45,19 @@ let stateObj = {
   ifScan: false,
   ifMobileStyle: false,
   collectionTags: [],
-  currentCallChat:null,
-  videoDialog:false,
-  miniVideoDialog:false,
-  mergeMessageDialog:false,
-  noteMessageDialog:false,
-  noteMessageSrc:null,
-  currentMergeMessage:null,
-  imageMessageViewDialog:false,
-  imageMessageSrc:null,
-  videoRecordMessageViewDialog:false,
-  videoRecordMessageSrc:null,
-  currentPhoneContact:null,
-  currentCollection:null,
+  currentCallChat: null,
+  videoDialog: false,
+  miniVideoDialog: false,
+  mergeMessageDialog: false,
+  noteMessageDialog: false,
+  noteMessageSrc: null,
+  currentMergeMessage: null,
+  imageMessageViewDialog: false,
+  imageMessageSrc: null,
+  videoRecordMessageViewDialog: false,
+  videoRecordMessageSrc: null,
+  currentPhoneContact: null,
+  currentCollection: null,
   dbLogMap: {},
   selectedCollectionItems: [],
   channels: [],
@@ -73,13 +74,13 @@ let stateObj = {
   }
 }
 const store = new Vuex.Store({
-  state: deepClone(stateObj) ,
+  state: deepClone(stateObj),
   mutations: {
     updateObj(state, properties) {
       //properties.obj[properties.p] = properties.val
       //state.linkmans[0][properties.p] = properties.val
     },
-    resetState (state) {
+    resetState(state) {
       store.replaceState(deepClone(stateObj))
     }
   },

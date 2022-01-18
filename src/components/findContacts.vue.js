@@ -5,6 +5,7 @@ import { EntityState } from 'libcolla'
 import { myself } from 'libcolla'
 import { webrtcPeerPool } from 'libcolla'
 
+import * as CollaConstant from '@/libs/base/colla-constant'
 import pinyinUtil from '@/libs/base/colla-pinyin'
 import { statusBarComponent } from '@/libs/base/colla-cordova'
 import { systemAudioComponent, mediaComponent } from '@/libs/base/colla-media'
@@ -63,50 +64,15 @@ export default {
         }
       })
     },
-    /*validate(val) {
-      let _that = this
-      let store = _that.$store
-      let isPeerIdValid = false
-      try {
-        isPeerIdValid = PeerId.isPeerId(PeerId.createFromB58String(val))
-      } catch (e) {
-        console.log(e)
-      }
-      if (isPeerIdValid) {
-        return true
-      } else {
-        let myMobileCountryCode = MobileNumberUtil.parse(myself.myselfPeerClient.mobile).getCountryCode()
-        console.log('myMobileCountryCode:' + myMobileCountryCode)
-        let countryCode = null
-        try {
-          countryCode = MobileNumberUtil.parse(val).getCountryCode()
-        } catch (e) {
-          console.log(e)
-        }
-        if (!countryCode) {
-          countryCode = myMobileCountryCode
-        }
-        let isPhoneNumberValid = false
-        try {
-          isPhoneNumberValid = MobileNumberUtil.isPhoneNumberValid(val, MobileNumberUtil.getRegionCodeForCountryCode(countryCode))
-        } catch (e) {
-          console.log(e)
-        }
-        if (isPhoneNumberValid) {
-          let mobile = MobileNumberUtil.formatE164(val, MobileNumberUtil.getRegionCodeForCountryCode(countryCode))
-          console.log('formatE164:' + mobile)
-          if (!mobile) {
-            isPhoneNumberValid = false
-          } else {
-            store.state.findLinkmanData.peerId = mobile
-          }
-        }
-        return isPhoneNumberValid
-      }
-    },*/
+    validate(val) {
+      return val && val.length > 0 && CollaConstant.countryCodeISO['zh-hans'].indexOf(val) !== -1
+    },
     search() {
       let _that = this
       let store = _that.$store
+      if (!_that.validate(store.state.countryCode)) {
+        store.state.countryCode = store.defaultCountryCode
+      }
       let val = store.state.findLinkmanData.peerId
       if (val && val.length > 0) {
         store.findContactsEntry = ''

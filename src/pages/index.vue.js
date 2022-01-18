@@ -1407,18 +1407,8 @@ export default {
             } else {
               store.findLinkmans = []
             }
-            let countryCode = null
-            try {
-              countryCode = MobileNumberUtil.parse(peerId).getCountryCode()
-            } catch (e) {
-              console.log(e)
-            }
-            if (!countryCode && myselfPeerClient.mobile) {
-              let myMobileCountryCode = MobileNumberUtil.parse(myselfPeerClient.mobile).getCountryCode()
-              console.log('myMobileCountryCode:' + myMobileCountryCode)
-              countryCode = myMobileCountryCode
-            }
             let mobile = null
+            let countryCode = store.state.countryCode
             if (countryCode) {
               let isPhoneNumberValid = false
               try {
@@ -4756,6 +4746,16 @@ export default {
     if (!(_that.ifMobileSize || store.state.ifMobileStyle)) {
       _that.drawer = true
     }
+
+    store.defaultCountryCode = '86'
+    if (myself.myselfPeerClient.mobile) {
+      let myMobileCountryCode = MobileNumberUtil.parse(myself.myselfPeerClient.mobile).getCountryCode()
+      console.log('myMobileCountryCode:' + myMobileCountryCode)
+      if (myMobileCountryCode) {
+        store.defaultCountryCode = myMobileCountryCode
+      }
+    }
+    store.state.countryCode = store.defaultCountryCode
 
     chatAction.registReceiver('chat', _that.chatReceiver)
     p2pChatAction.registReceiver('p2pChat', _that.p2pChatReceiver)

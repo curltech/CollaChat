@@ -282,9 +282,6 @@ class ContactComponent {
     }
   }
   formatMobile(mobile) {
-    let myMobileCountryCode = MobileNumberUtil.parse(myself.myselfPeerClient.mobile).getCountryCode()
-    console.log('myMobileCountryCode:' + myMobileCountryCode)
-
     let countryCode = null
     try {
       countryCode = MobileNumberUtil.parse(mobile).getCountryCode()
@@ -292,17 +289,23 @@ class ContactComponent {
       console.log(e)
     }
     if (!countryCode) {
-      countryCode = myMobileCountryCode
+      let myMobileCountryCode = MobileNumberUtil.parse(myself.myselfPeerClient.mobile).getCountryCode()
+      console.log('myMobileCountryCode:' + myMobileCountryCode)
+      if (myMobileCountryCode) {
+        countryCode = myMobileCountryCode
+      }
     }
-    let isPhoneNumberValid = false
-    try {
-      isPhoneNumberValid = MobileNumberUtil.isPhoneNumberValid(mobile, MobileNumberUtil.getRegionCodeForCountryCode(countryCode))
-    } catch (e) {
-      console.log(e)
-    }
-    if (isPhoneNumberValid) {
-      mobile = MobileNumberUtil.formatE164(mobile, MobileNumberUtil.getRegionCodeForCountryCode(countryCode))
-      console.log('formatE164:' + mobile)
+    if (countryCode) {
+      let isPhoneNumberValid = false
+      try {
+        isPhoneNumberValid = MobileNumberUtil.isPhoneNumberValid(mobile, MobileNumberUtil.getRegionCodeForCountryCode(countryCode))
+      } catch (e) {
+        console.log(e)
+      }
+      if (isPhoneNumberValid) {
+        mobile = MobileNumberUtil.formatE164(mobile, MobileNumberUtil.getRegionCodeForCountryCode(countryCode))
+        console.log('formatE164:' + mobile)
+      }
     }
 
     return mobile

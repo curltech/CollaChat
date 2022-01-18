@@ -20,25 +20,29 @@
           :style="ifMobileSize || $store.state.ifMobileStyle ? 'padding-right:54px' : ''"
         ) {{ $t('Find Contacts') }}
       q-toolbar(insert)
-        q-form(@submit="search" style="width: 100%")
-          q-input.c-field(
-            autofocus,
-            filled,
-            dense,
-            clearable,
-            v-model="$store.state.findLinkmanData.peerId",
-            :placeholder="$t('PeerId or Mobile or Name')",
-            input-class="text-center",
-            lazy-rules :rules="[val => val && val.length > 0 || $t('Please input PeerId or Mobile or Name')]"
-          )
-            template(v-slot:after)
-              q-btn.text-primary(
-                flat,
-                round,
+        div(class="row justify-between")
+          div(class="col-3")
+            q-input.c-field(prefix="+" filled dense clearable v-model="$store.state.countryCode" :placeholder="$t('Code')" input-class="text-center" lazy-rules :rules="[val => validate(val) || $t('Invalid')]")
+          div(class="col-9 q-pl-xs")
+            q-form(@submit="search" style="width: 100%")
+              q-input.c-field(
+                autofocus,
+                filled,
                 dense,
-                icon="search",
-                @click="search"
+                clearable,
+                v-model="$store.state.findLinkmanData.peerId",
+                :placeholder="$t('PeerId/Mobile/Name')",
+                input-class="text-center",
+                lazy-rules :rules="[val => val && val.length > 0 || $t('Please input PeerId/Mobile/Name')]"
               )
+                template(v-slot:after)
+                  q-btn.text-primary(
+                    flat,
+                    round,
+                    dense,
+                    icon="search",
+                    @click="search"
+                  )
       q-list
         q-item(
           v-if="$store.state.findLinkmanData.peerId && $store.state.findLinkmanResult === 1",
