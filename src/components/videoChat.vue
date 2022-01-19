@@ -101,7 +101,7 @@
                     //q-btn(flat round color="primary" icon="fullscreen_exit" @click="fullSize = false" v-if="!ifMobileSize && $store.state.currentCallChat && $store.state.currentCallChat.stream && $store.state.currentCallChat.stream.length > 1 && fullSize")
                 //.col-10
             q-toolbar.group-video-toolbar.pc-group-video-toolbar
-                q-btn.text-primary(v-if = "(ifMobileSize || $store.state.ifMobileStyle) && $store.state.currentCallChat.stream" unelevated round :icon="audioToggle === 'speaker'?'volume_up':'volume_off'" color='primary' @click="changeAudioToggle")
+                q-btn.text-primary(v-if = "(ifMobileSize || $store.state.ifMobileStyle) && $store.state.currentCallChat.stream && $store.state.currentCallChat.stream.length > 1" unelevated round :icon="audioToggle === 'speaker'?'volume_up':'volume_off'" color='primary' @click="changeAudioToggle")
                 q-btn.text-primary(v-if = "!(ifMobileSize || $store.state.ifMobileStyle) && $store.state.currentCallChat.stream && $store.state.currentCallChat.stream.length > 1" color="primary" unelevated round :icon="chatMute?'volume_off':'volume_up'" @click="changeChatMute")
                 q-space(v-if = "$store.state.currentCallChat.stream")
                 q-btn(unelevated round color="red" icon="call_end" v-close-popup @click="closeCall")
