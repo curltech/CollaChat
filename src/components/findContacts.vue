@@ -20,11 +20,11 @@
           :style="ifMobileSize || $store.state.ifMobileStyle ? 'padding-right:54px' : ''"
         ) {{ $t('Find Contacts') }}
       q-toolbar(insert)
-        div(class="row justify-between")
+        div(class="row justify-between" style="width: 100%")
           div(class="col-3")
             q-input.c-field(prefix="+" filled dense clearable v-model="$store.state.countryCode" :placeholder="$t('Code')" input-class="text-center" lazy-rules :rules="[val => validate(val) || $t('Invalid')]")
           div(class="col-9 q-pl-xs")
-            q-form(@submit="search" style="width: 100%")
+            q-form(@submit="search")
               q-input.c-field(
                 autofocus,
                 filled,
