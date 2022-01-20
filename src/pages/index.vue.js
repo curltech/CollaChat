@@ -674,7 +674,7 @@ export default {
             option.stream.getAudioTracks()[0].enable = true
             store.state.currentCallChat.streamMap[linkman.peerId].pending = false
             console.log('index.vue -add stream')
-            webrtcPeerPool.create(linkman.peerId, option)
+            await webrtcPeerPool.create(linkman.peerId, option)
             linkman.lastWebrtcRequestTime = new Date().getTime()
           }
 
@@ -977,7 +977,7 @@ export default {
         if (store.state.linkmanMap[subjectId].activeStatus === ActiveStatus.UP) {
           message.destroyTime = chat.destroyTime
         }
-        store.p2pSend(message, subjectId)
+        await store.p2pSend(message, subjectId)
       } else if (subjectType === SubjectType.GROUP_CHAT) {
         let groupMembers
         if (message.contentType === ChatContentType.VIDEO_INVITATION || message.contentType === ChatContentType.AUDIO_INVITATION || message.messageType === P2pChatMessageType.CALL_CLOSE) {
@@ -988,7 +988,7 @@ export default {
         for (let groupMember of groupMembers) {
           let linkman = store.state.linkmanMap[groupMember.memberPeerId ? groupMember.memberPeerId : groupMember]
           if (!linkman || linkman.peerId !== linkman.ownerPeerId) { // 自己除外
-            store.p2pSend(message, groupMember.memberPeerId ? groupMember.memberPeerId : groupMember)
+            await store.p2pSend(message, groupMember.memberPeerId ? groupMember.memberPeerId : groupMember)
             let receive = {
               ownerPeerId: message.ownerPeerId,
               subjectType: message.subjectType,
@@ -1982,17 +1982,19 @@ export default {
         // 重复消息不处理、但仍发送Receive收条
         let _id = content._id
         let currentTime = new Date()
-        let duplicated = false
+        let groupChat = store.state.groupChatMap[content.groupId]
+        /*let duplicated = false
         for (let groupChat of store.state.groupChats) {
           if (groupChat._id === _id + myselfPeerClient.peerId) {
             duplicated = true
             break
           }
         }
-        if (!duplicated) {
+        if (!duplicated) {*/
+        if (!groupChat) {
           // 新增群组
           let groupChat = {}
-          groupChat._id = _id + myselfPeerClient.peerId // 标识重复消息
+          //groupChat._id = _id + myselfPeerClient.peerId // 标识重复消息
           groupChat.ownerPeerId = myselfPeerClient.peerId
           groupChat.groupId = content.groupId
           groupChat.groupCategory = 'Chat'
@@ -2055,6 +2057,7 @@ export default {
           store.state.groupChats.unshift(groupChat)
           store.state.groupChatMap[groupChat.groupId] = groupChat
           let chatMessage = {
+            _id: _id + ,
             messageType: P2pChatMessageType.CHAT_SYS,
             contentType: ChatContentType.EVENT,
             content: inviterName + _that.$i18n.t(" has invited ") + _that.$i18n.t("you") + (groupMemberNames ? _that.$i18n.t(" and ") + groupMemberNames : '') + (includeNonContacts ? _that.$i18n.t(" and ") + _that.$i18n.t("other NonContacts") : '') + _that.$i18n.t(" to join group chat")
@@ -2078,13 +2081,12 @@ export default {
         let _id = content._id
         let currentTime = new Date()
         let groupChat = store.state.groupChatMap[content.groupId]
-        let nameChanged = false
-        let descriptionChanged = false
-        let aliasChanged = false
-        let recallTimeLimitChanged = false
-        let recallAlertChanged = false
         if (groupChat) {
           // 修改群组
+          let nameChanged = false
+          let descriptionChanged = false
+          let recallTimeLimitChanged = false
+          let recallAlertChanged = false
           if (groupChat.name !== content.groupName) {
             nameChanged = true
             groupChat.name = content.groupName
@@ -2117,6 +2119,7 @@ export default {
           }
 
           // 修改发送人在本群的昵称
+          let aliasChanged = false
           let senderGroupMember
           let groupMembers = groupChat.groupMembers
           for (let groupMember of groupMembers) {
@@ -2144,11 +2147,10 @@ export default {
         if (senderLinkman) {
           modifierName = senderLinkman.givenName ? senderLinkman.givenName : senderLinkman.name
         }
-        let _content = ``
+        let _content = ''
         if (modifierName && (nameChanged || descriptionChanged)) {
           _content = modifierName + _that.$i18n.t(" has modified ") + (nameChanged ? (descriptionChanged ? _that.$i18n.t("Group Name to be : ") + groupChat.name + _that.$i18n.t(",") + _that.$i18n.t(" modified ")
             + _that.$i18n.t("Group Description to be : ") + groupChat.description : _that.$i18n.t("Group Name to be : ") + groupChat.name) : _that.$i18n.t("Group Description to be : ") + groupChat.description)
-
         } else if (modifierName && (recallTimeLimitChanged || recallAlertChanged)) {
           let _type
           let value
@@ -2165,6 +2167,7 @@ export default {
         if (_content) {
           let chat = await store.getChat(groupChat.groupId)
           let chatMessage = {
+            _id: _id + peerId,
             messageType: P2pChatMessageType.CHAT_SYS,
             contentType: ChatContentType.EVENT,
             content: _content
@@ -2188,21 +2191,21 @@ export default {
         // 重复消息不处理、但仍发送Receive收条
         let _id = content._id
         let currentTime = new Date()
-        let duplicated = false
+        /*let duplicated = false
         for (let groupChat of store.state.groupChats) {
           if (groupChat._id === _id + myselfPeerClient.peerId) {
             duplicated = true
             break
           }
         }
-        if (!duplicated) {
+        if (!duplicated) {*/
           let groupChat = store.state.groupChatMap[content.groupId]
           let newCreated = false
           // 新增群组（对于新增群组成员群组还不存在）
           if (!groupChat) {
             newCreated = true
             groupChat = {}
-            groupChat._id = _id + myselfPeerClient.peerId // 标识重复消息
+            //groupChat._id = _id + myselfPeerClient.peerId // 标识重复消息
             groupChat.ownerPeerId = myselfPeerClient.peerId
             groupChat.groupId = content.groupId
             groupChat.groupCategory = 'Chat'
@@ -2223,16 +2226,27 @@ export default {
 
           // 新增群组成员（对于新增群组成员为全量，否则为增量）
           let gms = groupChat.groupMembers
-          let groupOwnerPeerId
           if (!gms) {
             gms = []
           }
-          let inviterName
+          let groupOwnerPeerId
+          let inviterName = ''
           let addedGroupMemberNames
           let includeNonContacts = false
           for (let gm of content.data) {
             let linkman = store.state.linkmanMap[gm.memberPeerId]
-            if ((!newCreated && gm.dirtyFlag === 'NEW') || newCreated) {
+            let notExists = true
+            if (!newCreated) {
+              let existingGms = await contactComponent.loadGroupMember({
+                ownerPeerId: myselfPeerClient.peerId,
+                groupId: content.groupId,
+                memberPeerId: gm.memberPeerId
+              })
+              if (existingGms && existingGms.length > 0) {
+                notExists = false
+              }
+            }
+            if (notExists) {
               let groupMember = {}
               groupMember.ownerPeerId = myselfPeerClient.peerId
               groupMember.groupId = content.groupId
@@ -2277,6 +2291,7 @@ export default {
 
           let chat = await store.getChat(groupChat.groupId)
           let chatMessage = {
+            _id: _id + peerId,
             messageType: P2pChatMessageType.CHAT_SYS,
             contentType: ChatContentType.EVENT,
             content: newCreated ?
@@ -2285,7 +2300,8 @@ export default {
               inviterName + _that.$i18n.t(" has invited ") + (addedGroupMemberNames ? addedGroupMemberNames : '') + (includeNonContacts ? (addedGroupMemberNames ? _that.$i18n.t(" and ") : '') + _that.$i18n.t("other NonContacts") : '') + _that.$i18n.t(" to join group chat")
           }
           await store.addCHATSYSMessage(chat, chatMessage)
-        }
+        /*}*/
+
         // 发送Receive收条
         let linkmanRequest = {}
         linkmanRequest._id = _id
@@ -2364,6 +2380,7 @@ export default {
 
             let chat = await store.getChat(groupChat.groupId)
             let chatMessage = {
+              _id: _id + peerId,
               messageType: P2pChatMessageType.CHAT_SYS,
               contentType: ChatContentType.EVENT,
               content: inviterName + _that.$i18n.t(" has removed ") + _that.$i18n.t("you") + _that.$i18n.t(" from group chat")
@@ -2427,6 +2444,7 @@ export default {
 
             let chat = await store.getChat(groupChat.groupId)
             let chatMessage = {
+              _id: _id + peerId,
               messageType: P2pChatMessageType.CHAT_SYS,
               contentType: ChatContentType.EVENT,
               content: fromGroupOwner ?
@@ -2496,6 +2514,7 @@ export default {
         }
         let chat = await store.getChat(groupChat.groupId)
         let chatMessage = {
+          _id: _id + peerId,
           messageType: P2pChatMessageType.CHAT_SYS,
           contentType: ChatContentType.EVENT,
           content: newOwner.memberPeerId === myselfPeerClient.peerId ? _that.$i18n.t("You") + _that.$i18n.t(" have become the new Group Owner") : newOwnerName + _that.$i18n.t(" has become the new Group Owner")
@@ -2704,6 +2723,7 @@ export default {
           }*/
         }
         let newPayload = {}
+        newPayload._id = _id
         newPayload.srcClientId = myselfPeerClient.clientId
         newPayload.srcPeerId = clientPeerId
         if (linkman && linkman.status !== LinkmanStatus.REQUESTED) {
@@ -2752,6 +2772,7 @@ export default {
         }
       } else if (messageType === P2pChatMessageType.ADD_LINKMAN_REPLY && content) {
         let data = content
+        let _id = data._id
         let srcPeerId = data.srcPeerId
         let clientPeerId = myselfPeerClient.peerId
         let linkman = store.state.linkmanMap[srcPeerId]
@@ -2896,12 +2917,13 @@ export default {
               }
               await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
             }
-            //webrtcPeerPool.create(srcPeerId)
+            //await webrtcPeerPool.create(srcPeerId)
             let chat = store.state.chatMap[srcPeerId]
             if (!chat) { // 尚未创建对应聊天时才需要执行
               chat = await store.getChat(srcPeerId)
             }
             let chatMessage = {
+              _id: _id + peerId,
               messageType: P2pChatMessageType.CHAT_SYS,
               contentType: ChatContentType.EVENT,
               content: (linkman.givenName ? linkman.givenName : linkman.name) + _that.$i18n.t(" has accepted ") + _that.$i18n.t("you") + _that.$i18n.t(", you can chat now")
@@ -3170,23 +3192,24 @@ export default {
         let blockId = UUID.string(null, null)
         let store = _that.$store
         if (store.state.networkStatus !== 'CONNECTED') {
-          _that.$q.notify({
-            message: _that.$i18n.t('CONNECTING'),
-            timeout: 3000,
-            type: "info",
-            color: "info",
-          })
+          if (store.displayActiveStatus) {
+            _that.$q.notify({
+              message: _that.$i18n.t('CONNECTING'),
+              timeout: 3000,
+              type: "info",
+              color: "info",
+            })
+          }
           return
         }
         if (message.subjectType === SubjectType.CHAT) {
-          let currentMes
           let messages = await chatComponent.loadMessage(
             {
               ownerPeerId: message.ownerPeerId,
               messageId: message.messageId
             })
           if (messages && messages.length > 0) {
-            currentMes = messages[0]
+            let currentMes = messages[0]
             currentMes.blockId = blockId
             await chatComponent.update(ChatDataType.MESSAGE, currentMes, null)
           }
@@ -3222,17 +3245,25 @@ export default {
         }
         dataBlock = dataBlocks[0]
         dataBlock.payload = messageString // for webrtc send
-        await p2pChatAction.chat(null, dataBlock, peerId)
-        //socket已连接，webrtc未连接且最后连接时间超过1分钟
+        // socket已连接，webrtc未连接且最后连接时间超过1分钟
         let linkman = store.state.linkmanMap[peerId]
-        if (linkman && store.state.networkStatus === 'CONNECTED' && linkman.activeStatus === ActiveStatus.DOWN && (!linkman.lastWebrtcRequestTime || (linkman.lastWebrtcRequestTime && (createTimestamp - linkman.lastWebrtcRequestTime) / 1000 > 60)) && message.messageType !== P2pChatMessageType.CALL_REQUEST && message.messageType !== P2pChatMessageType.ADD_LINKMAN_REPLY  && message.messageType !== P2pChatMessageType.ADD_LINKMAN) {
+        if (linkman && store.state.networkStatus === 'CONNECTED' && linkman.activeStatus === ActiveStatus.DOWN
+          && (!linkman.lastWebrtcRequestTime || (linkman.lastWebrtcRequestTime && (createTimestamp - linkman.lastWebrtcRequestTime) / 1000 > 60))
+          && message.messageType !== P2pChatMessageType.CALL_REQUEST
+          && message.messageType !== P2pChatMessageType.ADD_LINKMAN
+          && message.messageType !== P2pChatMessageType.ADD_LINKMAN_REPLY
+          && message.messageType !== P2pChatMessageType.DROP_LINKMAN
+          && message.messageType !== P2pChatMessageType.DROP_LINKMAN_RECEIPT
+          && message.messageType !== P2pChatMessageType.BLACK_LINKMAN
+          && message.messageType !== P2pChatMessageType.BLACK_LINKMAN_RECEIPT) {
           let option = {}
           option.config = {
             "iceServers": config.appParams.iceServer[0]
           }
-          webrtcPeerPool.create(linkman.peerId, option)
+          await webrtcPeerPool.create(linkman.peerId, option)
           linkman.lastWebrtcRequestTime = createTimestamp
         }
+        await p2pChatAction.chat(null, dataBlock, peerId)
       } catch (e) {
         await logService.log(e, 'p2pSendError', 'error')
       }

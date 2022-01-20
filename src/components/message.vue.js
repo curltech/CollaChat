@@ -2331,7 +2331,7 @@ export default {
           groupChat.recallTimeLimit = value
           groupChatRecord.recallTimeLimit = value
           await contactComponent.update(ContactDataType.GROUP, groupChatRecord)
-          _that.sendGroupInfo()
+          await _that.sendGroupInfo()
         }
 
         let _type = _that.$i18n.t("Recall Time Limit")
@@ -2369,7 +2369,7 @@ export default {
           groupChat.recallAlert = value
           groupChatRecord.recallAlert = value
           await contactComponent.update(ContactDataType.GROUP, groupChatRecord)
-          _that.sendGroupInfo()
+          await _that.sendGroupInfo()
 
           let _type = _that.$i18n.t("Recall Alert")
           let _content = `${store.state.myselfPeerClient.name}${(value ? _that.$i18n.t("Add") : _that.$i18n.t("Cancel"))}${_type}`

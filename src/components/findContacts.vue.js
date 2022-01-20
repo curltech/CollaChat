@@ -228,23 +228,24 @@ export default {
         }
       )
       if (linkmanRequests && linkmanRequests.length > 0) {
-        for (let linkmanRequest of linkmanRequests) {
-          linkmanRequest.status = RequestStatus.ACCEPTED
-          linkmanRequest.statusDate = currentTime
+        for (let lr of linkmanRequests) {
+          lr.status = RequestStatus.ACCEPTED
+          lr.statusDate = currentTime
         }
         await contactComponent.update(ContactDataType.LINKMAN_REQUEST, linkmanRequests, null)
       }
       for (let linkmanRequest of store.state.linkmanRequests) {
-        if (linkmanRequest.receiverPeerId === myselfPeerClient.peerId
-          && linkmanRequest.senderPeerId === peerId
-          && linkmanRequest.status === RequestStatus.RECEIVED
-          && linkmanRequest.requestType === RequestType.ADD_LINKMAN) {
-          linkmanRequest.status = RequestStatus.ACCEPTED
-          linkmanRequest.statusDate = currentTime
+        if (lr.receiverPeerId === myselfPeerClient.peerId
+          && lr.senderPeerId === peerId
+          && lr.status === RequestStatus.RECEIVED
+          && lr.requestType === RequestType.ADD_LINKMAN) {
+          lr.status = RequestStatus.ACCEPTED
+          lr.statusDate = currentTime
         }
       }
 
       let payload = {}
+      payload._id = linkmanRequest._id
       payload.srcClientId = myselfPeerClient.clientId
       payload.srcPeerId = myselfPeerClient.peerId
       payload.acceptTime = currentTime
@@ -253,7 +254,7 @@ export default {
         content: payload
       }
       await store.p2pSend(message, peerId)
-      //webrtcPeerPool.create(peerId)
+      //await webrtcPeerPool.create(peerId)
       _that.$q.notify({
         message: _that.$i18n.t("Accept contacts request and add contacts successfully"),
         timeout: 3000,

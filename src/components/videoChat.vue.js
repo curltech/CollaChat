@@ -450,7 +450,7 @@ export default {
         let option = {}
         _that.localCloneStream[peerId] = localStream.clone()
         option.stream = _that.localCloneStream[peerId]
-        webrtcPeerPool.create(peerId, option)
+        await webrtcPeerPool.create(peerId, option)
         //}
       })
     },
@@ -553,7 +553,7 @@ export default {
         let option = {}
         _that.localCloneStream[senderPeerId] = callChat.streamMap[callChat.ownerPeerId].stream.clone()
         option.stream = _that.localCloneStream[senderPeerId]
-        webrtcPeerPool.create(senderPeerId, option)
+        await webrtcPeerPool.create(senderPeerId, option)
         if (callChat.callMessage.hasAddStream) {
           callChat.callMessage.hasAddStream[senderPeerId] = senderPeerId
         } else {
