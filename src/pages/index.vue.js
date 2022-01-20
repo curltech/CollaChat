@@ -2061,7 +2061,7 @@ export default {
           store.state.groupChats.unshift(groupChat)
           store.state.groupChatMap[groupChat.groupId] = groupChat
           let chatMessage = {
-            _id: _id + ,
+            _id: _id + peerId,
             messageType: P2pChatMessageType.CHAT_SYS,
             contentType: ChatContentType.EVENT,
             content: inviterName + _that.$i18n.t(" has invited ") + _that.$i18n.t("you") + (groupMemberNames ? _that.$i18n.t(" and ") + groupMemberNames : '') + (includeNonContacts ? _that.$i18n.t(" and ") + _that.$i18n.t("other NonContacts") : '') + _that.$i18n.t(" to join group chat")
