@@ -1061,9 +1061,11 @@ export default {
     async addCHATSYSMessage(chat, message) { // message必填属性：messageType, contentType, content
       let _that = this
       let store = _that.$store
-      let msg = await chatComponent.get(ChatDataType.MESSAGE, message._id)
-      if (msg) {
-        return
+      if(message._id){
+        let msg = await chatComponent.get(ChatDataType.MESSAGE, message._id)
+        if (msg) {
+          return
+        }
       }
       let myselfPeerId = myself.myselfPeerClient.peerId
       // chat属性
