@@ -9,14 +9,14 @@
                     q-toolbar-title.ios-single-video-media-timer(v-if="$store.state.currentCallChat && $store.state.currentCallChat.stream" align="center" style="line-height:20vh;")
                         span.text-primary(ref="mediaTimer")
                 .col-3
-                    video(ref='zoomVideo' autoplay='autoplay' style="float:right;height:20vh;")
+                    video(ref='zoomVideo' autoplay='autoplay' style="float:right;height:20vh;width:auto;max-width:100%;")
             q-card-section.row.zoom-video-section(@click="zoomVideoChange" v-if="!Platform.is.ios" v-show = "$store.state.currentCallChat && $store.state.currentCallChat.stream")
                 video(ref='zoomVideo' autoplay='autoplay')
-            q-card-section.current-video-section.current-video-section-ios(v-show ="$store.state.currentCallChat.stream")
+            q-card-section.current-video-section(:class="Platform.is.ios?'current-video-section-ios':''" v-show ="$store.state.currentCallChat.stream")
                 q-item(style="display:none")
                     q-item-section
                         span {{addStreamCount}}
-                video(ref='currentVideo' autoplay = 'autoplay')
+                video(ref='currentVideo' autoplay = 'autoplay' style='width:auto;max-width:100%;')
             q-card-section.linkman-video-section(v-if="$store.state.currentCallChat && $store.state.currentCallChat.stream && $store.state.currentCallChat.stream.length === 1")
                 q-item
                     q-item-section(avatar)
@@ -62,7 +62,7 @@
                             //q-btn.text-primary(unelevated round  style="padding-top:5px;padding-left:10px"  icon="cached" @click="iosGroupVideoFocus" v-if="$store.state.currentCallChat.stream")
                             //q-toolbar-title(align="center" class="text-c-grey-10") {{`${groupFocusNum}/${$store.state.currentCallChat.callMessage.content.length}`}}
                         .col-3
-                            video(ref='zoomVideo' autoplay='autoplay' style="float:right;height:20vh")
+                            video(ref='zoomVideo' autoplay='autoplay' style="float:right;height:20vh;width:auto;max-width:100%;")
                     q-card-section.current-video-section.current-video-section-ios(v-show ="$store.state.currentCallChat.stream")
                         q-list.row.group-video-list(flat v-if="$store.state.currentCallChat && $store.state.currentCallChat.stream")
                             template(v-for="(memberPeerId, index) in $store.state.currentCallChat.callMessage.content")
@@ -74,8 +74,8 @@
                                     q-item-section(v-if="$store.state.currentCallChat.streamMap && !$store.state.currentCallChat.streamMap[memberPeerId]" )
                                         q-avatar(style = 'width:50vw;height:auto;padding-top:30px;margin-left:25vw' align='center')
                                             img(:src="($store.state.linkmanMap[memberPeerId] && $store.state.linkmanMap[memberPeerId].avatar) ? $store.state.linkmanMap[memberPeerId].avatar : $store.defaultActiveAvatar")
-                                    q-item-section(style='margin:0;padding:0;width:100%' v-if="$store.state.currentCallChat.streamMap && $store.state.currentCallChat.streamMap[memberPeerId]")
-                                        video(:ref='`memberVideo${memberPeerId}`' autoplay = 'autoplay')
+                                    q-item-section(style='margin:0;padding:0;width:100%;text-align:center;' v-if="$store.state.currentCallChat.streamMap && $store.state.currentCallChat.streamMap[memberPeerId]")
+                                        video(:ref='`memberVideo${memberPeerId}`' autoplay = 'autoplay' style="width:auto;display:inline-block;max-width:100%;")
                 q-list.scroll.row.group-video-list(style="height:80vh" v-if="(!Platform.is.ios || Platform.is.ios && $store.state.currentCallChat.callType == 'audio')  && $store.state.currentCallChat && $store.state.currentCallChat.stream")
                     template(v-for="(memberPeerId, index) in $store.state.currentCallChat.callMessage.content")
                         q-item.group-video-item(:class="fullSize?'col-3':'col-6'")

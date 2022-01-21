@@ -234,7 +234,7 @@ export default {
         }
         await contactComponent.update(ContactDataType.LINKMAN_REQUEST, linkmanRequests, null)
       }
-      for (let linkmanRequest of store.state.linkmanRequests) {
+      for (let lr of store.state.linkmanRequests) {
         if (lr.receiverPeerId === myselfPeerClient.peerId
           && lr.senderPeerId === peerId
           && lr.status === RequestStatus.RECEIVED
