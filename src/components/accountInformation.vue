@@ -133,7 +133,7 @@
             div(class="col-4")
               q-input.c-field(:label="$t('Code')" prefix="+" filled clearable v-model="code_" lazy-rules :rules="[val => val && val.length > 0 || $t('Code')]")
             div(class="col-8 q-pl-xs")
-              q-input.c-field(autofocus :label="$t('Mobile')" filled clearable v-model="mobile_" lazy-rules :rules="[val => val && val.length > 0 || $t('Please input Mobile')]")
+              q-input.c-field(autofocus :label="$t('Mobile')" filled clearable v-model="mobile_" lazy-rules :rules="[]")
     q-uploader(style="display:none" ref="upload" @added="files => upload(files)" accept=".jpg, image/*")
 </template>
 <script src="./accountInformation.vue.js" />

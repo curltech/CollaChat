@@ -105,7 +105,7 @@ export default {
       logoutData: null,
       _heartbeatTimer: null,
       _cloudSyncTimer: null,
-      fabPos: [ 18, 18 ],
+      fabPos: [18, 18],
       draggingFab: false
     }
   },
@@ -1061,7 +1061,7 @@ export default {
     async addCHATSYSMessage(chat, message) { // message必填属性：messageType, contentType, content
       let _that = this
       let store = _that.$store
-      if(message._id){
+      if (message._id) {
         let msg = await chatComponent.get(ChatDataType.MESSAGE, message._id)
         if (msg) {
           return
@@ -1989,18 +1989,9 @@ export default {
         let _id = content._id
         let currentTime = new Date()
         let groupChat = store.state.groupChatMap[content.groupId]
-        /*let duplicated = false
-        for (let groupChat of store.state.groupChats) {
-          if (groupChat._id === _id + myselfPeerClient.peerId) {
-            duplicated = true
-            break
-          }
-        }
-        if (!duplicated) {*/
         if (!groupChat) {
           // 新增群组
           let groupChat = {}
-          //groupChat._id = _id + myselfPeerClient.peerId // 标识重复消息
           groupChat.ownerPeerId = myselfPeerClient.peerId
           groupChat.groupId = content.groupId
           groupChat.groupCategory = 'Chat'
@@ -2197,115 +2188,106 @@ export default {
         // 重复消息不处理、但仍发送Receive收条
         let _id = content._id
         let currentTime = new Date()
-        /*let duplicated = false
-        for (let groupChat of store.state.groupChats) {
-          if (groupChat._id === _id + myselfPeerClient.peerId) {
-            duplicated = true
-            break
+        let groupChat = store.state.groupChatMap[content.groupId]
+        let newCreated = false
+        // 新增群组（对于新增群组成员群组还不存在）
+        if (!groupChat) {
+          newCreated = true
+          groupChat = {}
+          groupChat.ownerPeerId = myselfPeerClient.peerId
+          groupChat.groupId = content.groupId
+          groupChat.groupCategory = 'Chat'
+          groupChat.groupType = 'Private'
+          groupChat.name = content.groupName
+          groupChat.pyName = pinyinUtil.getPinyin(content.groupName)
+          groupChat.description = content.groupDescription
+          groupChat.pyDescription = pinyinUtil.getPinyin(content.groupDescription)
+          groupChat.createDate = content.groupCreateDate
+          groupChat.status = LinkmanStatus.EFFECTIVE
+          groupChat.locked = false
+          groupChat.notAlert = false
+          groupChat.top = false
+          groupChat.recallTimeLimit = true
+          groupChat.recallAlert = true
+          await contactComponent.insert(ContactDataType.GROUP, groupChat, null)
+        }
+
+        // 新增群组成员（对于新增群组成员为全量，否则为增量）
+        let gms = groupChat.groupMembers
+        if (!gms) {
+          gms = []
+        }
+        let groupOwnerPeerId
+        let inviterName = ''
+        let addedGroupMemberNames
+        let includeNonContacts = false
+        for (let gm of content.data) {
+          let linkman = store.state.linkmanMap[gm.memberPeerId]
+          let notExists = true
+          if (!newCreated) {
+            let existingGms = await contactComponent.loadGroupMember({
+              ownerPeerId: myselfPeerClient.peerId,
+              groupId: content.groupId,
+              memberPeerId: gm.memberPeerId
+            })
+            if (existingGms && existingGms.length > 0) {
+              notExists = false
+            }
+          }
+          if (notExists) {
+            let groupMember = {}
+            groupMember.ownerPeerId = myselfPeerClient.peerId
+            groupMember.groupId = content.groupId
+            groupMember.memberPeerId = gm.memberPeerId
+            groupMember.memberType = gm.memberType
+            groupMember.createDate = gm.createDate
+            groupMember.status = gm.status
+            await contactComponent.insert(ContactDataType.GROUP_MEMBER, groupMember, gms)
+            if (linkman && gm.memberPeerId !== content.senderPeerId && gm.memberPeerId !== myselfPeerClient.peerId) {
+              addedGroupMemberNames = (addedGroupMemberNames ? addedGroupMemberNames + _that.$i18n.t(", ") : '') + (linkman.givenName ? linkman.givenName : linkman.name)
+            }
+            if (!linkman && gm.memberPeerId !== myselfPeerClient.peerId) {
+              includeNonContacts = true
+              let peerClient = await peerClientService.getCachedPeerClient(gm.memberPeerId)
+              if (!peerClient) {
+                console.error('getCachedPeerClient is empty, memberPeerId:' + gm.memberPeerId)
+              }
+            }
+            if (linkman && gm.memberPeerId !== myselfPeerClient.peerId) {
+              linkman.groupChats.unshift(groupChat)
+              if (linkman.activeStatus === ActiveStatus.UP && groupChat.activeStatus !== ActiveStatus.UP) {
+                groupChat.activeStatus = ActiveStatus.UP
+              }
+            }
+          }
+          if (gm.memberType === MemberType.OWNER) {
+            groupOwnerPeerId = gm.memberPeerId
+          }
+          if (gm.memberPeerId === content.senderPeerId && linkman) {
+            inviterName = (linkman.givenName ? linkman.givenName : linkman.name)
           }
         }
-        if (!duplicated) {*/
-          let groupChat = store.state.groupChatMap[content.groupId]
-          let newCreated = false
-          // 新增群组（对于新增群组成员群组还不存在）
-          if (!groupChat) {
-            newCreated = true
-            groupChat = {}
-            //groupChat._id = _id + myselfPeerClient.peerId // 标识重复消息
-            groupChat.ownerPeerId = myselfPeerClient.peerId
-            groupChat.groupId = content.groupId
-            groupChat.groupCategory = 'Chat'
-            groupChat.groupType = 'Private'
-            groupChat.name = content.groupName
-            groupChat.pyName = pinyinUtil.getPinyin(content.groupName)
-            groupChat.description = content.groupDescription
-            groupChat.pyDescription = pinyinUtil.getPinyin(content.groupDescription)
-            groupChat.createDate = content.groupCreateDate
-            groupChat.status = LinkmanStatus.EFFECTIVE
-            groupChat.locked = false
-            groupChat.notAlert = false
-            groupChat.top = false
-            groupChat.recallTimeLimit = true
-            groupChat.recallAlert = true
-            await contactComponent.insert(ContactDataType.GROUP, groupChat, null)
-          }
 
-          // 新增群组成员（对于新增群组成员为全量，否则为增量）
-          let gms = groupChat.groupMembers
-          if (!gms) {
-            gms = []
-          }
-          let groupOwnerPeerId
-          let inviterName = ''
-          let addedGroupMemberNames
-          let includeNonContacts = false
-          for (let gm of content.data) {
-            let linkman = store.state.linkmanMap[gm.memberPeerId]
-            let notExists = true
-            if (!newCreated) {
-              let existingGms = await contactComponent.loadGroupMember({
-                ownerPeerId: myselfPeerClient.peerId,
-                groupId: content.groupId,
-                memberPeerId: gm.memberPeerId
-              })
-              if (existingGms && existingGms.length > 0) {
-                notExists = false
-              }
-            }
-            if (notExists) {
-              let groupMember = {}
-              groupMember.ownerPeerId = myselfPeerClient.peerId
-              groupMember.groupId = content.groupId
-              groupMember.memberPeerId = gm.memberPeerId
-              groupMember.memberType = gm.memberType
-              groupMember.createDate = gm.createDate
-              groupMember.status = gm.status
-              await contactComponent.insert(ContactDataType.GROUP_MEMBER, groupMember, gms)
-              if (linkman && gm.memberPeerId !== content.senderPeerId && gm.memberPeerId !== myselfPeerClient.peerId) {
-                addedGroupMemberNames = (addedGroupMemberNames ? addedGroupMemberNames + _that.$i18n.t(", ") : '') + (linkman.givenName ? linkman.givenName : linkman.name)
-              }
-              if (!linkman && gm.memberPeerId !== myselfPeerClient.peerId) {
-                includeNonContacts = true
-                let peerClient = await peerClientService.getCachedPeerClient(gm.memberPeerId)
-                if (!peerClient) {
-                  console.error('getCachedPeerClient is empty, memberPeerId:' + gm.memberPeerId)
-                }
-              }
-              if (linkman && gm.memberPeerId !== myselfPeerClient.peerId) {
-                linkman.groupChats.unshift(groupChat)
-                if (linkman.activeStatus === ActiveStatus.UP && groupChat.activeStatus !== ActiveStatus.UP) {
-                  groupChat.activeStatus = ActiveStatus.UP
-                }
-              }
-            }
-            if (gm.memberType === MemberType.OWNER) {
-              groupOwnerPeerId = gm.memberPeerId
-            }
-            if (gm.memberPeerId === content.senderPeerId && linkman) {
-              inviterName = (linkman.givenName ? linkman.givenName : linkman.name)
-            }
-          }
+        if (groupOwnerPeerId) {
+          groupChat.groupOwnerPeerId = groupOwnerPeerId
+        }
+        groupChat.groupMembers = gms
+        if (newCreated) {
+          store.state.groupChats.unshift(groupChat)
+        }
+        store.state.groupChatMap[content.groupId] = groupChat
 
-          if (groupOwnerPeerId) {
-            groupChat.groupOwnerPeerId = groupOwnerPeerId
-          }
-          groupChat.groupMembers = gms
-          if (newCreated) {
-            store.state.groupChats.unshift(groupChat)
-          }
-          store.state.groupChatMap[content.groupId] = groupChat
-
-          let chat = await store.getChat(groupChat.groupId)
-          let chatMessage = {
-            _id: _id + peerId,
-            messageType: P2pChatMessageType.CHAT_SYS,
-            contentType: ChatContentType.EVENT,
-            content: newCreated ?
-              inviterName + _that.$i18n.t(" has invited ") + _that.$i18n.t("you") + _that.$i18n.t(" to join group chat") + _that.$i18n.t(", other group members : ") + (addedGroupMemberNames ? addedGroupMemberNames : '') + (includeNonContacts ? (addedGroupMemberNames ? _that.$i18n.t(" and ") : '') + _that.$i18n.t("other NonContacts") : '')
-              :
-              inviterName + _that.$i18n.t(" has invited ") + (addedGroupMemberNames ? addedGroupMemberNames : '') + (includeNonContacts ? (addedGroupMemberNames ? _that.$i18n.t(" and ") : '') + _that.$i18n.t("other NonContacts") : '') + _that.$i18n.t(" to join group chat")
-          }
-          await store.addCHATSYSMessage(chat, chatMessage)
+        let chat = await store.getChat(groupChat.groupId)
+        let chatMessage = {
+          _id: _id + peerId,
+          messageType: P2pChatMessageType.CHAT_SYS,
+          contentType: ChatContentType.EVENT,
+          content: newCreated ?
+            inviterName + _that.$i18n.t(" has invited ") + _that.$i18n.t("you") + _that.$i18n.t(" to join group chat") + _that.$i18n.t(", other group members : ") + (addedGroupMemberNames ? addedGroupMemberNames : '') + (includeNonContacts ? (addedGroupMemberNames ? _that.$i18n.t(" and ") : '') + _that.$i18n.t("other NonContacts") : '')
+            :
+            inviterName + _that.$i18n.t(" has invited ") + (addedGroupMemberNames ? addedGroupMemberNames : '') + (includeNonContacts ? (addedGroupMemberNames ? _that.$i18n.t(" and ") : '') + _that.$i18n.t("other NonContacts") : '') + _that.$i18n.t(" to join group chat")
+        }
+        await store.addCHATSYSMessage(chat, chatMessage)
         /*}*/
 
         // 发送Receive收条

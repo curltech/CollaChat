@@ -409,8 +409,9 @@ export default {
       // 先保存要通知的群组成员
       let groupChatLinkmans = []
       for (let groupMember of groupMembers) {
-        let linkman = store.state.linkmanMap[groupMember.memberPeerId]
-        if (linkman) { // 自己和非联系人除外
+        /*let linkman = store.state.linkmanMap[groupMember.memberPeerId]
+        if (linkman && linkman.peerId !== myselfPeerClient.peerId) { // 自己和非联系人除外*/
+        if (groupMember.memberPeerId !== myselfPeerClient.peerId) { // 自己除外
           groupChatLinkmans.push(store.state.linkmanMap[groupMember.memberPeerId])
         }
       }

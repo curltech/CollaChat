@@ -6,6 +6,7 @@ import { myself, peerClientService } from 'libcolla'
 import { TypeUtil, MobileNumberUtil } from 'libcolla'
 
 import { phoneContactComponent } from '@/libs/base/colla-cordova'
+import pinyinUtil from '@/libs/base/colla-pinyin'
 
 export let ContactDataType = {
   'LINKMAN': 'LINKMAN',
@@ -330,8 +331,9 @@ class ContactComponent {
       if (contacts && contacts.length > 0) {
         for (let contact of contacts) {
           let peerContact = {}
-          if(contact.name.formatted){
+          if (contact.name.formatted) {
             peerContact.formattedName = contact.name.formatted.trim()
+            peerContact.pyFormattedName = pinyinUtil.getPinyin(peerContact.formattedName)
           }
           if (contact.phoneNumbers && contact.phoneNumbers.length > 0) {
             for (let phoneNumber of contact.phoneNumbers) {

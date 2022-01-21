@@ -43,7 +43,7 @@ export default {
         if (selectContactsfilter) {
           SelectLinkmanFilteredArray = linkmans.filter((linkman) => {
             return (linkman.peerId.toLowerCase().includes(selectContactsfilter.toLowerCase())
-              || linkman.mobile.toLowerCase().includes(selectContactsfilter.toLowerCase())
+              || (linkman.mobile && linkman.mobile.toLowerCase().includes(selectContactsfilter.toLowerCase()))
               || linkman.name.toLowerCase().includes(selectContactsfilter.toLowerCase())
               || linkman.pyName.toLowerCase().includes(selectContactsfilter.toLowerCase())
               || (linkman.givenName && linkman.givenName.toLowerCase().includes(selectContactsfilter.toLowerCase()))

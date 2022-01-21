@@ -56,7 +56,7 @@ export default {
         if (filter) {
           LockArray = linkmans.filter((linkman) => {
             return (linkman.peerId.toLowerCase().includes(filter.toLowerCase())
-              || linkman.mobile.toLowerCase().includes(filter.toLowerCase())
+              || (linkman.mobile && linkman.mobile.toLowerCase().includes(filter.toLowerCase()))
               || linkman.name.toLowerCase().includes(filter.toLowerCase())
               || linkman.pyName.toLowerCase().includes(filter.toLowerCase())
               || (linkman.givenName && linkman.givenName.toLowerCase().includes(filter.toLowerCase()))

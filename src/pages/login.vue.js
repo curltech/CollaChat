@@ -461,6 +461,7 @@ export default {
       _that.loginData.code_ = _that.registerData.code_
       _that.loginData.mobile_ = _that.registerData.mobile_
       _that.loginData.password_ = _that.registerData.password_
+      _that.loginData.name_ = _that.registerData.name_
       _that.subKind = 'default'
     },
     enterScan() {

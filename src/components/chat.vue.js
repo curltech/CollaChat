@@ -140,7 +140,7 @@ export default {
               if (chat.subjectType === SubjectType.CHAT) {
                 let linkman = store.state.linkmanMap[chat.subjectId]
                 return linkman && (linkman.peerId.toLowerCase().includes(chatFilter.toLowerCase())
-                  || linkman.mobile.toLowerCase().includes(chatFilter.toLowerCase())
+                  || (linkman.mobile && linkman.mobile.toLowerCase().includes(chatFilter.toLowerCase()))
                   || linkman.name.toLowerCase().includes(chatFilter.toLowerCase())
                   || linkman.pyName.toLowerCase().includes(chatFilter.toLowerCase())
                   || (linkman.givenName && linkman.givenName.toLowerCase().includes(chatFilter.toLowerCase()))

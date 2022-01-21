@@ -43,20 +43,19 @@ export default {
         let selectGroupChatFilter = _that.selectGroupChatFilter
         if (selectGroupChatFilter) {
           SelectGroupChatFilteredArray = groupChats.filter((groupChat) => {
-            return (groupChat.peerId.toLowerCase().includes(selectContactsfilter.toLowerCase())
-              || groupChat.mobile.toLowerCase().includes(selectContactsfilter.toLowerCase())
-              || groupChat.name.toLowerCase().includes(selectContactsfilter.toLowerCase())
-              || groupChat.pyName.toLowerCase().includes(selectContactsfilter.toLowerCase())
+            return ((groupChat.name && groupChat.name.toLowerCase().includes(selectContactsfilter.toLowerCase()))
+              || (groupChat.pyName && groupChat.pyName.toLowerCase().includes(selectContactsfilter.toLowerCase()))
               || (groupChat.givenName && groupChat.givenName.toLowerCase().includes(selectContactsfilter.toLowerCase()))
               || (groupChat.pyGivenName && groupChat.pyGivenName.toLowerCase().includes(selectContactsfilter.toLowerCase()))
+              || (groupChat.description && groupChat.description.toLowerCase().includes(selectContactsfilter.toLowerCase()))
+              || (groupChat.pyDescription && groupChat.pyDescription.toLowerCase().includes(selectContactsfilter.toLowerCase()))
               || (groupChat.tag && groupChat.tag.toLowerCase().includes(selectContactsfilter.toLowerCase()))
               || (groupChat.pyTag && groupChat.pyTag.toLowerCase().includes(selectContactsfilter.toLowerCase())))
               && ((store.state.lockContactsSwitch && !groupChat.locked) || !store.state.lockContactsSwitch)
-            && groupChat.peerId !== myself.myselfPeerClient.peerId
           })
         } else {
           SelectGroupChatFilteredArray = groupChats.filter((groupChat) => {
-            return ((store.state.lockContactsSwitch && !groupChat.locked) || !store.state.lockContactsSwitch) && groupChat.peerId !== myself.myselfPeerClient.peerId
+            return (store.state.lockContactsSwitch && !groupChat.locked) || !store.state.lockContactsSwitch
           })
         }
       }

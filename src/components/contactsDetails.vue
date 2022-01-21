@@ -51,12 +51,12 @@
           q-item-section(side)
             q-item-label.text-c-grey-10 {{ $t('Mobile') }}
           q-item-section
-            q-item-label.text-primary {{ $store.state.currentLinkman && /^[0-9]+$/.test($store.state.currentLinkman.mobile.substring(1)) ? $store.state.currentLinkman.mobile : '' }}
+            q-item-label.text-primary {{ $store.state.currentLinkman && $store.state.currentLinkman.mobile && /^[0-9]+$/.test($store.state.currentLinkman.mobile.substring(1)) ? $store.state.currentLinkman.mobile : '' }}
         q-item(v-if="!$store.ifMobile()" v-ripple)
           q-item-section(side)
             q-item-label.text-c-grey-10 {{ $t('Mobile') }}
           q-item-section
-            q-item-label {{ $store.state.currentLinkman && /^[0-9]+$/.test($store.state.currentLinkman.mobile.substring(1)) ? $store.state.currentLinkman.mobile : '' }}
+            q-item-label {{ $store.state.currentLinkman && $store.state.currentLinkman.mobile && /^[0-9]+$/.test($store.state.currentLinkman.mobile.substring(1)) ? $store.state.currentLinkman.mobile : '' }}
         q-separator.c-separator(v-if="$store.state.currentLinkman && $store.state.currentLinkman.peerId !== $store.state.myselfPeerClient.peerId"
           style="margin-left:16px;width:calc(100% - 16px)"
         )

@@ -10,6 +10,7 @@ import pinyinUtil from '@/libs/base/colla-pinyin'
 import { ContactDataType, contactComponent } from '@/libs/biz/colla-contact'
 import { mediaComponent, cameraComponent, alloyFingerComponent } from '@/libs/base/colla-media'
 import SelectChat from '@/components/selectChat'
+import { store } from 'quasar/wrappers'
 
 export default {
   name: "AccountInformation",
@@ -63,17 +64,21 @@ export default {
       this.subKind = 'name'
     },
     enterMobile() {
-      try {
-        this.countryOptions = CollaConstant.countryOptionsISO[myself.myselfPeerClient.language]
-        this.options = this.countryOptions
-        let mobileObject = MobileNumberUtil.parse(myself.myselfPeerClient.mobile)
-        this.code_ = mobileObject.getCountryCode()
-        this.mobile_ = mobileObject.getNationalNumber() + ''
-        this.countryRegion_ = this.options[CollaConstant.countryCodeISO[myself.myselfPeerClient.language].indexOf(this.code_ + '')]
-        this.subKind = 'mobile'
-      } catch (e) {
-        console.log(e)
+      this.countryOptions = CollaConstant.countryOptionsISO[myself.myselfPeerClient.language]
+      this.options = this.countryOptions
+      this.code_ = '86'
+      this.mobile_ = ''
+      if (myself.myselfPeerClient.mobile) {
+        try {
+          let mobileObject = MobileNumberUtil.parse(myself.myselfPeerClient.mobile)
+          this.code_ = mobileObject.getCountryCode() + ''
+          this.mobile_ = mobileObject.getNationalNumber() + ''
+        } catch (e) {
+          console.log(e)
+        }
       }
+      this.countryRegion_ = this.options[CollaConstant.countryCodeISO[myself.myselfPeerClient.language].indexOf(this.code_)]
+      this.subKind = 'mobile'
     },
     filterFnAutoselect(val, update, abort) {
       // call abort() at any time if you can't retrieve data somehow
@@ -371,6 +376,9 @@ export default {
             myselfPeer = await myselfPeerService.update(myselfPeer)
             myself.myselfPeer = myselfPeer
 
+            store.defaultCountryCode = this.code_
+            store.state.countryCode = this.code_
+
             // 更新对应linkman
             let linkmanPeerId = myselfPeerClient.peerId
             let linkman = this.$store.state.linkmanMap[linkmanPeerId]
@@ -410,11 +418,9 @@ export default {
               myselfPeer.mobile = backupMobile
             }
             this.$q.loading.hide()
-            this.subKind = 'default'
           }
-        } else {
-          this.subKind = 'default'
         }
+        this.subKind = 'default'
       } else {
         this.$q.notify({
           message: this.$i18n.t("Invalid mobile number"),

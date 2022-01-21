@@ -111,7 +111,7 @@ export default {
         if (contactsfilter) {
           LinkmanFilteredArray = linkmans.filter((linkman) => {
             return (linkman.peerId.toLowerCase().includes(contactsfilter.toLowerCase())
-              || linkman.mobile.toLowerCase().includes(contactsfilter.toLowerCase())
+              || (linkman.mobile && linkman.mobile.toLowerCase().includes(contactsfilter.toLowerCase()))
               || linkman.name.toLowerCase().includes(contactsfilter.toLowerCase())
               || linkman.pyName.toLowerCase().includes(contactsfilter.toLowerCase())
               || (linkman.givenName && linkman.givenName.toLowerCase().includes(contactsfilter.toLowerCase()))

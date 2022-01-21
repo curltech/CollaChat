@@ -300,7 +300,7 @@ export default {
           if (member) {
             let linkman = store.state.linkmanMap[member.memberPeerId]
             return (linkman.peerId.toLowerCase().includes(selectFocusMemberFilter.toLowerCase())
-              || linkman.mobile.toLowerCase().includes(selectFocusMemberFilter.toLowerCase())
+              || (linkman.mobile && linkman.mobile.toLowerCase().includes(selectFocusMemberFilter.toLowerCase()))
               || linkman.name.toLowerCase().includes(selectFocusMemberFilter.toLowerCase())
               || linkman.pyName.toLowerCase().includes(selectFocusMemberFilter.toLowerCase())
               || (linkman.givenName && linkman.givenName.toLowerCase().includes(selectFocusMemberFilter.toLowerCase()))
@@ -344,7 +344,7 @@ export default {
           if (groupChatMemberfilter) {
             GroupChatMemberFilteredArray = linkmans.filter((linkman) => {
               return (linkman.peerId.toLowerCase().includes(groupChatMemberfilter.toLowerCase())
-                || linkman.mobile.toLowerCase().includes(groupChatMemberfilter.toLowerCase())
+                || (linkman.mobile && linkman.mobile.toLowerCase().includes(groupChatMemberfilter.toLowerCase()))
                 || linkman.name.toLowerCase().includes(groupChatMemberfilter.toLowerCase())
                 || linkman.pyName.toLowerCase().includes(groupChatMemberfilter.toLowerCase())
                 || (linkman.givenName && linkman.givenName.toLowerCase().includes(groupChatMemberfilter.toLowerCase()))
@@ -1596,8 +1596,9 @@ export default {
       }
       let groupChatLinkmans = []
       for (let groupMember of groupChat.groupMembers) {
-        let linkman = store.state.linkmanMap[groupMember.memberPeerId]
-        if (linkman && linkman.peerId !== myselfPeerClient.peerId) { // 自己和非联系人除外
+        /*let linkman = store.state.linkmanMap[groupMember.memberPeerId]
+        if (linkman && linkman.peerId !== myselfPeerClient.peerId) { // 自己和非联系人除外*/
+        if (groupMember.memberPeerId !== myselfPeerClient.peerId) { // 自己除外
           groupChatLinkmans.push(store.state.linkmanMap[groupMember.memberPeerId])
         }
       }
@@ -1741,8 +1742,9 @@ export default {
       // 先保存要通知的群组成员
       let groupChatLinkmans = []
       for (let groupMember of groupMembers) {
-        let linkman = store.state.linkmanMap[groupMember.memberPeerId]
-        if (linkman && linkman.peerId !== myselfPeerClient.peerId) { // 自己和非联系人除外
+        /*let linkman = store.state.linkmanMap[groupMember.memberPeerId]
+        if (linkman && linkman.peerId !== myselfPeerClient.peerId) { // 自己和非联系人除外*/
+        if (groupMember.memberPeerId !== myselfPeerClient.peerId) { // 自己除外
           groupChatLinkmans.push(store.state.linkmanMap[groupMember.memberPeerId])
           let _index = 0
           for (let gc of linkman.groupChats) {
@@ -1970,8 +1972,9 @@ export default {
       // 先保存要通知的群组成员
       let groupChatLinkmans = []
       for (let groupMember of groupMembers) {
-        let linkman = store.state.linkmanMap[groupMember.memberPeerId]
-        if (linkman && linkman.peerId !== myselfPeerClient.peerId) { // 自己和非联系人除外
+        /*let linkman = store.state.linkmanMap[groupMember.memberPeerId]
+        if (linkman && linkman.peerId !== myselfPeerClient.peerId) { // 自己和非联系人除外*/
+        if (groupMember.memberPeerId !== myselfPeerClient.peerId) { // 自己除外
           groupChatLinkmans.push(store.state.linkmanMap[groupMember.memberPeerId])
         }
       }
@@ -2069,8 +2072,9 @@ export default {
       let groupChatLinkmans = []
       let oldOwner, newOwner
       for (let groupMember of groupMembers) {
-        let linkman = store.state.linkmanMap[groupMember.memberPeerId]
-        if (linkman && linkman.peerId !== myselfPeerClient.peerId) { // 自己和非联系人除外
+        /*let linkman = store.state.linkmanMap[groupMember.memberPeerId]
+        if (linkman && linkman.peerId !== myselfPeerClient.peerId) { // 自己和非联系人除外*/
+        if (groupMember.memberPeerId !== myselfPeerClient.peerId) { // 自己除外
           groupChatLinkmans.push(store.state.linkmanMap[groupMember.memberPeerId])
         }
         if (groupMember.memberPeerId === myselfPeerClient.peerId) {
