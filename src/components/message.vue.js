@@ -10,7 +10,7 @@ import pinyinUtil from '@/libs/base/colla-pinyin'
 import { audioCaptureComponent, mediaCaptureComponent, mediaComponent, cameraComponent, alloyFingerComponent, mediaPickerComponent, mediaRecorderComponent, mediaStreamComponent, audioInputComponent } from '@/libs/base/colla-media'
 import { statusBarComponent, fileComponent, photoLibraryComponent } from '@/libs/base/colla-cordova'
 import { chatComponent, ChatContentType, ChatMessageStatus, ChatDataType, P2pChatMessageType, SubjectType, chatBlockComponent } from '@/libs/biz/colla-chat'
-import { ActiveStatus, contactComponent, ContactDataType, MemberType, RequestStatus, RequestType } from '@/libs/biz/colla-contact'
+import { ActiveStatus, contactComponent, ContactDataType, GroupStatus, MemberType, RequestStatus, RequestType } from '@/libs/biz/colla-contact'
 import { SrcEntityType, CollectionType } from '@/libs/biz/colla-collection'
 import { collectionUtil } from '@/libs/biz/colla-collection-util'
 
@@ -1054,7 +1054,7 @@ export default {
       if (store.state.currentChat.subjectType === SubjectType.CHAT) {
         if (store.state.linkmanMap[store.state.currentChat.subjectId].blackedMe === true) {
           _that.$q.notify({
-            message: _that.$i18n.t("You are in your opponent's blacklist."),
+            message: _that.$i18n.t("You are in your opponent's blacklist"),
             timeout: 3000,
             type: "warning",
             color: "warning",
@@ -1066,7 +1066,7 @@ export default {
         }
         if (store.state.linkmanMap[store.state.currentChat.subjectId].droppedMe === true) {
           _that.$q.notify({
-            message: _that.$i18n.t("You are no longer your opponent's contacts."),
+            message: _that.$i18n.t("You are no longer your opponent's contacts"),
             timeout: 3000,
             type: "warning",
             color: "warning",
@@ -1079,6 +1079,18 @@ export default {
       } else if (store.state.currentChat.subjectType === SubjectType.GROUP_CHAT) {
         let ret = true
         let groupChat = store.state.groupChatMap[store.state.currentChat.subjectId]
+        if (groupChat && groupChat.status === GroupStatus.DISBANDED) {
+          _that.$q.notify({
+            message: _that.$i18n.t('This group chat has been disbanded'),
+            timeout: 3000,
+            type: "warning",
+            color: "warning",
+          })
+          if (editorContent && editorContent.substr(editorContent.length - 1, editorContent.length) === '\n') {
+            store.state.currentChat.tempText = editorContent.substr(0, editorContent.length - 1)
+          }
+          return false
+        }
         if (groupChat && groupChat.groupMembers && groupChat.groupMembers.length > 0) {
           for (let groupMember of groupChat.groupMembers) {
             if (groupMember.memberPeerId === myself.myselfPeerClient.peerId) {
@@ -1089,7 +1101,7 @@ export default {
         }
         if (ret) {
           _that.$q.notify({
-            message: _that.$i18n.t('You have been removed from this group chat.'),
+            message: _that.$i18n.t('You have been removed from this group chat'),
             timeout: 3000,
             type: "warning",
             color: "warning",
@@ -1483,87 +1495,98 @@ export default {
     async modifyGroupChat() {
       let _that = this
       let store = _that.$store
-      let myselfPeerClient = myself.myselfPeerClient
-      let groupChat = store.state.groupChatMap[store.state.currentChat.subjectId]
+      _that.$q.loading.show()
+      try {
+        let myselfPeerClient = myself.myselfPeerClient
+        let groupChat = store.state.groupChatMap[store.state.currentChat.subjectId]
 
-      // 修改群组信息
-      let nameChanged = false
-      if (groupChat.name !== _that.groupChatData.name) {
-        nameChanged = true
-      }
-      let descriptionChanged = false
-      if (groupChat.description !== _that.groupChatData.description) {
-        descriptionChanged = true
-      }
-      let myAliasChanged = false
-      if (groupChat.myAlias !== _that.groupChatData.myAlias) {
-        myAliasChanged = true
-      }
-      groupChat.name = _that.groupChatData.name
-      groupChat.pyName = pinyinUtil.getPinyin(_that.groupChatData.name)
-      groupChat.description = _that.groupChatData.description
-      groupChat.pyDescription = pinyinUtil.getPinyin(_that.groupChatData.description)
-      groupChat.givenName = _that.groupChatData.givenName
-      groupChat.pyGivenName = pinyinUtil.getPinyin(_that.groupChatData.givenName)
-      groupChat.tag = _that.groupChatData.tag
-      groupChat.pyTag = pinyinUtil.getPinyin(_that.groupChatData.tag)
-      groupChat.myAlias = _that.groupChatData.myAlias
-      store.state.groupChatMap[groupChat.groupId] = groupChat
-      let groupChatRecord = await contactComponent.get(ContactDataType.GROUP, groupChat._id)
-      if (groupChatRecord) {
-        groupChatRecord.name = groupChat.name
-        groupChatRecord.pyName = groupChat.pyName
-        groupChatRecord.description = groupChat.description
-        groupChatRecord.pyDescription = groupChat.pyDescription
-        groupChatRecord.givenName = groupChat.givenName
-        groupChatRecord.pyGivenName = groupChat.pyGivenName
-        groupChatRecord.tag = groupChat.tag
-        groupChatRecord.pyTag = groupChat.pyTag
-        groupChatRecord.myAlias = groupChat.myAlias
-        groupChatRecord.recallTimeLimit = groupChat.recallTimeLimit
-        groupChatRecord.recallAlert = groupChat.recallAlert
-        await contactComponent.update(ContactDataType.GROUP, groupChatRecord)
-      }
-
-      // 修改我在本群的昵称
-      let myselfGroupMember
-      let memberAliasChanged = false
-      let groupMembers = groupChat.groupMembers
-      for (let groupMember of groupMembers) {
-        if (groupMember.memberPeerId === myselfPeerClient.peerId) {
-          if (groupMember.memberAlias !== groupChat.myAlias) {
-            memberAliasChanged = true
-            groupMember.memberAlias = groupChat.myAlias
+        // 修改群组信息
+        let nameChanged = false
+        if (groupChat.name !== _that.groupChatData.name) {
+          nameChanged = true
+        }
+        let descriptionChanged = false
+        if (groupChat.description !== _that.groupChatData.description) {
+          descriptionChanged = true
+        }
+        let givenNameChanged = false
+        if (groupChat.givenName !== _that.groupChatData.givenName) {
+          givenNameChanged = true
+        }
+        let myAliasChanged = false
+        if (groupChat.myAlias !== _that.groupChatData.myAlias) {
+          myAliasChanged = true
+        }
+        if (nameChanged || descriptionChanged || givenNameChanged || myAliasChanged) {
+          groupChat.name = _that.groupChatData.name
+          groupChat.pyName = pinyinUtil.getPinyin(_that.groupChatData.name)
+          groupChat.description = _that.groupChatData.description
+          groupChat.pyDescription = pinyinUtil.getPinyin(_that.groupChatData.description)
+          groupChat.givenName = _that.groupChatData.givenName
+          groupChat.pyGivenName = pinyinUtil.getPinyin(_that.groupChatData.givenName)
+          groupChat.tag = _that.groupChatData.tag
+          groupChat.pyTag = pinyinUtil.getPinyin(_that.groupChatData.tag)
+          groupChat.myAlias = _that.groupChatData.myAlias
+          store.state.groupChatMap[groupChat.groupId] = groupChat
+          let groupChatRecord = await contactComponent.get(ContactDataType.GROUP, groupChat._id)
+          if (groupChatRecord) {
+            groupChatRecord.name = groupChat.name
+            groupChatRecord.pyName = groupChat.pyName
+            groupChatRecord.description = groupChat.description
+            groupChatRecord.pyDescription = groupChat.pyDescription
+            groupChatRecord.givenName = groupChat.givenName
+            groupChatRecord.pyGivenName = groupChat.pyGivenName
+            groupChatRecord.tag = groupChat.tag
+            groupChatRecord.pyTag = groupChat.pyTag
+            groupChatRecord.myAlias = groupChat.myAlias
+            await contactComponent.update(ContactDataType.GROUP, groupChatRecord)
           }
-          myselfGroupMember = groupMember
         }
-      }
-      if (memberAliasChanged) {
-        let groupMemberRecord = await contactComponent.get(ContactDataType.GROUP_MEMBER, myselfGroupMember._id)
-        if (groupMemberRecord) {
-          groupMemberRecord.memberAlias = groupChat.myAlias
-          await contactComponent.update(ContactDataType.GROUP_MEMBER, groupMemberRecord)
+
+        // 修改我在本群的昵称
+        let myselfGroupMember
+        let memberAliasChanged = false
+        let groupMembers = groupChat.groupMembers
+        for (let groupMember of groupMembers) {
+          if (groupMember.memberPeerId === myselfPeerClient.peerId) {
+            if (groupMember.memberAlias !== groupChat.myAlias) {
+              memberAliasChanged = true
+              groupMember.memberAlias = groupChat.myAlias
+            }
+            myselfGroupMember = groupMember
+            break
+          }
         }
-      }
-      groupChat.groupMembers = groupMembers
-      store.state.groupChatMap[groupChat.groupId] = groupChat
-
-      // 新增Sent请求
-      if (nameChanged || descriptionChanged || myAliasChanged) {
-        await _that.sendGroupInfo()
-      }
-
-      if (nameChanged || descriptionChanged) {
-        let chat = await store.getChat(groupChat.groupId)
-        let chatMessage = {
-          messageType: P2pChatMessageType.CHAT_SYS,
-          contentType: ChatContentType.EVENT,
-          content: _that.$i18n.t("You") + _that.$i18n.t(" have modified ") + (nameChanged ? (descriptionChanged ? _that.$i18n.t("Group Name to be : ") + groupChat.name + _that.$i18n.t(",") + _that.$i18n.t(" modified ") + _that.$i18n.t("Group Description to be : ") + groupChat.description : _that.$i18n.t("Group Name to be : ") + groupChat.name) : _that.$i18n.t("Group Description to be : ") + groupChat.description)
+        if (memberAliasChanged) {
+          groupChat.groupMembers = groupMembers
+          store.state.groupChatMap[groupChat.groupId] = groupChat
+          let groupMemberRecord = await contactComponent.get(ContactDataType.GROUP_MEMBER, myselfGroupMember._id)
+          if (groupMemberRecord) {
+            groupMemberRecord.memberAlias = groupChat.myAlias
+            await contactComponent.update(ContactDataType.GROUP_MEMBER, groupMemberRecord)
+          }
         }
-        await store.addCHATSYSMessage(chat, chatMessage)
-      }
 
-      _that.subKind = "default"
+        // 新增Sent请求
+        if (nameChanged || descriptionChanged || myAliasChanged) {
+          await _that.sendGroupInfo()
+        }
+
+        if (nameChanged || descriptionChanged) {
+          let chat = await store.getChat(groupChat.groupId)
+          let chatMessage = {
+            messageType: P2pChatMessageType.CHAT_SYS,
+            contentType: ChatContentType.EVENT,
+            content: _that.$i18n.t("You") + _that.$i18n.t(" have modified ") + (nameChanged ? (descriptionChanged ? _that.$i18n.t("Group Name to be : ") + groupChat.name + _that.$i18n.t(",") + _that.$i18n.t(" modified ") + _that.$i18n.t("Group Description to be : ") + groupChat.description : _that.$i18n.t("Group Name to be : ") + groupChat.name) : _that.$i18n.t("Group Description to be : ") + groupChat.description)
+          }
+          await store.addCHATSYSMessage(chat, chatMessage)
+        }
+      } catch (error) {
+        console.error(error)
+      } finally {
+        _that.$q.loading.hide()
+        _that.subKind = "default"
+      }
     },
     async sendGroupInfo() {
       let _that = this
@@ -1575,9 +1598,7 @@ export default {
       linkmanRequest.requestType = RequestType.MODIFY_GROUPCHAT
       linkmanRequest.ownerPeerId = myselfPeerClient.peerId
       linkmanRequest.senderPeerId = myselfPeerClient.peerId
-      //linkmanRequest.data = JSON.stringify(groupMembers) // 数据库为JSON格式
       linkmanRequest.groupId = groupChat.groupId
-      //linkmanRequest.groupCreateDate = groupChat.createDate
       linkmanRequest.groupName = groupChat.name
       linkmanRequest.groupDescription = groupChat.description
       linkmanRequest.myAlias = groupChat.myAlias
@@ -1664,6 +1685,99 @@ export default {
       }
       _that.subKind = "default"
     },
+    confirmDisbandGroupChat() {
+      let _that = this
+      let store = _that.$store
+      _that.$q.bottomSheet({
+        message: _that.$i18n.t('Disband this group chat?'),
+        actions: [
+          {},
+          {
+            label: _that.$i18n.t('Confirm'),
+            classes: 'text-red',
+            icon: 'check_circle',
+            color: 'primary',
+            id: 'confirm'
+          },
+          {},
+          {
+            label: _that.$i18n.t('Cancel'),
+            icon: 'cancel',
+            color: 'primary',
+            id: 'cancel'
+          }
+        ]
+      }).onOk(async action => {
+        // console.log('Action chosen:', action.id)
+        if (action.id === 'confirm') {
+          await _that.disbandGroupChat()
+        }
+      }).onCancel(() => {
+        // console.log('Dismissed')
+      }).onDismiss(() => {
+        // console.log('I am triggered on both OK and Cancel')
+      })
+    },
+    async disbandGroupChat() {
+      let _that = this
+      let store = _that.$store
+      _that.$q.loading.show()
+      try {
+        let myselfPeerClient = myself.myselfPeerClient
+        let groupChat = store.state.groupChatMap[store.state.currentChat.subjectId]
+        // 修改群组信息
+        groupChat.status = GroupStatus.DISBANDED
+        store.state.groupChatMap[groupChat.groupId] = groupChat
+        let groupChatRecord = await contactComponent.get(ContactDataType.GROUP, groupChat._id)
+        if (groupChatRecord) {
+          groupChatRecord.status = GroupStatus.DISBANDED
+          await contactComponent.update(ContactDataType.GROUP, groupChatRecord)
+        }
+
+        // 新增Sent请求
+        let currentTime = new Date()
+        let linkmanRequest = {}
+        linkmanRequest.requestType = RequestType.DISBAND_GROUPCHAT
+        linkmanRequest.ownerPeerId = myselfPeerClient.peerId
+        linkmanRequest.senderPeerId = myselfPeerClient.peerId
+        linkmanRequest.groupId = groupChat.groupId
+        linkmanRequest.createDate = currentTime
+        linkmanRequest.status = RequestStatus.SENT
+        console.log(linkmanRequest)
+        await contactComponent.insert(ContactDataType.LINKMAN_REQUEST, linkmanRequest, null)
+
+        // 保存/发送Sent请求
+        let message = {
+          subjectType: SubjectType.LINKMAN_REQUEST,
+          messageType: P2pChatMessageType.DISBAND_GROUPCHAT,
+          content: linkmanRequest
+        }
+        let groupChatLinkmans = []
+        for (let groupMember of groupChat.groupMembers) {
+          /*let linkman = store.state.linkmanMap[groupMember.memberPeerId]
+          if (linkman && linkman.peerId !== myselfPeerClient.peerId) { // 自己和非联系人除外*/
+          if (groupMember.memberPeerId !== myselfPeerClient.peerId) { // 自己除外
+            groupChatLinkmans.push(store.state.linkmanMap[groupMember.memberPeerId])
+          }
+        }
+        for (let groupChatLinkman of groupChatLinkmans) {
+          await store.saveAndSendMessage(message, groupChatLinkman)
+        }
+
+        let chat = await store.getChat(groupChat.groupId)
+        let chatMessage = {
+          messageType: P2pChatMessageType.CHAT_SYS,
+          contentType: ChatContentType.EVENT,
+          content: _that.$i18n.t("You") + _that.$i18n.t(" have disbanded this group chat")
+        }
+        await store.addCHATSYSMessage(chat, chatMessage)
+      } catch (error) {
+        console.error(error)
+      } finally {
+        _that.$q.loading.hide()
+        _that.subKind = "default"
+      }
+    },
     confirmRemoveGroupChat() {
       let _that = this
       let store = _that.$store
@@ -1719,92 +1833,99 @@ export default {
     async removeGroupChat() {
       let _that = this
       let store = _that.$store
-      let myselfPeerClient = myself.myselfPeerClient
-      let currentGroupChatGroupId = store.state.groupChatMap[store.state.currentChat.subjectId].groupId
-      let groupMembers = store.state.groupChatMap[store.state.currentChat.subjectId].groupMembers
-      let currentTime = new Date()
+      _that.$q.loading.show()
+      try {
+        let myselfPeerClient = myself.myselfPeerClient
+        let currentGroupChatGroupId = store.state.groupChatMap[store.state.currentChat.subjectId].groupId
+        let groupMembers = store.state.groupChatMap[store.state.currentChat.subjectId].groupMembers
+        let currentTime = new Date()
 
-      // 删除聊天记录
-      let messages = await chatComponent.loadMessage({
-        ownerPeerId: myselfPeerClient.peerId,
-        subjectId: currentGroupChatGroupId
-      })
-      if (messages && messages.length > 0) {
-        await chatComponent.remove(ChatDataType.MESSAGE, messages)
-      }
-      let chat = store.state.chatMap[currentGroupChatGroupId]
-      chat = await chatComponent.get(ChatDataType.CHAT, chat._id)
-      if (chat) {
-        await chatComponent.remove(ChatDataType.CHAT, chat, store.state.chats)
-      }
-      delete store.state.chatMap[currentGroupChatGroupId]
+        // 删除聊天记录
+        let messages = await chatComponent.loadMessage({
+          ownerPeerId: myselfPeerClient.peerId,
+          subjectId: currentGroupChatGroupId
+        })
+        if (messages && messages.length > 0) {
+          await chatComponent.remove(ChatDataType.MESSAGE, messages)
+        }
+        let chat = store.state.chatMap[currentGroupChatGroupId]
+        chat = await chatComponent.get(ChatDataType.CHAT, chat._id)
+        if (chat) {
+          await chatComponent.remove(ChatDataType.CHAT, chat, store.state.chats)
+        }
+        delete store.state.chatMap[currentGroupChatGroupId]
 
-      // 先保存要通知的群组成员
-      let groupChatLinkmans = []
-      for (let groupMember of groupMembers) {
-        /*let linkman = store.state.linkmanMap[groupMember.memberPeerId]
-        if (linkman && linkman.peerId !== myselfPeerClient.peerId) { // 自己和非联系人除外*/
-        if (groupMember.memberPeerId !== myselfPeerClient.peerId) { // 自己除外
-          groupChatLinkmans.push(store.state.linkmanMap[groupMember.memberPeerId])
-          let _index = 0
-          for (let gc of linkman.groupChats) {
-            if (gc.groupId === currentGroupChatGroupId) {
-              linkman.groupChats.splice(_index, 1)
-              break
+        // 先保存要通知的群组成员
+        let groupChatLinkmans = []
+        for (let groupMember of groupMembers) {
+          /*let linkman = store.state.linkmanMap[groupMember.memberPeerId]
+          if (linkman && linkman.peerId !== myselfPeerClient.peerId) { // 自己和非联系人除外*/
+          if (groupMember.memberPeerId !== myselfPeerClient.peerId) { // 自己除外
+            groupChatLinkmans.push(store.state.linkmanMap[groupMember.memberPeerId])
+            let _index = 0
+            for (let gc of linkman.groupChats) {
+              if (gc.groupId === currentGroupChatGroupId) {
+                linkman.groupChats.splice(_index, 1)
+                break
+              }
+              _index++
             }
-            _index++
           }
         }
-      }
 
-      // 删除群组成员
-      let removeGroupMembers = await contactComponent.loadGroupMember({
-        ownerPeerId: myselfPeerClient.peerId,
-        groupId: currentGroupChatGroupId
-      })
-      if (removeGroupMembers && removeGroupMembers.length > 0) {
-        await contactComponent.remove(ContactDataType.GROUP_MEMBER, removeGroupMembers)
-      }
-
-      // 删除群组
-      let groupChatRecord = await contactComponent.get(ContactDataType.GROUP, store.state.groupChatMap[store.state.currentChat.subjectId]._id)
-      await contactComponent.remove(ContactDataType.GROUP, groupChatRecord, store.state.groupChats)
-      delete store.state.groupChatMap[currentGroupChatGroupId]
-      store.state.currentChat = null
-      _that.subKind = "default"
-      if (store.state.ifMobileStyle) {
-        store.toggleDrawer(false)
-      }
-
-      if (groupChatLinkmans.length > 0) {
-        // 新增Sent请求
-        let groupMembersWithFlag = []
-        let groupMember = {}
-        groupMember.groupId = currentGroupChatGroupId
-        groupMember.memberPeerId = myselfPeerClient.peerId
-        groupMember.dirtyFlag = 'DELETED' // 脏标志
-        groupMembersWithFlag.push(groupMember)
-        let linkmanRequest = {}
-        linkmanRequest.requestType = RequestType.REMOVE_GROUPCHAT_MEMBER
-        linkmanRequest.ownerPeerId = myselfPeerClient.peerId
-        linkmanRequest.senderPeerId = myselfPeerClient.peerId
-        linkmanRequest.data = JSON.stringify(groupMembersWithFlag) // 数据库为JSON格式
-        linkmanRequest.groupId = currentGroupChatGroupId
-        linkmanRequest.createDate = currentTime
-        linkmanRequest.status = RequestStatus.SENT
-        console.log(linkmanRequest)
-        await contactComponent.insert(ContactDataType.LINKMAN_REQUEST, linkmanRequest, null)
-        linkmanRequest.data = groupMembersWithFlag // 内存为对象格式
-
-        // 保存/发送Sent请求
-        let message = {
-          subjectType: SubjectType.LINKMAN_REQUEST,
-          messageType: P2pChatMessageType.REMOVE_GROUPCHAT_MEMBER,
-          content: linkmanRequest
+        // 删除群组成员
+        let removeGroupMembers = await contactComponent.loadGroupMember({
+          ownerPeerId: myselfPeerClient.peerId,
+          groupId: currentGroupChatGroupId
+        })
+        if (removeGroupMembers && removeGroupMembers.length > 0) {
+          await contactComponent.remove(ContactDataType.GROUP_MEMBER, removeGroupMembers)
         }
-        for (let groupChatLinkman of groupChatLinkmans) {
-          await store.saveAndSendMessage(message, groupChatLinkman)
+
+        // 删除群组
+        let groupChatRecord = await contactComponent.get(ContactDataType.GROUP, store.state.groupChatMap[store.state.currentChat.subjectId]._id)
+        await contactComponent.remove(ContactDataType.GROUP, groupChatRecord, store.state.groupChats)
+        delete store.state.groupChatMap[currentGroupChatGroupId]
+        store.state.currentChat = null
+        _that.subKind = "default"
+        if (store.state.ifMobileStyle) {
+          store.toggleDrawer(false)
         }
+
+        if (groupChatLinkmans.length > 0) {
+          // 新增Sent请求
+          let groupMembersWithFlag = []
+          let groupMember = {}
+          groupMember.groupId = currentGroupChatGroupId
+          groupMember.memberPeerId = myselfPeerClient.peerId
+          groupMember.dirtyFlag = 'DELETED' // 脏标志
+          groupMembersWithFlag.push(groupMember)
+          let linkmanRequest = {}
+          linkmanRequest.requestType = RequestType.REMOVE_GROUPCHAT_MEMBER
+          linkmanRequest.ownerPeerId = myselfPeerClient.peerId
+          linkmanRequest.senderPeerId = myselfPeerClient.peerId
+          linkmanRequest.data = JSON.stringify(groupMembersWithFlag) // 数据库为JSON格式
+          linkmanRequest.groupId = currentGroupChatGroupId
+          linkmanRequest.createDate = currentTime
+          linkmanRequest.status = RequestStatus.SENT
+          console.log(linkmanRequest)
+          await contactComponent.insert(ContactDataType.LINKMAN_REQUEST, linkmanRequest, null)
+          linkmanRequest.data = groupMembersWithFlag // 内存为对象格式
+
+          // 保存/发送Sent请求
+          let message = {
+            subjectType: SubjectType.LINKMAN_REQUEST,
+            messageType: P2pChatMessageType.REMOVE_GROUPCHAT_MEMBER,
+            content: linkmanRequest
+          }
+          for (let groupChatLinkman of groupChatLinkmans) {
+            await store.saveAndSendMessage(message, groupChatLinkman)
+          }
+        }
+      } catch (error) {
+        console.error(error)
+      } finally {
+        _that.$q.loading.hide()
       }
     },
     showAddGroupChatMember() {
@@ -1965,186 +2086,198 @@ export default {
     async removeGroupChatMember() {
       let _that = this
       let store = _that.$store
-      let myselfPeerClient = myself.myselfPeerClient
-      let groupChat = store.state.groupChatMap[store.state.currentChat.subjectId]
-      let groupMembers = groupChat.groupMembers
-      let currentTime = new Date()
-      // 先保存要通知的群组成员
-      let groupChatLinkmans = []
-      for (let groupMember of groupMembers) {
-        /*let linkman = store.state.linkmanMap[groupMember.memberPeerId]
-        if (linkman && linkman.peerId !== myselfPeerClient.peerId) { // 自己和非联系人除外*/
-        if (groupMember.memberPeerId !== myselfPeerClient.peerId) { // 自己除外
-          groupChatLinkmans.push(store.state.linkmanMap[groupMember.memberPeerId])
+      _that.$q.loading.show()
+      try {
+        let myselfPeerClient = myself.myselfPeerClient
+        let groupChat = store.state.groupChatMap[store.state.currentChat.subjectId]
+        let groupMembers = groupChat.groupMembers
+        let currentTime = new Date()
+        // 先保存要通知的群组成员
+        let groupChatLinkmans = []
+        for (let groupMember of groupMembers) {
+          /*let linkman = store.state.linkmanMap[groupMember.memberPeerId]
+          if (linkman && linkman.peerId !== myselfPeerClient.peerId) { // 自己和非联系人除外*/
+          if (groupMember.memberPeerId !== myselfPeerClient.peerId) { // 自己除外
+            groupChatLinkmans.push(store.state.linkmanMap[groupMember.memberPeerId])
+          }
         }
-      }
 
-      // 删除群组成员
-      let groupMembersWithFlag = []
-      let removedGroupMemberNames
-      for (let selectedGroupChatMember of _that.selectedGroupChatMembers) {
-        let gms = await contactComponent.loadGroupMember({
-          ownerPeerId: myselfPeerClient.peerId,
-          groupId: groupChat.groupId,
-          memberPeerId: selectedGroupChatMember.peerId
-        })
-        await contactComponent.remove(ContactDataType.GROUP_MEMBER, gms, groupMembers)
+        // 删除群组成员
+        let groupMembersWithFlag = []
+        let removedGroupMemberNames
+        for (let selectedGroupChatMember of _that.selectedGroupChatMembers) {
+          let gms = await contactComponent.loadGroupMember({
+            ownerPeerId: myselfPeerClient.peerId,
+            groupId: groupChat.groupId,
+            memberPeerId: selectedGroupChatMember.peerId
+          })
+          await contactComponent.remove(ContactDataType.GROUP_MEMBER, gms, groupMembers)
 
-        let groupMember = {}
-        groupMember.groupId = groupChat.groupId
-        groupMember.memberPeerId = selectedGroupChatMember.peerId
-        groupMember.dirtyFlag = 'DELETED' // 脏标志
-        groupMembersWithFlag.push(groupMember)
-        removedGroupMemberNames = (removedGroupMemberNames ? removedGroupMemberNames + _that.$i18n.t(", ") : '') + (selectedGroupChatMember.givenName ? selectedGroupChatMember.givenName : selectedGroupChatMember.name)
-        let linkman = store.state.linkmanMap[groupMember.memberPeerId]
-        if (linkman) {
-          let _index = 0
-          for (let gc of linkman.groupChats) {
-            if (gc.groupId === groupChat.groupId) {
-              linkman.groupChats.splice(_index, 1)
+          let groupMember = {}
+          groupMember.groupId = groupChat.groupId
+          groupMember.memberPeerId = selectedGroupChatMember.peerId
+          groupMember.dirtyFlag = 'DELETED' // 脏标志
+          groupMembersWithFlag.push(groupMember)
+          removedGroupMemberNames = (removedGroupMemberNames ? removedGroupMemberNames + _that.$i18n.t(", ") : '') + (selectedGroupChatMember.givenName ? selectedGroupChatMember.givenName : selectedGroupChatMember.name)
+          let linkman = store.state.linkmanMap[groupMember.memberPeerId]
+          if (linkman) {
+            let _index = 0
+            for (let gc of linkman.groupChats) {
+              if (gc.groupId === groupChat.groupId) {
+                linkman.groupChats.splice(_index, 1)
+                break
+              }
+              _index++
+            }
+          }
+        }
+        // 更新groupChat activeStatus
+        if (groupChat.activeStatus === ActiveStatus.UP) {
+          let hasActiveGroupMember = false
+          for (let groupChatMember of groupMembers) {
+            let linkman = store.state.linkmanMap[groupChatMember.memberPeerId]
+            if (linkman && linkman.activeStatus === ActiveStatus.UP) {
+              hasActiveGroupMember = true
               break
             }
-            _index++
+          }
+          if (!hasActiveGroupMember) {
+            groupChat.activeStatus = ActiveStatus.DOWN
           }
         }
-      }
-      // 更新groupChat activeStatus
-      if (groupChat.activeStatus === ActiveStatus.UP) {
-        let hasActiveGroupMember = false
-        for (let groupChatMember of groupMembers) {
-          let linkman = store.state.linkmanMap[groupChatMember.memberPeerId]
-          if (linkman && linkman.activeStatus === ActiveStatus.UP) {
-            hasActiveGroupMember = true
-            break
-          }
+
+        groupChat.groupMembers = groupMembers
+        store.state.groupChatMap[groupChat.groupId] = groupChat
+
+        // 新增Sent请求
+        let linkmanRequest = {}
+        linkmanRequest.requestType = RequestType.REMOVE_GROUPCHAT_MEMBER
+        linkmanRequest.ownerPeerId = myselfPeerClient.peerId
+        linkmanRequest.senderPeerId = myselfPeerClient.peerId
+        linkmanRequest.data = JSON.stringify(groupMembersWithFlag) // 数据库为JSON格式
+        linkmanRequest.groupId = groupChat.groupId
+        linkmanRequest.createDate = currentTime
+        linkmanRequest.status = RequestStatus.SENT
+        await contactComponent.insert(ContactDataType.LINKMAN_REQUEST, linkmanRequest)
+
+        linkmanRequest.data = groupMembersWithFlag // 内存为对象格式
+
+        // 保存/发送Sent请求
+        let message = {
+          subjectType: SubjectType.LINKMAN_REQUEST,
+          messageType: P2pChatMessageType.REMOVE_GROUPCHAT_MEMBER,
+          content: linkmanRequest
         }
-        if (!hasActiveGroupMember) {
-          groupChat.activeStatus = ActiveStatus.DOWN
+        for (let groupChatLinkman of groupChatLinkmans) {
+          await store.saveAndSendMessage(message, groupChatLinkman)
         }
+
+        let chat = await store.getChat(groupChat.groupId)
+        let chatMessage = {
+          messageType: P2pChatMessageType.CHAT_SYS,
+          contentType: ChatContentType.EVENT,
+          content: _that.$i18n.t("You") + _that.$i18n.t(" have removed ") + removedGroupMemberNames + _that.$i18n.t(" from group chat")
+        }
+        await store.addCHATSYSMessage(chat, chatMessage)
+      } catch (error) {
+        console.error(error)
+      } finally {
+        _that.$q.loading.hide()
+        _that.subKind = 'GROUP_CHATDetails'
       }
-
-      groupChat.groupMembers = groupMembers
-      store.state.groupChatMap[groupChat.groupId] = groupChat
-
-      // 新增Sent请求
-      let linkmanRequest = {}
-      linkmanRequest.requestType = RequestType.REMOVE_GROUPCHAT_MEMBER
-      linkmanRequest.ownerPeerId = myselfPeerClient.peerId
-      linkmanRequest.senderPeerId = myselfPeerClient.peerId
-      linkmanRequest.data = JSON.stringify(groupMembersWithFlag) // 数据库为JSON格式
-      linkmanRequest.groupId = groupChat.groupId
-      linkmanRequest.createDate = currentTime
-      linkmanRequest.status = RequestStatus.SENT
-      await contactComponent.insert(ContactDataType.LINKMAN_REQUEST, linkmanRequest)
-
-      linkmanRequest.data = groupMembersWithFlag // 内存为对象格式
-
-      // 保存/发送Sent请求
-      let message = {
-        subjectType: SubjectType.LINKMAN_REQUEST,
-        messageType: P2pChatMessageType.REMOVE_GROUPCHAT_MEMBER,
-        content: linkmanRequest
-      }
-      for (let groupChatLinkman of groupChatLinkmans) {
-        await store.saveAndSendMessage(message, groupChatLinkman)
-      }
-
-      let chat = await store.getChat(groupChat.groupId)
-      let chatMessage = {
-        messageType: P2pChatMessageType.CHAT_SYS,
-        contentType: ChatContentType.EVENT,
-        content: _that.$i18n.t("You") + _that.$i18n.t(" have removed ") + removedGroupMemberNames + _that.$i18n.t(" from group chat")
-      }
-      await store.addCHATSYSMessage(chat, chatMessage)
-
-      _that.subKind = 'GROUP_CHATDetails'
     },
     async ownershipHandover() {
       let _that = this
       let store = _that.$store
-      let myselfPeerClient = myself.myselfPeerClient
-      let groupChat = store.state.groupChatMap[store.state.currentChat.subjectId]
-      let groupMembers = groupChat.groupMembers
-      let selectedGroupChatMemberPeerId = _that.selectedGroupChatMemberPeerId
-      let currentTime = new Date()
+      _that.$q.loading.show()
+      try {
+        let myselfPeerClient = myself.myselfPeerClient
+        let groupChat = store.state.groupChatMap[store.state.currentChat.subjectId]
+        let groupMembers = groupChat.groupMembers
+        let selectedGroupChatMemberPeerId = _that.selectedGroupChatMemberPeerId
+        let currentTime = new Date()
 
-      // 修改群组成员群主身份
-      let groupChatLinkmans = []
-      let oldOwner, newOwner
-      for (let groupMember of groupMembers) {
-        /*let linkman = store.state.linkmanMap[groupMember.memberPeerId]
-        if (linkman && linkman.peerId !== myselfPeerClient.peerId) { // 自己和非联系人除外*/
-        if (groupMember.memberPeerId !== myselfPeerClient.peerId) { // 自己除外
-          groupChatLinkmans.push(store.state.linkmanMap[groupMember.memberPeerId])
+        // 修改群组成员群主身份
+        let groupChatLinkmans = []
+        let oldOwner, newOwner
+        for (let groupMember of groupMembers) {
+          /*let linkman = store.state.linkmanMap[groupMember.memberPeerId]
+          if (linkman && linkman.peerId !== myselfPeerClient.peerId) { // 自己和非联系人除外*/
+          if (groupMember.memberPeerId !== myselfPeerClient.peerId) { // 自己除外
+            groupChatLinkmans.push(store.state.linkmanMap[groupMember.memberPeerId])
+          }
+          if (groupMember.memberPeerId === myselfPeerClient.peerId) {
+            groupMember.memberType = MemberType.MEMBER
+            oldOwner = groupMember
+          } else if (groupMember.memberPeerId === selectedGroupChatMemberPeerId) {
+            groupMember.memberType = MemberType.OWNER
+            newOwner = groupMember
+          }
         }
-        if (groupMember.memberPeerId === myselfPeerClient.peerId) {
-          groupMember.memberType = MemberType.MEMBER
-          oldOwner = groupMember
-        } else if (groupMember.memberPeerId === selectedGroupChatMemberPeerId) {
-          groupMember.memberType = MemberType.OWNER
-          newOwner = groupMember
+        let groupMemberRecord = await contactComponent.get(ContactDataType.GROUP_MEMBER, oldOwner._id)
+        if (groupMemberRecord) {
+          groupMemberRecord.memberType = MemberType.MEMBER
+          await contactComponent.update(ContactDataType.GROUP_MEMBER, groupMemberRecord)
         }
-      }
-      let groupMemberRecord = await contactComponent.get(ContactDataType.GROUP_MEMBER, oldOwner._id)
-      if (groupMemberRecord) {
-        groupMemberRecord.memberType = MemberType.MEMBER
-        await contactComponent.update(ContactDataType.GROUP_MEMBER, groupMemberRecord)
-      }
-      groupMemberRecord = await contactComponent.get(ContactDataType.GROUP_MEMBER, newOwner._id)
-      if (groupMemberRecord) {
-        groupMemberRecord.memberType = MemberType.OWNER
-        await contactComponent.update(ContactDataType.GROUP_MEMBER, groupMemberRecord)
-      }
+        groupMemberRecord = await contactComponent.get(ContactDataType.GROUP_MEMBER, newOwner._id)
+        if (groupMemberRecord) {
+          groupMemberRecord.memberType = MemberType.OWNER
+          await contactComponent.update(ContactDataType.GROUP_MEMBER, groupMemberRecord)
+        }
 
-      groupChat.groupOwnerPeerId = selectedGroupChatMemberPeerId
-      groupChat.groupMembers = groupMembers
-      store.state.groupChatMap[groupChat.groupId] = groupChat
+        groupChat.groupOwnerPeerId = selectedGroupChatMemberPeerId
+        groupChat.groupMembers = groupMembers
+        store.state.groupChatMap[groupChat.groupId] = groupChat
 
-      // 新增Sent请求
-      let groupMembersWithFlag = []
-      let groupMember = {}
-      groupMember.groupId = oldOwner.groupId
-      groupMember.memberPeerId = oldOwner.memberPeerId
-      groupMember.dirtyFlag = 'OLDOWNER' // 脏标志
-      groupMembersWithFlag.push(groupMember)
-      groupMember = {}
-      groupMember.groupId = newOwner.groupId
-      groupMember.memberPeerId = newOwner.memberPeerId
-      groupMember.dirtyFlag = 'NEWOWNER' // 脏标志
-      groupMembersWithFlag.push(groupMember)
-      let linkmanRequest = {}
-      linkmanRequest.requestType = RequestType.MODIFY_GROUPCHAT_OWNER
-      linkmanRequest.ownerPeerId = myselfPeerClient.peerId
-      linkmanRequest.senderPeerId = myselfPeerClient.peerId
-      linkmanRequest.data = JSON.stringify(groupMembersWithFlag) // 数据库为JSON格式
-      linkmanRequest.groupId = groupChat.groupId
-      linkmanRequest.createDate = currentTime
-      linkmanRequest.status = RequestStatus.SENT
-      console.log(linkmanRequest)
-      await contactComponent.insert(ContactDataType.LINKMAN_REQUEST, linkmanRequest)
+        // 新增Sent请求
+        let groupMembersWithFlag = []
+        let groupMember = {}
+        groupMember.groupId = oldOwner.groupId
+        groupMember.memberPeerId = oldOwner.memberPeerId
+        groupMember.dirtyFlag = 'OLDOWNER' // 脏标志
+        groupMembersWithFlag.push(groupMember)
+        groupMember = {}
+        groupMember.groupId = newOwner.groupId
+        groupMember.memberPeerId = newOwner.memberPeerId
+        groupMember.dirtyFlag = 'NEWOWNER' // 脏标志
+        groupMembersWithFlag.push(groupMember)
+        let linkmanRequest = {}
+        linkmanRequest.requestType = RequestType.MODIFY_GROUPCHAT_OWNER
+        linkmanRequest.ownerPeerId = myselfPeerClient.peerId
+        linkmanRequest.senderPeerId = myselfPeerClient.peerId
+        linkmanRequest.data = JSON.stringify(groupMembersWithFlag) // 数据库为JSON格式
+        linkmanRequest.groupId = groupChat.groupId
+        linkmanRequest.createDate = currentTime
+        linkmanRequest.status = RequestStatus.SENT
+        console.log(linkmanRequest)
+        await contactComponent.insert(ContactDataType.LINKMAN_REQUEST, linkmanRequest)
 
-      linkmanRequest.data = groupMembersWithFlag // 内存为对象格式
+        linkmanRequest.data = groupMembersWithFlag // 内存为对象格式
 
-      // 保存/发送Sent请求
-      let message = {
-        subjectType: SubjectType.LINKMAN_REQUEST,
-        messageType: P2pChatMessageType.MODIFY_GROUPCHAT_OWNER,
-        content: linkmanRequest
+        // 保存/发送Sent请求
+        let message = {
+          subjectType: SubjectType.LINKMAN_REQUEST,
+          messageType: P2pChatMessageType.MODIFY_GROUPCHAT_OWNER,
+          content: linkmanRequest
+        }
+        for (let groupChatLinkman of groupChatLinkmans) {
+          await store.saveAndSendMessage(message, groupChatLinkman)
+        }
+
+        let newOwnerName = store.state.linkmanMap[selectedGroupChatMemberPeerId].givenName ? store.state.linkmanMap[selectedGroupChatMemberPeerId].givenName : store.state.linkmanMap[selectedGroupChatMemberPeerId].name
+        let chat = await store.getChat(groupChat.groupId)
+        let chatMessage = {
+          messageType: P2pChatMessageType.CHAT_SYS,
+          contentType: ChatContentType.EVENT,
+          content: newOwnerName + _that.$i18n.t(" has become the new Group Owner")
+        }
+        await store.addCHATSYSMessage(chat, chatMessage)
+      } catch (error) {
+        console.error(error)
+      } finally {
+        _that.$q.loading.hide()
+        _that.subKind = 'GROUP_CHATDetails'
       }
-      for (let groupChatLinkman of groupChatLinkmans) {
-        await store.saveAndSendMessage(message, groupChatLinkman)
-      }
-
-      let newOwnerName = store.state.linkmanMap[selectedGroupChatMemberPeerId].givenName ? store.state.linkmanMap[selectedGroupChatMemberPeerId].givenName : store.state.linkmanMap[selectedGroupChatMemberPeerId].name
-      let chat = await store.getChat(groupChat.groupId)
-      let chatMessage = {
-        messageType: P2pChatMessageType.CHAT_SYS,
-        contentType: ChatContentType.EVENT,
-        content: newOwnerName + _that.$i18n.t(" has become the new Group Owner")
-      }
-      await store.addCHATSYSMessage(chat, chatMessage)
-
-      _that.subKind = 'GROUP_CHATDetails'
     },
     confirmCleanChatHistory() {
       let _that = this
@@ -2317,66 +2450,31 @@ export default {
     changeRecallTimeLimit: async function (value) {
       let _that = this
       let store = _that.$store
-      let subjectType = store.state.currentChat.subjectType
-      let subjectId = store.state.currentChat.subjectId
-      if (subjectType === SubjectType.CHAT) {
-        let linkman = store.state.linkmanMap[subjectId]
-        let linkmanRecord = await contactComponent.get(ContactDataType.LINKMAN, linkman._id)
-        if (linkmanRecord) {
-          linkman.myselfRecallTimeLimit = value
-          linkmanRecord.myselfRecallTimeLimit = value
-          await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
-          await store.sendLinkmanInfo(subjectId, `modify`)
-        }
-      } else if (subjectType === SubjectType.GROUP_CHAT) {
-        let groupChat = store.state.groupChatMap[subjectId]
-        let groupChatRecord = await contactComponent.get(ContactDataType.GROUP, groupChat._id)
-        if (groupChatRecord) {
-          groupChat.recallTimeLimit = value
-          groupChatRecord.recallTimeLimit = value
-          await contactComponent.update(ContactDataType.GROUP, groupChatRecord)
-          await _that.sendGroupInfo()
-        }
-
-        let _type = _that.$i18n.t("Recall Time Limit")
-        let _content = `${store.state.myselfPeerClient.name}${(value ? _that.$i18n.t("Add") : _that.$i18n.t("Cancel"))}${_type}`
-        if (_content) {
-          let chat = await store.getChat(groupChat.groupId)
-          let chatMessage = {
-            messageType: P2pChatMessageType.CHAT_SYS,
-            contentType: ChatContentType.EVENT,
-            content: _content
+      _that.$q.loading.show()
+      try {
+        let subjectType = store.state.currentChat.subjectType
+        let subjectId = store.state.currentChat.subjectId
+        if (subjectType === SubjectType.CHAT) {
+          let linkman = store.state.linkmanMap[subjectId]
+          let linkmanRecord = await contactComponent.get(ContactDataType.LINKMAN, linkman._id)
+          if (linkmanRecord) {
+            linkman.myselfRecallTimeLimit = value
+            linkmanRecord.myselfRecallTimeLimit = value
+            await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
+            await store.sendLinkmanInfo(subjectId, `modify`)
           }
-          await store.addCHATSYSMessage(chat, chatMessage)
-        }
-      }
-      _that.$forceUpdate()
-    },
-    changeRecallAlert: async function (value) {
-      let _that = this
-      let store = _that.$store
-      let subjectType = store.state.currentChat.subjectType
-      let subjectId = store.state.currentChat.subjectId
-      if (subjectType === SubjectType.CHAT) {
-        let linkman = store.state.linkmanMap[subjectId]
-        let linkmanRecord = await contactComponent.get(ContactDataType.LINKMAN, linkman._id)
-        if (linkmanRecord) {
-          linkman.myselfRecallAlert = value
-          linkmanRecord.myselfRecallAlert = value
-          await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
-          await store.sendLinkmanInfo(subjectId, `modify`)
-        }
-      } else if (subjectType === SubjectType.GROUP_CHAT) {
-        let groupChat = store.state.groupChatMap[subjectId]
-        let groupChatRecord = await contactComponent.get(ContactDataType.GROUP, groupChat._id)
-        if (groupChatRecord) {
-          groupChat.recallAlert = value
-          groupChatRecord.recallAlert = value
-          await contactComponent.update(ContactDataType.GROUP, groupChatRecord)
-          await _that.sendGroupInfo()
+        } else if (subjectType === SubjectType.GROUP_CHAT) {
+          let groupChat = store.state.groupChatMap[subjectId]
+          let groupChatRecord = await contactComponent.get(ContactDataType.GROUP, groupChat._id)
+          if (groupChatRecord) {
+            groupChat.recallTimeLimit = value
+            groupChatRecord.recallTimeLimit = value
+            await contactComponent.update(ContactDataType.GROUP, groupChatRecord)
+            await _that.sendGroupInfo()
+          }
 
-          let _type = _that.$i18n.t("Recall Alert")
-          let _content = `${store.state.myselfPeerClient.name}${(value ? _that.$i18n.t("Add") : _that.$i18n.t("Cancel"))}${_type}`
+          let _type = _that.$i18n.t("Recall Time Limit")
+          let _content = `${_that.$i18n.t("You")}${(value ? _that.$i18n.t(" have switched on ") : _that.$i18n.t(" have switched off "))}${_type}`
           if (_content) {
             let chat = await store.getChat(groupChat.groupId)
             let chatMessage = {
@@ -2387,6 +2485,55 @@ export default {
             await store.addCHATSYSMessage(chat, chatMessage)
           }
         }
+      } catch (error) {
+        console.error(error)
+      } finally {
+        _that.$q.loading.hide()
+        _that.$forceUpdate()
+      }
+    },
+    changeRecallAlert: async function (value) {
+      let _that = this
+      let store = _that.$store
+      _that.$q.loading.show()
+      try {
+        let subjectType = store.state.currentChat.subjectType
+        let subjectId = store.state.currentChat.subjectId
+        if (subjectType === SubjectType.CHAT) {
+          let linkman = store.state.linkmanMap[subjectId]
+          let linkmanRecord = await contactComponent.get(ContactDataType.LINKMAN, linkman._id)
+          if (linkmanRecord) {
+            linkman.myselfRecallAlert = value
+            linkmanRecord.myselfRecallAlert = value
+            await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
+            await store.sendLinkmanInfo(subjectId, `modify`)
+          }
+        } else if (subjectType === SubjectType.GROUP_CHAT) {
+          let groupChat = store.state.groupChatMap[subjectId]
+          let groupChatRecord = await contactComponent.get(ContactDataType.GROUP, groupChat._id)
+          if (groupChatRecord) {
+            groupChat.recallAlert = value
+            groupChatRecord.recallAlert = value
+            await contactComponent.update(ContactDataType.GROUP, groupChatRecord)
+            await _that.sendGroupInfo()
+
+            let _type = _that.$i18n.t("Recall Alert")
+            let _content = `${_that.$i18n.t("You")}${(value ? _that.$i18n.t(" have switched on ") : _that.$i18n.t(" have switched off "))}${_type}`
+            if (_content) {
+              let chat = await store.getChat(groupChat.groupId)
+              let chatMessage = {
+                messageType: P2pChatMessageType.CHAT_SYS,
+                contentType: ChatContentType.EVENT,
+                content: _content
+              }
+              await store.addCHATSYSMessage(chat, chatMessage)
+            }
+          }
+        }
+      } catch (error) {
+        console.error(error)
+      } finally {
+        _that.$q.loading.hide()
       }
     },
     async enterDetail() {

@@ -23,7 +23,7 @@ import { cameraComponent, systemAudioComponent, mediaComponent } from '@/libs/ba
 import { fileComponent } from '@/libs/base/colla-cordova'
 import { CollectionType, collectionComponent } from '@/libs/biz/colla-collection'
 import { ChatDataType, ChatContentType, ChatMessageStatus, P2pChatMessageType, SubjectType, chatComponent, chatBlockComponent } from '@/libs/biz/colla-chat'
-import { ContactDataType, RequestType, RequestStatus, LinkmanStatus, ActiveStatus, contactComponent, MemberType } from '@/libs/biz/colla-contact'
+import { ContactDataType, RequestType, RequestStatus, LinkmanStatus, GroupStatus, ActiveStatus, contactComponent, MemberType } from '@/libs/biz/colla-contact'
 import { channelComponent, ChannelDataType, ChannelType, EntityType } from '@/libs/biz/colla-channel'
 import { collectionUtil, blockLogComponent } from '@/libs/biz/colla-collection-util'
 
@@ -2001,7 +2001,7 @@ export default {
           groupChat.description = content.groupDescription
           groupChat.pyDescription = pinyinUtil.getPinyin(content.groupDescription)
           groupChat.createDate = content.groupCreateDate
-          groupChat.status = LinkmanStatus.EFFECTIVE
+          groupChat.status = GroupStatus.EFFECTIVE
           groupChat.locked = false
           groupChat.notAlert = false
           groupChat.top = false
@@ -2074,6 +2074,53 @@ export default {
         }
         await _that.sendOrSaveReceipt(message)
       }
+      else if (messageType === P2pChatMessageType.DISBAND_GROUPCHAT && content) {
+        let _id = content._id
+        let currentTime = new Date()
+        let groupChat = store.state.groupChatMap[content.groupId]
+        if (groupChat) {
+          // 修改群组
+          groupChat.status = GroupStatus.DISBANDED
+          store.state.groupChatMap[content.groupId] = groupChat
+          let groupChatRecord = await contactComponent.get(ContactDataType.GROUP, groupChat._id)
+          if (groupChatRecord) {
+            groupChatRecord.status = GroupStatus.DISBANDED
+            await contactComponent.update(ContactDataType.GROUP, groupChatRecord)
+          }
+
+          let modifierName
+          let senderLinkman = store.state.linkmanMap[content.senderPeerId]
+          if (senderLinkman) {
+            modifierName = senderLinkman.givenName ? senderLinkman.givenName : senderLinkman.name
+          }
+          let _content = ''
+          if (modifierName) {
+            _content = modifierName + _that.$i18n.t(" has disbanded this group chat")
+          }
+          if (_content) {
+            let chat = await store.getChat(groupChat.groupId)
+            let chatMessage = {
+              _id: _id + peerId,
+              messageType: P2pChatMessageType.CHAT_SYS,
+              contentType: ChatContentType.EVENT,
+              content: _content
+            }
+            await store.addCHATSYSMessage(chat, chatMessage)
+          }
+        }
+
+        // 发送Receive收条
+        let linkmanRequest = {}
+        linkmanRequest._id = _id
+        linkmanRequest.receiveTime = currentTime
+        let message = {
+          messageType: P2pChatMessageType.DISBAND_GROUPCHAT_RECEIPT,
+          ownerPeerId: myselfPeerClient.peerId,
+          subjectId: content.senderPeerId,
+          content: linkmanRequest
+        }
+        await _that.sendOrSaveReceipt(message)
+      }
       else if (messageType === P2pChatMessageType.MODIFY_GROUPCHAT && content) {
         let _id = content._id
         let currentTime = new Date()
@@ -2137,39 +2184,39 @@ export default {
           }
           groupChat.groupMembers = groupMembers
           store.state.groupChatMap[content.groupId] = groupChat
-        }
 
-        let modifierName
-        let senderLinkman = store.state.linkmanMap[content.senderPeerId]
-        if (senderLinkman) {
-          modifierName = senderLinkman.givenName ? senderLinkman.givenName : senderLinkman.name
-        }
-        let _content = ''
-        if (modifierName && (nameChanged || descriptionChanged)) {
-          _content = modifierName + _that.$i18n.t(" has modified ") + (nameChanged ? (descriptionChanged ? _that.$i18n.t("Group Name to be : ") + groupChat.name + _that.$i18n.t(",") + _that.$i18n.t(" modified ")
-            + _that.$i18n.t("Group Description to be : ") + groupChat.description : _that.$i18n.t("Group Name to be : ") + groupChat.name) : _that.$i18n.t("Group Description to be : ") + groupChat.description)
-        } else if (modifierName && (recallTimeLimitChanged || recallAlertChanged)) {
-          let _type
-          let value
-          if (recallTimeLimitChanged) {
-            _type = _that.$i18n.t("Recall Time Limit")
-            value = groupChat.recallTimeLimit
-          } else {
-            _type = _that.$i18n.t("Recall Alert")
-            value = groupChat.recallAlert
-            _that.$forceUpdate()
+          let modifierName
+          let senderLinkman = store.state.linkmanMap[content.senderPeerId]
+          if (senderLinkman) {
+            modifierName = senderLinkman.givenName ? senderLinkman.givenName : senderLinkman.name
           }
-          _content = `${modifierName}${(value ? _that.$i18n.t("Add") : _that.$i18n.t("Cancel"))}${_type}`
-        }
-        if (_content) {
-          let chat = await store.getChat(groupChat.groupId)
-          let chatMessage = {
-            _id: _id + peerId,
-            messageType: P2pChatMessageType.CHAT_SYS,
-            contentType: ChatContentType.EVENT,
-            content: _content
+          let _content = ''
+          if (modifierName && (nameChanged || descriptionChanged)) {
+            _content = modifierName + _that.$i18n.t(" has modified ") + (nameChanged ? (descriptionChanged ? _that.$i18n.t("Group Name to be : ") + groupChat.name + _that.$i18n.t(",") + _that.$i18n.t(" modified ")
+              + _that.$i18n.t("Group Description to be : ") + groupChat.description : _that.$i18n.t("Group Name to be : ") + groupChat.name) : _that.$i18n.t("Group Description to be : ") + groupChat.description)
+          } else if (modifierName && (recallTimeLimitChanged || recallAlertChanged)) {
+            let _type
+            let value
+            if (recallTimeLimitChanged) {
+              _type = _that.$i18n.t("Recall Time Limit")
+              value = groupChat.recallTimeLimit
+            } else {
+              _type = _that.$i18n.t("Recall Alert")
+              value = groupChat.recallAlert
+              _that.$forceUpdate()
+            }
+            _content = `${modifierName}${(value ? _that.$i18n.t(" has switched on ") : _that.$i18n.t(" has switched off "))}${_type}`
           }
-          await store.addCHATSYSMessage(chat, chatMessage)
+          if (_content) {
+            let chat = await store.getChat(groupChat.groupId)
+            let chatMessage = {
+              _id: _id + peerId,
+              messageType: P2pChatMessageType.CHAT_SYS,
+              contentType: ChatContentType.EVENT,
+              content: _content
+            }
+            await store.addCHATSYSMessage(chat, chatMessage)
+          }
         }
 
         // 发送Receive收条
@@ -2203,7 +2250,7 @@ export default {
           groupChat.description = content.groupDescription
           groupChat.pyDescription = pinyinUtil.getPinyin(content.groupDescription)
           groupChat.createDate = content.groupCreateDate
-          groupChat.status = LinkmanStatus.EFFECTIVE
+          groupChat.status = GroupStatus.EFFECTIVE
           groupChat.locked = false
           groupChat.notAlert = false
           groupChat.top = false
@@ -2604,6 +2651,7 @@ export default {
         await _that.sendOrSaveReceipt(message)
       }
       else if ((messageType === P2pChatMessageType.ADD_GROUPCHAT_RECEIPT
+        || messageType === P2pChatMessageType.DISBAND_GROUPCHAT_RECEIPT
         || messageType === P2pChatMessageType.MODIFY_GROUPCHAT_RECEIPT
         || messageType === P2pChatMessageType.ADD_GROUPCHAT_MEMBER_RECEIPT
         || messageType === P2pChatMessageType.REMOVE_GROUPCHAT_MEMBER_RECEIPT

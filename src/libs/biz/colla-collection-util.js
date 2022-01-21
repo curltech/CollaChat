@@ -7,7 +7,6 @@ import pinyinUtil from '@/libs/base/colla-pinyin'
 import { mediaComponent, audioMediaComponent } from '@/libs/base/colla-media'
 import { fileComponent } from '@/libs/base/colla-cordova'
 import { collectionComponent, CollectionType } from '@/libs/biz/colla-collection'
-import { P2pChatMessageType } from '@/libs/biz/colla-chat'
 
 /**
  * message和collection复用功能
