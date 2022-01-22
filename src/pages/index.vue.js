@@ -742,7 +742,7 @@ export default {
     async insertReceivedMessage(message) {
       let _that = this
       let store = _that.$store
-      if ((message.subjectType === SubjectType.CHAT && !store.state.linkmanMap[message.senderPeerId]) || (message.subjectType === SubjectType.GROUP_CHAT && !store.state.groupChatMap[message.subjectId])) {
+      if ((message.subjectType === SubjectType.CHAT && !store.state.linkmanMap[message.senderPeerId]) || (message.subjectType === SubjectType.GROUP_CHAT && (!store.state.groupChatMap[message.subjectId] || store.state.groupChatMap[message.subjectId].status === GroupStatus.DISBANDED))) {
         return
       }
       if (message.messageType == P2pChatMessageType.CHAT_LINKMAN || message.messageType == P2pChatMessageType.CALL_REQUEST) {
@@ -2688,15 +2688,15 @@ export default {
       else if (messageType === P2pChatMessageType.ADD_LINKMAN && content) {
         let data = content
         let srcPeerId = data.srcPeerId
-        let clientPeerId = myselfPeerClient.peerId
         let linkman = store.state.linkmanMap[srcPeerId]
+        let clientPeerId = myselfPeerClient.peerId
         let currentTime = new Date()
         // 重复消息不处理、但仍发送Receive收条
         let duplicated = false
         let srcName = data.srcName
         let srcMobile = data.srcMobile
         let srcAvatar = data.srcAvatar
-        let _id = data.id
+        let _id = data._id
         let blackedMe = data.blackedMe
         for (let linkmanRequest of store.state.linkmanRequests) {
           if (linkmanRequest._id === _id) {

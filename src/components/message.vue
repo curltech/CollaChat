@@ -160,53 +160,51 @@
                 q-avatar(size="56px")
                   img(:src="groupChatMemeberAvatar(groupChatMember)")
               q-icon(v-if="$store.displayActiveStatus" size="16px" name="person" :color="$store.state.linkmanMap[groupChatMember.memberPeerId] && $store.state.linkmanMap[groupChatMember.memberPeerId].activeStatus === ActiveStatus.UP ? 'secondary' : 'grey-1'")
-            q-item-section(avatar v-if="ifIAmGroupOwner($store.state.currentChat)")
+            q-item-section(avatar v-if="ifIAmEffectiveGroupOwner($store.state.currentChat)")
               q-btn.text-primary(dense flat round size="28px" icon="add" @click="showAddGroupChatMember")
-            q-item-section(avatar v-if="ifIAmGroupOwner($store.state.currentChat)")
+            q-item-section(avatar v-if="ifIAmEffectiveGroupOwner($store.state.currentChat)")
               q-btn.text-primary(dense flat round size="28px" icon="remove" @click="showSelectGroupChatMember")
-            q-item-section(avatar v-if="ifIAmGroupOwner($store.state.currentChat)")
+            q-item-section(avatar v-if="ifIAmEffectiveGroupOwner($store.state.currentChat)")
               q-btn.text-primary(dense flat round size="24px" icon="clear" @click="confirmDisbandGroupChat")
           q-separator.c-separator.message-sep-2
           q-item(clickable v-ripple @click="showOwnershipHandover")
             q-item-section
-              q-item-label {{ ifIAmGroupOwner($store.state.currentChat) ? $t('Ownership Handover') : $t('Group Owner') }}
+              q-item-label {{ ifIAmEffectiveGroupOwner($store.state.currentChat) ? $t('Ownership Handover') : $t('Group Owner') }}
             q-item-section(side) {{ groupChatOwnerName() }}
-            q-item-section(avatar v-if="ifIAmGroupOwner($store.state.currentChat)")
+            q-item-section(avatar v-if="ifIAmEffectiveGroupOwner($store.state.currentChat)")
               q-icon(name="keyboard_arrow_right" color="c-grey-10")
           q-separator.c-separator.message-sep-1
           q-item(clickable v-ripple @click="showModifyGroupChat")
             q-item-section
               q-item-label {{$t('Group Name')}}
             q-item-section(side) {{ $store.state.currentChat && $store.state.groupChatMap[$store.state.currentChat.subjectId] && $store.state.groupChatMap[$store.state.currentChat.subjectId].name ? $store.state.groupChatMap[$store.state.currentChat.subjectId].name : '' }}
-            q-item-section(avatar v-if="ifIAmGroupOwner($store.state.currentChat)")
+            q-item-section(avatar v-if="ifIAmEffectiveGroupOwner($store.state.currentChat)")
               q-icon(name="keyboard_arrow_right" color="c-grey-10")
           q-separator.c-separator.message-sep-1
           q-item(clickable v-ripple @click="showModifyGroupChat")
             q-item-section
               q-item-label {{$t('Group Description')}}
               q-item-label(caption lines="3") {{ $store.state.currentChat && $store.state.groupChatMap[$store.state.currentChat.subjectId] && $store.state.groupChatMap[$store.state.currentChat.subjectId].description ? $store.state.groupChatMap[$store.state.currentChat.subjectId].description : '' }}
-            q-item-section(avatar v-if="ifIAmGroupOwner($store.state.currentChat)")
+            q-item-section(avatar v-if="ifIAmEffectiveGroupOwner($store.state.currentChat)")
               q-icon(name="keyboard_arrow_right" color="c-grey-10")
           q-separator.c-separator.message-sep-1
           q-item
             q-item-section
               q-item-label {{$t('Recall Time Limit')}}
             q-item-section(side)
-              q-toggle(v-if="$store.state.currentChat && $store.state.groupChatMap[$store.state.currentChat.subjectId] && ifIAmGroupOwner($store.state.currentChat)" v-model="$store.state.groupChatMap[$store.state.currentChat.subjectId].recallTimeLimit" @input="changeRecallTimeLimit")
-              q-toggle(v-if="$store.state.currentChat && $store.state.groupChatMap[$store.state.currentChat.subjectId] && !ifIAmGroupOwner($store.state.currentChat)" disable = true v-model="$store.state.groupChatMap[$store.state.currentChat.subjectId].recallTimeLimit")
+              q-toggle(v-if="$store.state.currentChat && $store.state.groupChatMap[$store.state.currentChat.subjectId]" :disable="!ifIAmEffectiveGroupOwner($store.state.currentChat)" v-model="$store.state.groupChatMap[$store.state.currentChat.subjectId].recallTimeLimit" @input="changeRecallTimeLimit")
           q-separator.c-separator.message-sep-1
           q-item
             q-item-section
               q-item-label {{$t('Recall Alert')}}
             q-item-section(side)
-              q-toggle(v-if="$store.state.currentChat && $store.state.groupChatMap[$store.state.currentChat.subjectId] && ifIAmGroupOwner($store.state.currentChat)" v-model="$store.state.groupChatMap[$store.state.currentChat.subjectId].recallAlert" @input="changeRecallAlert")
-              q-toggle(v-if="$store.state.currentChat && $store.state.groupChatMap[$store.state.currentChat.subjectId] && !ifIAmGroupOwner($store.state.currentChat)" disable = true v-model="$store.state.groupChatMap[$store.state.currentChat.subjectId].recallAlert")
+              q-toggle(v-if="$store.state.currentChat && $store.state.groupChatMap[$store.state.currentChat.subjectId]" :disable="!ifIAmEffectiveGroupOwner($store.state.currentChat)" v-model="$store.state.groupChatMap[$store.state.currentChat.subjectId].recallAlert" @input="changeRecallAlert")
           q-separator.c-separator.message-sep-2
           q-item(clickable v-ripple @click="showModifyGroupChat")
             q-item-section
               q-item-label {{$t('Given Name')}}
             q-item-section(side) {{ $store.state.currentChat && $store.state.groupChatMap[$store.state.currentChat.subjectId] && $store.state.groupChatMap[$store.state.currentChat.subjectId].givenName ? $store.state.groupChatMap[$store.state.currentChat.subjectId].givenName : '' }}
-            q-item-section(avatar)
+            q-item-section(avatar v-if="$store.state.currentChat && $store.state.groupChatMap[$store.state.currentChat.subjectId] && $store.state.groupChatMap[$store.state.currentChat.subjectId].status === GroupStatus.Effective")
               q-icon(name="keyboard_arrow_right" color="c-grey-10")
           q-separator.c-separator.message-sep-1
           //q-item(clickable v-ripple @click="showModifyGroupChat")
@@ -220,7 +218,7 @@
             q-item-section
               q-item-label {{$t('My Alias')}}
             q-item-section(side) {{ $store.state.currentChat && $store.state.groupChatMap[$store.state.currentChat.subjectId] && $store.state.groupChatMap[$store.state.currentChat.subjectId].myAlias ? $store.state.groupChatMap[$store.state.currentChat.subjectId].myAlias : '' }}
-            q-item-section(avatar)
+            q-item-section(avatar v-if="$store.state.currentChat && $store.state.groupChatMap[$store.state.currentChat.subjectId] && $store.state.groupChatMap[$store.state.currentChat.subjectId].status === GroupStatus.Effective")
               q-icon(name="keyboard_arrow_right" color="c-grey-10")
           q-separator.c-separator.message-sep-2
           q-item(clickable v-ripple @click="enterGroupFile")
@@ -245,13 +243,13 @@
             q-item-section
               q-item-label {{$t('Alert New Message')}}
             q-item-section(side)
-              q-toggle(v-if="$store.state.currentChat && $store.state.groupChatMap[$store.state.currentChat.subjectId]" v-model="$store.state.groupChatMap[$store.state.currentChat.subjectId].notAlert" @input="changeNotAlertSwitch")
+              q-toggle(v-if="$store.state.currentChat && $store.state.groupChatMap[$store.state.currentChat.subjectId]" :disable="!ifIAmEffectiveGroupOwner($store.state.currentChat)" v-model="$store.state.groupChatMap[$store.state.currentChat.subjectId].notAlert" @input="changeNotAlertSwitch")
           q-separator.c-separator.message-sep-1
           q-item
             q-item-section
               q-item-label {{$t('Sticky Top')}}
             q-item-section(side)
-              q-toggle(v-if="$store.state.currentChat && $store.state.groupChatMap[$store.state.currentChat.subjectId]" v-model="$store.state.groupChatMap[$store.state.currentChat.subjectId].top" @input="changeTopSwitch")
+              q-toggle(v-if="$store.state.currentChat && $store.state.groupChatMap[$store.state.currentChat.subjectId]" :disable="!ifIAmEffectiveGroupOwner($store.state.currentChat)" v-model="$store.state.groupChatMap[$store.state.currentChat.subjectId].top" @input="changeTopSwitch")
           q-separator.c-separator.message-sep-2
           q-item
             q-item-section(align="center")
@@ -274,14 +272,14 @@
           q-toolbar-title(align="center") {{ $t('GroupChat Details') }}
           q-btn.text-primary(flat round icon="check" @click="modifyGroupChat")
         q-form(ref="formModifyGroupChat" @submit="modifyGroupChat" class="q-pa-sm")
-          q-input.c-field(v-if="ifIAmGroupOwner($store.state.currentChat)"
-            :autofocus="ifIAmGroupOwner($store.state.currentChat)"
+          q-input.c-field(v-if="ifIAmEffectiveGroupOwner($store.state.currentChat)"
+            :autofocus="ifIAmEffectiveGroupOwner($store.state.currentChat)"
             :label="$t('Group Name')" filled clearable v-model="groupChatData.name" lazy-rules :rules="[]")
           p
-          q-input.c-field(v-if="ifIAmGroupOwner($store.state.currentChat)" :label="$t('Group Description')" filled clearable v-model="groupChatData.description" lazy-rules :rules="[]")
-          p(v-if="ifIAmGroupOwner($store.state.currentChat)")
+          q-input.c-field(v-if="ifIAmEffectiveGroupOwner($store.state.currentChat)" :label="$t('Group Description')" filled clearable v-model="groupChatData.description" lazy-rules :rules="[]")
+          p(v-if="ifIAmEffectiveGroupOwner($store.state.currentChat)")
           q-input.c-field(:label="$t('Given Name')"
-            :autofocus="!ifIAmGroupOwner($store.state.currentChat)"
+            :autofocus="!ifIAmEffectiveGroupOwner($store.state.currentChat)"
             filled clearable v-model="groupChatData.givenName" lazy-rules :rules="[]")
           p
           q-input.c-field(:label="$t('My Alias')" filled clearable v-model="groupChatData.myAlias" lazy-rules :rules="[]")
@@ -320,9 +318,9 @@
       q-tab-panel(name="groupFile" style="padding:0px 0px")
         q-toolbar.header-toolbar
           q-btn(flat round icon="keyboard_arrow_left" @click="subKind='GROUP_CHATDetails'")
-          q-toolbar-title(align="center" :style="ifIAmGroupOwner($store.state.currentChat) ? '' : 'padding-right:54px'") {{ $t('Group File') + '(' + GroupFileFilteredList.length + ')' }}
-          q-btn.text-primary(v-if="ifIAmGroupOwner($store.state.currentChat) && !(ifMobileSize || $store.state.ifMobileStyle)" flat round icon="add_circle_outline" @click="$refs.groupFileUpload.pickFiles()")
-          form#groupFileUploadForm(v-if="ifIAmGroupOwner($store.state.currentChat) && (ifMobileSize || $store.state.ifMobileStyle)")
+          q-toolbar-title(align="center" :style="ifIAmEffectiveGroupOwner($store.state.currentChat) ? '' : 'padding-right:54px'") {{ $t('Group File') + '(' + GroupFileFilteredList.length + ')' }}
+          q-btn.text-primary(v-if="ifIAmEffectiveGroupOwner($store.state.currentChat) && !(ifMobileSize || $store.state.ifMobileStyle)" flat round icon="add_circle_outline" @click="$refs.groupFileUpload.pickFiles()")
+          form#groupFileUploadForm(v-if="ifIAmEffectiveGroupOwner($store.state.currentChat) && (ifMobileSize || $store.state.ifMobileStyle)")
             label(for="groupFileUpload" class="notranslate material-icons q-icon text-primary" aria-hidden="true" style="font-size: 1.715em;") add_circle_outline
             input#groupFileUpload(type="file" class="visually-hidden" @change="uploadGroupFileMobile()")
         div.scroll.header-mar-top(id="scroll-target-default" :class="ifMobileSize || $store.state.ifMobileStyle ? (ifMobileSize ? 'scrollHeightMobileSize-editor' : 'scrollHeightMobileStyle-editor') : 'scrollHeightStyle'")
@@ -339,7 +337,7 @@
                   q-item-label(lines="1" clickable v-ripple @click="groupFileSelected(groupFile, index)" ) {{ groupFile.name }}
                 q-item-section(side)
                   q-item-label(lines="1") {{ detailDateFormat(groupFile.createTimestamp) }}
-                q-item-section(v-if="ifIAmGroupOwner($store.state.currentChat)" side)
+                q-item-section(v-if="ifIAmEffectiveGroupOwner($store.state.currentChat)" side)
                   q-btn.text-primary(dense round flat icon="remove_circle_outline" @click="confirmRemoveGroupFile(groupFile)")
       // group chat ///////////////////////////////////////////////////////////////////////////////////
       q-tab-panel(name="selectGroupChatMember" style="padding:0px 0px")

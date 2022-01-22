@@ -48,6 +48,7 @@ export default {
       subKind: this.$store.messageEntry === 'search' ? 'searchChatHistory' : 'default',
       SubjectType: SubjectType,
       ActiveStatus: ActiveStatus,
+      GroupStatus: GroupStatus,
       ChatMessageStatus: ChatMessageStatus,
       MemberType: MemberType,
       messageMultiSelectedVal: [],
@@ -162,7 +163,7 @@ export default {
     ifMobileSize() {
       return (!window.device && this.$q.screen.width < 481)
     },
-    ifIAmGroupOwner() {
+    ifIAmEffectiveGroupOwner() {
       let _that = this
       let store = _that.$store
       return function (currentChat) {
@@ -170,7 +171,8 @@ export default {
         if (currentChat) {
           let groupChat = store.state.groupChatMap[currentChat.subjectId]
           if (groupChat) {
-            if (groupChat.groupOwnerPeerId === myself.myselfPeerClient.peerId) {
+            if (groupChat.groupOwnerPeerId === myself.myselfPeerClient.peerId
+              && groupChat.status !== GroupStatus.DISBANDED) {
               ret = true
             }
           }
@@ -1495,7 +1497,7 @@ export default {
       let currentChat = store.state.currentChat
       if (currentChat) {
         let groupChat = store.state.groupChatMap[currentChat.subjectId]
-        if (groupChat) {
+        if (groupChat && groupChat.status !== GroupStatus.DISBANDED) {
           _that.groupChatData = {
             name: groupChat.name,
             description: groupChat.description,
@@ -1912,7 +1914,7 @@ export default {
           store.toggleDrawer(false)
         }
 
-        if (groupChatLinkmans.length > 0) {
+        if (groupchat.status !== GroupStatus.DISBANDED && groupChatLinkmans.length > 0) {
           // 新增Sent请求
           let groupMembersWithFlag = []
           let groupMember = {}
@@ -2033,7 +2035,7 @@ export default {
       let _that = this
       let store = _that.$store
       let groupChat = store.state.groupChatMap[store.state.currentChat.subjectId]
-      if (groupChat.groupOwnerPeerId !== myself.myselfPeerClient.peerId) {
+      if (groupChat.groupOwnerPeerId !== myself.myselfPeerClient.peerId || groupChat.status === GroupStatus.DISBANDED) {
         return
       }
 
