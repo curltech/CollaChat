@@ -255,7 +255,7 @@ export default {
             })
           } else {
             this.$q.notify({
-              message: this.$i18n.t("Change avatar failed"),
+              message: this.$i18n.t("Failed to change avatar"),
               timeout: 3000,
               type: "warning",
               color: "warning"
@@ -329,7 +329,7 @@ export default {
               })
             } else {
               this.$q.notify({
-                message: this.$i18n.t("Change name failed"),
+                message: this.$i18n.t("Failed to change name"),
                 timeout: 3000,
                 type: "warning",
                 color: "warning"
@@ -404,7 +404,7 @@ export default {
               })
             } else {
               this.$q.notify({
-                message: this.$i18n.t("Change mobile failed"),
+                message: this.$i18n.t("Failed to change mobile"),
                 timeout: 3000,
                 type: "warning",
                 color: "warning"

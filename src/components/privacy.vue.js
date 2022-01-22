@@ -93,7 +93,7 @@ export default {
           })
         } else {
           this.$q.notify({
-            message: this.$i18n.t("Change visibility setting failed"),
+            message: this.$i18n.t("Failed to change visibility setting"),
             timeout: 3000,
             type: "warning",
             color: "warning"

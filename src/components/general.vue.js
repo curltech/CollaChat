@@ -114,7 +114,7 @@ export default {
           })
         } else {
           this.$q.notify({
-            message: this.$i18n.t("Change language failed"),
+            message: this.$i18n.t("Failed to change language"),
             timeout: 3000,
             type: "warning",
             color: "warning"

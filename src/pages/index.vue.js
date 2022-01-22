@@ -1992,6 +1992,7 @@ export default {
         if (!groupChat) {
           // 新增群组
           let groupChat = {}
+          groupChat._id = _id + peerId
           groupChat.ownerPeerId = myselfPeerClient.peerId
           groupChat.groupId = content.groupId
           groupChat.groupCategory = 'Chat'
@@ -2241,6 +2242,7 @@ export default {
         if (!groupChat) {
           newCreated = true
           groupChat = {}
+          groupChat._id = _id + peerId
           groupChat.ownerPeerId = myselfPeerClient.peerId
           groupChat.groupId = content.groupId
           groupChat.groupCategory = 'Chat'
@@ -2283,6 +2285,7 @@ export default {
           }
           if (notExists) {
             let groupMember = {}
+            groupMember._id = _id + peerId
             groupMember.ownerPeerId = myselfPeerClient.peerId
             groupMember.groupId = content.groupId
             groupMember.memberPeerId = gm.memberPeerId
@@ -2330,7 +2333,7 @@ export default {
           messageType: P2pChatMessageType.CHAT_SYS,
           contentType: ChatContentType.EVENT,
           content: newCreated ?
-            inviterName + _that.$i18n.t(" has invited ") + _that.$i18n.t("you") + _that.$i18n.t(" to join group chat") + _that.$i18n.t(", other group members : ") + (addedGroupMemberNames ? addedGroupMemberNames : '') + (includeNonContacts ? (addedGroupMemberNames ? _that.$i18n.t(" and ") : '') + _that.$i18n.t("other NonContacts") : '')
+            inviterName + _that.$i18n.t(" has invited ") + _that.$i18n.t("you") + _that.$i18n.t(" to join group chat") + _that.$i18n.t(", other group members: ") + (addedGroupMemberNames ? addedGroupMemberNames : '') + (includeNonContacts ? (addedGroupMemberNames ? _that.$i18n.t(" and ") : '') + _that.$i18n.t("other NonContacts") : '')
             :
             inviterName + _that.$i18n.t(" has invited ") + (addedGroupMemberNames ? addedGroupMemberNames : '') + (includeNonContacts ? (addedGroupMemberNames ? _that.$i18n.t(" and ") : '') + _that.$i18n.t("other NonContacts") : '') + _that.$i18n.t(" to join group chat")
         }
@@ -2699,7 +2702,7 @@ export default {
         let _id = data._id
         let blackedMe = data.blackedMe
         for (let linkmanRequest of store.state.linkmanRequests) {
-          if (linkmanRequest._id === _id) {
+          if (linkmanRequest._id === _id + peerId) {
             duplicated = true
             break
           }
@@ -2715,7 +2718,7 @@ export default {
           linkmanRequest.mobile = srcMobile
           linkmanRequest.avatar = srcAvatar
           //linkmanRequest.publicKey = srcPeerClient.publicKey
-          linkmanRequest._id = _id // 标识重复消息
+          linkmanRequest._id = _id + peerId // 标识重复消息
           linkmanRequest.message = data.message
           linkmanRequest.createDate = data.createDate
           if (linkman && linkman.status !== LinkmanStatus.REQUESTED) { // 如果请求方已是联系人，直接接受

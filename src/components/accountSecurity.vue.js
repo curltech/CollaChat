@@ -120,7 +120,7 @@ export default {
           })
         } else {
           _that.$q.notify({
-            message: _that.$i18n.t("Reset key failed"),
+            message: _that.$i18n.t("Failed to reset key"),
             timeout: 3000,
             type: "warning",
             color: "warning"

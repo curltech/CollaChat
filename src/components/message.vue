@@ -142,7 +142,7 @@
           q-toolbar-title(align="center" style="padding-right:54px") {{$t('Chat Details') + ($store.state.currentChat && $store.state.groupChatMap[$store.state.currentChat.subjectId] && $store.state.groupChatMap[$store.state.currentChat.subjectId].groupMembers ? '(' + $store.state.groupChatMap[$store.state.currentChat.subjectId].groupMembers.length + ')' : '')}}
         q-list
           q-item
-            q-item-section(avatar style="justify-content: flex-end;" v-for="(groupChatMember, index) in ($store.state.groupChatMap[$store.state.currentChat.subjectId] ? $store.state.groupChatMap[$store.state.currentChat.subjectId].groupMembers : [])" v-if="groupChatMember.memberType === MemberType.OWNER && groupChatMember.memberPeerId === $store.state.myselfPeerClient.peerId" :key="groupChatMember.memberPeerId") {{$store.state.myselfPeerClient.name}}
+            q-item-section(avatar style="justify-content: flex-end;" v-for="(groupChatMember, index) in ($store.state.groupChatMap[$store.state.currentChat.subjectId] ? $store.state.groupChatMap[$store.state.currentChat.subjectId].groupMembers : [])" v-if="groupChatMember.memberType === MemberType.OWNER && groupChatMember.memberPeerId === $store.state.myselfPeerClient.peerId" :key="groupChatMember.memberPeerId") {{ $store.state.myselfPeerClient.name.length > 3 ? $store.state.myselfPeerClient.name.substr(0, 3) + '...' : $store.state.myselfPeerClient.name }}
               q-avatar(size="56px")
                 img(:src="$store.state.myselfPeerClient.avatar ? $store.state.myselfPeerClient.avatar : $store.defaultActiveAvatar")
               q-icon(v-if="$store.displayActiveStatus" size="16px" name="person" color="secondary")
@@ -151,7 +151,7 @@
                 q-avatar(size="56px")
                   img(:src="groupChatMemeberAvatar(groupChatMember)")
               q-icon(v-if="$store.displayActiveStatus" size="16px" name="person" :color="groupChatMember.memberPeerId === $store.state.myselfPeerClient.peerId || ($store.state.linkmanMap[groupChatMember.memberPeerId] && $store.state.linkmanMap[groupChatMember.memberPeerId].activeStatus === ActiveStatus.UP) ? 'secondary' : 'grey-1'")
-            q-item-section(avatar style="justify-content: flex-end;" v-for="(groupChatMember, index) in ($store.state.groupChatMap[$store.state.currentChat.subjectId] ? $store.state.groupChatMap[$store.state.currentChat.subjectId].groupMembers : [])" v-if="groupChatMember.memberType !== MemberType.OWNER && groupChatMember.memberPeerId === $store.state.myselfPeerClient.peerId" :key="groupChatMember.memberPeerId") {{$store.state.myselfPeerClient.name}}
+            q-item-section(avatar style="justify-content: flex-end;" v-for="(groupChatMember, index) in ($store.state.groupChatMap[$store.state.currentChat.subjectId] ? $store.state.groupChatMap[$store.state.currentChat.subjectId].groupMembers : [])" v-if="groupChatMember.memberType !== MemberType.OWNER && groupChatMember.memberPeerId === $store.state.myselfPeerClient.peerId" :key="groupChatMember.memberPeerId") {{ $store.state.myselfPeerClient.name.length > 3 ? $store.state.myselfPeerClient.name.substr(0, 3) + '...' : $store.state.myselfPeerClient.name }}
               q-avatar(size="56px")
                 img(:src="$store.state.myselfPeerClient.avatar ? $store.state.myselfPeerClient.avatar : $store.defaultActiveAvatar")
               q-icon(v-if="$store.displayActiveStatus" size="16px" name="person" color="secondary")
