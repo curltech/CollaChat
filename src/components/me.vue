@@ -7,7 +7,7 @@
             img(:src="$store.state.myselfPeerClient.avatar ? $store.state.myselfPeerClient.avatar : $store.defaultActiveAvatar")
         q-item-section
           q-item-label(class="text-h6") {{ $store.state.myselfPeerClient.givenName ? $store.state.myselfPeerClient.givenName : $store.state.myselfPeerClient.name }}
-          q-item-label(caption lines="1") {{ $t('Mobile: ') + $store.state.myselfPeerClient.mobile }}
+          q-item-label(caption lines="1") {{ $t('Mobile: ') + ($store.state.myselfPeerClient.mobile ? $store.state.myselfPeerClient.mobile : '') }}
         q-item-section(side)
           q-icon(name="qr_code" color="primary")
         q-item-section(side)

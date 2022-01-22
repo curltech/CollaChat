@@ -129,12 +129,18 @@ export default {
     async addLinkman() {
       let _that = this
       let store = _that.$store
-      let findLinkman = store.state.currentLinkman
-      let linkmanData = _that.linkmanData
+      _that.$q.loading.show()
+      try {
+        let findLinkman = store.state.currentLinkman
+        let linkmanData = _that.linkmanData
 
-      await store.addLinkman(findLinkman, linkmanData)
-
-      _that.subKind = 'default'
+        await store.addLinkman(findLinkman, linkmanData)
+      } catch (error) {
+        console.error(error)
+      } finally {
+        _that.$q.loading.hide()
+        _that.subKind = 'default'
+      }
     },
     async confirmBlackList(value) {
       let _that = this

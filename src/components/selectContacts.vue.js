@@ -145,6 +145,7 @@ export default {
       let _that = this
       let store = _that.$store
       _that.$q.loading.show()
+      let groupChat = {}
       try {
         let myselfPeerClient = myself.myselfPeerClient
         let name = _that.groupChatData.name
@@ -155,7 +156,6 @@ export default {
         let currentTime = new Date()
 
         // 新增群组
-        let groupChat = {}
         groupChat.ownerPeerId = myselfPeerClient.peerId
         groupChat.groupId = UUID.string(null, null)
         groupChat.groupCategory = 'Chat'

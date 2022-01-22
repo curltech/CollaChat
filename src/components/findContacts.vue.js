@@ -120,12 +120,18 @@ export default {
     async addLinkman() {
       let _that = this
       let store = _that.$store
-      let findLinkman = store.findLinkman
-      let linkmanData = _that.addFindLinkmanData
+      _that.$q.loading.show()
+      try {
+        let findLinkman = store.findLinkman
+        let linkmanData = _that.addFindLinkmanData
 
-      await store.addLinkman(findLinkman, linkmanData)
-      
-      store.state.findContactsSubKind = 'default'
+        await store.addLinkman(findLinkman, linkmanData)
+      } catch (error) {
+        console.error(error)
+      } finally {
+        _that.$q.loading.hide()
+        store.state.findContactsSubKind = 'default'
+      }
     },
     async acceptLinkman() {
       let _that = this

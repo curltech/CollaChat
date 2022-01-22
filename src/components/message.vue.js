@@ -721,41 +721,46 @@ export default {
         } else {
           message.loading = true
           _that.$q.loading.show()
-          // 指定connectPeerId以优化速度
-          let connectPeerId = message.connectPeerId
-          let block = await dataBlockService.findTxPayload(connectPeerId, message.attachBlockId)
-          if (block && block.length > 0 && block[0]) {
-            if (block[0].attachs && block[0].attachs.length > 0) {
-              let attach = block[0].attachs[0]
-              if (attach) {
-                fileData = attach.content
-                if (!message.messageId) { // 群共享接收方创建message
-                  message.ownerPeerId = myself.myselfPeerClient.peerId
-                  message.messageId = UUID.string(null, null)
-                  message.messageType = P2pChatMessageType.GROUP_FILE
-                  message.fileSize = StringUtil.getSize(fileData)
-                  message.contentType = attach.contentType
-                  message.connectPeerId = null
-                  if (attach.contentType === ChatContentType.IMAGE) {
-                    message.thumbnail = await mediaComponent.compressImage(fileData)
-                  } else if (attach.contentType === ChatContentType.VIDEO) {
-                    message.thumbnail = await mediaComponent.createVideoThumbnailByBase64(fileData)
+          try {
+            // 指定connectPeerId以优化速度
+            let connectPeerId = message.connectPeerId
+            let block = await dataBlockService.findTxPayload(connectPeerId, message.attachBlockId)
+            if (block && block.length > 0 && block[0]) {
+              if (block[0].attachs && block[0].attachs.length > 0) {
+                let attach = block[0].attachs[0]
+                if (attach) {
+                  fileData = attach.content
+                  if (!message.messageId) { // 群共享接收方创建message
+                    message.ownerPeerId = myself.myselfPeerClient.peerId
+                    message.messageId = UUID.string(null, null)
+                    message.messageType = P2pChatMessageType.GROUP_FILE
+                    message.fileSize = StringUtil.getSize(fileData)
+                    message.contentType = attach.contentType
+                    message.connectPeerId = null
+                    if (attach.contentType === ChatContentType.IMAGE) {
+                      message.thumbnail = await mediaComponent.compressImage(fileData)
+                    } else if (attach.contentType === ChatContentType.VIDEO) {
+                      message.thumbnail = await mediaComponent.createVideoThumbnailByBase64(fileData)
+                    }
+                    await chatComponent.insert(ChatDataType.MESSAGE, message, null)
                   }
-                  await chatComponent.insert(ChatDataType.MESSAGE, message, null)
-                }
-                attach.ownerPeerId = myself.myselfPeerClient.peerId
-                await chatBlockComponent.saveLocalAttach({ attachs: [attach] })
-                if (message.contentType === ChatContentType.VIDEO) {
-                  fileData = mediaComponent.fixVideoUrl(fileData)
-                }
-                if (attach.originalMessageId) {
-                  message.fileoriginalMessageId = attach.originalMessageId
+                  attach.ownerPeerId = myself.myselfPeerClient.peerId
+                  await chatBlockComponent.saveLocalAttach({ attachs: [attach] })
+                  if (message.contentType === ChatContentType.VIDEO) {
+                    fileData = mediaComponent.fixVideoUrl(fileData)
+                  }
+                  if (attach.originalMessageId) {
+                    message.fileoriginalMessageId = attach.originalMessageId
+                  }
                 }
               }
             }
+          } catch (error) {
+            console.error(error)
+          } finally {
+            message.loading = false
+            _that.$q.loading.hide()
           }
-          message.loading = false
-          _that.$q.loading.hide()
         }
         chatComponent.localFileDataMap[message.attachBlockId] = fileData
       }
@@ -918,12 +923,17 @@ export default {
             })
           } else {
             _that.$q.loading.show()
-            for (let file of files) {
-              if (file) {
-                await _that.uploadMessageFile(file)
+            try {
+              for (let file of files) {
+                if (file) {
+                  await _that.uploadMessageFile(file)
+                }
               }
+            } catch (error) {
+              console.error(error)
+            } finally {
+              _that.$q.loading.hide()
             }
-            _that.$q.loading.hide()
           }
         }
       }
@@ -945,12 +955,17 @@ export default {
               })
             } else {
               _that.$q.loading.show()
-              for (let file of messageUpload.files) {
-                if (file) {
-                  await _that.uploadMessageFile(file)
+              try {
+                for (let file of messageUpload.files) {
+                  if (file) {
+                    await _that.uploadMessageFile(file)
+                  }
                 }
+              } catch (error) {
+                console.error(error)
+              } finally {
+                _that.$q.loading.hide()
               }
-              _that.$q.loading.hide()
             }
           }
         }
@@ -1783,22 +1798,24 @@ export default {
       let store = _that.$store
       let myselfPeerClient = myself.myselfPeerClient
       let groupChat = store.state.groupChatMap[store.state.currentChat.subjectId]
-      let groupMembers = groupChat.groupMembers
-      let remainingLinkmanCount = 0
-      for (let groupMember of groupMembers) {
-        let linkman = store.state.linkmanMap[groupMember.memberPeerId]
-        if (linkman) {
-          remainingLinkmanCount++
+      if (groupChat.status !== GroupStatus.DISBANDED) {
+        let groupMembers = groupChat.groupMembers
+        let remainingLinkmanCount = 0
+        for (let groupMember of groupMembers) {
+          let linkman = store.state.linkmanMap[groupMember.memberPeerId]
+          if (linkman) {
+            remainingLinkmanCount++
+          }
         }
-      }
-      if (groupChat.groupOwnerPeerId === myselfPeerClient.peerId && remainingLinkmanCount > 1) {
-        _that.$q.notify({
-          message: _that.$i18n.t("Please handover your ownership first!"),
-          timeout: 3000,
-          type: "info",
-          color: "info",
-        })
-        return
+        if (groupChat.groupOwnerPeerId === myselfPeerClient.peerId && remainingLinkmanCount > 1) {
+          _that.$q.notify({
+            message: _that.$i18n.t("Please handover your ownership first!"),
+            timeout: 3000,
+            type: "info",
+            color: "info",
+          })
+          return
+        }
       }
       _that.$q.bottomSheet({
         message: _that.$i18n.t('Remove this group chat (together with chat records)?'),
@@ -1862,13 +1879,16 @@ export default {
           if (linkman && linkman.peerId !== myselfPeerClient.peerId) { // 自己和非联系人除外*/
           if (groupMember.memberPeerId !== myselfPeerClient.peerId) { // 自己除外
             groupChatLinkmans.push(store.state.linkmanMap[groupMember.memberPeerId])
-            let _index = 0
-            for (let gc of linkman.groupChats) {
-              if (gc.groupId === currentGroupChatGroupId) {
-                linkman.groupChats.splice(_index, 1)
-                break
+            let linkman = store.state.linkmanMap[groupMember.memberPeerId]
+            if (linkman) {
+              let _index = 0
+              for (let gc of linkman.groupChats) {
+                if (gc.groupId === currentGroupChatGroupId) {
+                  linkman.groupChats.splice(_index, 1)
+                  break
+                }
+                _index++
               }
-              _index++
             }
           }
         }
@@ -3080,8 +3100,13 @@ export default {
       let store = _that.$store
       _that.subKind = 'groupFile'
       _that.$q.loading.show()
-      await _that.getGroupFileList()
-      _that.$q.loading.hide()
+      try {
+        await _that.getGroupFileList()
+      } catch (error) {
+        console.error(error)
+      } finally {
+        _that.$q.loading.hide()
+      }
     },
     async getGroupFileList() {
       let _that = this
@@ -3144,12 +3169,17 @@ export default {
           })
         } else {
           _that.$q.loading.show()
-          for (let file of files) {
-            if (file) {
-              await _that.uploadGroupFile(file)
+          try {
+            for (let file of files) {
+              if (file) {
+                await _that.uploadGroupFile(file)
+              }
             }
+          } catch (error) {
+            console.error(error)
+          } finally {
+            _that.$q.loading.hide()
           }
-          _that.$q.loading.hide()
         }
       }
       _that.$refs.groupFileUpload.reset()
@@ -3169,12 +3199,17 @@ export default {
             })
           } else {
             _that.$q.loading.show()
-            for (let file of groupFileUpload.files) {
-              if (file) {
-                await _that.uploadGroupFile(file)
+            try {
+              for (let file of groupFileUpload.files) {
+                if (file) {
+                  await _that.uploadGroupFile(file)
+                }
               }
+            } catch (error) {
+              console.error(error)
+            } finally {
+              _that.$q.loading.hide()
             }
-            _that.$q.loading.hide()
           }
         }
         let form = document.getElementById('groupFileUploadForm')
@@ -3263,9 +3298,14 @@ export default {
     async removeGroupFile(groupFile) {
       let _that = this
       _that.$q.loading.show()
-      await collectionUtil.deleteBlock(groupFile, true, BlockType.GroupFile)
-      await _that.getGroupFileList()
-      _that.$q.loading.hide()
+      try {
+        await collectionUtil.deleteBlock(groupFile, true, BlockType.GroupFile)
+        await _that.getGroupFileList()
+      } catch (error) {
+        console.error(error)
+      } finally {
+        _that.$q.loading.hide()
+      }
     },
     async groupFileSelected(groupFile, _index) {
       let _that = this
