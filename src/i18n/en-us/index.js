@@ -155,6 +155,7 @@ export default {
   "You are no longer your opponent's contacts": "You are no longer your opponent's contacts",
   "You have been removed from this group chat": "You have been removed from this group chat",
   "This group chat has been disbanded": "This group chat has been disbanded",
+  "Disbanded": "Disbanded",
 
   // Chat
   "no internet connection, please check network settings": "internet connection unavailable, check network settings",

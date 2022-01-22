@@ -155,6 +155,7 @@ export default {
   "You are no longer your opponent's contacts": "你不再是对方的联系人",
   "You have been removed from this group chat": "你已被移出此群聊",
   "This group chat has been disbanded": "此群聊已解散",
+  "Disbanded": "解散",
 
   // Chat
   "no internet connection, please check network settings": "当前网络不可用，请检查网络设置",

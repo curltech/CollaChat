@@ -170,11 +170,9 @@ export default {
         let ret = false
         if (currentChat) {
           let groupChat = store.state.groupChatMap[currentChat.subjectId]
-          if (groupChat) {
-            if (groupChat.groupOwnerPeerId === myself.myselfPeerClient.peerId
-              && groupChat.status !== GroupStatus.DISBANDED) {
-              ret = true
-            }
+          if (groupChat && groupChat.groupOwnerPeerId === myself.myselfPeerClient.peerId
+            && groupChat.status !== GroupStatus.DISBANDED) {
+            ret = true
           }
         }
         return ret
@@ -1800,7 +1798,7 @@ export default {
       let store = _that.$store
       let myselfPeerClient = myself.myselfPeerClient
       let groupChat = store.state.groupChatMap[store.state.currentChat.subjectId]
-      if (groupChat.status !== GroupStatus.DISBANDED) {
+      if (groupChat && groupChat.status !== GroupStatus.DISBANDED) {
         let groupMembers = groupChat.groupMembers
         let remainingLinkmanCount = 0
         for (let groupMember of groupMembers) {
@@ -1855,8 +1853,9 @@ export default {
       _that.$q.loading.show()
       try {
         let myselfPeerClient = myself.myselfPeerClient
-        let currentGroupChatGroupId = store.state.groupChatMap[store.state.currentChat.subjectId].groupId
-        let groupMembers = store.state.groupChatMap[store.state.currentChat.subjectId].groupMembers
+        let currentGroupChat = store.state.groupChatMap[store.state.currentChat.subjectId]
+        let currentGroupChatGroupId = currentGroupChat.groupId
+        let groupMembers = currentGroupChat.groupMembers
         let currentTime = new Date()
 
         // 删除聊天记录
@@ -1914,7 +1913,7 @@ export default {
           store.toggleDrawer(false)
         }
 
-        if (groupchat.status !== GroupStatus.DISBANDED && groupChatLinkmans.length > 0) {
+        if (currentGroupChat.status !== GroupStatus.DISBANDED && groupChatLinkmans.length > 0) {
           // 新增Sent请求
           let groupMembersWithFlag = []
           let groupMember = {}
@@ -2035,7 +2034,7 @@ export default {
       let _that = this
       let store = _that.$store
       let groupChat = store.state.groupChatMap[store.state.currentChat.subjectId]
-      if (groupChat.groupOwnerPeerId !== myself.myselfPeerClient.peerId || groupChat.status === GroupStatus.DISBANDED) {
+      if (!groupChat || groupChat.groupOwnerPeerId !== myself.myselfPeerClient.peerId || groupChat.status === GroupStatus.DISBANDED) {
         return
       }
 

@@ -8,7 +8,7 @@ import { myself } from 'libcolla'
 import { statusBarComponent } from '@/libs/base/colla-cordova'
 import { systemAudioComponent } from '@/libs/base/colla-media'
 import { chatComponent, ChatContentType, ChatDataType, SubjectType } from '@/libs/biz/colla-chat'
-import { ActiveStatus, contactComponent, ContactDataType, LinkmanStatus } from '@/libs/biz/colla-contact'
+import { ActiveStatus, contactComponent, ContactDataType, GroupStatus, LinkmanStatus } from '@/libs/biz/colla-contact'
 import GroupAvatar from '@/components/groupAvatar'
 import Message from '@/components/message'
 
@@ -407,9 +407,10 @@ export default {
         }
       } else if (subjectType === SubjectType.GROUP_CHAT) {
         let groupId = subjectId
-        if (store.state.groupChatMap[groupId]) {
-          let givenName = store.state.groupChatMap[groupId].givenName
-          let name = store.state.groupChatMap[groupId].name
+        let groupChat = store.state.groupChatMap[groupId]
+        if (groupChat) {
+          let givenName = groupChat.givenName
+          let name = groupChat.name
           if (givenName) {
             chatName = givenName
           } else if (name) {
@@ -417,7 +418,7 @@ export default {
           } else {
             let defaultName = ''
             let hasNonContacts = false
-            let groupChatMembers = store.state.groupChatMap[groupId].groupMembers
+            let groupChatMembers = groupChat.groupMembers
             if (groupChatMembers && groupChatMembers.length > 0) {
               for (let groupChatMember of groupChatMembers) {
                 let linkman = store.state.linkmanMap[groupChatMember.memberPeerId]
@@ -429,6 +430,9 @@ export default {
               }
             }
             chatName = (hasNonContacts ? defaultName + _that.$i18n.t(", ") + _that.$i18n.t("other NonContacts") : defaultName)
+          }
+          if (groupChat.status === GroupStatus.DISBANDED) {
+            chatName = '[' + _that.$i18n.t("Disbanded") + '] ' + chatName
           }
         }
       }

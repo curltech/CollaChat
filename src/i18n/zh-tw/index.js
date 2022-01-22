@@ -155,6 +155,7 @@
   "You are no longer your opponent's contacts": "你不再是對方的聯系人",
   "You have been removed from this group chat": "你已被移出此群聊",
   "This group chat has been disbanded": "此群聊已解散",
+  "Disbanded": "解散",
 
   // Chat
   "no internet connection, please check network settings": "當前網絡不可用，請檢查網絡設置",

@@ -155,6 +155,7 @@
   "You are no longer your opponent's contacts": "あなたはもはや対戦相手の連絡先ではありません",
   "You have been removed from this group chat": "このグループチャットから削除されました",
   "This group chat has been disbanded": "このグループチャットは解散しました",
+  "Disbanded": "解散",
 
   // Chat
   "no internet connection, please check network settings": "現在のネットワークは利用できません，ネットワーク設定を確認してください",

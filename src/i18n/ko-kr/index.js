@@ -155,6 +155,7 @@
   "You are no longer your opponent's contacts": "당신은 더 이상 상대방의 연락처가 아닙니다",
   "You have been removed from this group chat": "이 그룹 채팅에서 제거되었습니다",
   "This group chat has been disbanded": "이 그룹 채팅은 해산되었습니다",
+  "Disbanded": "해산",
 
   // Chat
   "no internet connection, please check network settings": "현재 네트워크 가 사용 할 수 없습니다. 네트워크 설정 을 확인 하 세 요",
