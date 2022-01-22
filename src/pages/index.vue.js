@@ -2285,7 +2285,7 @@ export default {
           }
           if (notExists) {
             let groupMember = {}
-            groupMember._id = _id + peerId
+            groupMember._id = _id + gm.memberPeerId
             groupMember.ownerPeerId = myselfPeerClient.peerId
             groupMember.groupId = content.groupId
             groupMember.memberPeerId = gm.memberPeerId
