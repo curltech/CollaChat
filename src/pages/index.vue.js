@@ -882,6 +882,9 @@ export default {
         case ChatContentType.VIDEO_INVITATION:
           result = `[${_that.$i18n.t("videoInvitation")}]`
           break
+        case ChatContentType.VOICE:
+          result = `[${_that.$i18n.t("voice")}]`
+          break
         case ChatContentType.AUDIO:
           result = `[${_that.$i18n.t("audio")}]`
           break
@@ -895,10 +898,10 @@ export default {
           result = `[${_that.$i18n.t("note")}]`
           break
         case ChatContentType.CHANNEL:
-          result = `[${_that.$i18n.t("Channel")}]`
+          result = `[${_that.$i18n.t("channel")}]`
           break
         case ChatContentType.ARTICLE:
-          result = `[${_that.$i18n.t("Article")}]`
+          result = `[${_that.$i18n.t("article")}]`
           break
         default:
           result = content
