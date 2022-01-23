@@ -1309,7 +1309,7 @@ export default {
       await store.saveFileInMessage(chat, message, fileData, type, name, message.messageId)
       await store.sendChatMessage(chat, message)
     },
-    async saveAndSendMessage(message, groupChatLinkman) {
+    async saveAndSendMessage(message, peerId) {
       let _that = this
       let store = _that.$store
       let myselfPeerClient = myself.myselfPeerClient
@@ -1320,7 +1320,7 @@ export default {
       receiveMessage.messageType = message.messageType
       receiveMessage.messageId = message.content._id
       receiveMessage.createDate = message.content.createDate
-      receiveMessage.receiverPeerId = groupChatLinkman.peerId
+      receiveMessage.receiverPeerId = peerId
       receiveMessage.receiveTime = null
       //receiveMessage.receiveTime = message.content.createDate
       await chatComponent.insert(ChatDataType.RECEIVE, receiveMessage, null)
@@ -1331,7 +1331,7 @@ export default {
       }
       console.log('saveAndSendMessage')
       console.log(rtcMessage)
-      await store.p2pSend(rtcMessage, groupChatLinkman.peerId)
+      await store.p2pSend(rtcMessage, peerId)
     },
     async findContacts(findType, peerId) {
       let _that = this
@@ -2017,9 +2017,8 @@ export default {
           // 新增群组成员（已包括自己）
           let groupMembers = []
           let groupOwnerPeerId
-          let inviterName
+          let inviterName = ''
           let groupMemberNames
-          let includeNonContacts = false
           for (let gm of content.data) {
             let groupMember = {}
             groupMember.ownerPeerId = myselfPeerClient.peerId
@@ -2032,23 +2031,24 @@ export default {
             if (gm.memberType === MemberType.OWNER) {
               groupOwnerPeerId = gm.memberPeerId
             }
-            let linkman = store.state.linkmanMap[gm.memberPeerId]
-            if (linkman && gm.memberPeerId !== myselfPeerClient.peerId) {
-              linkman.groupChats.unshift(groupChat)
-              if (linkman.activeStatus === ActiveStatus.UP && groupChat.activeStatus !== ActiveStatus.UP) {
-                groupChat.activeStatus = ActiveStatus.UP
+            if (gm.memberPeerId !== myselfPeerClient.peerId) {
+              let linkman = store.state.linkmanMap[gm.memberPeerId]
+              if (linkman) {
+                linkman.groupChats.unshift(groupChat)
+                if (linkman.activeStatus === ActiveStatus.UP && groupChat.activeStatus !== ActiveStatus.UP) {
+                  groupChat.activeStatus = ActiveStatus.UP
+                }
               }
-              if (gm.memberPeerId === content.senderPeerId) {
-                inviterName = (linkman.givenName ? linkman.givenName : linkman.name)
-              } else {
-                groupMemberNames = (groupMemberNames ? groupMemberNames + _that.$i18n.t(", ") : '') + (linkman.givenName ? linkman.givenName : linkman.name)
+              let member = linkman
+              if (!member) {
+                member = await peerClientService.getCachedPeerClient(gm.memberPeerId)
               }
-            }
-            if (!linkman && gm.memberPeerId !== myselfPeerClient.peerId) {
-              includeNonContacts = true
-              let peerClient = await peerClientService.getCachedPeerClient(gm.memberPeerId)
-              if (!peerClient) {
-                console.error('getCachedPeerClient is empty, memberPeerId:' + gm.memberPeerId)
+              if (member) {
+                if (gm.memberPeerId === content.senderPeerId) {
+                  inviterName = (member.givenName ? member.givenName : member.name)
+                } else {
+                  groupMemberNames = (groupMemberNames ? groupMemberNames + _that.$i18n.t(", ") : '') + (member.givenName ? member.givenName : member.name)
+                }
               }
             }
           }
@@ -2061,7 +2061,7 @@ export default {
             _id: _id + peerId,
             messageType: P2pChatMessageType.CHAT_SYS,
             contentType: ChatContentType.EVENT,
-            content: inviterName + _that.$i18n.t(" has invited ") + _that.$i18n.t("you") + (groupMemberNames ? _that.$i18n.t(" and ") + groupMemberNames : '') + (includeNonContacts ? _that.$i18n.t(" and ") + _that.$i18n.t("other NonContacts") : '') + _that.$i18n.t(" to join group chat")
+            content: inviterName + _that.$i18n.t(" has invited ") + _that.$i18n.t("you") + (groupMemberNames ? _that.$i18n.t(" and ") + groupMemberNames : '') + _that.$i18n.t(" to join group chat")
           }
           let chat = await store.getChat(groupChat.groupId)
           await store.addCHATSYSMessage(chat, chatMessage)
@@ -2093,11 +2093,14 @@ export default {
           }
 
           let modifierName
-          let senderLinkman = store.state.linkmanMap[content.senderPeerId]
-          if (senderLinkman) {
-            modifierName = senderLinkman.givenName ? senderLinkman.givenName : senderLinkman.name
+          let sender = store.state.linkmanMap[content.senderPeerId]
+          if (!sender) {
+            sender = await peerClientService.getCachedPeerClient(content.senderPeerId)
           }
-          let _content = ''
+          if (sender) {
+            modifierName = sender.givenName ? sender.givenName : sender.name
+          }
+          let _content
           if (modifierName) {
             _content = modifierName + _that.$i18n.t(" has disbanded this group chat")
           }
@@ -2190,11 +2193,14 @@ export default {
           store.state.groupChatMap[content.groupId] = groupChat
 
           let modifierName
-          let senderLinkman = store.state.linkmanMap[content.senderPeerId]
-          if (senderLinkman) {
-            modifierName = senderLinkman.givenName ? senderLinkman.givenName : senderLinkman.name
+          let sender = store.state.linkmanMap[content.senderPeerId]
+          if (!sender) {
+            sender = await peerClientService.getCachedPeerClient(content.senderPeerId)
           }
-          let _content = ''
+          if (sender) {
+            modifierName = sender.givenName ? sender.givenName : sender.name
+          }
+          let _content
           if (modifierName && (nameChanged || descriptionChanged)) {
             _content = modifierName + _that.$i18n.t(" has modified ") + (nameChanged ? (descriptionChanged ? _that.$i18n.t("Group Name to be : ") + groupChat.name + _that.$i18n.t(",") + _that.$i18n.t(" modified ")
               + _that.$i18n.t("Group Description to be : ") + groupChat.description : _that.$i18n.t("Group Name to be : ") + groupChat.name) : _that.$i18n.t("Group Description to be : ") + groupChat.description)
@@ -2207,7 +2213,6 @@ export default {
             } else {
               _type = _that.$i18n.t("Recall Alert")
               value = groupChat.recallAlert
-              _that.$forceUpdate()
             }
             _content = `${modifierName}${(value ? _that.$i18n.t(" has switched on ") : _that.$i18n.t(" has switched off "))}${_type}`
           }
@@ -2272,9 +2277,12 @@ export default {
         let groupOwnerPeerId
         let inviterName = ''
         let addedGroupMemberNames
-        let includeNonContacts = false
         for (let gm of content.data) {
           let linkman = store.state.linkmanMap[gm.memberPeerId]
+          let member = linkman
+          if (!member) {
+            member = await peerClientService.getCachedPeerClient(gm.memberPeerId)
+          }
           let notExists = true
           if (!newCreated) {
             let existingGms = await contactComponent.loadGroupMember({
@@ -2296,28 +2304,21 @@ export default {
             groupMember.createDate = gm.createDate
             groupMember.status = gm.status
             await contactComponent.insert(ContactDataType.GROUP_MEMBER, groupMember, gms)
-            if (linkman && gm.memberPeerId !== content.senderPeerId && gm.memberPeerId !== myselfPeerClient.peerId) {
-              addedGroupMemberNames = (addedGroupMemberNames ? addedGroupMemberNames + _that.$i18n.t(", ") : '') + (linkman.givenName ? linkman.givenName : linkman.name)
-            }
-            if (!linkman && gm.memberPeerId !== myselfPeerClient.peerId) {
-              includeNonContacts = true
-              let peerClient = await peerClientService.getCachedPeerClient(gm.memberPeerId)
-              if (!peerClient) {
-                console.error('getCachedPeerClient is empty, memberPeerId:' + gm.memberPeerId)
-              }
-            }
-            if (linkman && gm.memberPeerId !== myselfPeerClient.peerId) {
+            if (gm.memberPeerId !== myselfPeerClient.peerId && linkman) {
               linkman.groupChats.unshift(groupChat)
               if (linkman.activeStatus === ActiveStatus.UP && groupChat.activeStatus !== ActiveStatus.UP) {
                 groupChat.activeStatus = ActiveStatus.UP
               }
             }
+            if (gm.memberPeerId !== content.senderPeerId && gm.memberPeerId !== myselfPeerClient.peerId && member) {
+              addedGroupMemberNames = (addedGroupMemberNames ? addedGroupMemberNames + _that.$i18n.t(", ") : '') + (member.givenName ? member.givenName : member.name)
+            }
           }
           if (gm.memberType === MemberType.OWNER) {
             groupOwnerPeerId = gm.memberPeerId
           }
-          if (gm.memberPeerId === content.senderPeerId && linkman) {
-            inviterName = (linkman.givenName ? linkman.givenName : linkman.name)
+          if (gm.memberPeerId === content.senderPeerId && member) {
+            inviterName = (member.givenName ? member.givenName : member.name)
           }
         }
 
@@ -2336,12 +2337,16 @@ export default {
           messageType: P2pChatMessageType.CHAT_SYS,
           contentType: ChatContentType.EVENT,
           content: newCreated ?
-            inviterName + _that.$i18n.t(" has invited ") + _that.$i18n.t("you") + _that.$i18n.t(" to join group chat") + _that.$i18n.t(", other group members: ") + (addedGroupMemberNames ? addedGroupMemberNames : '') + (includeNonContacts ? (addedGroupMemberNames ? _that.$i18n.t(" and ") : '') + _that.$i18n.t("other NonContacts") : '')
+            inviterName + _that.$i18n.t(" has invited ") + _that.$i18n.t("you") + _that.$i18n.t(" to join group chat") + _that.$i18n.t(", other group members: ") + (addedGroupMemberNames ? addedGroupMemberNames : '')
             :
-            inviterName + _that.$i18n.t(" has invited ") + (addedGroupMemberNames ? addedGroupMemberNames : '') + (includeNonContacts ? (addedGroupMemberNames ? _that.$i18n.t(" and ") : '') + _that.$i18n.t("other NonContacts") : '') + _that.$i18n.t(" to join group chat")
+            inviterName + _that.$i18n.t(" has invited ") + (addedGroupMemberNames ? addedGroupMemberNames : '') + _that.$i18n.t(" to join group chat")
         }
         await store.addCHATSYSMessage(chat, chatMessage)
         /*}*/
+
+        if (!newCreated) {
+          _that.$forceUpdate()
+        }
 
         // 发送Receive收条
         let linkmanRequest = {}
@@ -2367,14 +2372,16 @@ export default {
               removeGroupChat = true
             }
           }
-          let inviterName
+          let inviterName = ''
           let removedGroupMemberNames
-          let includeNonContacts = false
           for (let groupChatMember of gms) {
             if (groupChatMember.memberPeerId === content.senderPeerId) {
-              let linkman = store.state.linkmanMap[groupChatMember.memberPeerId]
-              if (linkman) {
-                inviterName = (linkman.givenName ? linkman.givenName : linkman.name)
+              let member = store.state.linkmanMap[groupChatMember.memberPeerId]
+              if (!member) {
+                member = await peerClientService.getCachedPeerClient(groupChatMember.memberPeerId)
+              }
+              if (member) {
+                inviterName = (member.givenName ? member.givenName : member.name)
               }
               break
             }
@@ -2438,11 +2445,13 @@ export default {
             }
             for (let gm of content.data) {
               let linkman = store.state.linkmanMap[gm.memberPeerId]
+              let member = linkman
+              if (!member) {
+                member = await peerClientService.getCachedPeerClient(gm.memberPeerId)
+              }
               if (fromGroupOwner) {
-                if (linkman) {
-                  removedGroupMemberNames = (removedGroupMemberNames ? removedGroupMemberNames + _that.$i18n.t(", ") : '') + (linkman.givenName ? linkman.givenName : linkman.name)
-                } else if (gm.memberPeerId !== myselfPeerClient.peerId) {
-                  includeNonContacts = true
+                if (member) {
+                  removedGroupMemberNames = (removedGroupMemberNames ? removedGroupMemberNames + _that.$i18n.t(", ") : '') + (member.givenName ? member.givenName : member.name)
                 }
               }
               let groupMembers = await contactComponent.loadGroupMember(
@@ -2489,13 +2498,14 @@ export default {
               messageType: P2pChatMessageType.CHAT_SYS,
               contentType: ChatContentType.EVENT,
               content: fromGroupOwner ?
-                inviterName + _that.$i18n.t(" has removed ") + removedGroupMemberNames + (includeNonContacts ? _that.$i18n.t(" and ") + _that.$i18n.t("other NonContacts") : '') + _that.$i18n.t(" from group chat")
+                inviterName + _that.$i18n.t(" has removed ") + (removedGroupMemberNames ? removedGroupMemberNames : '') + _that.$i18n.t(" from group chat")
                 :
                 inviterName + _that.$i18n.t(" has left the group chat")
             }
             await store.addCHATSYSMessage(chat, chatMessage)
           }
         }
+        _that.$forceUpdate()
 
         // 发送Receive收条
         let linkmanRequest = {}
@@ -2546,12 +2556,15 @@ export default {
         groupChat.groupMembers = groupMembers
         store.state.groupChatMap[content.groupId] = groupChat
 
-        let newOwnerName
-        let newOwnerLinkman = store.state.linkmanMap[newOwner.memberPeerId]
-        if (newOwnerLinkman) {
-          newOwnerName = newOwnerLinkman.givenName ? newOwnerLinkman.givenName : newOwnerLinkman.name
-        } else if (newOwner.memberPeerId !== myselfPeerClient.peerId) {
-          newOwnerName = _that.$i18n.t("other NonContacts")
+        let newOwnerName = ''
+        if (newOwner.memberPeerId !== myselfPeerClient.peerId) {
+          let newOwnerLinkman = store.state.linkmanMap[newOwner.memberPeerId]
+          if (!newOwnerLinkman) {
+            newOwnerLinkman = await peerClientService.getCachedPeerClient(newOwner.memberPeerId)
+          }
+          if (newOwnerLinkman) {
+            newOwnerName = newOwnerLinkman.givenName ? newOwnerLinkman.givenName : newOwnerLinkman.name
+          }
         }
         let chat = await store.getChat(groupChat.groupId)
         let chatMessage = {

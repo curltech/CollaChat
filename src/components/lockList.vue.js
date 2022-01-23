@@ -22,11 +22,14 @@ export default {
       let _that = this
       let store = _that.$store
       let linkman = store.state.linkmanMap[lockedLinkman.peerId]
-      linkman.locked = false
-      let linkmanRecord = await contactComponent.get(ContactDataType.LINKMAN, linkman._id)
-      if (linkmanRecord) {
-        linkmanRecord.locked = false
-        await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
+      if (linkman) {
+        linkman.locked = false
+        store.state.linkmanMap[lockedLinkman.peerId] = linkman
+        let linkmanRecord = await contactComponent.get(ContactDataType.LINKMAN, linkman._id)
+        if (linkmanRecord) {
+          linkmanRecord.locked = false
+          await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
+        }
       }
     },
     showContacts(linkman, index) {

@@ -4,6 +4,7 @@ import jimp from 'jimp'
 
 import { CollaUtil } from 'libcolla'
 import { myself } from 'libcolla'
+import { peerClientService } from 'libcolla'
 
 import { statusBarComponent } from '@/libs/base/colla-cordova'
 import { systemAudioComponent } from '@/libs/base/colla-media'
@@ -400,10 +401,9 @@ export default {
       let store = _that.$store
       let chatName = ''
       if (subjectType === SubjectType.CHAT) {
-        let peerId = subjectId
-        if (store.state.linkmanMap[peerId]) {
-          let givenName = store.state.linkmanMap[peerId].givenName
-          chatName = (givenName ? givenName : store.state.linkmanMap[peerId].name)
+        let linkman = store.state.linkmanMap[subjectId]
+        if (linkman) {
+          chatName = (linkman.givenName ? linkman.givenName : linkman.name)
         }
       } else if (subjectType === SubjectType.GROUP_CHAT) {
         let groupId = subjectId
@@ -416,20 +416,18 @@ export default {
           } else if (name) {
             chatName = name
           } else {
-            let defaultName = ''
-            let hasNonContacts = false
             let groupChatMembers = groupChat.groupMembers
             if (groupChatMembers && groupChatMembers.length > 0) {
               for (let groupChatMember of groupChatMembers) {
-                let linkman = store.state.linkmanMap[groupChatMember.memberPeerId]
-                if (linkman) {
-                  defaultName = (defaultName ? defaultName + _that.$i18n.t(", ") : '') + (linkman.givenName ? linkman.givenName : linkman.name)
-                } else {
-                  hasNonContacts = true
+                let member = store.state.linkmanMap[groupChatMember.memberPeerId]
+                if (!member) {
+                  member = peerClientService.getPeerClientFromCache(groupChatMember.memberPeerId)
+                }
+                if (member) {
+                  chatName = (chatName ? chatName + _that.$i18n.t(", ") : '') + (member.givenName ? member.givenName : member.name)
                 }
               }
             }
-            chatName = (hasNonContacts ? defaultName + _that.$i18n.t(", ") + _that.$i18n.t("other NonContacts") : defaultName)
           }
           if (groupChat.status === GroupStatus.DISBANDED) {
             chatName = '[' + _that.$i18n.t("Disbanded") + '] ' + chatName

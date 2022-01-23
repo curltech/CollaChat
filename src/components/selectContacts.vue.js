@@ -238,7 +238,7 @@ export default {
         }
         let groupMemberNames
         for (let includedLinkman of store.state.includedLinkmans) {
-          await store.saveAndSendMessage(message, includedLinkman)
+          await store.saveAndSendMessage(message, includedLinkman.peerId)
           groupMemberNames = (groupMemberNames ? groupMemberNames + _that.$i18n.t(", ") : '') + (includedLinkman.givenName ? includedLinkman.givenName : includedLinkman.name)
         }
 
@@ -319,7 +319,7 @@ export default {
         }
         for (let includedLinkman of store.state.includedLinkmans) {
           if(includedLinkman.peerId !== myselfPeerClient.peerId){
-            await store.saveAndSendMessage(message, includedLinkman)
+            await store.saveAndSendMessage(message, includedLinkman.peerId)
           }
         }
 

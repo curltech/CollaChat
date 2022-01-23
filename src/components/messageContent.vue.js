@@ -80,7 +80,6 @@ export default {
         if (message.senderPeerId === state.myselfPeerClient.peerId) {
           name = state.myselfPeerClient.name
         } else {
-          //name = this.$i18n.t("NonContacts")
           if (message.subjectType === SubjectType.GROUP_CHAT) {
             let group = state.groupChatMap[message.subjectId]
             let groupChatMembers = group.groupMembers

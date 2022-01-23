@@ -367,11 +367,11 @@ export default {
       let srcEntityName = item.srcEntityName
       let name = ''
       if (srcEntityId) {
+        let linkman = store.state.linkmanMap[srcEntityId]
         if (srcEntityType === SrcEntityType.MYSELF || srcEntityId === myself.myselfPeerClient.peerId) {
           name = _that.$i18n.t('Me')
-        } else if (srcEntityType === SrcEntityType.LINKMAN || store.state.linkmanMap[srcEntityId]) {
-          let givenName = store.state.linkmanMap[srcEntityId].givenName
-          name = (givenName ? givenName : store.state.linkmanMap[srcEntityId].name)
+        } else if (srcEntityType === SrcEntityType.LINKMAN || linkman) {
+          name = (linkman.givenName ? linkman.givenName : linkman.name)
         } else {
           name = srcEntityName ? srcEntityName : ''
         }

@@ -1459,10 +1459,11 @@ export default {
     getSrcEntityName(senderPeerId) {
       let _that = this
       let store = _that.$store
+      let linkman = store.state.linkmanMap[senderPeerId]
       if (senderPeerId === myself.myselfPeerClient.peerId) {
         return myself.myselfPeerClient.name
-      } else if (store.state.linkmanMap[senderPeerId]) {
-        return store.state.linkmanMap[senderPeerId].givenName ? store.state.linkmanMap[senderPeerId].givenName : store.state.linkmanMap[senderPeerId].name
+      } else if (linkman) {
+        return linkman.givenName ? linkman.givenName : linkman.name
       }
     },
     copyMessage(message, index) {
@@ -1630,16 +1631,16 @@ export default {
         messageType: P2pChatMessageType.MODIFY_GROUPCHAT,
         content: linkmanRequest
       }
-      let groupChatLinkmans = []
+      let groupChatMemberPeerIds = []
       for (let groupMember of groupChat.groupMembers) {
         /*let linkman = store.state.linkmanMap[groupMember.memberPeerId]
         if (linkman && linkman.peerId !== myselfPeerClient.peerId) { // 自己和非联系人除外*/
         if (groupMember.memberPeerId !== myselfPeerClient.peerId) { // 自己除外
-          groupChatLinkmans.push(store.state.linkmanMap[groupMember.memberPeerId])
+          groupChatMemberPeerIds.push(groupMember.memberPeerId)
         }
       }
-      for (let groupChatLinkman of groupChatLinkmans) {
-        await store.saveAndSendMessage(message, groupChatLinkman)
+      for (let groupChatMemberPeerId of groupChatMemberPeerIds) {
+        await store.saveAndSendMessage(message, groupChatMemberPeerId)
       }
     },
     confirmRemoveChat() {
@@ -1767,16 +1768,16 @@ export default {
           messageType: P2pChatMessageType.DISBAND_GROUPCHAT,
           content: linkmanRequest
         }
-        let groupChatLinkmans = []
+        let groupChatMemberPeerIds = []
         for (let groupMember of groupChat.groupMembers) {
           /*let linkman = store.state.linkmanMap[groupMember.memberPeerId]
           if (linkman && linkman.peerId !== myselfPeerClient.peerId) { // 自己和非联系人除外*/
           if (groupMember.memberPeerId !== myselfPeerClient.peerId) { // 自己除外
-            groupChatLinkmans.push(store.state.linkmanMap[groupMember.memberPeerId])
+            groupChatMemberPeerIds.push(groupMember.memberPeerId)
           }
         }
-        for (let groupChatLinkman of groupChatLinkmans) {
-          await store.saveAndSendMessage(message, groupChatLinkman)
+        for (let groupChatMemberPeerId of groupChatMemberPeerIds) {
+          await store.saveAndSendMessage(message, groupChatMemberPeerId)
         }
 
         let chat = await store.getChat(groupChat.groupId)
@@ -1874,12 +1875,12 @@ export default {
         delete store.state.chatMap[currentGroupChatGroupId]
 
         // 先保存要通知的群组成员
-        let groupChatLinkmans = []
+        let groupChatMemberPeerIds = []
         for (let groupMember of groupMembers) {
           /*let linkman = store.state.linkmanMap[groupMember.memberPeerId]
           if (linkman && linkman.peerId !== myselfPeerClient.peerId) { // 自己和非联系人除外*/
           if (groupMember.memberPeerId !== myselfPeerClient.peerId) { // 自己除外
-            groupChatLinkmans.push(store.state.linkmanMap[groupMember.memberPeerId])
+            groupChatMemberPeerIds.push(groupMember.memberPeerId)
             let linkman = store.state.linkmanMap[groupMember.memberPeerId]
             if (linkman) {
               let _index = 0
@@ -1913,7 +1914,7 @@ export default {
           store.toggleDrawer(false)
         }
 
-        if (currentGroupChat.status !== GroupStatus.DISBANDED && groupChatLinkmans.length > 0) {
+        if (currentGroupChat.status !== GroupStatus.DISBANDED && groupChatMemberPeerIds.length > 0) {
           // 新增Sent请求
           let groupMembersWithFlag = []
           let groupMember = {}
@@ -1939,8 +1940,8 @@ export default {
             messageType: P2pChatMessageType.REMOVE_GROUPCHAT_MEMBER,
             content: linkmanRequest
           }
-          for (let groupChatLinkman of groupChatLinkmans) {
-            await store.saveAndSendMessage(message, groupChatLinkman)
+          for (let groupChatMemberPeerId of groupChatMemberPeerIds) {
+            await store.saveAndSendMessage(message, groupChatMemberPeerId)
           }
         }
       } catch (error) {
@@ -2114,12 +2115,12 @@ export default {
         let groupMembers = groupChat.groupMembers
         let currentTime = new Date()
         // 先保存要通知的群组成员
-        let groupChatLinkmans = []
+        let groupChatMemberPeerIds = []
         for (let groupMember of groupMembers) {
           /*let linkman = store.state.linkmanMap[groupMember.memberPeerId]
           if (linkman && linkman.peerId !== myselfPeerClient.peerId) { // 自己和非联系人除外*/
           if (groupMember.memberPeerId !== myselfPeerClient.peerId) { // 自己除外
-            groupChatLinkmans.push(store.state.linkmanMap[groupMember.memberPeerId])
+            groupChatMemberPeerIds.push(groupMember.memberPeerId)
           }
         }
 
@@ -2189,8 +2190,8 @@ export default {
           messageType: P2pChatMessageType.REMOVE_GROUPCHAT_MEMBER,
           content: linkmanRequest
         }
-        for (let groupChatLinkman of groupChatLinkmans) {
-          await store.saveAndSendMessage(message, groupChatLinkman)
+        for (let groupChatMemberPeerId of groupChatMemberPeerIds) {
+          await store.saveAndSendMessage(message, groupChatMemberPeerId)
         }
 
         let chat = await store.getChat(groupChat.groupId)
@@ -2219,13 +2220,13 @@ export default {
         let currentTime = new Date()
 
         // 修改群组成员群主身份
-        let groupChatLinkmans = []
+        let groupChatMemberPeerIds = []
         let oldOwner, newOwner
         for (let groupMember of groupMembers) {
           /*let linkman = store.state.linkmanMap[groupMember.memberPeerId]
           if (linkman && linkman.peerId !== myselfPeerClient.peerId) { // 自己和非联系人除外*/
           if (groupMember.memberPeerId !== myselfPeerClient.peerId) { // 自己除外
-            groupChatLinkmans.push(store.state.linkmanMap[groupMember.memberPeerId])
+            groupChatMemberPeerIds.push(store.state.linkmanMap[groupMember.memberPeerId])
           }
           if (groupMember.memberPeerId === myselfPeerClient.peerId) {
             groupMember.memberType = MemberType.MEMBER
@@ -2281,8 +2282,8 @@ export default {
           messageType: P2pChatMessageType.MODIFY_GROUPCHAT_OWNER,
           content: linkmanRequest
         }
-        for (let groupChatLinkman of groupChatLinkmans) {
-          await store.saveAndSendMessage(message, groupChatLinkman)
+        for (let groupChatMemberPeerId of groupChatMemberPeerIds) {
+          await store.saveAndSendMessage(message, groupChatMemberPeerId)
         }
 
         let newOwnerName = store.state.linkmanMap[selectedGroupChatMemberPeerId].givenName ? store.state.linkmanMap[selectedGroupChatMemberPeerId].givenName : store.state.linkmanMap[selectedGroupChatMemberPeerId].name

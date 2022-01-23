@@ -94,7 +94,7 @@ export default {
           messageType: P2pChatMessageType.UNBLACK_LINKMAN,
           content: linkmanRequest
         }
-        await store.saveAndSendMessage(message, linkman)
+        await store.saveAndSendMessage(message, linkman.peerId)
       }
     },
     showContacts(linkman, index) {

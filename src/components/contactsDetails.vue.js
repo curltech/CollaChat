@@ -221,7 +221,7 @@ export default {
           messageType: (value === LinkmanStatus.EFFECTIVE ? P2pChatMessageType.UNBLACK_LINKMAN : P2pChatMessageType.BLACK_LINKMAN),
           content: linkmanRequest
         }
-        await store.saveAndSendMessage(message, linkman)
+        await store.saveAndSendMessage(message, linkman.peerId)
         //todo setupRTC
         // webrtcComponent.resetFlag = false
         // webrtcComponent.closeDataChannel(store.state.currentLinkman.peerId)
@@ -230,14 +230,16 @@ export default {
     async updateContactsLock() {
       let _that = this
       let store = _that.$store
-      let myselfPeerClient = myself.myselfPeerClient
       let newLocked = store.state.currentLinkman.locked
       let linkman = store.state.linkmanMap[store.state.currentLinkman.peerId]
-      linkman.locked = newLocked
-      let linkmanRecord = await contactComponent.get(ContactDataType.LINKMAN, linkman._id)
-      if (linkmanRecord) {
-        linkmanRecord.locked = newLocked
-        await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
+      if (linkman) {
+        linkman.locked = newLocked
+        store.state.linkmanMap[store.state.currentLinkman.peerId] = linkman
+        let linkmanRecord = await contactComponent.get(ContactDataType.LINKMAN, linkman._id)
+        if (linkmanRecord) {
+          linkmanRecord.locked = newLocked
+          await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
+        }
       }
       if (store.state.lockContactsSwitch) {
         if (_that.ifMobileSize || store.state.ifMobileStyle) {
@@ -360,7 +362,7 @@ export default {
         messageType: P2pChatMessageType.DROP_LINKMAN,
         content: linkmanRequest
       }
-      await store.saveAndSendMessage(message, store.state.currentLinkman)
+      await store.saveAndSendMessage(message, store.state.currentLinkman.peerId)
 
       //todo setupRTC
       webrtcPeerPool.clearPeer(currentLinkmanPeerId)
@@ -414,12 +416,12 @@ export default {
         let groupMembers = groupChat.groupMembers
         let currentTime = new Date()
         // 先保存要通知的群组成员
-        let groupChatLinkmans = []
+        let groupChatMemberPeerIds = []
         for (let groupMember of groupMembers) {
           /*let linkman = store.state.linkmanMap[groupMember.memberPeerId]
           if (linkman && linkman.peerId !== myselfPeerClient.peerId) { // 自己和非联系人除外*/
           if (groupMember.memberPeerId !== myselfPeerClient.peerId) { // 自己除外
-            groupChatLinkmans.push(store.state.linkmanMap[groupMember.memberPeerId])
+            groupChatMemberPeerIds.push(groupMember.memberPeerId)
           }
         }
 
@@ -455,8 +457,8 @@ export default {
         // 更新groupChat activeStatus
         if (groupChat.activeStatus === ActiveStatus.UP) {
           let hasActiveGroupMember = false
-          for (let groupChatMember of groupMembers) {
-            let linkman = store.state.linkmanMap[groupChatMember.memberPeerId]
+          for (let groupMember of groupMembers) {
+            let linkman = store.state.linkmanMap[groupMember.memberPeerId]
             if (linkman && linkman.activeStatus === ActiveStatus.UP) {
               hasActiveGroupMember = true
               break
@@ -489,8 +491,8 @@ export default {
           messageType: P2pChatMessageType.REMOVE_GROUPCHAT_MEMBER,
           content: linkmanRequest
         }
-        for (let groupChatLinkman of groupChatLinkmans) {
-          await store.saveAndSendMessage(message, groupChatLinkman)
+        for (let groupChatMemberPeerId of groupChatMemberPeerIds) {
+          await store.saveAndSendMessage(message, groupChatMemberPeerId)
         }
 
         let chat = await store.getChat(groupChat.groupId)
