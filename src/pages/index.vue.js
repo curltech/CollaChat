@@ -802,6 +802,11 @@ export default {
       }
       let currentChat = await store.getChat(subjectId)
       currentChat.content = store.getChatContent(message.contentType, message.content)
+      if (message.destroyTime) {
+        currentChat.hiddenContent = true
+      }else{
+        currentChat.hiddenContent = false
+      }
       currentChat.updateTime = currentDate
       let content = message.content
       if (message.subjectType === SubjectType.GROUP_CHAT && message.contentType == ChatContentType.TEXT && content.indexOf('@') > -1) {
@@ -814,6 +819,7 @@ export default {
       let db_chat = await chatComponent.get(ChatDataType.CHAT, currentChat._id)
       db_chat.content = currentChat.content
       db_chat.updateTime = currentChat.updateTime
+      db_chat.hiddenContent = currentChat.hiddenContent
       await chatComponent.update(ChatDataType.CHAT, db_chat)
       /*localNotificationComponent.sendNotification(
         store.getChatName(currentChat.subjectType, currentChat.subjectId),
@@ -977,9 +983,9 @@ export default {
         message.actualReceiveTime = message.createDate
       }
       if (subjectType === SubjectType.CHAT && subjectId !== myselfPeerId) {
-        if (store.state.linkmanMap[subjectId].activeStatus === ActiveStatus.UP) {
+        //if (store.state.linkmanMap[subjectId].activeStatus === ActiveStatus.UP) {
           message.destroyTime = chat.destroyTime
-        }
+        //}
         await store.p2pSend(message, subjectId)
       } else if (subjectType === SubjectType.GROUP_CHAT) {
         let groupMembers
