@@ -248,13 +248,16 @@ export default {
       let store = _that.$store
       message.opened = true
       message.countDown = message.destroyTime / 1000
+      let _chat = store.state.chatMap[message.senderPeerId]
+      let currentChatMessages = _chat.messages
+      _that.$forceUpdate()
       let countDownInterval = setInterval(async function () {
         if (!message.countDown) {
           clearInterval(countDownInterval)
-          let currentChatMessages = store.state.chatMap[message.senderPeerId].messages
           for (let i = currentChatMessages.length - 1; i >= 0; i--) {
             if (message == currentChatMessages[i]) {
-              await chatComponent.remove(ChatDataType.MESSAGE, message, store.state.currentChat.messages)
+              let msg = await chatComponent.get(ChatDataType.MESSAGE, message._id)
+              await chatComponent.remove(ChatDataType.MESSAGE, msg, currentChatMessages)
             }
           }
           return

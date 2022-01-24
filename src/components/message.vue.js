@@ -461,7 +461,7 @@ export default {
       let store = _that.$store
       let editor = _that.$refs.editor
       let alias = store.state.linkmanMap[groupMember.memberPeerId].givenName ? store.state.linkmanMap[groupMember.memberPeerId].givenName : store.state.linkmanMap[groupMember.memberPeerId].name
-      let selectionStart = editor.selectionStart
+      let selectionStart = editor.$refs.input.selectionStart
       if (selectionStart == null) {
         selectionStart = 0
       }
@@ -2800,7 +2800,7 @@ export default {
       if ((!e.shiftKey && e.keyCode == 13) || (store.ios && e.keyCode == 13)) {
         _that.preSend()
       } else {
-        if (((e.shiftKey && e.keyCode == 50)) && store.state.currentChat.subjectType === SubjectType.GROUP_CHAT) {
+        if ((((e.shiftKey ||(Platform.is.ios || Platform.is.android)) && e.keyCode == 50)) && store.state.currentChat.subjectType === SubjectType.GROUP_CHAT) {
           _that.focusGroupMemberDialog = true
         } else if (store.state.ifMobileStyle) {
           _that.talkHeight()

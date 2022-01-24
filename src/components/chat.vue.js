@@ -105,7 +105,7 @@ export default {
       let store = _that.$store
       return function (chat) {
         if (chat) {
-          return (chat.unReadCount && _that.alertStatus(chat) ? '[' + chat.unReadCount + ' ' + _that.$i18n.t('messages') + ']' : '') + (chat.content ? chat.content : '')
+          return (chat.unReadCount && _that.alertStatus(chat) ? '[' + chat.unReadCount + ' ' + _that.$i18n.t('messages') + ']' : '') + (chat.content && !chat.hiddenContent ? chat.content : '')
         } else {
           return ''
         }
