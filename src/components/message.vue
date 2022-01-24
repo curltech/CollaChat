@@ -397,18 +397,19 @@
     q-dialog(v-model="focusGroupMemberDialog")
       q-card(flat square bordered)
         q-card-section
-          q-toolbar(insert style="flex-wrap:wrap")
-            q-input.c-field(debounce="100" outlined dense color="c-grey-10" bg-color="c-grey-0" v-model="selectFocusMemberFilter" :placeholder="placeholder" input-class="text-center iconfont")
+          q-toolbar(insert class="q-px-xs")
+            q-input.c-field(debounce="100" filled dense v-model="selectFocusMemberFilter" :placeholder="placeholder" input-class="text-center iconfont")
               template(slot="append")
                 q-icon(v-if="selectFocusMemberFilter" name="cancel" class="cursor-pointer" @click.stop="selectFocusMemberFilter = null")
-          q-separator.c-separator
-          q-list.full-width
-            q-item(v-for="(groupMember, index) in FocusGroupMemberOptions" :key="groupMember.memberPeerId")
-              q-item-section(avatar)
-                q-avatar
-                  img(:src="$store.state.linkmanMap[groupMember.memberPeerId] && $store.state.linkmanMap[groupMember.memberPeerId].avatar ? $store.state.linkmanMap[groupMember.memberPeerId].avatar : $store.defaultActiveAvatar")
-              q-item-section(@click="selectedFocusGroupMember(groupMember)")
-                q-item-label {{$store.state.linkmanMap[groupMember.memberPeerId].givenName?$store.state.linkmanMap[groupMember.memberPeerId].givenName:$store.state.linkmanMap[groupMember.memberPeerId].name }}
+          q-list
+            div(v-for="(groupMember, index) in FocusGroupMemberFilteredList" :key="groupMember.peerId")
+              // 实际选择的不是GroupChatMember，而是对应的linkman，所以属性为peerId、不是memberPeerId
+              q-item(clickable v-ripple @click="selectedFocusGroupMember(groupMember)")
+                q-item-section(avatar)
+                  q-avatar
+                    img(:src="groupMember.avatar ? groupMember.avatar : $store.defaultActiveAvatar")
+                q-item-section
+                  q-item-label {{ groupMember.givenName ? groupMember.givenName : groupMember.name }}
     q-uploader(style="display:none" ref="messageUpload" multiple batch @added="files => uploadMessageFilePC(files)")
     q-uploader(style="display:none" ref="groupFileUpload" multiple batch @added="files => uploadGroupFilePC(files)")
     mergeMessageDialog

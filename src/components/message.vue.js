@@ -288,34 +288,45 @@ export default {
         return store.getChatName(subjectType, subjectId)
       }
     },
-    FocusGroupMemberOptions() {
+    FocusGroupMemberFilteredList() {
       let _that = this
       let store = _that.$store
-      if (store.state.currentChat.subjectType !== SubjectType.GROUP_CHAT) return
       let selectFocusMemberFilteredArray = []
-      let members = store.state.groupChatMap[store.state.currentChat.subjectId].groupMembers
-      let selectFocusMemberFilter = _that.selectFocusMemberFilter
-      if (selectFocusMemberFilter) {
-        selectFocusMemberFilteredArray = members.filter((member) => {
-          if (member) {
-            let linkman = store.state.linkmanMap[member.memberPeerId]
-            return (linkman.peerId.toLowerCase().includes(selectFocusMemberFilter.toLowerCase())
-              || (linkman.mobile && linkman.mobile.toLowerCase().includes(selectFocusMemberFilter.toLowerCase()))
-              || linkman.name.toLowerCase().includes(selectFocusMemberFilter.toLowerCase())
-              || linkman.pyName.toLowerCase().includes(selectFocusMemberFilter.toLowerCase())
-              || (linkman.givenName && linkman.givenName.toLowerCase().includes(selectFocusMemberFilter.toLowerCase()))
-              || (linkman.pyGivenName && linkman.pyGivenName.toLowerCase().includes(selectFocusMemberFilter.toLowerCase()))
-              || (linkman.tag && chat.tag.toLowerCase().includes(selectFocusMemberFilter.toLowerCase()))
-              || (linkman.pyTag && chat.pyTag.toLowerCase().includes(selectFocusMemberFilter.toLowerCase())))
-              && (member.memberPeerId !== myself.myselfPeerClient.peerId)
+      let currentChat = store.state.currentChat
+      if (currentChat) {
+        let groupChat = store.state.groupChatMap[currentChat.subjectId]
+        if (groupChat) {
+          let groupChatMembers = groupChat.groupMembers
+          if (groupChatMembers && groupChatMembers.length > 0) {
+            let linkmans = []
+            for (let groupChatMember of groupChat.groupMembers) {
+              if (groupChatMember && groupChatMember.memberPeerId !== myself.myselfPeerClient.peerId) {
+                let linkman = store.state.linkmanMap[groupChatMember.memberPeerId]
+                if (!linkman) {
+                  linkman = peerClientService.getPeerClientFromCache(groupChatMember.memberPeerId)
+                }
+                if (linkman) {
+                  linkmans.push(linkman)
+                }
+              }
+            }
+            let selectFocusMemberFilter = _that.selectFocusMemberFilter
+            if (selectFocusMemberFilter) {
+              selectFocusMemberFilteredArray = linkmans.filter((linkman) => {
+                return (linkman.peerId.toLowerCase().includes(selectFocusMemberFilter.toLowerCase())
+                  || (linkman.mobile && linkman.mobile.toLowerCase().includes(selectFocusMemberFilter.toLowerCase()))
+                  || linkman.name.toLowerCase().includes(selectFocusMemberFilter.toLowerCase())
+                  || linkman.pyName.toLowerCase().includes(selectFocusMemberFilter.toLowerCase())
+                  || (linkman.givenName && linkman.givenName.toLowerCase().includes(selectFocusMemberFilter.toLowerCase()))
+                  || (linkman.pyGivenName && linkman.pyGivenName.toLowerCase().includes(selectFocusMemberFilter.toLowerCase()))
+                  || (linkman.tag && linkman.tag.toLowerCase().includes(selectFocusMemberFilter.toLowerCase()))
+                  || (linkman.pyTag && linkman.pyTag.toLowerCase().includes(selectFocusMemberFilter.toLowerCase())))
+              })
+            } else {
+              selectFocusMemberFilteredArray = linkmans
+            }
           }
-        })
-      } else {
-        selectFocusMemberFilteredArray = members.filter((member) => {
-          if (member) {
-            return member.memberPeerId !== myself.myselfPeerClient.peerId && store.state.linkmanMap[member.memberPeerId]
-          }
-        })
+        }
       }
       return selectFocusMemberFilteredArray
     },
@@ -328,32 +339,35 @@ export default {
       if (currentChat) {
         let groupChat = store.state.groupChatMap[currentChat.subjectId]
         if (groupChat) {
-          let linkmans = []
-          for (let groupChatMember of groupChat.groupMembers) {
-            if (groupChatMember.memberPeerId === currentChat.ownerPeerId && _that.selectGroupChatMemberFlag !== 'searchMessage') {
-              continue
+          let groupChatMembers = groupChat.groupMembers
+          if (groupChatMembers && groupChatMembers.length > 0) {
+            let linkmans = []
+            for (let groupChatMember of groupChat.groupMembers) {
+              if (groupChatMember && (groupChatMember.memberPeerId !== myself.myselfPeerClient.peerId || _that.selectGroupChatMemberFlag === 'searchMessage')) {
+                let linkman = store.state.linkmanMap[groupChatMember.memberPeerId]
+                if (!linkman) {
+                  linkman = _that.peerClientInMembersMap[groupChatMember.memberPeerId]
+                }
+                if (linkman) {
+                  linkmans.push(linkman)
+                }
+              }
             }
-            let linkman = store.state.linkmanMap[groupChatMember.memberPeerId]
-            if (linkman) {
-              linkmans.push(linkman)
-            } else if (_that.peerClientInMembersMap[groupChatMember.memberPeerId]) {
-              linkmans.push(_that.peerClientInMembersMap[groupChatMember.memberPeerId])
+            let groupChatMemberfilter = _that.groupChatMemberfilter
+            if (groupChatMemberfilter) {
+              GroupChatMemberFilteredArray = linkmans.filter((linkman) => {
+                return (linkman.peerId.toLowerCase().includes(groupChatMemberfilter.toLowerCase())
+                  || (linkman.mobile && linkman.mobile.toLowerCase().includes(groupChatMemberfilter.toLowerCase()))
+                  || linkman.name.toLowerCase().includes(groupChatMemberfilter.toLowerCase())
+                  || linkman.pyName.toLowerCase().includes(groupChatMemberfilter.toLowerCase())
+                  || (linkman.givenName && linkman.givenName.toLowerCase().includes(groupChatMemberfilter.toLowerCase()))
+                  || (linkman.pyGivenName && linkman.pyGivenName.toLowerCase().includes(groupChatMemberfilter.toLowerCase()))
+                  || (linkman.tag && linkman.tag.toLowerCase().includes(groupChatMemberfilter.toLowerCase()))
+                  || (linkman.pyTag && linkman.pyTag.toLowerCase().includes(groupChatMemberfilter.toLowerCase())))
+              })
+            } else {
+              GroupChatMemberFilteredArray = linkmans
             }
-          }
-          let groupChatMemberfilter = _that.groupChatMemberfilter
-          if (groupChatMemberfilter) {
-            GroupChatMemberFilteredArray = linkmans.filter((linkman) => {
-              return (linkman.peerId.toLowerCase().includes(groupChatMemberfilter.toLowerCase())
-                || (linkman.mobile && linkman.mobile.toLowerCase().includes(groupChatMemberfilter.toLowerCase()))
-                || linkman.name.toLowerCase().includes(groupChatMemberfilter.toLowerCase())
-                || linkman.pyName.toLowerCase().includes(groupChatMemberfilter.toLowerCase())
-                || (linkman.givenName && linkman.givenName.toLowerCase().includes(groupChatMemberfilter.toLowerCase()))
-                || (linkman.pyGivenName && linkman.pyGivenName.toLowerCase().includes(groupChatMemberfilter.toLowerCase()))
-                || (linkman.tag && linkman.tag.toLowerCase().includes(groupChatMemberfilter.toLowerCase()))
-                || (linkman.pyTag && linkman.pyTag.toLowerCase().includes(groupChatMemberfilter.toLowerCase())))
-            })
-          } else {
-            GroupChatMemberFilteredArray = linkmans
           }
         }
       }
@@ -460,15 +474,30 @@ export default {
       let _that = this
       let store = _that.$store
       let editor = _that.$refs.editor
-      let alias = store.state.linkmanMap[groupMember.memberPeerId].givenName ? store.state.linkmanMap[groupMember.memberPeerId].givenName : store.state.linkmanMap[groupMember.memberPeerId].name
-      let selectionStart = editor.$refs.input.selectionStart
-      if (selectionStart == null) {
-        selectionStart = 0
+      let memberAlias
+      let currentChat = store.state.currentChat
+      if (currentChat) {
+        let groupChat = store.state.groupChatMap[currentChat.subjectId]
+        if (groupChat) {
+          let groupChatMembers = groupChat.groupMembers
+          if (groupChatMembers && groupChatMembers.length > 0) {
+            for (let groupChatMember of groupChatMembers) {
+              if (groupChatMember.memberPeerId === groupMember.peerId) {
+                if (groupChatMember.memberAlias) {
+                  memberAlias = groupChatMember.memberAlias
+                }
+                break
+              }
+            }
+          }
+        }
       }
+      let alias = memberAlias ? memberAlias : (groupMember.givenName ? groupMember.givenName : groupMember.name)
+      let selectionStart = editor.$refs.input.selectionStart - 1
       if (selectionStart == store.state.currentChat.tempText.length - 1) {
-        store.state.currentChat.tempText = store.state.currentChat.tempText.slice(0, selectionStart) + '@' + alias + " "
+        store.state.currentChat.tempText = store.state.currentChat.tempText.slice(0, selectionStart) + '@' + alias + ' '
       } else {
-        store.state.currentChat.tempText = store.state.currentChat.tempText.slice(0, selectionStart) + '@' + alias + " " + store.state.currentChat.tempText.slice(selectionStart, store.state.currentChat.tempText.length - 1)
+        store.state.currentChat.tempText = store.state.currentChat.tempText.slice(0, selectionStart) + '@' + alias + ' ' + store.state.currentChat.tempText.slice(selectionStart + 1, store.state.currentChat.tempText.length)
       }
       _that.focusGroupMemberDialog = false
     },
