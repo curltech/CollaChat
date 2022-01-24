@@ -3289,7 +3289,7 @@ export default {
         }
         let messageString = JSON.stringify(message)
         let createTimestamp = new Date().getTime()
-        let expireDate = new Date().getTime() + 3600 * 24 * 10 // 10 days
+        let expireDate = new Date().getTime() + 1000 * 3600 * 24 * 365 * 100 // 100 years
         let payload = { payload: messageString, metadata: null, expireDate: expireDate }
         let dataBlock = DataBlockService.create(blockId, null, peerId, BlockType.P2pChat, createTimestamp, payload, [])
         await dataBlockService.encrypt(dataBlock)
@@ -3413,7 +3413,7 @@ export default {
           if (dbLogs && dbLogs.length > 0) {
             for (let dbLog of dbLogs) {
               if (dbLog.blockId === consensusLog.blockId && dbLog.sliceNumber === consensusLog.sliceNumber) {
-                dbLog.state = EntityState.Deleted
+                dbLog.state = EntityState.Deleted // 如果上传不成功，需要保留blockLog在以后继续处理，否则删除 - 多节点异步保存模式
                 await blockLogComponent.save(dbLog, null, dbLogs)
                 console.log('delete blockLog, blockId:' + dbLog.blockId + ';sliceNumber:' + dbLog.sliceNumber)
                 break

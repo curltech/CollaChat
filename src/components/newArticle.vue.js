@@ -87,7 +87,7 @@ export default {
         }
         // 云端保存
         let _peers = []
-        let expireDate = currentTime + 3600*24*365*100 // 100 years
+        let expireDate = currentTime + 1000 * 3600 * 24 * 365 * 100 // 100 years
         let result = await collectionUtil.saveBlock(current, true, blockType, _peers, expireDate)
         if (!result) {
           _that.$q.notify({
@@ -484,9 +484,9 @@ export default {
         _that.subKind = 'captureMedia'
       } else if (store.safari === true) {
         //if (type === 'image') {
-          store.captureMediaEntry = 'article'
-          store.captureType = type
-          _that.subKind = 'captureMedia'
+        store.captureMediaEntry = 'article'
+        store.captureType = type
+        _that.subKind = 'captureMedia'
         /*} else {
           console.error('Not support browser safari!')
         }*/

@@ -49,9 +49,9 @@ export default {
             let weekTimeArrary = weekTimeString.split(' ')
             let weekString = `${_that.$i18n.t(weekTimeArrary[0])} ${weekTimeArrary[1]}`
             return weekString
-            } else {
-              return date.formatDate(createDate, 'YYYY-MM-DD HH:mm')
-            }
+          } else {
+            return date.formatDate(createDate, 'YYYY-MM-DD HH:mm')
+          }
         }
       }
     },
@@ -70,17 +70,17 @@ export default {
           article.content = attachs[0].content
         }
         if (!article.content) {*/
-          let blocks = await dataBlockService.findTxPayload(null, article.blockId)
-          if (blocks && blocks.length > 0) {
-            article = blocks[0]
-          } else {
-            _that.$q.notify({
-              message: `${_that.$i18n.t("Article")} ${_that.$i18n.t("Deleted")}`,
-              timeout: 3000,
-              type: "warning",
-              color: "warning",
-            })
-          }
+        let blocks = await dataBlockService.findTxPayload(null, article.blockId)
+        if (blocks && blocks.length > 0) {
+          article = blocks[0]
+        } else {
+          _that.$q.notify({
+            message: `${_that.$i18n.t("Article")} ${_that.$i18n.t("Deleted")}`,
+            timeout: 3000,
+            type: "warning",
+            color: "warning",
+          })
+        }
         /*}*/
       }
       store.state.currentArticle = article
@@ -114,7 +114,7 @@ export default {
           label: _that.$i18n.t('Edit'),
           icon: 'edit',
           id: 'edit'
-        },{})
+        }, {})
       }
       _that.$q.bottomSheet({
         actions: actions
@@ -194,17 +194,17 @@ export default {
           label: _that.$i18n.t('Delete'),
           icon: 'delete',
           id: 'delete'
-        },{})
+        }, {})
         actions.unshift({
           label: _that.$i18n.t('Edit'),
           icon: 'edit',
           id: 'edit'
-        },{})
+        }, {})
         actions.unshift({
           label: _that.$i18n.t('New Article'),
           icon: 'article',
           id: 'newArticle'
-        },{})
+        }, {})
       }
       _that.$q.bottomSheet({
         actions: actions
@@ -325,7 +325,7 @@ export default {
         current.blockId = UUID.string(null, null)
         // 云端保存
         let _peers = []
-        let expireDate = currentTime + 3600*24*365*100 // 100 years
+        let expireDate = currentTime + 1000 * 3600 * 24 * 365 * 100 // 100 years
         let result = await collectionUtil.saveBlock(current, true, blockType, _peers, expireDate)
         if (!result) {
           _that.$q.notify({
@@ -504,7 +504,7 @@ export default {
     },
     channelBack() {
       let _that = this
-      let store = _that.$store 
+      let store = _that.$store
       if (store.channelDetailsChannelEntry === 'article') {
         _that.subKind = 'view'
       } else {
@@ -514,7 +514,7 @@ export default {
     },
     articleBack() {
       let _that = this
-      let store = _that.$store 
+      let store = _that.$store
       if (store.channelDetailsArticleEntry === 'message') {
         store.changeKind('message')
       } else if (store.channelDetailsArticleEntry === 'search') {

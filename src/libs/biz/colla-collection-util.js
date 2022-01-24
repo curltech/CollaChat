@@ -343,7 +343,7 @@ export class CollectionUtil {
       parentBusinessNumber = bizObj.channelId
     }
     if (!expireDate) {
-      expireDate = new Date().getTime() + 3600 * 24 * 365 * 100 // 100 years
+      expireDate = new Date().getTime() + 1000 * 3600 * 24 * 365 * 100 // 100 years
     }
     let payload = { payload: CollaUtil.clone(bizObj), metadata: bizObj.metadata ? bizObj.metadata : bizObj.tag, expireDate: expireDate }
     if (blockType === BlockType.GroupFile) {
@@ -453,11 +453,9 @@ export class CollectionUtil {
           for (let i = 0; i < responses.length; ++i) {
             let response = responses[i]
             console.log("response:" + JSON.stringify(response))
-            if (response &&
-              (response.MessageType === MsgType[MsgType.CONSENSUS_REPLY] || response.MessageType === MsgType[MsgType.PUTVALUE]) &&
-              response.Payload === MsgType[MsgType.OK]) {
-              if (blockType === BlockType.Collection) { // 如果上传不成功，需要保留blockLog在以后继续处理，否则删除
-                dbLogs[i].state = EntityState.Deleted
+            if (response === MsgType[MsgType.OK]) {
+              if (blockType === BlockType.Collection) {
+                dbLogs[i].state = EntityState.Deleted // 如果上传不成功，需要保留blockLog在以后继续处理，否则删除 - 单节点同步保存模式
                 console.log('delete dbLog, blockId:' + dbLogs[i].blockId + ';sliceNumber:' + dbLogs[i].sliceNumber)
               }
             } else {

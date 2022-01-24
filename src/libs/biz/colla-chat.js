@@ -621,10 +621,10 @@ export class ChatBlockComponent {
   async save(current, _peers) {
     let _that = this
     let blockType = BlockType.ChatAttach
-    let expireDate = new Date().getTime() + 3600 * 24 * 10 // 10 days
+    let expireDate = new Date().getTime() + 1000 * 3600 * 24 * 10 // 10 days
     if (current.messageType === P2pChatMessageType.GROUP_FILE) {
       blockType = BlockType.GroupFile
-      expireDate = new Date().getTime() + 3600 * 24 * 365 * 100 // 100 years
+      expireDate = new Date().getTime() + 1000 * 3600 * 24 * 365 * 100 // 100 years
     }
     let blockResult = await collectionUtil.saveBlock(current, true, blockType, _peers, expireDate)
     let result = true

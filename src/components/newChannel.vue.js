@@ -54,7 +54,7 @@ export default {
         }
         let blockType = BlockType.Channel
         let _peers = []
-        let expireDate = currentTime + 3600*24*365*100 // 100 years
+        let expireDate = currentTime + 1000 * 3600 * 24 * 365 * 100 // 100 years
         // 云端保存
         let result = await collectionUtil.saveBlock(current, true, blockType, _peers, expireDate)
         if (!result) {
