@@ -370,7 +370,7 @@
                 q-avatar
                   img(:src="groupChatMember.avatar ? groupChatMember.avatar : $store.defaultActiveAvatar")
               q-item-section
-                q-item-label {{ groupChatMember.name }}
+                q-item-label {{ groupChatMember.memberAlias ? groupChatMember.memberAlias : (groupChatMember.givenName ? groupChatMember.givenName : groupChatMember.name) }}
                   q-icon(v-if="$store.displayActiveStatus" name="person" :color="groupChatMember.activeStatus === ActiveStatus.UP ? 'secondary' : 'grey-1'")
               q-item-section(avatar)
                 q-icon(color="c-grey-10" :name="groupChatMember.locked ? 'lock' : ''")
@@ -409,7 +409,7 @@
                   q-avatar
                     img(:src="groupMember.avatar ? groupMember.avatar : $store.defaultActiveAvatar")
                 q-item-section
-                  q-item-label {{ groupMember.givenName ? groupMember.givenName : groupMember.name }}
+                  q-item-label {{ groupMember.memberAlias ? groupMember.memberAlias : (groupMember.givenName ? groupMember.givenName : groupMember.name) }}
     q-uploader(style="display:none" ref="messageUpload" multiple batch @added="files => uploadMessageFilePC(files)")
     q-uploader(style="display:none" ref="groupFileUpload" multiple batch @added="files => uploadGroupFilePC(files)")
     mergeMessageDialog

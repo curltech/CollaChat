@@ -306,6 +306,8 @@ export default {
                   linkman = peerClientService.getPeerClientFromCache(groupChatMember.memberPeerId)
                 }
                 if (linkman) {
+                  linkman.memberAlias = groupChatMember.memberAlias
+                  linkman.pyMemberAlias = pinyinUtil.getPinyin(groupChatMember.memberAlias)
                   linkmans.push(linkman)
                 }
               }
@@ -319,6 +321,8 @@ export default {
                   || linkman.pyName.toLowerCase().includes(selectFocusMemberFilter.toLowerCase())
                   || (linkman.givenName && linkman.givenName.toLowerCase().includes(selectFocusMemberFilter.toLowerCase()))
                   || (linkman.pyGivenName && linkman.pyGivenName.toLowerCase().includes(selectFocusMemberFilter.toLowerCase()))
+                  || (linkman.memberAlias && linkman.memberAlias.toLowerCase().includes(groupChatMemberfilter.toLowerCase()))
+                  || (linkman.pyMemberAlias && linkman.pyMemberAlias.toLowerCase().includes(groupChatMemberfilter.toLowerCase()))
                   || (linkman.tag && linkman.tag.toLowerCase().includes(selectFocusMemberFilter.toLowerCase()))
                   || (linkman.pyTag && linkman.pyTag.toLowerCase().includes(selectFocusMemberFilter.toLowerCase())))
               })
@@ -349,6 +353,8 @@ export default {
                   linkman = _that.peerClientInMembersMap[groupChatMember.memberPeerId]
                 }
                 if (linkman) {
+                  linkman.memberAlias = groupChatMember.memberAlias
+                  linkman.pyMemberAlias = pinyinUtil.getPinyin(groupChatMember.memberAlias)
                   linkmans.push(linkman)
                 }
               }
@@ -362,6 +368,8 @@ export default {
                   || linkman.pyName.toLowerCase().includes(groupChatMemberfilter.toLowerCase())
                   || (linkman.givenName && linkman.givenName.toLowerCase().includes(groupChatMemberfilter.toLowerCase()))
                   || (linkman.pyGivenName && linkman.pyGivenName.toLowerCase().includes(groupChatMemberfilter.toLowerCase()))
+                  || (linkman.memberAlias && linkman.memberAlias.toLowerCase().includes(groupChatMemberfilter.toLowerCase()))
+                  || (linkman.pyMemberAlias && linkman.pyMemberAlias.toLowerCase().includes(groupChatMemberfilter.toLowerCase()))
                   || (linkman.tag && linkman.tag.toLowerCase().includes(groupChatMemberfilter.toLowerCase()))
                   || (linkman.pyTag && linkman.pyTag.toLowerCase().includes(groupChatMemberfilter.toLowerCase())))
               })
@@ -474,25 +482,7 @@ export default {
       let _that = this
       let store = _that.$store
       let editor = _that.$refs.editor
-      let memberAlias
-      let currentChat = store.state.currentChat
-      if (currentChat) {
-        let groupChat = store.state.groupChatMap[currentChat.subjectId]
-        if (groupChat) {
-          let groupChatMembers = groupChat.groupMembers
-          if (groupChatMembers && groupChatMembers.length > 0) {
-            for (let groupChatMember of groupChatMembers) {
-              if (groupChatMember.memberPeerId === groupMember.peerId) {
-                if (groupChatMember.memberAlias) {
-                  memberAlias = groupChatMember.memberAlias
-                }
-                break
-              }
-            }
-          }
-        }
-      }
-      let alias = memberAlias ? memberAlias : (groupMember.givenName ? groupMember.givenName : groupMember.name)
+      let alias = groupMember.memberAlias ? groupMember.memberAlias : (groupMember.givenName ? groupMember.givenName : groupMember.name)
       let selectionStart = editor.$refs.input.selectionStart - 1
       if (selectionStart == store.state.currentChat.tempText.length - 1) {
         store.state.currentChat.tempText = store.state.currentChat.tempText.slice(0, selectionStart) + '@' + alias + ' '
