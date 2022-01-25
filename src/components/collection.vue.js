@@ -670,11 +670,11 @@ export default {
       _that.subKind = 'view'
       //}
     },
-    doneSelectCollectionItem() {
+    async doneSelectCollectionItem() {
       let _that = this
       let store = _that.$store
       if (store.state.selectedCollectionItems && store.state.selectedCollectionItems.length > 0) {
-        store.collectionPicked(store.state.selectedCollectionItems)
+        await store.collectionPicked(store.state.selectedCollectionItems)
       }
     },
     // 新增
