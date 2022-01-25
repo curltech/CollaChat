@@ -1106,70 +1106,77 @@ export default {
       let _that = this
       let store = _that.$store
       if (store.preCheck()) {
-        // put content into attach
-        if (!item.content) {
-          let attachs = await collectionComponent.loadAttach(item, null, null)
-          if (attachs && attachs.length > 0) {
-            item.attachs = attachs
-            item.content = attachs[0].content
-          }
+        _that.$q.loading.show()
+        try {
+          // put content into attach
           if (!item.content) {
-            item.content = ''
-          }
-        }
-        if (item.collectionType === CollectionType.FILE || item.collectionType === CollectionType.VIDEO || item.collectionType === CollectionType.AUDIO || item.collectionType === CollectionType.IMAGE) {
-          let _content = item.content
-          let name
-          if (item.collectionType !== CollectionType.FILE) {
-            let pat = /\bsrc\b\s*=\s*[\'\"]?([^\'\"]*)[\'\"]?/i
-            let res = _content.match(pat)
-            if (res && res.length > 1) {
-              _content = res[1]
+            let attachs = await collectionComponent.loadAttach(item, null, null)
+            if (attachs && attachs.length > 0) {
+              item.attachs = attachs
+              item.content = attachs[0].content
             }
-          } else {
-            let firstFileInfo = item.firstFileInfo
-            name = firstFileInfo.slice(firstFileInfo.indexOf(' ') + 1, firstFileInfo.length)
+            if (!item.content) {
+              item.content = ''
+            }
           }
-          let fileData = _content
-          let type = item.collectionType
-          await store.saveFileAndSendMessage(chat, fileData, type, name)
-        } else {
-          let message = {}
-          message.title = item.contentTitle
-          if (item.collectionType === ChatContentType.CHAT) {
-            let mergeMessages = JSON.parse(item.plainContent)
-            let firstMessage = mergeMessages[0]
-            message.mergeMessageId = firstMessage.mergeMessageId
-            message.content = store.getChatContent(firstMessage.contentType, firstMessage.content)
-            message.mergeMessages = mergeMessages
-          } else if (item.collectionType === ChatContentType.NOTE) {
-            message.title = item.title
-            message.thumbnail = item.thumbnail
-            message.thumbType = item.thumbType
-            message.attachIVAmount = item.attachIVAmount
-            message.contentIVAmount = item.contentIVAmount
-            message.contentTitle = item.contentTitle
-            message.contentAAmount = item.contentAAmount
-            message.attachAAmount = item.attachAAmount
-            message.attachOAmount = item.attachOAmount
-            message.firstAudioDuration = item.firstAudioDuration
-            message.firstFileInfo = item.firstFileInfo
-            message.contentBody = item.contentBody
-            //message.content = item.content
-            message.srcEntityType = item.srcEntityType
-            message.srcEntityId = item.srcEntityId
-            message.srcEntityName = item.srcEntityName
-            message.messageId = UUID.string(null, null)
+          if (item.collectionType === CollectionType.FILE || item.collectionType === CollectionType.VIDEO || item.collectionType === CollectionType.AUDIO || item.collectionType === CollectionType.IMAGE) {
+            let _content = item.content
+            let name
+            if (item.collectionType !== CollectionType.FILE) {
+              let pat = /\bsrc\b\s*=\s*[\'\"]?([^\'\"]*)[\'\"]?/i
+              let res = _content.match(pat)
+              if (res && res.length > 1) {
+                _content = res[1]
+              }
+            } else {
+              let firstFileInfo = item.firstFileInfo
+              name = firstFileInfo.slice(firstFileInfo.indexOf(' ') + 1, firstFileInfo.length)
+            }
+            let fileData = _content
+            let type = item.collectionType
+            await store.saveFileAndSendMessage(chat, fileData, type, name)
+          } else {
+            let message = {}
+            message.title = item.contentTitle
+            if (item.collectionType === ChatContentType.CHAT) {
+              let mergeMessages = JSON.parse(item.plainContent)
+              let firstMessage = mergeMessages[0]
+              message.mergeMessageId = firstMessage.mergeMessageId
+              message.content = store.getChatContent(firstMessage.contentType, firstMessage.content)
+              message.mergeMessages = mergeMessages
+            } else if (item.collectionType === ChatContentType.NOTE) {
+              message.title = item.title
+              message.thumbnail = item.thumbnail
+              message.thumbType = item.thumbType
+              message.attachIVAmount = item.attachIVAmount
+              message.contentIVAmount = item.contentIVAmount
+              message.contentTitle = item.contentTitle
+              message.contentAAmount = item.contentAAmount
+              message.attachAAmount = item.attachAAmount
+              message.attachOAmount = item.attachOAmount
+              message.firstAudioDuration = item.firstAudioDuration
+              message.firstFileInfo = item.firstFileInfo
+              message.contentBody = item.contentBody
+              //message.content = item.content
+              message.srcEntityType = item.srcEntityType
+              message.srcEntityId = item.srcEntityId
+              message.srcEntityName = item.srcEntityName
+              message.messageId = UUID.string(null, null)
+              message.messageType = P2pChatMessageType.CHAT_LINKMAN
+              await store.saveFileInMessage(chat, message, item.content, item.collectionType, item.title, message.messageId)
+            } else {
+              message.content = item.plainContent
+            }
             message.messageType = P2pChatMessageType.CHAT_LINKMAN
-            await store.saveFileInMessage(chat, message, item.content, item.collectionType, item.title, message.messageId)
-          } else {
-            message.content = item.plainContent
+            message.contentType = item.collectionType
+            console.log(message)
+            await store.sendChatMessage(chat, message)
+            _that.setCurrentChat(chat.subjectId)
           }
-          message.messageType = P2pChatMessageType.CHAT_LINKMAN
-          message.contentType = item.collectionType
-          console.log(message)
-          await store.sendChatMessage(chat, message)
-          _that.setCurrentChat(chat.subjectId)
+        } catch (error) {
+          console.error(error)
+        } finally {
+          _that.$q.loading.hide()
         }
       }
       if (_that.tab !== 'chat') {

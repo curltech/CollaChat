@@ -2644,19 +2644,26 @@ export default {
       if (!_that.preCheck()) {
         return
       }
-      let linkmans = store.state.includedLinkmans
-      for (let linkman of linkmans) {
-        let card = {
-          avatar: linkman.avatar,
-          peerId: linkman.peerId,
-          name: linkman.name
+      _that.$q.loading.show()
+      try {
+        let linkmans = store.state.includedLinkmans
+        for (let linkman of linkmans) {
+          let card = {
+            avatar: linkman.avatar,
+            peerId: linkman.peerId,
+            name: linkman.name
+          }
+          let message = {
+            content: card,
+            contentType: ChatContentType.CARD,
+            messageType: P2pChatMessageType.CHAT_LINKMAN
+          }
+          await store.sendChatMessage(store.state.currentChat, message)
         }
-        let message = {
-          content: card,
-          contentType: ChatContentType.CARD,
-          messageType: P2pChatMessageType.CHAT_LINKMAN
-        }
-        await store.sendChatMessage(store.state.currentChat, message)
+      } catch (error) {
+        console.error(error)
+      } finally {
+        _that.$q.loading.hide()
       }
     },
     backToDefault() {
