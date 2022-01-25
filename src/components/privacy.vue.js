@@ -56,7 +56,7 @@ export default {
       let backupMobile = null
       try {
         let currentDate = new Date()
-        let visibilitySetting = myselfPeerClient.visibilitySetting ? myselfPeerClient.visibilitySetting : 'YYYYY'
+        let visibilitySetting = myselfPeerClient.visibilitySetting ? myselfPeerClient.visibilitySetting : 'YYYYYY'
         if (kind === 'peerId') {
           visibilitySetting = (value ? 'Y' : 'N') + visibilitySetting.substring(1, 5)
         } else if (kind === 'mobileNumber') {
