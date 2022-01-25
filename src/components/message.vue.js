@@ -10,7 +10,7 @@ import pinyinUtil from '@/libs/base/colla-pinyin'
 import { audioCaptureComponent, mediaCaptureComponent, mediaComponent, cameraComponent, alloyFingerComponent, mediaPickerComponent, mediaRecorderComponent, mediaStreamComponent, audioInputComponent } from '@/libs/base/colla-media'
 import { statusBarComponent, fileComponent, photoLibraryComponent } from '@/libs/base/colla-cordova'
 import { chatComponent, ChatContentType, ChatMessageStatus, ChatDataType, P2pChatMessageType, SubjectType, chatBlockComponent } from '@/libs/biz/colla-chat'
-import { ActiveStatus, contactComponent, ContactDataType, GroupStatus, MemberType, RequestStatus, RequestType } from '@/libs/biz/colla-contact'
+import { ActiveStatus, contactComponent, ContactDataType, GroupStatus, MemberType, RequestStatus, RequestType, LinkmanStatus } from '@/libs/biz/colla-contact'
 import { SrcEntityType, CollectionType } from '@/libs/biz/colla-collection'
 import { collectionUtil } from '@/libs/biz/colla-collection-util'
 
@@ -2589,29 +2589,28 @@ export default {
       let _that = this
       let store = _that.$store
       if (peerId) {
-        let myselfPeerClient = myself.myselfPeerClient
         let linkman = store.state.linkmanMap[peerId]
-        if (linkman) {
+        if (linkman && linkman.status !== LinkmanStatus.REQUESTED) {
           store.state.currentLinkman = linkman
-          store.contactsDetailsEntry = _that.subKind // CHATDetails, GROUP_CHATDetails,default
+          store.contactsDetailsEntry = _that.subKind // CHATDetails, GROUP_CHATDetails, default
           _that.subKind = 'contactsDetails'
-          /*if (store.state.ifMobileStyle) {
-            statusBarComponent.style(true, '#ffffff')
-          }*/
         } else {
-          linkman = await peerClientService.getCachedPeerClient(peerId)
-          if (linkman && linkman.visibilitySetting && linkman.visibilitySetting.substring(2, 3) === 'N') {
-            store.state.findLinkmanResult = 1
-            store.state.findLinkmanTip = _that.$i18n.t('The contact is invisible')
-            store.findLinkman = null
-            store.state.findLinkmanData = {
-              peerId: _that.$i18n.t('Invisible Peer Id'), // set Peer Id
-              message: null,
-              givenName: null,
-              tag: null
-            }
-            store.state.findContactsSubKind = 'default'
-          } else if (linkman && !(linkman.visibilitySetting && linkman.visibilitySetting.substring(0, 1) === 'N')) {
+          linkman = await peerClientService.findPeerClient(null, peerId, null, null)
+          if (!linkman) {
+            _that.$q.notify({
+              message: _that.$i18n.t('The contact does not exist'),
+              timeout: 3000,
+              type: "info",
+              color: "info",
+            })
+          } else if (linkman.visibilitySetting && linkman.visibilitySetting.substring(2, 3) === 'N') {
+            _that.$q.notify({
+              message: _that.$i18n.t('The contact is invisible'),
+              timeout: 3000,
+              type: "info",
+              color: "info",
+            })
+          } else {
             store.state.findLinkmanResult = 4
             store.state.findLinkmanTip = ''
             store.findLinkman = linkman
@@ -2619,20 +2618,9 @@ export default {
               store.findLinkmans.splice(0)
             }
             store.state.findContactsSubKind = 'result'
-          } else {
-            store.state.findLinkmanResult = 1
-            store.state.findLinkmanTip = _that.$i18n.t('The contact does not exist')
-            store.findLinkman = null
-            store.state.findLinkmanData = {
-              peerId: peerId,
-              message: null,
-              givenName: null,
-              tag: null
-            }
-            store.state.findContactsSubKind = 'default'
+            store.findContactsEntry = 'GROUP_CHATDetails'
+            _that.subKind = 'findContacts'
           }
-          store.findContactsEntry = 'GROUP_CHATDetails'
-          _that.subKind = 'findContacts'
         }
       }
     },
@@ -2670,21 +2658,6 @@ export default {
         }
         await store.sendChatMessage(store.state.currentChat, message)
       }
-    },
-    async openCard(message) {
-      let _that = this
-      let store = _that.$store
-      store.findLinkman = null
-      store.state.findLinkmanData = {
-        peerId: null,
-        message: null,
-        givenName: null,
-        tag: null
-      }
-      store.state.findContactsSubKind = 'default'
-      store.findContactsEntry = 'message'
-      store.changeKind('findContacts')
-      await store.findContacts('card', message.content.peerId)
     },
     backToDefault() {
       let _that = this

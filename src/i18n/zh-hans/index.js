@@ -60,7 +60,7 @@ export default {
   "Group Member": "群聊成员",
   "Select Group Member": "选择群聊成员",
   "Remove Group Member": "删除群聊成员",
-  "Can't add yourself into contacts list": "不能添加自己到通讯录",
+  "This is yourself": "这是你自己",
   "The contact does not exist": "该用户不存在",
   "The contact is invisible": "该用户不可见",
   "Invisible Peer Id": "不可见的身份编号",

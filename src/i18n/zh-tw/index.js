@@ -60,7 +60,7 @@
   "Group Member": "群聊成員",
   "Select Group Member": "選擇群聊成員",
   "Remove Group Member": "刪除群聊成員",
-  "Can't add yourself into contacts list": "不能添加自己到通訊錄",
+  "This is yourself": "這是你自己",
   "The contact does not exist": "該用戶不存在",
   "The contact is invisible": "該用戶不可見",
   "Invisible Peer Id": "不可見的身份編號",

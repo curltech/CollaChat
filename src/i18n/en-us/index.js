@@ -60,7 +60,7 @@ export default {
   "Group Member" : "GroupChat Member",
   "Select Group Member": "Select GroupChat Member",
   "Remove Group Member": "Remove GroupChat Member",
-  "Can't add yourself into contacts list": "Can't add yourself into contacts list",
+  "This is yourself": "This is yourself",
   "The contact does not exist": "The contact does not exist",
   "The contact is invisible": "The contact is invisible",
   "Invisible Peer Id": "Invisible Peer Id",

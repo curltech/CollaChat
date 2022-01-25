@@ -60,7 +60,7 @@
   "Group Member": "단체 채 팅 멤버",
   "Select Group Member": "단체 채 팅 멤버 선택",
   "Remove Group Member": "단체 채 팅 멤버 삭제",
-  "Can't add yourself into contacts list": "자신 을 주소록 에 추가 할 수 없습니다",
+  "This is yourself": "이것은 당신 자신입니다",
   "The contact does not exist": "이 사용자 가 존재 하지 않 습 니 다",
   "The contact is invisible": "이 사용자 가 보이 지 않 습 니 다",
   "Invisible Peer Id": "보이 지 않 는 신분 번호",

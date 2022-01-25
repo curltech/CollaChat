@@ -1,10 +1,11 @@
 import { date } from 'quasar'
 
-import { webrtcPeerPool, peerClientService, BlockType, queryValueAction, myself } from 'libcolla'
+import { peerClientService } from 'libcolla'
 
 import { ChatDataType, chatComponent, ChatMessageStatus, ChatContentType, P2pChatMessageType, SubjectType } from '@/libs/biz/colla-chat'
-import { ActiveStatus } from '@/libs/biz/colla-contact'
-import { channelComponent, ChannelType, EntityType } from '@/libs/biz/colla-channel'
+import { ActiveStatus, LinkmanStatus } from '@/libs/biz/colla-contact'
+import { channelComponent } from '@/libs/biz/colla-channel'
+
 import NotePreview from '@/components/notePreview'
 import MobileAudio from '@/components/mobileAudio'
 
@@ -143,17 +144,50 @@ export default {
     async openCard(message) {
       let _that = this
       let store = _that.$store
-      store.findLinkman = null
-      store.state.findLinkmanData = {
-        peerId: null,
-        message: null,
-        givenName: null,
-        tag: null
+      let peerId = message.content.peerId
+      if (store.state.myselfPeerClient.peerId === peerId) {
+        _that.$q.notify({
+          message: _that.$i18n.t('This is yourself'),
+          timeout: 3000,
+          type: "info",
+          color: "info",
+        })
+      } else {
+        let linkman = store.state.linkmanMap[peerId]
+        if (linkman && linkman.status !== LinkmanStatus.REQUESTED) {
+          store.state.currentLinkman = linkman
+          store.contactsDetailsEntry = 'message'
+          store.changeKind('contactsDetails')
+        } else {
+          linkman = await peerClientService.findPeerClient(null, peerId, null, null)
+          if (!linkman) {
+            _that.$q.notify({
+              message: _that.$i18n.t('The contact does not exist'),
+              timeout: 3000,
+              type: "info",
+              color: "info",
+            })
+          } else if (linkman.visibilitySetting && linkman.visibilitySetting.substring(4, 5) === 'N') {
+            _that.$q.notify({
+              message: _that.$i18n.t('The contact is invisible'),
+              timeout: 3000,
+              type: "info",
+              color: "info",
+            })
+          } else {
+            store.findLinkman = null
+            store.state.findLinkmanData = {
+              peerId: null,
+              message: null,
+              givenName: null,
+              tag: null
+            }
+            store.findContactsEntry = 'message'
+            store.changeKind('findContacts')
+            await store.findContacts('card', peerId)
+          }
+        }
       }
-      store.state.findContactsSubKind = 'default'
-      store.findContactsEntry = 'message'
-      store.changeKind('findContacts')
-      await store.findContacts('card', message.content.peerId)
     },
     async openChannel(message) {
       let _that = this

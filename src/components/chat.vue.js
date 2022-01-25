@@ -370,17 +370,50 @@ export default {
             if (resolve && resolve.data) {
               console.log(resolve.data)
               systemAudioComponent.scanAudioPlay()
-              store.findLinkman = null
-              store.state.findLinkmanData = {
-                peerId: null,
-                message: null,
-                givenName: null,
-                tag: null
+              let peerId = resolve.data
+              if (store.state.myselfPeerClient.peerId === peerId) {
+                _that.$q.notify({
+                  message: _that.$i18n.t('This is yourself'),
+                  timeout: 3000,
+                  type: "info",
+                  color: "info",
+                })
+              } else {
+                let linkman = store.state.linkmanMap[peerId]
+                if (linkman && linkman.status !== LinkmanStatus.REQUESTED) {
+                  store.state.currentLinkman = linkman
+                  store.contactsDetailsEntry = 'chat'
+                  store.changeKind('contactsDetails')
+                } else {
+                  linkman = await peerClientService.findPeerClient(null, peerId, null, null)
+                  if (!linkman) {
+                    _that.$q.notify({
+                      message: _that.$i18n.t('The contact does not exist'),
+                      timeout: 3000,
+                      type: "info",
+                      color: "info",
+                    })
+                  } else if (linkman.visibilitySetting && linkman.visibilitySetting.substring(3, 4) === 'N') {
+                    _that.$q.notify({
+                      message: _that.$i18n.t('The contact is invisible'),
+                      timeout: 3000,
+                      type: "info",
+                      color: "info",
+                    })
+                  } else {
+                    store.findLinkman = null
+                    store.state.findLinkmanData = {
+                      peerId: null,
+                      message: null,
+                      givenName: null,
+                      tag: null
+                    }
+                    store.findContactsEntry = 'chat'
+                    store.changeKind('findContacts')
+                    await store.findContacts('qrCode', peerId)
+                  }
+                }
               }
-              store.state.findContactsSubKind = 'default'
-              store.findContactsEntry = 'chat'
-              store.changeKind('findContacts')
-              await store.findContacts('qrCode', resolve.data)
             }
           } catch (err) {
             console.error(err)

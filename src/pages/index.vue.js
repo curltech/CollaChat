@@ -1347,9 +1347,9 @@ export default {
         peerId = store.state.findLinkmanData.peerId
       }
       if (peerId) {
-        if (myselfPeerClient.peerId === peerId && findType !== 'card') {
+        if (myselfPeerClient.peerId === peerId) {
           store.state.findLinkmanResult = 1
-          store.state.findLinkmanTip = _that.$i18n.t("Can't add yourself into contacts list")
+          store.state.findLinkmanTip = _that.$i18n.t("This is yourself")
         } else {
           let isPeerIdValid = false
           try {
@@ -1358,6 +1358,9 @@ export default {
             console.log(e)
           }
           if (isPeerIdValid) {
+            if (store.findLinkmans) {
+              store.findLinkmans.splice(0)
+            }
             let linkman = store.state.linkmanMap[peerId]
             if (linkman && linkman.status !== LinkmanStatus.REQUESTED) {
               store.state.findLinkmanResult = 2
@@ -1365,15 +1368,7 @@ export default {
               store.findLinkman = linkman
               store.state.currentLinkman = linkman
               store.state.findContactsSubKind = 'contactsDetails'
-              if (findType === 'card') {
-                store.contactsDetailsEntry = 'message'
-                store.changeKind('findContacts')
-              } else {
-                store.contactsDetailsEntry = 'findContacts'
-              }
-              /*if (store.state.ifMobileStyle) {
-                statusBarComponent.style(true, '#ffffff')
-              }*/
+              store.contactsDetailsEntry = 'findContacts'
             } else {
               let receivedRequest = false
               for (let linkmanRequest of store.state.linkmanRequests) {
@@ -1389,17 +1384,7 @@ export default {
               }
               if (!receivedRequest) {
                 store.findLinkman = await peerClientService.findPeerClient(null, peerId, null, null)
-                if (store.findLinkman && store.findLinkman.visibilitySetting && ((findType === 'qrCode' && store.findLinkman.visibilitySetting.substring(3, 4) === 'N') || (findType === 'card' && store.findLinkman.visibilitySetting.substring(4, 5) === 'N'))) {
-                  store.state.findLinkmanResult = 1
-                  store.state.findLinkmanTip = _that.$i18n.t('The contact is invisible')
-                  store.findLinkman = null
-                  store.state.findLinkmanData = {
-                    peerId: _that.$i18n.t('Invisible Peer Id'), // set Peer Id scenario 1
-                    message: null,
-                    givenName: null,
-                    tag: null
-                  }
-                } else if (store.findLinkman && !(store.findLinkman.visibilitySetting && store.findLinkman.visibilitySetting.substring(0, 1) === 'N')) {
+                if (store.findLinkman && !(store.findLinkman.visibilitySetting && store.findLinkman.visibilitySetting.substring(0, 1) === 'N')) {
                   store.state.findLinkmanResult = 4
                   store.state.findLinkmanTip = ''
                 } else {
@@ -1481,7 +1466,9 @@ export default {
                     }
                   }
                   if (!receivedRequest) {
-                    if (store.findLinkmans[i] && !(store.findLinkmans[i].visibilitySetting && store.findLinkmans[i].visibilitySetting.substring(1, 2) === 'N')) {
+                    if (!(store.findLinkmans[i].visibilitySetting
+                      && store.findLinkmans[i].visibilitySetting.substring(5, 6) === 'N'
+                      && store.findLinkmans[i].name === peerId)) {
                       //store.state.findLinkmanResult = 4
                       //store.state.findLinkmanTip = ''
                       store.findLinkmans[i].findLinkmanResult = 4
@@ -1503,10 +1490,6 @@ export default {
               store.state.findContactsSubKind = 'result'
             }
           }
-        }
-        // set Peer Id scenario 2
-        if (!store.state.findLinkmanData.peerId) {
-          store.state.findLinkmanData.peerId = peerId
         }
       }
     },
@@ -1562,23 +1545,58 @@ export default {
               console.log(resolve.data)
               systemAudioComponent.scanAudioPlay()
               store.scanSwitch(false)
-              store.findLinkman = null
-              store.state.findLinkmanData = {
-                peerId: null,
-                message: null,
-                givenName: null,
-                tag: null
-              }
-              store.state.findContactsSubKind = 'default'
-              if (store.scanEntry !== 'findContacts') {
-                store.findContactsEntry = store.scanEntry
-                store.changeKind('findContacts')
-              }
               store.toggleDrawer(true)
               if (store.state.ifMobileStyle) {
                 document.querySelector("body").classList.add('bgc')
               }
-              await _that.findContacts('qrCode', resolve.data)
+              let peerId = resolve.data
+              if (store.state.myselfPeerClient.peerId === peerId) {
+                _that.$q.notify({
+                  message: _that.$i18n.t('This is yourself'),
+                  timeout: 3000,
+                  type: "info",
+                  color: "info",
+                })
+              } else {
+                let linkman = store.state.linkmanMap[peerId]
+                if (linkman && linkman.status !== LinkmanStatus.REQUESTED) {
+                  store.state.currentLinkman = linkman
+                  store.contactsDetailsEntry = store.scanEntry // chat, findContacts
+                  store.changeKind('contactsDetails')
+                } else {
+                  linkman = await peerClientService.findPeerClient(null, peerId, null, null)
+                  if (!linkman) {
+                    _that.$q.notify({
+                      message: _that.$i18n.t('The contact does not exist'),
+                      timeout: 3000,
+                      type: "info",
+                      color: "info",
+                    })
+                  } else if (linkman.visibilitySetting && linkman.visibilitySetting.substring(3, 4) === 'N') {
+                    _that.$q.notify({
+                      message: _that.$i18n.t('The contact is invisible'),
+                      timeout: 3000,
+                      type: "info",
+                      color: "info",
+                    })
+                  } else {
+                    store.findLinkman = null
+                    store.state.findLinkmanData = {
+                      peerId: null,
+                      message: null,
+                      givenName: null,
+                      tag: null
+                    }
+                    if (store.scanEntry === 'findContacts') {
+                      store.findContactsEntry = ''
+                    } else { // chat
+                      store.findContactsEntry = store.scanEntry
+                      store.changeKind('findContacts')
+                    }
+                    await _that.findContacts('qrCode', peerId)
+                  }
+                }
+              }
             }
           } catch (err) {
             console.error(err)
@@ -1626,23 +1644,58 @@ export default {
                   _that.migrateDialog = true
                 } else {
                   store.scanSwitch(false)
-                  store.findLinkman = null
-                  store.state.findLinkmanData = {
-                    peerId: null,
-                    message: null,
-                    givenName: null,
-                    tag: null
-                  }
-                  store.state.findContactsSubKind = 'default'
-                  if (store.scanEntry !== 'findContacts') {
-                    store.findContactsEntry = store.scanEntry
-                    store.changeKind('findContacts')
-                  }
                   store.toggleDrawer(true)
                   if (store.state.ifMobileStyle) {
                     document.querySelector("body").classList.add('bgc')
                   }
-                  await _that.findContacts('qrCode', contents)
+                  let peerId = contents
+                  if (store.state.myselfPeerClient.peerId === peerId) {
+                    _that.$q.notify({
+                      message: _that.$i18n.t('This is yourself'),
+                      timeout: 3000,
+                      type: "info",
+                      color: "info",
+                    })
+                  } else {
+                    let linkman = store.state.linkmanMap[peerId]
+                    if (linkman && linkman.status !== LinkmanStatus.REQUESTED) {
+                      store.state.currentLinkman = linkman
+                      store.contactsDetailsEntry = store.scanEntry // chat, findContacts
+                      store.changeKind('contactsDetails')
+                    } else {
+                      linkman = await peerClientService.findPeerClient(null, peerId, null, null)
+                      if (!linkman) {
+                        _that.$q.notify({
+                          message: _that.$i18n.t('The contact does not exist'),
+                          timeout: 3000,
+                          type: "info",
+                          color: "info",
+                        })
+                      } else if (linkman.visibilitySetting && linkman.visibilitySetting.substring(3, 4) === 'N') {
+                        _that.$q.notify({
+                          message: _that.$i18n.t('The contact is invisible'),
+                          timeout: 3000,
+                          type: "info",
+                          color: "info",
+                        })
+                      } else {
+                        store.findLinkman = null
+                        store.state.findLinkmanData = {
+                          peerId: null,
+                          message: null,
+                          givenName: null,
+                          tag: null
+                        }
+                        if (store.scanEntry === 'findContacts') {
+                          store.findContactsEntry = ''
+                        } else { // chat
+                          store.findContactsEntry = store.scanEntry
+                          store.changeKind('findContacts')
+                        }
+                        await _that.findContacts('qrCode', peerId)
+                      }
+                    }
+                  }
                 }
               }
             }

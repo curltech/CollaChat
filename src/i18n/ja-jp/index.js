@@ -60,7 +60,7 @@
   "Group Member": "グループトークメンバー",
   "Select Group Member": "グループチャットメンバーを選択",
   "Remove Group Member": "グループ雑談メンバーを削除",
-  "Can't add yourself into contacts list": "自分をアドレス帳に追加することはできません",
+  "This is yourself": "これはあなた自身です",
   "The contact does not exist": "このユーザは存在しません",
   "The contact is invisible": "このユーザーは見えない",
   "Invisible Peer Id": "見えないアイデンティティ番号",

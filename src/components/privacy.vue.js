@@ -18,6 +18,7 @@ export default {
       groupChatSwitch: !myself.myselfPeerClient.visibilitySetting || myself.myselfPeerClient.visibilitySetting.substring(2, 3) === 'Y',
       qrCodeSwitch: !myself.myselfPeerClient.visibilitySetting || myself.myselfPeerClient.visibilitySetting.substring(3, 4) === 'Y',
       contactCardSwitch: !myself.myselfPeerClient.visibilitySetting || myself.myselfPeerClient.visibilitySetting.substring(4, 5) === 'Y',
+      nameSwitch: !myself.myselfPeerClient.visibilitySetting || myself.myselfPeerClient.visibilitySetting.substring(5, 6) === 'Y',
     }
   },
   computed: {
@@ -65,7 +66,9 @@ export default {
         } else if (kind === 'qrCode') {
           visibilitySetting = visibilitySetting.substring(0, 3) + (value ? 'Y' : 'N') + visibilitySetting.substring(4, 5)
         } else if (kind === 'contactCard') {
-          visibilitySetting = visibilitySetting.substring(0, 4) + (value ? 'Y' : 'N')
+          visibilitySetting = visibilitySetting.substring(0, 4) + (value ? 'Y' : 'N') + visibilitySetting.substring(5, 6)
+        } else if (kind === 'name') {
+          visibilitySetting = visibilitySetting.substring(0, 5) + (value ? 'Y' : 'N')
         }
         myselfPeerClient.visibilitySetting = visibilitySetting
         myselfPeerClient.lastUpdateTime = currentDate
@@ -123,6 +126,9 @@ export default {
     },
     changeContactCardSwitch: async function (value) {
       await this.changeSwitch('contactCard', value)
+    },
+    changeNameSwitch: async function (value) {
+      await this.changeSwitch('name', value)
     }
   },
   created() {

@@ -529,12 +529,9 @@ export default {
         store.changeContactsTagListSubKind('editContactsTag')
       } else if (store.contactsDetailsEntry === 'phoneContactsList') {
         store.changePhoneContactsListSubKind('default')
+      } else if (store.contactsDetailsEntry === 'chat') {
+        store.toggleDrawer(false)
       }
-      /*if (store.contactsDetailsEntry !== 'contacts') {
-        if (store.state.ifMobileStyle) {
-          statusBarComponent.style(true, '#eee')
-        }
-      }*/
     },
     showFullscreen() {
       let _that = this

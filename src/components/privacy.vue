@@ -36,7 +36,13 @@
           q-separator.c-separator(style="margin-left:16px;width:calc(100% - 16px)")
           q-item
             q-item-section
-              q-item-label {{$t('Mobile Number')}}
+              q-item-label {{$t('UserName')}}
+            q-item-section(side)
+              q-toggle(v-model="nameSwitch" @input="changeNameSwitch")
+          q-separator.c-separator(style="margin-left:16px;width:calc(100% - 16px)")
+          q-item
+            q-item-section
+              q-item-label {{$t('Mobile')}}
             q-item-section(side)
               q-toggle(v-model="mobileNumberSwitch" @input="changeMobileNumberSwitch")
           q-separator.c-separator(style="height:8px;margin-left:0px;margin-right:0px")

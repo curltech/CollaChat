@@ -2,7 +2,7 @@ import jsQR from 'jsqr'
 import jimp from 'jimp'
 
 import { EntityState } from 'libcolla'
-import { myself } from 'libcolla'
+import { myself, peerClientService } from 'libcolla'
 import { webrtcPeerPool } from 'libcolla'
 
 import * as CollaConstant from '@/libs/base/colla-constant'
@@ -299,6 +299,8 @@ export default {
         store.changeReceivedListSubKind('default')
       } else if (store.findContactsEntry === 'phoneContactsList') {
         store.changePhoneContactsListSubKind('default')
+      } else if (store.findContactsEntry === 'chat') {
+        store.toggleDrawer(false)
       } else {
         store.state.findContactsSubKind = 'default'
       }
@@ -343,14 +345,49 @@ export default {
             if (resolve && resolve.data) {
               console.log(resolve.data)
               systemAudioComponent.scanAudioPlay()
-              store.findLinkman = null
-              store.state.findLinkmanData = {
-                peerId: null,
-                message: null,
-                givenName: null,
-                tag: null
+              let peerId = resolve.data
+              if (store.state.myselfPeerClient.peerId === peerId) {
+                _that.$q.notify({
+                  message: _that.$i18n.t('This is yourself'),
+                  timeout: 3000,
+                  type: "info",
+                  color: "info",
+                })
+              } else {
+                let linkman = store.state.linkmanMap[peerId]
+                if (linkman && linkman.status !== LinkmanStatus.REQUESTED) {
+                  store.state.currentLinkman = linkman
+                  store.contactsDetailsEntry = 'findContacts'
+                  store.changeKind('contactsDetails')
+                } else {
+                  linkman = await peerClientService.findPeerClient(null, peerId, null, null)
+                  if (!linkman) {
+                    _that.$q.notify({
+                      message: _that.$i18n.t('The contact does not exist'),
+                      timeout: 3000,
+                      type: "info",
+                      color: "info",
+                    })
+                  } else if (linkman.visibilitySetting && linkman.visibilitySetting.substring(3, 4) === 'N') {
+                    _that.$q.notify({
+                      message: _that.$i18n.t('The contact is invisible'),
+                      timeout: 3000,
+                      type: "info",
+                      color: "info",
+                    })
+                  } else {
+                    store.findLinkman = null
+                    store.state.findLinkmanData = {
+                      peerId: null,
+                      message: null,
+                      givenName: null,
+                      tag: null
+                    }
+                    store.findContactsEntry = ''
+                    await store.findContacts('qrCode', peerId)
+                  }
+                }
               }
-              await store.findContacts('qrCode', resolve.data)
             }
           } catch (err) {
             console.error(err)
