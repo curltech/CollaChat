@@ -79,15 +79,15 @@ export default {
       } else {
         store.state.findLinkmanResult = 4
         store.state.findLinkmanTip = ''
-        store.findLinkman = peerContact.linkman
+        store.state.findLinkman = peerContact.linkman
         store.state.findLinkmanData = {
           peerId: peerContact.linkman.peerId,
           message: null,
           givenName: null,
           tag: null
         }
-        if (store.findLinkmans) {
-          store.findLinkmans.splice(0)
+        if (store.state.findLinkmans) {
+          store.state.findLinkmans.splice(0)
         }
         store.state.findContactsSubKind = 'result'
         store.findContactsEntry = 'phoneContactsList'
@@ -103,7 +103,7 @@ export default {
     showAddContacts() {
       let _that = this
       let store = _that.$store
-      store.findLinkman = _that.currentPeerContact
+      store.state.findLinkman = _that.currentPeerContact
       store.state.findLinkmanData = {
         peerId: _that.currentPeerContact.peerId,
         message: _that.$i18n.t("I'm ") + myself.myselfPeerClient.name,

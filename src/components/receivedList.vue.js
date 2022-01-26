@@ -23,10 +23,10 @@ export default {
       let store = _that.$store
       store.state.findLinkmanResult = 3
       store.state.findLinkmanTip = ''
-      store.findLinkman = linkmanRequest
-      store.findLinkman.peerId = linkmanRequest.senderPeerId
-      if (store.findLinkmans) {
-        store.findLinkmans.splice(0)
+      store.state.findLinkman = linkmanRequest
+      store.state.findLinkman.peerId = linkmanRequest.senderPeerId
+      if (store.state.findLinkmans) {
+        store.state.findLinkmans.splice(0)
       }
       store.state.findContactsSubKind = 'result'
       store.findContactsEntry = 'receivedList'

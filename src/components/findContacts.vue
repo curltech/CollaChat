@@ -83,18 +83,18 @@
       q-toolbar
         q-btn(flat, round, icon="keyboard_arrow_left", @click="resultBack")
       q-list.bg-c-grey-0
-        q-item(v-if="$store.findLinkman && ($store.state.findLinkmanResult === 3 || $store.state.findLinkmanResult === 4)")
+        q-item(v-if="$store.state.findLinkman && ($store.state.findLinkmanResult === 3 || $store.state.findLinkmanResult === 4)")
           q-item-section(avatar, bolder)
             q-avatar(size="64px")
               img(
-                :src="$store.findLinkman.avatar ? $store.findLinkman.avatar : $store.defaultActiveAvatar"
+                :src="$store.state.findLinkman.avatar ? $store.state.findLinkman.avatar : $store.defaultActiveAvatar"
               )
           q-item-section
-            q-item-label {{ $store.findLinkman.name ? $store.findLinkman.name : '' }}
-            //q-item-label(caption lines="1") {{ $t('Mobile: ') + ($store.findLinkman.mobile ? $store.findLinkman.mobile : '') }}
-            q-item-label(caption, lines="3", style="word-break:break-all") {{ $t('PeerId: ') + ($store.findLinkman.peerId ? $store.findLinkman.peerId : '') }}
+            q-item-label {{ $store.state.findLinkman.name ? $store.state.findLinkman.name : '' }}
+            //q-item-label(caption lines="1") {{ $t('Mobile: ') + ($store.state.findLinkman.mobile ? $store.state.findLinkman.mobile : '') }}
+            q-item-label(caption, lines="3", style="word-break:break-all") {{ $t('PeerId: ') + ($store.state.findLinkman.peerId ? $store.state.findLinkman.peerId : '') }}
         q-separator.c-separator(
-          v-if="$store.findLinkman && ($store.state.findLinkmanResult === 3 || $store.state.findLinkmanResult === 4)",
+          v-if="$store.state.findLinkman && ($store.state.findLinkmanResult === 3 || $store.state.findLinkmanResult === 4)",
           style="height:8px;margin-left:0px;margin-right:0px"
         )
         q-item(
@@ -119,7 +119,7 @@
             q-icon(color="primary", name="person_add")
           q-item-section.text-primary(side) {{ $t('Add Contacts') }}
           q-item-section
-      div(v-for="(linkman, index) in $store.findLinkmans" :key="linkman.peerId")
+      div(v-for="(linkman, index) in $store.state.findLinkmans" :key="linkman.peerId")
         q-item
           q-item-section(avatar, bolder)
             q-avatar(size="64px")

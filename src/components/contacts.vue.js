@@ -64,7 +64,7 @@ export default {
       }
       store.state.findLinkmanResult = 0
       store.state.findLinkmanTip = ''
-      store.findLinkman = null
+      store.state.findLinkman = null
       store.state.findContactsSubKind = 'default'
       store.changeKind('findContacts')
       store.toggleDrawer(true)

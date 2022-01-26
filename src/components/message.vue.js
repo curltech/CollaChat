@@ -2613,9 +2613,9 @@ export default {
           } else {
             store.state.findLinkmanResult = 4
             store.state.findLinkmanTip = ''
-            store.findLinkman = linkman
-            if (store.findLinkmans) {
-              store.findLinkmans.splice(0)
+            store.state.findLinkman = linkman
+            if (store.state.findLinkmans) {
+              store.state.findLinkmans.splice(0)
             }
             store.state.findContactsSubKind = 'result'
             store.findContactsEntry = 'GROUP_CHATDetails'

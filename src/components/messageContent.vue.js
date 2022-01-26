@@ -175,7 +175,7 @@ export default {
               color: "info",
             })
           } else {
-            store.findLinkman = null
+            store.state.findLinkman = null
             store.state.findLinkmanData = {
               peerId: null,
               message: null,

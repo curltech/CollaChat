@@ -524,18 +524,20 @@ export default {
               //myselfPeerClient.mobile = peer.mobile
               //myselfPeerClient.publicKey = peer.publicKey
               //myselfPeerClient.privateKey = peer.privateKey
-              myselfPeerClient.visibilitySetting = peer.visibilitySetting
 
               //myselfPeer.mobile = peer.mobile
               //myselfPeer.publicKey = peer.publicKey
               //myselfPeer.privateKey = peer.privateKey
-              myselfPeer.visibilitySetting = peer.visibilitySetting
 
               // 更新对应linkman
-              if (myselfPeerClient.avatar !== peer.avatar || myselfPeerClient.name !== peer.name) {
+              if (myselfPeerClient.visibilitySetting !== peer.visibilitySetting
+                || myselfPeerClient.avatar !== peer.avatar
+                || myselfPeerClient.name !== peer.name) {
+                myselfPeerClient.visibilitySetting = peer.visibilitySetting
                 myselfPeerClient.avatar = peer.avatar
                 myselfPeerClient.name = peer.name
 
+                myselfPeer.visibilitySetting = peer.visibilitySetting
                 myselfPeer.avatar = peer.avatar
                 myselfPeer.name = peer.name
 
@@ -1365,14 +1367,14 @@ export default {
             console.log(e)
           }
           if (isPeerIdValid) {
-            if (store.findLinkmans) {
-              store.findLinkmans.splice(0)
+            if (store.state.findLinkmans) {
+              store.state.findLinkmans.splice(0)
             }
             let linkman = store.state.linkmanMap[peerId]
             if (linkman && linkman.status !== LinkmanStatus.REQUESTED) {
               store.state.findLinkmanResult = 2
               store.state.findLinkmanTip = ''
-              store.findLinkman = linkman
+              store.state.findLinkman = linkman
               store.state.currentLinkman = linkman
               store.state.findContactsSubKind = 'contactsDetails'
               store.contactsDetailsEntry = 'findContacts'
@@ -1385,19 +1387,19 @@ export default {
                   receivedRequest = true
                   store.state.findLinkmanResult = 3
                   store.state.findLinkmanTip = ''
-                  store.findLinkman = linkmanRequest
-                  store.findLinkman.peerId = linkmanRequest.senderPeerId
+                  store.state.findLinkman = linkmanRequest
+                  store.state.findLinkman.peerId = linkmanRequest.senderPeerId
                 }
               }
               if (!receivedRequest) {
-                store.findLinkman = await peerClientService.findPeerClient(null, peerId, null, null)
-                if (store.findLinkman && !(store.findLinkman.visibilitySetting && store.findLinkman.visibilitySetting.substring(0, 1) === 'N')) {
+                store.state.findLinkman = await peerClientService.findPeerClient(null, peerId, null, null)
+                if (store.state.findLinkman && !(store.state.findLinkman.visibilitySetting && store.state.findLinkman.visibilitySetting.substring(0, 1) === 'N')) {
                   store.state.findLinkmanResult = 4
                   store.state.findLinkmanTip = ''
                 } else {
                   store.state.findLinkmanResult = 1
                   store.state.findLinkmanTip = _that.$i18n.t('The contact does not exist')
-                  store.findLinkman = null
+                  store.state.findLinkman = null
                 }
               }
               if (store.state.findLinkmanResult === 3 || store.state.findLinkmanResult === 4) {
@@ -1405,11 +1407,11 @@ export default {
               }
             }
           } else {
-            store.findLinkman = null
-            if (store.findLinkmans) {
-              store.findLinkmans.splice(0)
+            store.state.findLinkman = null
+            if (store.state.findLinkmans) {
+              store.state.findLinkmans.splice(0)
             } else {
-              store.findLinkmans = []
+              store.state.findLinkmans = []
             }
             let mobile = null
             let countryCode = store.state.countryCode
@@ -1442,19 +1444,19 @@ export default {
               for (let key in pcMap) {
                 let pcArray = pcMap[key]
                 let best = await peerClientService.getBestPeerClient(pcArray, null)
-                store.findLinkmans.push(best)
+                store.state.findLinkmans.push(best)
               }
             }
-            if (store.findLinkmans.length > 0) {
-              for (let i = store.findLinkmans.length - 1; i >= 0; i--) {
-                let thePeerId = store.findLinkmans[i].peerId
+            if (store.state.findLinkmans.length > 0) {
+              for (let i = store.state.findLinkmans.length - 1; i >= 0; i--) {
+                let thePeerId = store.state.findLinkmans[i].peerId
                 let linkman = store.state.linkmanMap[thePeerId]
                 if (linkman && linkman.status !== LinkmanStatus.REQUESTED) {
                   //store.state.findLinkmanResult = 2
                   linkman.findLinkmanResult = 2
                   //store.state.findLinkmanTip = ''
-                  //store.findLinkman = linkman
-                  store.findLinkmans.splice(i, 1, linkman)
+                  //store.state.findLinkman = linkman
+                  store.state.findLinkmans.splice(i, 1, linkman)
                   //store.state.currentLinkman = linkman
                   //store.state.findContactsSubKind = 'contactsDetails'
                   //store.contactsDetailsEntry = 'findContacts'
@@ -1469,26 +1471,26 @@ export default {
                       //store.state.findLinkmanTip = ''
                       linkmanRequest.findLinkmanResult = 3
                       linkmanRequest.peerId = linkmanRequest.senderPeerId
-                      store.findLinkmans.splice(i, 1, linkmanRequest)
+                      store.state.findLinkmans.splice(i, 1, linkmanRequest)
                     }
                   }
                   if (!receivedRequest) {
-                    if (!(store.findLinkmans[i].visibilitySetting
-                      && store.findLinkmans[i].visibilitySetting.substring(5, 6) === 'N'
-                      && store.findLinkmans[i].name === peerId)) {
+                    if (!(store.state.findLinkmans[i].visibilitySetting
+                      && store.state.findLinkmans[i].visibilitySetting.substring(5, 6) === 'N'
+                      && store.state.findLinkmans[i].name === peerId)) {
                       //store.state.findLinkmanResult = 4
                       //store.state.findLinkmanTip = ''
-                      store.findLinkmans[i].findLinkmanResult = 4
+                      store.state.findLinkmans[i].findLinkmanResult = 4
                     } else {
                       //store.state.findLinkmanResult = 1
                       //store.state.findLinkmanTip = _that.$i18n.t('The contact does not exist')
-                      store.findLinkmans.splice(i, 1)
+                      store.state.findLinkmans.splice(i, 1)
                     }
                   }
                 }
               }
             }
-            if (store.findLinkmans.length === 0) {
+            if (store.state.findLinkmans.length === 0) {
               store.state.findLinkmanResult = 1
               store.state.findLinkmanTip = _that.$i18n.t('The contact does not exist')
             } else {
@@ -1587,7 +1589,7 @@ export default {
                       color: "info",
                     })
                   } else {
-                    store.findLinkman = null
+                    store.state.findLinkman = null
                     store.state.findLinkmanData = {
                       peerId: null,
                       message: null,
@@ -1686,7 +1688,7 @@ export default {
                           color: "info",
                         })
                       } else {
-                        store.findLinkman = null
+                        store.state.findLinkman = null
                         store.state.findLinkmanData = {
                           peerId: null,
                           message: null,

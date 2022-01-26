@@ -37,6 +37,8 @@ let stateObj = {
   },
   findLinkmanResult: 0, // 0 - 待查询，1 - 未查询到（含查询到自己），2 - 查询到本地好友，3 - 查询到本地未接受好友请求，4 - 查询到线上好友
   findLinkmanTip: '',
+  findLinkman: null,
+  findLinkmans: [],
   linkmanTagData: null,
   linkmanTagNames: [],
   linkmanTagNameMap: {},

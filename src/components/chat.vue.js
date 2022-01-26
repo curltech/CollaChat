@@ -337,7 +337,7 @@ export default {
       }
       store.state.findLinkmanResult = 0
       store.state.findLinkmanTip = ''
-      store.findLinkman = null
+      store.state.findLinkman = null
       store.state.findContactsSubKind = 'default'
       store.changeKind('findContacts')
       store.toggleDrawer(true)
@@ -401,7 +401,7 @@ export default {
                       color: "info",
                     })
                   } else {
-                    store.findLinkman = null
+                    store.state.findLinkman = null
                     store.state.findLinkmanData = {
                       peerId: null,
                       message: null,

@@ -91,7 +91,7 @@ export default {
     },
     showContactsDetails(linkman) {
       if (linkman) {
-        this.$store.findLinkman = linkman
+        this.$store.state.findLinkman = linkman
         this.$store.state.currentLinkman = linkman
         this.$store.state.findContactsSubKind = 'contactsDetails'
         this.$store.contactsDetailsEntry = 'findContacts-result'
@@ -99,7 +99,7 @@ export default {
     },
     showAddContacts(linkman) {
       if (linkman) {
-        this.$store.findLinkman = linkman
+        this.$store.state.findLinkman = linkman
       }
       this.addFindLinkmanData.message = this.$i18n.t("I'm ") + myself.myselfPeerClient.name
       this.addFindLinkmanData.givenName = null
@@ -111,7 +111,7 @@ export default {
     },
     showAcceptContacts(linkman) {
       if (linkman) {
-        this.$store.findLinkman = linkman
+        this.$store.state.findLinkman = linkman
       }
       this.acceptFindLinkmanData.givenName = null
       this.acceptFindLinkmanData.tagNames = []
@@ -122,7 +122,7 @@ export default {
       let store = _that.$store
       _that.$q.loading.show()
       try {
-        let findLinkman = store.findLinkman
+        let findLinkman = store.state.findLinkman
         let linkmanData = _that.addFindLinkmanData
 
         await store.addLinkman(findLinkman, linkmanData)
@@ -137,7 +137,7 @@ export default {
       let _that = this
       let store = _that.$store
       let myselfPeerClient = myself.myselfPeerClient
-      let linkmanRequest = store.findLinkman // 数据对象为linkmanRequest、不是linkman
+      let linkmanRequest = store.state.findLinkman // 数据对象为linkmanRequest、不是linkman
       let peerId = linkmanRequest.senderPeerId
       let givenName = _that.acceptFindLinkmanData.givenName
       let currentTime = new Date()
@@ -376,7 +376,7 @@ export default {
                       color: "info",
                     })
                   } else {
-                    store.findLinkman = null
+                    store.state.findLinkman = null
                     store.state.findLinkmanData = {
                       peerId: null,
                       message: null,
