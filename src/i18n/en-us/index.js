@@ -567,6 +567,7 @@ export default {
   "Registration failed": "Registration failed",
   "It's recommended to attach your mobile number so that your friends can reach you easier, of cause, you may do this later in Profile, and you may switch it off at any time in Privacy-Visibility Setting.": "It's recommended to attach your mobile number so that your friends can reach you easier, of cause, you may do this later in Profile, and you may switch it off at any time in Privacy-Visibility Setting.",
 
+  "My ": "My ",
   "Coming Soon...": "Coming Soon...",
   "Confirm": "Confirm",
   "Alert": "Alert",

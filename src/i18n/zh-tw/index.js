@@ -575,6 +575,7 @@
   "Registration failed": "新建身份失敗",
   "It's recommended to attach your mobile number so that your friends can reach you easier, of cause, you may do this later in Profile, and you may switch it off at any time in Privacy-Visibility Setting.": "建議附上您的手機號碼，以便您的朋友可以更輕鬆地聯繫到您，當然，您可以稍後在個人資料中執行此操作，並且您可以隨時在隱私-可見性設置中將其關閉。",
 
+  "My ": "我的",
   "Coming Soon...": "敬請期待...",
   "Confirm": "確認",
   "Alert": "提示",

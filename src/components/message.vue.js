@@ -862,9 +862,9 @@ export default {
             let fileEntry = await fileComponent.createNewFileEntry(filename, dirPath)
             let message = _that.$i18n.t("Save successfully")
             if (store.android === true) {
-              message = message + '(file:///storage/emulated/0/Colla/File/)'
+              message = message + ' (file:///storage/emulated/0/Colla/File/)'
             } else if (store.ios === true) {
-              message = message + '(File: My iPhone[iPad]/Colla/File)'
+              message = message + ' (' + _that.$i18n.t("File") + ': ' + _that.$i18n.t("My ") + 'iPhone[iPad]/Colla/File)'
             }
             fileComponent.writeFile(fileEntry, BlobUtil.base64ToBlob(fileData), false).then(function () {
               _that.$q.notify({

@@ -507,7 +507,7 @@ export default {
         if (store.android === true) {
           message = message + '(file:///storage/emulated/0/Colla/File/)'
         } else if (store.ios === true) {
-          message = message + '(File: My iPhone[iPad]/Colla/File)'
+          message = message + ' (' + _that.$i18n.t("File") + ': ' + _that.$i18n.t("My ") + 'iPhone[iPad]/Colla/File)'
         }
         fileComponent.writeFile(fileEntry, BlobUtil.base64ToBlob(collection.content), false).then(function () {
           _that.$q.notify({
