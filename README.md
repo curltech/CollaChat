@@ -1,4 +1,4 @@
-### A frontend Colla DApp, a private and decentralized messaging app owned by no one and everyone.
+### A Colla DApp, a private and decentralized messaging app owned by no one and everyone.
 
 [![use](https://img.shields.io/badge/use-js--libp2p-yellowgreen.svg)](https://github.com/libp2p/js-libp2p)
 [![use](https://img.shields.io/badge/use-js--ipfs-blue.svg)](https://github.com/ipfs/js-ipfs)
