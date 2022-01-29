@@ -269,8 +269,15 @@ export default {
     async openNoteMessage(message) {
       let _that = this
       let store = _that.$store
-      store.state.noteMessageSrc = await store.getMessageFile(message)
-      store.state.noteMessageDialog = true
+      _that.$q.loading.show()
+      try {
+        store.state.noteMessageSrc = await store.getMessageFile(message)
+        store.state.noteMessageDialog = true
+      } catch (error) {
+        console.error(error)
+      } finally {
+        _that.$q.loading.hide()
+      }
     },
     avatarClick(mouseEvent, message) {
       if (this.entry === 'message' && mouseEvent.target && mouseEvent.target.getAttribute("class") && mouseEvent.target.getAttribute("class").indexOf('q-message-avatar') > -1) {

@@ -739,47 +739,40 @@ export default {
           fileData = localAttachs[0].content
         } else {
           message.loading = true
-          _that.$q.loading.show()
-          try {
-            // 指定connectPeerId以优化速度
-            let connectPeerId = message.connectPeerId
-            let block = await dataBlockService.findTxPayload(connectPeerId, message.attachBlockId)
-            if (block && block.length > 0 && block[0]) {
-              if (block[0].attachs && block[0].attachs.length > 0) {
-                let attach = block[0].attachs[0]
-                if (attach) {
-                  fileData = attach.content
-                  if (!message.messageId) { // 群共享接收方创建message
-                    message.ownerPeerId = myself.myselfPeerClient.peerId
-                    message.messageId = UUID.string(null, null)
-                    message.messageType = P2pChatMessageType.GROUP_FILE
-                    message.fileSize = StringUtil.getSize(fileData)
-                    message.contentType = attach.contentType
-                    message.connectPeerId = null
-                    if (attach.contentType === ChatContentType.IMAGE) {
-                      message.thumbnail = await mediaComponent.compressImage(fileData)
-                    } else if (attach.contentType === ChatContentType.VIDEO) {
-                      message.thumbnail = await mediaComponent.createVideoThumbnailByBase64(fileData)
-                    }
-                    await chatComponent.insert(ChatDataType.MESSAGE, message, null)
+          // 指定connectPeerId以优化速度
+          let connectPeerId = message.connectPeerId
+          let block = await dataBlockService.findTxPayload(connectPeerId, message.attachBlockId)
+          if (block && block.length > 0 && block[0]) {
+            if (block[0].attachs && block[0].attachs.length > 0) {
+              let attach = block[0].attachs[0]
+              if (attach) {
+                fileData = attach.content
+                if (!message.messageId) { // 群共享接收方创建message
+                  message.ownerPeerId = myself.myselfPeerClient.peerId
+                  message.messageId = UUID.string(null, null)
+                  message.messageType = P2pChatMessageType.GROUP_FILE
+                  message.fileSize = StringUtil.getSize(fileData)
+                  message.contentType = attach.contentType
+                  message.connectPeerId = null
+                  if (attach.contentType === ChatContentType.IMAGE) {
+                    message.thumbnail = await mediaComponent.compressImage(fileData)
+                  } else if (attach.contentType === ChatContentType.VIDEO) {
+                    message.thumbnail = await mediaComponent.createVideoThumbnailByBase64(fileData)
                   }
-                  attach.ownerPeerId = myself.myselfPeerClient.peerId
-                  await chatBlockComponent.saveLocalAttach({ attachs: [attach] })
-                  if (message.contentType === ChatContentType.VIDEO) {
-                    fileData = mediaComponent.fixVideoUrl(fileData)
-                  }
-                  if (attach.originalMessageId) {
-                    message.fileoriginalMessageId = attach.originalMessageId
-                  }
+                  await chatComponent.insert(ChatDataType.MESSAGE, message, null)
+                }
+                attach.ownerPeerId = myself.myselfPeerClient.peerId
+                await chatBlockComponent.saveLocalAttach({ attachs: [attach] })
+                if (message.contentType === ChatContentType.VIDEO) {
+                  fileData = mediaComponent.fixVideoUrl(fileData)
+                }
+                if (attach.originalMessageId) {
+                  message.fileoriginalMessageId = attach.originalMessageId
                 }
               }
             }
-          } catch (error) {
-            console.error(error)
-          } finally {
-            message.loading = false
-            _that.$q.loading.hide()
           }
+          message.loading = false
         }
         chatComponent.localFileDataMap[message.attachBlockId] = fileData
       }
@@ -796,102 +789,117 @@ export default {
     async getMessageFileAndOpen(message) {
       let _that = this
       let store = _that.$store
-      let fileData = await store.getMessageFile(message)
-      if (message.contentType === ChatContentType.IMAGE) {
-        store.state.imageMessageSrc = fileData
-        _that.$nextTick(() => {
-          store.state.imageMessageViewDialog = true
+      _that.$q.loading.show()
+      try {
+        let fileData = await store.getMessageFile(message)
+        if (message.contentType === ChatContentType.IMAGE) {
+          store.state.imageMessageSrc = fileData
           _that.$nextTick(() => {
-            if (store.ifMobile()) {
-              setTimeout(function () {
-                var img = new Image()
-                img.src = store.state.imageMessageSrc
-                console.log('img.width: ' + img.width + ', img.height: ' + img.height)
-                let selectedContainer = document.getElementById('dialog-image-container')
-                let canvas = document.getElementById('dialog-image-canvas')
-                let ctx = canvas.getContext('2d')
-                canvas.width = _that.ifMobileSize || store.state.ifMobileStyle ? _that.$q.screen.width : (img.width > selectedContainer.clientWidth ? selectedContainer.clientWidth : img.width)
-                canvas.height = canvas.width * img.height / img.width
-                ctx.clearRect(0, 0, canvas.width, canvas.height)
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
-                let selectedImg = document.querySelector('#dialog-image')
-                selectedImg.src = canvas.toDataURL('image/png', 1.0)
-                let marginTop = 0
-                marginTop = (store.screenHeight - canvas.height) / 2 // 不使用_that.$q.screen.height，避免键盘弹出时的影响
-                marginTop = marginTop < 0 ? 0 : marginTop
-                console.log('$q.screen.Height:' + _that.$q.screen.height + ',canvas.width:' + canvas.width + ',canvas.height:' + canvas.height + ',marginTop:' + marginTop)
-                selectedImg.style.cssText += 'margin-top: ' + marginTop + 'px'
-                alloyFingerComponent.initImage('#dialog-image')
-                alloyFingerComponent.initLongSingleTap('#dialog-image-container', _that.mediaHold, _that.fullscreenBack)
-              }, 0)
-            }
-          })
-        })
-      } else if (message.contentType === ChatContentType.AUDIO) {
-        store.state.audioRecordMessageSrc = fileData
-        _that.$nextTick(() => {
-          store.state.audioRecordMessageViewDialog = true
-        })
-      } else if (message.contentType === ChatContentType.VIDEO) {
-        if (window.device && window.device.platform === 'iOS' && fileData.indexOf('data:video/webm;base64,') > -1) {
-          _that.$q.notify({
-            message: _that.$i18n.t("Can not play this video"),
-            timeout: 3000,
-            type: "warning",
-            color: "warning",
-          })
-        } else {
-          store.state.videoRecordMessageSrc = fileData
-          _that.$nextTick(() => {
-            store.state.videoRecordMessageViewDialog = true
-          })
-        }
-      }
-      else if (message.contentType === ChatContentType.FILE) {
-        let filename = message.content
-        if (store.ios === true || store.android === true) {
-          let storageLocation = ''
-          if (window.device) {
-            if (window.device.platform === 'Android') {
-              storageLocation = 'file:///storage/emulated/0/'
-            } else if (window.device.platform === 'iOS') {
-              storageLocation = cordova.file.documentsDirectory //cordova.file.applicationStorageDirectory, dataDirectory
-            }
-          }
-          console.log('storageLocation:' + storageLocation)
-          let dirEntry = await fileComponent.getDirEntry(storageLocation)
-          await fileComponent.createDirectory(dirEntry, 'Colla')
-          let dirPath = storageLocation + 'Colla/'
-          let fileEntry = await fileComponent.createNewFileEntry(filename, dirPath)
-          fileComponent.writeFile(fileEntry, BlobUtil.base64ToBlob(fileData), false).then(function () {
-            _that.$q.notify({
-              message: "save success",
-              timeout: 3000,
-              type: "info",
-              color: "info",
+            store.state.imageMessageViewDialog = true
+            _that.$nextTick(() => {
+              if (store.ifMobile()) {
+                setTimeout(function () {
+                  var img = new Image()
+                  img.src = store.state.imageMessageSrc
+                  console.log('img.width: ' + img.width + ', img.height: ' + img.height)
+                  let selectedContainer = document.getElementById('dialog-image-container')
+                  let canvas = document.getElementById('dialog-image-canvas')
+                  let ctx = canvas.getContext('2d')
+                  canvas.width = _that.ifMobileSize || store.state.ifMobileStyle ? _that.$q.screen.width : (img.width > selectedContainer.clientWidth ? selectedContainer.clientWidth : img.width)
+                  canvas.height = canvas.width * img.height / img.width
+                  ctx.clearRect(0, 0, canvas.width, canvas.height)
+                  ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+                  let selectedImg = document.querySelector('#dialog-image')
+                  selectedImg.src = canvas.toDataURL('image/png', 1.0)
+                  let marginTop = 0
+                  marginTop = (store.screenHeight - canvas.height) / 2 // 不使用_that.$q.screen.height，避免键盘弹出时的影响
+                  marginTop = marginTop < 0 ? 0 : marginTop
+                  console.log('$q.screen.Height:' + _that.$q.screen.height + ',canvas.width:' + canvas.width + ',canvas.height:' + canvas.height + ',marginTop:' + marginTop)
+                  selectedImg.style.cssText += 'margin-top: ' + marginTop + 'px'
+                  alloyFingerComponent.initImage('#dialog-image')
+                  alloyFingerComponent.initLongSingleTap('#dialog-image-container', _that.mediaHold, _that.fullscreenBack)
+                }, 0)
+              }
             })
-          }).catch(function (err) {
-            console.error(JSON.stringify(err))
+          })
+        } else if (message.contentType === ChatContentType.AUDIO) {
+          store.state.audioRecordMessageSrc = fileData
+          _that.$nextTick(() => {
+            store.state.audioRecordMessageViewDialog = true
+          })
+        } else if (message.contentType === ChatContentType.VIDEO) {
+          if (window.device && window.device.platform === 'iOS' && fileData.indexOf('data:video/webm;base64,') > -1) {
             _that.$q.notify({
-              message: "save failure",
+              message: _that.$i18n.t("Can not play this video"),
               timeout: 3000,
               type: "warning",
               color: "warning",
             })
-          })
-        } else {
-          let hyperlink = document.createElement("a"),
-            mouseEvent = new MouseEvent('click', {
-              view: window,
-              bubbles: true,
-              cancelable: true
+          } else {
+            store.state.videoRecordMessageSrc = fileData
+            _that.$nextTick(() => {
+              store.state.videoRecordMessageViewDialog = true
             })
-          hyperlink.href = fileData
-          hyperlink.target = '_blank'
-          hyperlink.download = message.content
-          hyperlink.dispatchEvent(mouseEvent)
-          (window.URL || window.webkitURL).revokeObjectURL(hyperlink.href)
+          }
         }
+        else if (message.contentType === ChatContentType.FILE) {
+          let filename = message.content
+          if (store.ios === true || store.android === true) {
+            let dirPath
+            if (store.android === true) {
+              let storageLocation = 'file:///storage/emulated/0/'
+              let dirEntry = await fileComponent.getDirEntry(storageLocation)
+              dirEntry = await fileComponent.createDirectory(dirEntry, 'Colla')
+              await fileComponent.createDirectory(dirEntry, 'File')
+              dirPath = storageLocation + 'Colla/File/'
+            } else if (store.ios === true) {
+              let storageLocation = cordova.file.documentsDirectory //cordova.file.applicationStorageDirectory, dataDirectory
+              console.log('storageLocation:' + storageLocation)
+              let dirEntry = await fileComponent.getDirEntry(storageLocation)
+              await fileComponent.createDirectory(dirEntry, 'File')
+              dirPath = storageLocation + 'File/'
+            }
+            let fileEntry = await fileComponent.createNewFileEntry(filename, dirPath)
+            let message = _that.$i18n.t("Save successfully")
+            if (store.android === true) {
+              message = message + '(file:///storage/emulated/0/Colla/File/)'
+            } else if (store.ios === true) {
+              message = message + '(File: My iPhone[iPad]/Colla/File)'
+            }
+            fileComponent.writeFile(fileEntry, BlobUtil.base64ToBlob(fileData), false).then(function () {
+              _that.$q.notify({
+                message: message,
+                timeout: 3000,
+                type: "info",
+                color: "info",
+              })
+            }).catch(function (err) {
+              console.error(JSON.stringify(err))
+              _that.$q.notify({
+                message: _that.$i18n.t("Save failed"),
+                timeout: 3000,
+                type: "warning",
+                color: "warning",
+              })
+            })
+          } else {
+            let hyperlink = document.createElement("a"),
+              mouseEvent = new MouseEvent('click', {
+                view: window,
+                bubbles: true,
+                cancelable: true
+              })
+            hyperlink.href = fileData
+            hyperlink.target = '_blank'
+            hyperlink.download = message.content
+            hyperlink.dispatchEvent(mouseEvent)
+            (window.URL || window.webkitURL).revokeObjectURL(hyperlink.href)
+          }
+        }
+      } catch (error) {
+        console.error(error)
+      } finally {
+        _that.$q.loading.hide()
       }
     },
     fullscreenBack() {
@@ -1196,71 +1204,70 @@ export default {
     async forwardToChat(chat) {
       let _that = this
       let store = _that.$store
-      let forwardMessage = store.forwardMessage
-      if (!Array.isArray(forwardMessage)) {
-        let message = {}
-        message.messageId = UUID.string(null, null)
-        message.messageType = P2pChatMessageType.CHAT_LINKMAN
-        let mergeMessages = await _that.insertMergeMessage(message.messageId)
-        let firstMergeMessage = mergeMessages[0]
-        message.contentType = ChatContentType.CHAT
-        message.content = store.getChatContent(firstMergeMessage.contentType, firstMergeMessage.content)
-        message.title = firstMergeMessage.mergeName
-        message.mergeMessages = mergeMessages
-        for (let mergeMessage of mergeMessages) {
-          mergeMessage.mergeMessageId = message.messageId
-          mergeMessage.topMessageId = message.messageId
-          if (mergeMessage.contentType === ChatContentType.CHAT) {
-            await _that.recursiveMergeMessages(chat, mergeMessage)
-          }
-          if ((message.contentType === ChatContentType.VIDEO || message.contentType === ChatContentType.FILE || message.contentType === ChatContentType.IMAGE)) {
-            let fileData = await store.getMessageFile(mergeMessage)
-            await store.saveFileInMessage(chat, message, fileData, message.contentType, null, mergeMessage.fileoriginalMessageId)
-          }
-        }
-        await store.sendChatMessage(chat, message)
-      } else {
-
-        for (let singleMessage of forwardMessage) {
+      _that.$q.loading.show()
+      try {
+        let forwardMessage = store.forwardMessage
+        if (!Array.isArray(forwardMessage)) {
           let message = {}
           message.messageId = UUID.string(null, null)
           message.messageType = P2pChatMessageType.CHAT_LINKMAN
-          message.contentType = singleMessage.contentType
-          message.content = singleMessage.content
-          message.title = singleMessage.title
-
+          let mergeMessages = await _that.insertMergeMessage(message.messageId)
+          let firstMergeMessage = mergeMessages[0]
+          message.contentType = ChatContentType.CHAT
+          message.content = store.getChatContent(firstMergeMessage.contentType, firstMergeMessage.content)
+          message.title = firstMergeMessage.mergeName
+          message.mergeMessages = mergeMessages
+          for (let mergeMessage of mergeMessages) {
+            mergeMessage.mergeMessageId = message.messageId
+            mergeMessage.topMessageId = message.messageId
+            if (mergeMessage.contentType === ChatContentType.CHAT) {
+              await _that.recursiveMergeMessages(chat, mergeMessage)
+            }
+            if ((message.contentType === ChatContentType.VIDEO || message.contentType === ChatContentType.FILE || message.contentType === ChatContentType.IMAGE)) {
+              let fileData = await store.getMessageFile(mergeMessage)
+              await store.saveFileInMessage(chat, message, fileData, message.contentType, null, mergeMessage.fileoriginalMessageId)
+            }
+          }
           await store.sendChatMessage(chat, message)
+        } else {
+          for (let singleMessage of forwardMessage) {
+            let message = {}
+            message.messageId = UUID.string(null, null)
+            message.messageType = P2pChatMessageType.CHAT_LINKMAN
+            message.contentType = singleMessage.contentType
+            message.content = singleMessage.content
+            message.title = singleMessage.title
+            await store.sendChatMessage(chat, message)
+          }
         }
-
-      }
-      if (store.selectChatEntry === 'messageForward') {
-        store.changeMessageSubKind('default')
+      } catch (error) {
+        console.error(error)
+      } finally {
+        _that.$q.loading.hide()
+        if (store.selectChatEntry === 'messageForward') {
+          store.changeMessageSubKind('default')
+        }
       }
     },
-    async recursiveMergeMessages(chat, message) {//mergeMessage
+    async recursiveMergeMessages(chat, message) {
       let _that = this
       let store = _that.$store
-      let mergeMessages
-      if (message.mergeMessages && message.mergeMessages.length > 0) {
-        mergeMessages = message.mergeMessages
-      } else {
-        let mergeMessages = await chatComponent.loadMergeMessage(
+      if (!(message.mergeMessages && message.mergeMessages.length > 0)) {
+        message.mergeMessages = await chatComponent.loadMergeMessage(
           {
             mergeMessageId: message.messageId
           }, null, null)
-        message.mergeMessages = mergeMessages
       }
-      for (let mergeMessage of message.mergeMessages) {
-        let fileData
-        if (message.contentType === ChatContentType.VIDEO || message.contentType === ChatContentType.FILE || message.contentType === ChatContentType.IMAGE) {
-          fileData = await store.getMessageFile(mergeMessage)
-        }
-        mergeMessage.mergeMessageId = message.messageId
-        mergeMessage.topMessageId = message.topMessageId
-        if (mergeMessage.contentType === message.contentType === ChatContentType.CHAT) {
-          await _that.recursiveMergeMessages(message)
-        } else if (message.contentType === ChatContentType.VIDEO || message.contentType === ChatContentType.FILE || message.contentType === ChatContentType.IMAGE) {
-          await store.saveFileInMessage(chat, message, fileData, message.contentType, null, mergeMessage.fileoriginalMessageId)
+      if (message.mergeMessages && message.mergeMessages.length > 0) {
+        for (let mergeMessage of message.mergeMessages) {
+          mergeMessage.mergeMessageId = message.messageId
+          mergeMessage.topMessageId = message.topMessageId
+          if (mergeMessage.contentType === message.contentType === ChatContentType.CHAT) {
+            await _that.recursiveMergeMessages(message)
+          } else if (message.contentType === ChatContentType.VIDEO || message.contentType === ChatContentType.FILE || message.contentType === ChatContentType.IMAGE) {
+            let fileData = await store.getMessageFile(mergeMessage)
+            await store.saveFileInMessage(chat, message, fileData, message.contentType, null, mergeMessage.fileoriginalMessageId)
+          }
         }
       }
     },
@@ -3328,7 +3335,7 @@ export default {
           subjectId: groupFile.businessNumber
         }
       }
-      _that.getMessageFileAndOpen(message)
+      await _that.getMessageFileAndOpen(message)
     },
     groupChatMemberName(groupChatMember) {
       let _that = this

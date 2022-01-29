@@ -488,22 +488,30 @@ export default {
       let collection = this.myCollections.c_meta.current
       let filename = collection.firstFileInfo.slice(collection.firstFileInfo.indexOf(' ') + 1)
       if (store.ios === true || store.android === true) {
-        let storageLocation = ''
-        if (window.device) {
-          if (window.device.platform === 'Android') {
-            storageLocation = 'file:///storage/emulated/0/'
-          } else if (window.device.platform === 'iOS') {
-            storageLocation = cordova.file.documentsDirectory //cordova.file.applicationStorageDirectory, dataDirectory
-          }
+        let dirPath
+        if (store.android === true) {
+          let storageLocation = 'file:///storage/emulated/0/'
+          let dirEntry = await fileComponent.getDirEntry(storageLocation)
+          dirEntry = await fileComponent.createDirectory(dirEntry, 'Colla')
+          await fileComponent.createDirectory(dirEntry, 'File')
+          dirPath = storageLocation + 'Colla/File/'
+        } else if (store.ios === true) {
+          let storageLocation = cordova.file.documentsDirectory //cordova.file.applicationStorageDirectory, dataDirectory
+          console.log('storageLocation:' + storageLocation)
+          let dirEntry = await fileComponent.getDirEntry(storageLocation)
+          await fileComponent.createDirectory(dirEntry, 'File')
+          dirPath = storageLocation + 'File/'
         }
-        console.log('storageLocation:' + storageLocation)
-        let dirEntry = await fileComponent.getDirEntry(storageLocation)
-        await fileComponent.createDirectory(dirEntry, 'Colla')
-        let dirPath = storageLocation + 'Colla/'
         let fileEntry = await fileComponent.createNewFileEntry(filename, dirPath)
+        let message = _that.$i18n.t("Save successfully")
+        if (store.android === true) {
+          message = message + '(file:///storage/emulated/0/Colla/File/)'
+        } else if (store.ios === true) {
+          message = message + '(File: My iPhone[iPad]/Colla/File)'
+        }
         fileComponent.writeFile(fileEntry, BlobUtil.base64ToBlob(collection.content), false).then(function () {
           _that.$q.notify({
-            message: "save success",
+            message: message,
             timeout: 3000,
             type: "info",
             color: "info",
@@ -511,7 +519,7 @@ export default {
         }).catch(function (err) {
           console.error(JSON.stringify(err))
           _that.$q.notify({
-            message: "save failure",
+            message: _that.$i18n.t("Save failed"),
             timeout: 3000,
             type: "warning",
             color: "warning",
