@@ -76,7 +76,7 @@
                                             img(:src="($store.state.linkmanMap[memberPeerId] && $store.state.linkmanMap[memberPeerId].avatar) ? $store.state.linkmanMap[memberPeerId].avatar : $store.defaultActiveAvatar")
                                     q-item-section(style='margin:0;padding:0;width:100%;text-align:center;' v-if="$store.state.currentCallChat.streamMap && $store.state.currentCallChat.streamMap[memberPeerId]")
                                         video(:ref='`memberVideo${memberPeerId}`' autoplay = 'autoplay' style="width:auto;display:inline-block;max-width:100%;")
-                q-list.scroll.row.group-video-list(style="height:80vh" v-if="(!Platform.is.ios || Platform.is.ios && $store.state.currentCallChat.callType == 'audio')  && $store.state.currentCallChat && $store.state.currentCallChat.stream")
+                q-list.scroll.row.group-video-list(style="max-height:80vh" v-if="(!Platform.is.ios || Platform.is.ios && $store.state.currentCallChat.callType == 'audio')  && $store.state.currentCallChat && $store.state.currentCallChat.stream")
                     template(v-for="(memberPeerId, index) in $store.state.currentCallChat.callMessage.content")
                         q-item.group-video-item(:class="fullSize?'col-3':'col-6'")
                             q-item-section(v-if="$store.state.currentCallChat.stream" style="display:none")

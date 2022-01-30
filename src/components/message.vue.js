@@ -1085,8 +1085,8 @@ export default {
         let container = document.getElementById('talk')
         if (container) {
           setTimeout(function () {
-            container.scrollTop = container.scrollHeight
-          }, 200)
+            container.scrollTop = container.scrollHeight + 50
+          }, 500)
         }
       })
     },
