@@ -7,7 +7,7 @@
           q-toolbar-title(align="center" :style="ifMobileSize || $store.state.ifMobileStyle ? '' : 'padding-left:54px'") {{ ChatTitle($store.state.currentChat) }}
           q-btn.text-primary(flat round icon="more_horiz" @click="enterDetail")
         q-separator.c-separator-message.header-mar-top(style="height:1px;margin-left:0px;margin-right:0px")
-        #talk.q-pa-md.bg-c-grey-message.row.justify-center.scroll.q-chat-message(:class="!(ifMobileSize || $store.state.ifMobileStyle)?'talk-height-pc':(keyboardMode?(ifMobileSize?'talk-height-mobileSize1':'talk-height-mobileStyle1'):(ifMobileSize?'talk-height-mobileSize2':'talk-height-mobileStyle2'))")
+        #talk.q-pa-md.bg-c-grey-message.row.justify-center.scroll.q-chat-message(:class="!$store.ifMobile() && !(ifMobileSize || $store.state.ifMobileStyle)?'talk-height-pc':(keyboardMode?(ifMobileSize?'talk-height-mobileSize1':'talk-height-mobileStyle1'):(ifMobileSize?'talk-height-mobileSize2':'talk-height-mobileStyle2'))")
           q-infinite-scroll(style="width:100%" @load="load_message" debounce="100" reverse :offset="50")
             q-chat-message(v-if="$store.state.currentChat && $store.state.currentChat.noMoreMessageTag" @touchstart="preventDefault" :label="$t('No more messages')")
             template(v-for="(message,index) in $store.state.currentChat.messages")
@@ -32,9 +32,9 @@
                       q-item-section {{$t('MultiSelect')}}
                 q-chat-message(v-if='message.messageType === P2pChatMessageType.CHAT_SYS && message.contentType === ChatContentType.EVENT' :label="detailDateFormat(message.createDate)+'</br>'+ message.content")
                 q-chat-message(v-if='message.messageType === P2pChatMessageType.CHAT_SYS && message.contentType === ChatContentType.TIME' :label="detailDateFormat(message.content)")
-        .message-editor-wrap(:class="ifMobileSize || $store.state.ifMobileStyle ? 'bg-c-grey-message-editor' : 'bg-c-grey-message-editor-pc'")
+        .message-editor-wrap(:class="$store.ifMobile() || (ifMobileSize || $store.state.ifMobileStyle) ? 'bg-c-grey-message-editor' : 'bg-c-grey-message-editor-pc'")
           .message-editor-area
-            q-toolbar.row(style="height:40px;min-height:40px" v-if="!(ifMobileSize || $store.state.ifMobileStyle) && !messageMultiSelectMode")
+            q-toolbar.row(style="height:40px;min-height:40px" v-if="!$store.ifMobile() && !(ifMobileSize || $store.state.ifMobileStyle) && !messageMultiSelectMode")
               q-btn.text-primary.q-mr-sm(round flat icon="alarm" :disable ='!(!ifSelfChat && $store.state.currentChat && $store.state.currentChat.subjectType === SubjectType.CHAT)' @click='destroyClock = true')
                 q-popup-edit(v-model="destroyClock" content-class="" style='width:100px')
                   q-option-group(:options="clockOptions" label="Notifications" type="radio" v-model="$store.state.currentChat.destroyTime")
@@ -48,18 +48,18 @@
               q-btn.text-primary.q-mr-sm(round flat icon="bookmarks" @click="openCollection")
               q-btn.text-primary.q-mr-sm(round flat icon="account_box" @click="selectLinkmanCard")
               q-btn.text-primary.q-mr-sm(round flat icon="folder" @click="$refs.messageUpload.pickFiles()")
-            q-toolbar.message-operate-wrap(v-if='messageMultiSelectMode' :class = 'ifMobileSize || $store.state.ifMobileStyle?"message-operate-wrap-mobile":"message-operate-wrap-pc"')
+            q-toolbar.message-operate-wrap(v-if='messageMultiSelectMode' :class = '$store.ifMobile() || (ifMobileSize || $store.state.ifMobileStyle) ? "message-operate-wrap-mobile" : "message-operate-wrap-pc"')
               q-btn-group.full-width(flat spread stretch)
                 q-btn.text-primary.btnMessage(flat stack no-caps :label="$t('Forward')" icon="forward" @click="multiForwardMessage('single')")
                 q-btn.text-primary.btnMessage(flat stack no-caps :label="$t('MultiForward')" icon="forward" @click="multiForwardMessage('multi')")
                 q-btn.text-primary.btnMessage(flat stack no-caps :label="$t('MultiCollection')" icon="bookmarks" @click="multiCollectionMessage()")
                 q-btn.text-primary.btnMessage(flat stack no-caps :label="$t('Cancel')" icon="cancel" @click="cancelMessageMultiSelect")
-            q-toolbar.message-operate-wrap(:class = 'ifMobileSize || $store.state.ifMobileStyle?"message-operate-wrap-mobile":"message-operate-wrap-pc"' v-if="!messageMultiSelectMode")
-              q-btn.text-primary.q-mr-sm(v-if="ifMobileSize || $store.state.ifMobileStyle" round flat icon ='add_circle_outline' @click = "more")
-              q-input.c-field.message-editor(type='textarea' autogrow ref='editor' rows='1' filled input-style='resize:none;max-height:98px;' name="editor" id="editor" v-model= '$store.state.currentChat.tempText' :class = 'ifMobileSize || $store.state.ifMobileStyle?"message-editor-mobile":"message-editor-pc"'
+            q-toolbar.message-operate-wrap(v-if="!messageMultiSelectMode" :class = '$store.ifMobile() || (ifMobileSize || $store.state.ifMobileStyle) ? "message-operate-wrap-mobile" : "message-operate-wrap-pc"')
+              q-btn.text-primary.q-mr-sm(v-if="$store.ifMobile() || (ifMobileSize || $store.state.ifMobileStyle)" round flat icon ='add_circle_outline' @click = "more")
+              q-input.c-field.message-editor(type='textarea' autogrow ref='editor' rows='1' filled input-style='resize:none;max-height:98px;' name="editor" id="editor" v-model= '$store.state.currentChat.tempText' :class = '$store.ifMobile() || (ifMobileSize || $store.state.ifMobileStyle) ? "message-editor-mobile" : "message-editor-pc"'
                 @keyup="editorKeyup" @focus="editorFocus" @blur="editorBlur" @paste="editorPaste" @drop="editorDrop")
-              q-btn.text-primary(v-if="ifMobileSize || $store.state.ifMobileStyle" round flat icon="send" @click = "preSend")
-            q-toolbar.no-padding(style='flex-wrap:wrap' v-if="(ifMobileSize || $store.state.ifMobileStyle) && !keyboardMode && !messageMultiSelectMode")
+              q-btn.text-primary(v-if="$store.ifMobile() || (ifMobileSize || $store.state.ifMobileStyle)" round flat icon="send" @click = "preSend")
+            q-toolbar.no-padding(style='flex-wrap:wrap' v-if="($store.ifMobile() || (ifMobileSize || $store.state.ifMobileStyle)) && !keyboardMode && !messageMultiSelectMode")
               .col-12
                 q-carousel(v-model="slide" swipeable animated padding control-text-color="c-grey" style="height: 210px")
                   q-carousel-slide(name="slide1" class="q-pa-md")
