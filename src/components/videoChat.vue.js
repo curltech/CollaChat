@@ -668,7 +668,7 @@ export default {
       _that.$forceUpdate()
       let pendingCallTimeOut = setTimeout(async function () {
         if (currentCallChat.streamMap[peerId].pending) {
-          if(currentCallChat.subjectType === SubjectType.CHAT){
+          if (currentCallChat.subjectType === SubjectType.CHAT) {
             _that.$q.notify({
               message: _that.$i18n.t('Chat already ended'),
               timeout: 3000,
@@ -676,7 +676,7 @@ export default {
               color: "warning",
             })
             await _that.closeCall(true)
-          }else if(currentCallChat.subjectType === SubjectType.GROUP_CHAT){
+          } else if (currentCallChat.subjectType === SubjectType.GROUP_CHAT) {
             await _that.removeStream(peerId)
           }
         }

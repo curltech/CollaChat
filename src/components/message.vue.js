@@ -894,7 +894,7 @@ export default {
             hyperlink.target = '_blank'
             hyperlink.download = message.content
             hyperlink.dispatchEvent(mouseEvent)
-            (window.URL || window.webkitURL).revokeObjectURL(hyperlink.href)
+              (window.URL || window.webkitURL).revokeObjectURL(hyperlink.href)
           }
         }
       } catch (error) {
@@ -1022,7 +1022,7 @@ export default {
         let fileData = await BlobUtil.fileObjectToBase64(file)
         let type
         if (mediaComponent.isAssetTypeAnImage(fileType)) {
-          if(fileType === 'heic'){
+          if (fileType === 'heic') {
             fileData = await mediaComponent.heicToPNG(fileData)
           }
           type = ChatContentType.IMAGE
@@ -2694,7 +2694,7 @@ export default {
             }
           })
         }
-      } else{
+      } else {
         _that.keyboardMode = true
         if (_that.moreMode) {
           _that.moreMode = !_that.moreMode
@@ -3272,7 +3272,7 @@ export default {
         let fileData = await BlobUtil.fileObjectToBase64(file)
         let type
         if (mediaComponent.isAssetTypeAnImage(fileType)) {
-          if(fileType === 'heic'){
+          if (fileType === 'heic') {
             fileData = await mediaComponent.heicToPNG(fileData)
           }
           type = ChatContentType.IMAGE

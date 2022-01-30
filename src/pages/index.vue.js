@@ -806,7 +806,7 @@ export default {
       currentChat.content = store.getChatContent(message.contentType, message.content)
       if (message.destroyTime) {
         currentChat.hiddenContent = true
-      }else{
+      } else {
         currentChat.hiddenContent = false
       }
       currentChat.updateTime = currentDate
@@ -986,7 +986,7 @@ export default {
       }
       if (subjectType === SubjectType.CHAT && subjectId !== myselfPeerId) {
         //if (store.state.linkmanMap[subjectId].activeStatus === ActiveStatus.UP) {
-          message.destroyTime = chat.destroyTime
+        message.destroyTime = chat.destroyTime
         //}
         await store.p2pSend(message, subjectId)
       } else if (subjectType === SubjectType.GROUP_CHAT) {
@@ -4920,9 +4920,9 @@ export default {
     webrtcPeerPool.registEvent('stream', async function (evt) {
       await _that.receiveRemoteStream(evt.stream, evt.source.targetPeerId)
       let signalSession = await _that.getSignalSession(evt.source.targetPeerId)
-        if (signalSession) {
-          await signalSession.close()
-        }
+      if (signalSession) {
+        await signalSession.close()
+      }
     })
     // online status monitoring
     deviceComponent.registOnline(async function () {
