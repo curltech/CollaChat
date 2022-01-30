@@ -86,6 +86,7 @@ export default {
       emojiShow: false,
       slide: 'slide1',
       keyboardMode: true,
+      moreMode: false,
       //auidoTouch
       eY1: 0,
       eY2: 0,
@@ -2682,8 +2683,22 @@ export default {
       let _that = this
       if (_that.keyboardMode) {
         _that.keyboardMode = false
-      } else {
+        _that.moreMode = !_that.moreMode
+        if (store.state.ifMobileStyle) {
+          _that.$nextTick(() => {
+            let container = document.getElementById('talk')
+            if (container) {
+              setTimeout(function () {
+                container.scrollTop = container.scrollHeight
+              }, 200)
+            }
+          })
+        }
+      } else{
         _that.keyboardMode = true
+        if (_that.moreMode) {
+          _that.moreMode = !_that.moreMode
+        }
       }
     },
     cancel: function () {
@@ -2806,7 +2821,7 @@ export default {
       if ((!e.shiftKey && e.keyCode == 13) || (store.ios && e.keyCode == 13)) {
         _that.preSend()
       } else {
-        if ((((e.shiftKey ||(Platform.is.ios || Platform.is.android)) && e.keyCode == 50)) && store.state.currentChat.subjectType === SubjectType.GROUP_CHAT) {
+        if ((((e.shiftKey || (Platform.is.ios || Platform.is.android)) && e.keyCode == 50)) && store.state.currentChat.subjectType === SubjectType.GROUP_CHAT) {
           _that.focusGroupMemberDialog = true
         } else if (store.state.ifMobileStyle) {
           _that.talkHeight()
@@ -2815,11 +2830,23 @@ export default {
     },
     editorFocus(e) {
       let _that = this
-      _that.keyboardMode = true
+      if (_that.moreMode) {
+        _that.keyboardMode = true
+      }
+      if (store.state.ifMobileStyle) {
+        _that.$nextTick(() => {
+          let container = document.getElementById('talk')
+          if (container) {
+            setTimeout(function () {
+              container.scrollTop = container.scrollHeight
+            }, 200)
+          }
+        })
+      }
     },
     editorBlur(e) {
       let _that = this
-      //_that.keyboardMode = false
+      _that.moreMode = false
     },
     editorPaste(e) {
       let _that = this

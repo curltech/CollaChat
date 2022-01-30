@@ -4918,7 +4918,11 @@ export default {
     webrtcPeerPool.registEvent('connect', _that.webrtcConnect)
     webrtcPeerPool.registEvent('close', _that.webrtcClose)
     webrtcPeerPool.registEvent('stream', async function (evt) {
-      _that.receiveRemoteStream(evt.stream, evt.source.targetPeerId)
+      await _that.receiveRemoteStream(evt.stream, evt.source.targetPeerId)
+      let signalSession = await _that.getSignalSession(evt.source.targetPeerId)
+        if (signalSession) {
+          await signalSession.close()
+        }
     })
     // online status monitoring
     deviceComponent.registOnline(async function () {

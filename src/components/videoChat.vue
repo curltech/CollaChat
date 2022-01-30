@@ -16,7 +16,7 @@
                 q-item(style="display:none")
                     q-item-section
                         span {{addStreamCount}}
-                video(ref='currentVideo' autoplay = 'autoplay' style='width:auto;max-width:100%;')
+                video(ref='currentVideo' autoplay = 'autoplay' style='width:auto;max-width:100%;display:inline-block;')
             q-card-section.linkman-video-section(v-if="$store.state.currentCallChat && $store.state.currentCallChat.stream && $store.state.currentCallChat.stream.length === 1")
                 q-item
                     q-item-section(avatar)

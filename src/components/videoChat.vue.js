@@ -355,8 +355,8 @@ export default {
       let subjectId = message.senderPeerId
       if (message.subjectType === SubjectType.CHAT) {
         let currentTime = new Date().getTime()
-        //大于1分钟的请求忽略掉
-        if (((currentTime - message.createDate) / 1000 > 60)) {
+        //大于20秒的请求忽略掉
+        if (((currentTime - message.createDate) / 1000 > 20)) {
           return
         }
         if (store.state.currentCallChat && store.state.currentCallChat.subjectId && store.state.videoDialog) {
@@ -668,13 +668,17 @@ export default {
       _that.$forceUpdate()
       let pendingCallTimeOut = setTimeout(async function () {
         if (currentCallChat.streamMap[peerId].pending) {
-          _that.$q.notify({
-            message: _that.$i18n.t('Chat already ended'),
-            timeout: 3000,
-            type: "warning",
-            color: "warning",
-          })
-          await _that.closeCall()
+          if(currentCallChat.subjectType === SubjectType.CHAT){
+            _that.$q.notify({
+              message: _that.$i18n.t('Chat already ended'),
+              timeout: 3000,
+              type: "warning",
+              color: "warning",
+            })
+            await _that.closeCall(true)
+          }else if(currentCallChat.subjectType === SubjectType.GROUP_CHAT){
+            await _that.removeStream(peerId)
+          }
         }
       }, 20000)
 
@@ -703,7 +707,7 @@ export default {
           message.actualReceiveTime = new Date().getTime()
           await store.addCHATSYSMessage(callChat, message)
         }
-        if (isReceived !== true && _that.activeStatus(callChat)) {
+        if (isReceived !== true) {
           let members = []
           if (callChat.subjectType === SubjectType.GROUP_CHAT) {
             for (let memberPeerId of callChat.callMessage.content) {
@@ -717,8 +721,8 @@ export default {
               (callChat.streamMap && callChat.streamMap[callChat.ownerPeerId]) ? ChatContentType.MEDIA_CLOSE : ChatContentType.MEDIA_REJECT,
               callChat.subjectType === SubjectType.GROUP_CHAT ? members : '')
           }
+          await _that.removeStream()
         }
-        await _that.removeStream()
         //close miniButton which is in index.vue
         store.state.miniVideoDialog = false
         clearInterval(_that.mediaTimer)
@@ -731,6 +735,7 @@ export default {
           _that.showVideoDialog(false)
           _that.chatMute = false
           _that.chatMic = true
+          _that.audioToggle = 'earpiece'
         })
       } catch (e) { await _that.removeStream() }
     },
@@ -765,6 +770,7 @@ export default {
       if (callChat.subjectType === SubjectType.GROUP_CHAT) {
         await _that.removeStream(senderPeerId)
       } else if (callChat.subjectType === SubjectType.CHAT) {
+        await _that.removeStream()
         let text
         if (message.contentType === ChatContentType.MEDIA_CLOSE) {
           text = _that.$i18n.t('Chat already ended')
