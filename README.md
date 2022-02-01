@@ -6,6 +6,15 @@
 [![use](https://img.shields.io/badge/use-openpgp-brightgreen.svg)](https://github.com/openpgpjs/openpgpjs)
 [![use](https://img.shields.io/badge/use-pion-orange.svg)](https://github.com/pion/ion-sdk-js)
 
+# Table of Contents
+- [Introduction](#introduction)
+- [License](#license)
+
+# Introduction
+CollaChat is a private and decentralized messaging app supports Web/Mobile/Desktop. It is aimed to leverage blockchain technology to put users back in control of their digital communication, while preserve user experiences that they know and love.
+
+CollaChat is the first DApp running on the Colla Network (connects to it via [Colla Node](https://github.com/curltech/go-colla-node)), which is a Web3 decentralized peer-to-peer communication and storage network.
+
 Learn more at https://curltech.io/#/collachat/.
 
 # License
