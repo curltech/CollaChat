@@ -6,7 +6,7 @@
           q-btn(:class="ifMobileSize || $store.state.ifMobileStyle || $store.channelDetailsChannelEntry === 'article' ? '' : 'hidden'" flat round icon="keyboard_arrow_left" @click="channelBack()")
           q-toolbar-title(align="center" :style="ifMobileSize || $store.state.ifMobileStyle ? '' : 'padding-left:54px'") {{$t('Channel')}}
           q-btn.text-primary(flat round icon="more_horiz" @click="channelCommand()")
-        q-list.bg-c-grey-0(flat)
+        q-list.bg-c-grey-0
           q-item
             q-item-section(avatar)
               q-avatar(size="64px")

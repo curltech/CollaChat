@@ -48,7 +48,7 @@
                             q-toolbar-title.media-timer-ios-group
                                 span.text-primary(ref="mediaTimer")
                             div.scroll(style="height:17vh;width:74vw;")
-                                q-list(flat v-if="$store.state.currentCallChat")
+                                q-list(v-if="$store.state.currentCallChat")
                                     template(v-for="(memberPeerId, index) in $store.state.currentCallChat.callMessage.content")
                                         q-item.text-c-grey-10(clickable v-ripple @click="iosGroupVideoFocus(index)" :class="index === 0 ? 'q-pt-none' : ''")
                                             q-item-section(avatar)
@@ -64,7 +64,7 @@
                         .col-3
                             video(ref='zoomVideo' autoplay='autoplay' style="float:right;height:20vh;width:auto;max-width:100%;")
                     q-card-section.current-video-section.current-video-section-ios(v-show ="$store.state.currentCallChat.stream")
-                        q-list.row.group-video-list(flat v-if="$store.state.currentCallChat && $store.state.currentCallChat.stream")
+                        q-list.row.group-video-list(v-if="$store.state.currentCallChat && $store.state.currentCallChat.stream")
                             template(v-for="(memberPeerId, index) in $store.state.currentCallChat.callMessage.content")
                                 q-item(v-if="groupFocusNum === index" style='padding:0;width:100%')
                                     q-item-section(v-if="$store.state.currentCallChat.stream" style="display:none")
