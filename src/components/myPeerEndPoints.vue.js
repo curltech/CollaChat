@@ -23,7 +23,7 @@ export default {
           //headerClasses: 'my-special-class'
         },
         //{ name: 'peerId', label: this.$i18n.t('Node PeerId'), field: 'peerId', align: 'center', sortable: true },
-        { name: 'address', label: this.$i18n.t('Node Address'), field: 'address', align: 'center', sortable: true, style: 'padding:0px 0px' },
+        { name: 'address', label: this.$i18n.t('Node Address'), field: 'address', align: 'center', sortable: true, style: 'padding:0px 0px; white-space: normal; height: 100%; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 8; word-break: break-all' },
         //{ name: 'publicKey', label: this.$i18n.t('PublicKey'), field: 'publicKey', align: 'center', sortable: true },
         //{ name: 'creditScore', label: this.$i18n.t('Credit'), field: 'creditScore', align: 'center', sortable: true, style: 'padding:0px 0px' },
         { name: 'lastConnectTime', label: this.$i18n.t('LastConnectTime'), field: 'lastConnectTime', align: 'center', sortable: true, style: 'padding:0px 0px' }
