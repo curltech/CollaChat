@@ -490,11 +490,7 @@ export default {
       if (store.ios === true || store.android === true) {
         let dirPath
         if (store.android === true) {
-          let storageLocation = 'file:///storage/emulated/0/'
-          let dirEntry = await fileComponent.getDirEntry(storageLocation)
-          dirEntry = await fileComponent.createDirectory(dirEntry, 'Colla')
-          await fileComponent.createDirectory(dirEntry, 'File')
-          dirPath = storageLocation + 'Colla/File/'
+          dirPath = cordova.file.externalDataDirectory
         } else if (store.ios === true) {
           let storageLocation = cordova.file.documentsDirectory //cordova.file.applicationStorageDirectory, dataDirectory
           console.log('storageLocation:' + storageLocation)
@@ -505,7 +501,7 @@ export default {
         let fileEntry = await fileComponent.createNewFileEntry(filename, dirPath)
         let message = _that.$i18n.t("Save successfully")
         if (store.android === true) {
-          message = message + '(file:///storage/emulated/0/Colla/File/)'
+          message = message + ' (/Android/data/io.curltech.colla/files)'
         } else if (store.ios === true) {
           message = message + ' (' + _that.$i18n.t("File") + ': ' + _that.$i18n.t("My ") + 'iPhone[iPad]/Colla/File)'
         }
@@ -517,9 +513,9 @@ export default {
             color: "info",
           })
         }).catch(function (err) {
-          console.error(JSON.stringify(err))
+          console.error(err)
           _that.$q.notify({
-            message: _that.$i18n.t("Save failed"),
+            message: _that.$i18n.t("Save failed") + ' (' + err + ')',
             timeout: 3000,
             type: "warning",
             color: "warning",

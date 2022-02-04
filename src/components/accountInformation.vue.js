@@ -505,9 +505,9 @@ export default {
               console.log('avatarSrc.length: ' + _that.avatarSrc.length)
               _that.subKind = 'showPhoto'
               _that.processAvatar(_that.avatarSrc)
-            })/*.catch(function (err) {
-              console.error(JSON.stringify(err))
-            })*/
+            }).catch(function (err) {
+              console.error(err)
+            })
           } else if (action.id === 'choosePhoto') {
             let params = null //{ targetHeight: 256, targetWidth: 256 }
             cameraComponent.getPicture(Camera.PictureSourceType.SAVEDPHOTOALBUM, params).then(function (imageUri) {
@@ -515,9 +515,9 @@ export default {
               console.log('avatarSrc.length: ' + _that.avatarSrc.length)
               _that.subKind = 'showPhoto'
               _that.processAvatar(_that.avatarSrc)
-            })/*.catch(function (err) {
-              console.error(JSON.stringify(err))
-            })*/
+            }).catch(function (err) {
+              console.error(err)
+            })
           } else if (action.id === 'save') {
             window.canvas2ImagePlugin.saveImageDataToLibrary(
               function (msg) {
