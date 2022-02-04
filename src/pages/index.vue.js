@@ -536,10 +536,12 @@ export default {
                 myselfPeerClient.visibilitySetting = peer.visibilitySetting
                 myselfPeerClient.avatar = peer.avatar
                 myselfPeerClient.name = peer.name
+                myselfPeerClient.lastUpdateTime = peer.lastUpdateTime
 
                 myselfPeer.visibilitySetting = peer.visibilitySetting
                 myselfPeer.avatar = peer.avatar
                 myselfPeer.name = peer.name
+                myselfPeer.lastUpdateTime = peer.lastUpdateTime
 
                 linkman.avatar = peer.avatar
                 linkman.name = peer.name

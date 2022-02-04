@@ -398,7 +398,7 @@
   "PublicKey": "公鑰",
   "Credit": "信用",
   "LastConnectTime": "最近連接時間",
-  "LastUpdateTime": "最近更新時間",
+  "LastUpdateTime: ": "最近更新時間：",
   "Restore initial settings?": "恢復初始設置？",
 
   // About

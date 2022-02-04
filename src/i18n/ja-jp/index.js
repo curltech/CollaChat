@@ -399,7 +399,7 @@
   "PublicKey": "公開鍵",
   "Credit": "信用",
   "LastConnectTime": "最近の接続時間",
-  "LastUpdateTime": "最近の更新時間",
+  "LastUpdateTime: ": "最近の更新時間：",
   "Restore initial settings?": "初期設定を再開しますか？",
 
   // About

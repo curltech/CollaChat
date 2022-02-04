@@ -399,7 +399,7 @@ export default {
   "PublicKey": "公钥",
   "Credit": "信用",
   "LastConnectTime": "最近连接时间",
-  "LastUpdateTime": "最近更新时间",
+  "LastUpdateTime: ": "最近更新时间：",
   "Restore initial settings?": "恢复初始设置？",
 
   // About

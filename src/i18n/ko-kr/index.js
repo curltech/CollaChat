@@ -399,7 +399,7 @@
   "PublicKey": "공개 키",
   "Credit": "신용",
   "LastConnectTime": "최근 접속 시간",
-  "LastUpdateTime": "최근 갱신 시간",
+  "LastUpdateTime: ": "최근 갱신 시간: ",
   "Restore initial settings?": "초기 설정 복원?",
 
   // About

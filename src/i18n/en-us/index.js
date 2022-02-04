@@ -391,7 +391,7 @@ export default {
   "PublicKey": "PublicKey",
   "Credit": "Credit",
   "LastConnectTime": "LastConnectTime",
-  "LastUpdateTime": "LastUpdateTime",
+  "LastUpdateTime: ": "LastUpdateTime: ",
   "Restore initial settings?": "Restore initial settings?",
 
   // About

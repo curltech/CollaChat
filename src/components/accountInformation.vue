@@ -55,6 +55,7 @@
                 q-item-label(caption lines="1") {{ $t('Id: ') + $store.state.myselfPeerClient.clientId }}
                   q-icon(v-if="$store.displayActiveStatus" class="q-pl-sm" name="person" color="secondary")
                 q-item-label(caption lines="1") {{ $t('Device: ') + $store.state.myselfPeerClient.clientType }}
+                q-item-label(caption lines="1") {{ $t('LastUpdateTime: ') + date.formatDate($store.state.myselfPeerClient.lastUpdateTime, 'YYYY-MM-DD HH:mm:ss') }}
                 q-item-label(caption lines="1") {{ $t('LastAccessTime: ') + date.formatDate($store.state.myselfPeerClient.lastAccessTime, 'YYYY-MM-DD HH:mm:ss') }}
                 q-item-label(caption lines="8" style="word-break:break-all") {{ $t('LastAccessNode: ') + GetAddressLabel($store.state.myselfPeerClient.connectPeerId) }}
           q-separator.c-separator(inset="item" v-if="$store.peerClients && $store.peerClients.length > 0")
@@ -66,6 +67,7 @@
                 q-item-label(caption lines="1") {{ $t('Id: ') + peerClient.clientId }}
                   q-icon(v-if="$store.displayActiveStatus" class="q-pl-sm" name="person" :color="peerClient.clientDevice === $store.state.myselfPeerClient.clientDevice ? 'c-grey' : (peerClient.activeStatus === 'Up' ? 'secondary' : 'c-grey')")
                 q-item-label(caption lines="1") {{ $t('Device: ') + peerClient.clientType }}
+                q-item-label(caption lines="1") {{ $t('LastUpdateTime: ') + date.formatDate(peerClient.lastUpdateTime, 'YYYY-MM-DD HH:mm:ss') }}
                 q-item-label(caption lines="1") {{ $t('LastAccessTime: ') + date.formatDate(peerClient.lastAccessTime, 'YYYY-MM-DD HH:mm:ss') }}
                 q-item-label(caption lines="8" style="word-break:break-all") {{ $t('LastAccessNode: ') + GetAddressLabel(peerClient.connectPeerId) }}
             q-separator.c-separator(inset="item" v-if="$store.peerClients && index < $store.peerClients.length - 1")
