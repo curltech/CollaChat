@@ -247,9 +247,9 @@ export default {
             _that.connectArray.splice(0, _that.connectArray.length, ...result)
           } else {
             _that.connectArray.splice(0, _that.connectArray.length)
-            for (let i = 1; i < CollaConstant.connectAddressOptionsISO[myself.myselfPeerClient.language].length; i++) {
+            for (let i = 1; i < store.connectAddressOptionsISO[myself.myselfPeerClient.language].length; i++) {
               let item = {}
-              item.address = CollaConstant.connectAddressOptionsISO[myself.myselfPeerClient.language][i].value
+              item.address = store.connectAddressOptionsISO[myself.myselfPeerClient.language][i].value
               _that.connectArray.push(item)
             }
           }

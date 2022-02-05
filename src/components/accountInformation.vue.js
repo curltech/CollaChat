@@ -43,9 +43,10 @@ export default {
     },
     GetAddressLabel() {
       let _that = this
+      let store = _that.$store
       return function (address) {
         let label = ''
-        for (let connectAddressOption of CollaConstant.connectAddressOptionsISO[myself.myselfPeerClient.language]) {
+        for (let connectAddressOption of store.connectAddressOptionsISO[myself.myselfPeerClient.language]) {
           if (connectAddressOption.value === address) {
             label = connectAddressOption.label
             break
