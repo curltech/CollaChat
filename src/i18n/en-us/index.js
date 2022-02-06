@@ -26,7 +26,7 @@ export default {
   "USA-Virginia": "USA-Virginia",
   "Code": "Code",
   "Node Address": "Node Address",
-  "Use Custom Node": "Use Custom Node",
+  "Custom Node": "Custom Node",
   "Default": "Default",
   "Custom": "Custom",
   "Protocol": "Protocol",

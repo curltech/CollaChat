@@ -53,7 +53,7 @@ export default {
           }
         }
         if (!label) {
-          label = _that.$i18n.t("Use Custom Node") + ' (' + address + ')'
+          label = _that.$i18n.t("Custom Node") + ' (' + address + ')'
         }
         return label
       }
