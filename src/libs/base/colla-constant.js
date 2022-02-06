@@ -62,7 +62,7 @@ export const languageOptions = [
 
 const connectAddressOptionsZH = [
     {
-      label: '自定义定位器',
+      label: '自定义节点',
       value: 'custom'
     },
     //// testing purpose start
@@ -93,7 +93,7 @@ const connectAddressOptionsZH = [
   ]
 const connectAddressOptionsTW = [
     {
-      label: '自定義定位器',
+      label: '自定義節點',
       value: 'custom'
     },
     {
@@ -114,7 +114,7 @@ const connectAddressOptionsTW = [
   ]
 const connectAddressOptionsEN = [
     {
-      label: 'Use Custom PeerEndPoint',
+      label: 'Custom Node',
       value: 'custom'
     },
     {
@@ -135,7 +135,7 @@ const connectAddressOptionsEN = [
   ]
 const connectAddressOptionsJA = [
     {
-      label: 'カスタムポジショナ',
+      label: 'カスタムノード',
       value: 'custom'
     },
     {
@@ -156,7 +156,7 @@ const connectAddressOptionsJA = [
   ]
 const connectAddressOptionsKO = [
     {
-      label: '사용자 정의 위치 지정 기',
+      label: '커스텀 노드',
       value: 'custom'
     },
     {
