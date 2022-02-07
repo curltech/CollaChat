@@ -617,7 +617,7 @@ export default {
         inAppBrowserComponent.open(appleUrl, '_system', 'location=no')
       } else if (store.android === true) {
         inAppBrowserComponent.open(downloadUrl, '_system', 'location=no')
-      } else if (store.safari === true) {
+      } else if (store.macos === true) {
         window.open(appleUrl, '_system')
       } else {
         window.open(downloadUrl, '_system')
@@ -626,7 +626,7 @@ export default {
     upgradeVersion(flag) {
       let _that = this
       let store = _that.$store
-      store.currentVersion = "1.1.1"
+      store.currentVersion = "1.1.2"
       store.mandatory = false
       if (_that.versionHistory && _that.versionHistory.length > 0) {
         let no = 1
@@ -701,6 +701,8 @@ export default {
     async startup() {
       let _that = this
       let store = _that.$store
+      store.macos = false
+      store.windows = false
       store.ifMobile = function () {
         return window.device && (window.device.platform === 'Android' || window.device.platform === 'iOS')
       }
@@ -902,8 +904,10 @@ export default {
         type = 'ios'
       } else if (store.android === true) {
         type = 'android'
-      } else if (store.safari === true) {
-        type = 'safari'
+      } else if (store.macos === true) {
+        type = 'macos'
+      } else if (store.windows === true) {
+        type = 'windows'
       }
       console.log('type:' + type)
       worker.postMessage(configItem + '-' + type)
