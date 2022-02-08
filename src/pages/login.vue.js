@@ -618,9 +618,9 @@ export default {
       } else if (store.android === true) {
         inAppBrowserComponent.open(downloadUrl, '_system', 'location=no')
       } else if (store.macos === true) {
-        window.open(appleUrl, '_system')
+        window.open(appleUrl, '_blank')
       } else {
-        window.open(downloadUrl, '_system')
+        window.open(downloadUrl, '_blank')
       }
     },
     upgradeVersion(flag) {
