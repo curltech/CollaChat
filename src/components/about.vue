@@ -17,7 +17,12 @@
                 q-item-section
                   q-item-label {{$t('About Colla')}}
               q-separator.c-separator
-              q-item(clickable v-ripple @click="$store.versionUpdate()")
+              q-item(v-if="$store.macos === true" v-ripple)
+                q-item-section
+                  q-item-label {{$t('Current Version')}}
+                q-item-section(side)
+                  q-item-label {{ $store.currentVersion }}
+              q-item(v-if="$store.macos !== true" clickable v-ripple @click="$store.versionUpdate()")
                 q-item-section
                   q-item-label {{$t('Version Update')}}
                 q-item-section(side)
