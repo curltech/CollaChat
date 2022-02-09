@@ -46,7 +46,7 @@
               q-icon(name="info")
             q-item-section {{$t('About')}}
             q-item-section(avatar)
-              q-badge(v-if="$store.macos === true && $store.latestVersion !== $store.currentVersion" color="red" floating rounded) New
+              q-badge(v-if="$store.macos !== true && $store.latestVersion !== $store.currentVersion" color="red" floating rounded) New
               q-icon(name="keyboard_arrow_right")
           q-separator.c-separator(style="height:8px;margin-left:0px;margin-right:0px")
           q-item

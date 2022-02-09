@@ -32,7 +32,7 @@
           q-icon.text-primary(name="settings")
         q-item-section {{$t('Settings')}}
         q-item-section(avatar)
-          q-badge(v-if="$store.macos === true && $store.latestVersion !== $store.currentVersion" color="red" floating rounded) New
+          q-badge(v-if="$store.macos !== true && $store.latestVersion !== $store.currentVersion" color="red" floating rounded) New
           q-icon(v-if="ifMobileSize || $store.state.ifMobileStyle" name="keyboard_arrow_right")
       //q-separator.c-separator
 </template>

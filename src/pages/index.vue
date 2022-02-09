@@ -79,7 +79,7 @@ q-layout
               no-caps,
               :ripple="false"
             )
-              q-badge(v-if="$store.macos === true && $store.latestVersion !== $store.currentVersion" color="red" floating rounded) New
+              q-badge(v-if="$store.macos !== true && $store.latestVersion !== $store.currentVersion" color="red" floating rounded) New
         .col-10
           q-tab-panels(
             v-model="tab",
@@ -152,7 +152,7 @@ q-layout
           no-caps,
           :ripple="false"
         )
-          q-badge(v-if="$store.macos === true && $store.latestVersion !== $store.currentVersion" color="red" floating rounded) New
+          q-badge(v-if="$store.macos !== true && $store.latestVersion !== $store.currentVersion" color="red" floating rounded) New
   q-drawer.mainDrawer(
     v-if="!$store.state.ifScan",
     :no-swipe-close="noSwipeClose",
