@@ -1541,19 +1541,19 @@ export default {
 
         // 修改群组信息
         let nameChanged = false
-        if (groupChat.name !== _that.groupChatData.name) {
+        if ((groupChat.name || _that.groupChatData.name) && groupChat.name !== _that.groupChatData.name) {
           nameChanged = true
         }
         let descriptionChanged = false
-        if (groupChat.description !== _that.groupChatData.description) {
+        if ((groupChat.description || _that.groupChatData.description) && groupChat.description !== _that.groupChatData.description) {
           descriptionChanged = true
         }
         let givenNameChanged = false
-        if (groupChat.givenName !== _that.groupChatData.givenName) {
+        if ((groupChat.givenName || _that.groupChatData.givenName) && groupChat.givenName !== _that.groupChatData.givenName) {
           givenNameChanged = true
         }
         let myAliasChanged = false
-        if (groupChat.myAlias !== _that.groupChatData.myAlias) {
+        if ((groupChat.myAlias || _that.groupChatData.myAlias) && groupChat.myAlias !== _that.groupChatData.myAlias) {
           myAliasChanged = true
         }
         if (nameChanged || descriptionChanged || givenNameChanged || myAliasChanged) {
@@ -1588,7 +1588,7 @@ export default {
         let groupMembers = groupChat.groupMembers
         for (let groupMember of groupMembers) {
           if (groupMember.memberPeerId === myselfPeerClient.peerId) {
-            if (groupMember.memberAlias !== groupChat.myAlias) {
+            if ((groupMember.memberAlias || groupChat.myAlias) && groupMember.memberAlias !== groupChat.myAlias) {
               memberAliasChanged = true
               groupMember.memberAlias = groupChat.myAlias
             }

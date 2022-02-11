@@ -2208,23 +2208,25 @@ export default {
           let descriptionChanged = false
           let recallTimeLimitChanged = false
           let recallAlertChanged = false
-          if (groupChat.name !== content.groupName) {
-            nameChanged = true
-            groupChat.name = content.groupName
-            groupChat.pyName = pinyinUtil.getPinyin(content.groupName)
-          }
-          if (groupChat.description !== content.groupDescription) {
-            descriptionChanged = true
-            groupChat.description = content.groupDescription
-            groupChat.pyDescription = pinyinUtil.getPinyin(content.groupDescription)
-          }
-          if (groupChat.recallTimeLimit !== content.recallTimeLimit) {
-            recallTimeLimitChanged = true
-            groupChat.recallTimeLimit = content.recallTimeLimit
-          }
-          if (groupChat.recallAlert !== content.recallAlert) {
-            recallAlertChanged = true
-            groupChat.recallAlert = content.recallAlert
+          if (groupChat.groupOwnerPeerId === content.senderPeerId) {
+            if ((groupChat.name || content.groupName) && groupChat.name !== content.groupName) {
+              nameChanged = true
+              groupChat.name = content.groupName
+              groupChat.pyName = pinyinUtil.getPinyin(content.groupName)
+            }
+            if ((groupChat.description || content.groupDescription) && groupChat.description !== content.groupDescription) {
+              descriptionChanged = true
+              groupChat.description = content.groupDescription
+              groupChat.pyDescription = pinyinUtil.getPinyin(content.groupDescription)
+            }
+            if (groupChat.recallTimeLimit !== content.recallTimeLimit) {
+              recallTimeLimitChanged = true
+              groupChat.recallTimeLimit = content.recallTimeLimit
+            }
+            if (groupChat.recallAlert !== content.recallAlert) {
+              recallAlertChanged = true
+              groupChat.recallAlert = content.recallAlert
+            }
           }
           if (nameChanged || descriptionChanged || recallTimeLimitChanged || recallAlertChanged) {
             let groupChatRecord = await contactComponent.get(ContactDataType.GROUP, groupChat._id)
@@ -2245,7 +2247,7 @@ export default {
           let groupMembers = groupChat.groupMembers
           for (let groupMember of groupMembers) {
             if (groupMember.memberPeerId === content.senderPeerId) {
-              if (groupMember.memberAlias !== content.myAlias) {
+              if ((groupMember.memberAlias || content.myAlias) && groupMember.memberAlias !== content.myAlias) {
                 aliasChanged = true
                 groupMember.memberAlias = content.myAlias
               }
