@@ -48,8 +48,8 @@
           q-space
           q-btn.text-primary(flat round icon="more_horiz" @click="operateQRCode")
         q-card(flat class="fixed-center q-pa-none")
-          q-card-section#qrCodeCard(class="q-pa-xs")
-            q-card(flat class="q-pa-sm")
+          q-card-section.bg-white#qrCodeCard(class="q-pa-xs")
+            q-card.bg-white(flat class="q-pa-sm")
               q-card-section(class="q-pb-none")
                 q-list
                   q-item
@@ -57,8 +57,8 @@
                       q-avatar
                         img(:src="$store.state.myselfPeerClient.avatar ? $store.state.myselfPeerClient.avatar : $store.defaultActiveAvatar")
                     q-item-section(side)
-                      q-item-label(class="text-h6") {{ $store.state.myselfPeerClient && $store.state.myselfPeerClient.name ? $store.state.myselfPeerClient.name : '' }}
-                      q-item-label(caption) {{ $t('Scan QR code to import ID') }}
+                      q-item-label(class="text-h6 text-dark") {{ $store.state.myselfPeerClient && $store.state.myselfPeerClient.name ? $store.state.myselfPeerClient.name : '' }}
+                      q-item-label(caption class="text-dark") {{ $t('Scan QR code to import ID') }}
               q-card-section(align="center" class="q-pt-md")
                 //canvas#qrCode
                 div#qrCode
