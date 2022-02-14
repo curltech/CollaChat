@@ -83,7 +83,7 @@
                                 span {{$store.state.currentCallChat.stream.length}}
                                 span {{addStreamCount}}
                             q-item-section.group-video-par(style="width:100%" v-if="$store.state.currentCallChat.callType == 'video' && ($store.state.currentCallChat.streamMap && $store.state.currentCallChat.streamMap[memberPeerId]) && !Platform.is.ios")
-                                video(:ref='`memberVideo${memberPeerId}`' @canplay="groupVideoOnplay" autoplay = 'autoplay')
+                                video.groupVideo(:ref='`memberVideo${memberPeerId}`' @canplay="groupVideoOnplay" autoplay = 'autoplay')
                                 //video(:ref='`memberVideo${memberPeerId}`' autoplay = 'autoplay')
                             q-item-section.group-video-par-else(v-else)
                                 q-avatar(style = 'width:100%;height:auto;')
@@ -93,7 +93,7 @@
                                     q-icon(size="20px" name="person" :color="$store.state.currentCallChat.streamMap && $store.state.currentCallChat.streamMap[memberPeerId] ? 'secondary' : 'c-grey'")
                             q-item-section.call-pending-section(v-if = '$store.state.currentCallChat.streamMap && $store.state.currentCallChat.streamMap[memberPeerId] && $store.state.currentCallChat.streamMap[memberPeerId].pending')
                                 q-spinner-dots(size="2rem")
-                        q-separator.c-separator-message(style="height:1px;margin-left:0px;margin-right:0px" v-if="index %2 !== 0") 
+                        q-separator.c-separator-message(style="height:1px;margin-left:0px;margin-right:0px" v-if="index %2 !== 0")
             q-card-section.mini-btn-section.group-video-mini-btn.row(v-if = "(!Platform.is.ios || $store.state.currentCallChat.callType == 'audio') && $store.state.currentCallChat.stream")
                 //.col-2
                 q-btn.text-primary(flat round icon="close_fullscreen" style="font-size:12px" @click="changeMiniVideoDialog")

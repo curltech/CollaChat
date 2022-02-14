@@ -491,6 +491,7 @@ export default {
         store.state.currentChat.tempText = store.state.currentChat.tempText.slice(0, selectionStart) + '@' + alias + ' ' + store.state.currentChat.tempText.slice(selectionStart + 1, store.state.currentChat.tempText.length)
       }
       _that.focusGroupMemberDialog = false
+      editor.$refs.input.selectionStart = editor.$refs.input.selectionStart + alias.length + 1
     },
     async updateReadTime() {
       let _that = this
@@ -1062,7 +1063,9 @@ export default {
         return
       }
       _that.sending = true
+      editorContent = editorContent.replace(`- - - - - - - - - -\n`, '- - - - - - - - - -#%#')
       editorContent = editorContent.replace(/^\s*|\s*$/g, '')
+      editorContent = editorContent.replace('#%#', `\<br/\>`)
       if (!editorContent) {
         store.state.currentChat.tempText = ''
         return
@@ -1077,14 +1080,6 @@ export default {
       _that.sending = false
       editor.focus()
       store.sendChatMessage(store.state.currentChat, message)
-      _that.$nextTick(() => {
-        let container = document.getElementById('talk')
-        if (container) {
-          setTimeout(function () {
-            container.scrollTop = container.scrollHeight + 50
-          }, 500)
-        }
-      })
     },
     preCheck() {
       let _that = this
@@ -1507,7 +1502,7 @@ export default {
     quoteMessage(message, index) {
       let _that = this
       let store = _that.$store
-      let messageText = `「 ${store.state.linkmanMap[message.senderPeerId].name}:${message.content} 」 - - - - - - - - - - - - - -\n`
+      let messageText = `「 ${store.state.linkmanMap[message.senderPeerId].name}:${message.content} 」 - - - - - - - - - -\n`
       _that.$forceUpdate()
       store.state.currentChat.tempText = messageText
       _that.$refs.editor.focus()

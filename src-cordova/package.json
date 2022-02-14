@@ -25,6 +25,7 @@
     "cordova-plugin-backbutton": "^0.3.0",
     "cordova-plugin-battery-status": "~2.0.3",
     "cordova-plugin-camera": "^4.1.0",
+    "cordova-plugin-headsetdetection": "^3.0.0",
     "cordova-plugin-canvas2image-updated": "^1.2.0",
     "cordova-plugin-compat": "^1.2.0",
     "cordova-plugin-contacts": "~3.0.1",
@@ -121,7 +122,8 @@
       "cordova-plugin-oppo-push": {
         "APP_KEY": "",
         "APP_SECRET": ""
-      }
+      },
+      "cordova-plugin-headsetdetection": {}
     },
     "platforms": [
       "ios",

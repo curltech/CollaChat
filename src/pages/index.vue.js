@@ -832,7 +832,7 @@ export default {
       )*/
       let messages = currentChat.messages
       // Read/UnRead
-      if (store.state.chatMap[subjectId] == store.state.currentChat) {
+      if (store.state.chatMap[subjectId] == store.state.currentChat && store.getKind() === 'message') {
         message.readTime = new Date()
         if (message.destroyTime) {
           message.opened = false
@@ -1030,14 +1030,16 @@ export default {
         db_chat.content = chat.content
         db_chat.updateTime = chat.updateTime
         await chatComponent.update(ChatDataType.CHAT, db_chat)
+      }
+      await chatComponent.insert(ChatDataType.MESSAGE, message, chat.messages)
+      if (message.messageType === P2pChatMessageType.CHAT_LINKMAN) {
         _that.$nextTick(() => {
           let container = _that.$el.querySelector('#talk')
           if (container) {
-            container.scrollTop = container.scrollHeight
+            container.scrollTop = container.scrollHeight + 50
           }
         })
       }
-      await chatComponent.insert(ChatDataType.MESSAGE, message, chat.messages)
     },
     async handleChatTime(current, chat) {
       let _that = this

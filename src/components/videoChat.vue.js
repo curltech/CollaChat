@@ -572,6 +572,9 @@ export default {
       }
       if (callChat.subjectType === SubjectType.GROUP_CHAT) {
         if (!(callChat.callMessage.hasAddStream && callChat.callMessage.hasAddStream[peerId]) || (callChat.streamMap && callChat.streamMap[peerId] && callChat.streamMap[peerId].pending)) { // 发起方--这里需要addStream给对方
+          if(callChat.streamMap && callChat.streamMap[peerId] && callChat.streamMap[peerId].pending){
+            callChat.streamMap[peerId].pending = false
+          }
           let webrtcPeers = await webrtcPeerPool.get(peerId)
           if (webrtcPeers && webrtcPeers.length > 0) {
             for (let webrtcPeer of webrtcPeers) {
@@ -655,8 +658,12 @@ export default {
         })
       }
       _that.addStreamCount++
-      if (store.state.currentCallChat.callType === 'video' && store.state.currentCallChat.stream.length === 2) {//视频默认外放
-        _that.changeDropdownChatMute('speaker')
+      if (store.state.currentCallChat.callType === 'video' && store.state.currentCallChat.stream.length === 2 && window.HeadsetDetection) {//视频默认外放
+        window.HeadsetDetection.detect(function (detected) {
+           if(!detected){
+             _that.changeDropdownChatMute('speaker')
+           }
+          })
       }
     },
     async pendingCall(peerId) {
@@ -862,18 +869,23 @@ export default {
       })
     },
     groupVideoOnplay(event) {
-      let dom = event.target
-      let targetWidth = dom.clientWidth
-      let targetHeight = dom.clientHeight
-      if (targetWidth > targetHeight) {
-        dom.parentElement.style.height = `${dom.parentElement.clientWidth}px`
-        dom.parentElement.style.position = `relative`
-        dom.style.position = `absolute`
-        dom.style.left = '50%'
-        dom.style.marginLeft = `-${targetWidth / 2}px`
-      } else {
-        dom.parentElement.style.height = `${targetWidth}px`
-      }
+      let _that = this
+      let videos = document.getElementsByClassName('groupVideo')
+      _that.$nextTick(() => {
+        for (var i = 0; i < videos.length; i++) {
+          let video = videos[i]
+          let targetWidth = video.clientWidth
+          if (video.srcObject && video.srcObject.getVideoTracks()[0].getSettings().aspectRatio > 2) {
+            video.parentElement.style.height = `${video.parentElement.clientWidth}px`
+            video.parentElement.style.position = `relative`
+            video.style.position = `absolute`
+            video.style.left = '50%'
+            video.style.marginLeft = `-${targetWidth / 2}px`
+          } else {
+            video.parentElement.style.height = `${targetWidth}px`
+          }
+        }
+      })
     },
     canCall() {
       let _that = this
