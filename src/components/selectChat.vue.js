@@ -47,6 +47,12 @@ export default {
         store.changeChannelDetailsSubKind('default')
       } else if (store.selectChatEntry === 'articleForward') {
         store.changeChannelDetailsSubKind('view')
+      } else if (store.selectChatEntry === 'aboutQrCode') {
+        store.aboutEnterQRCode()
+      } else if (store.selectChatEntry === 'collectionImg') {
+        store.changeCollectionSubKind('fullscreen')
+      } else if (store.selectChatEntry === 'articleImg') {
+        store.changeArticleSubKind('fullscreen')
       }
     },
     gotoSelectChatRecord() {

@@ -540,23 +540,25 @@ export default {
       _that.$nextTick(() => {
         var img = new Image()
         img.src = store.state.currentLinkman.avatar ? store.state.currentLinkman.avatar : store.defaultActiveAvatar
-        console.log('img.width: ' + img.width + ', img.height: ' + img.height)
-        let avatarContainer = document.getElementById('avatarContainer')
-        let canvas = document.getElementById('avatar')
-        let ctx = canvas.getContext('2d')
-        canvas.width = _that.ifMobileSize || store.state.ifMobileStyle ? _that.$q.screen.width : (img.width > avatarContainer.clientWidth ? avatarContainer.clientWidth : img.width)
-        canvas.height = canvas.width * img.height / img.width
-        console.log('canvasWidth: ' + canvas.width + ', canvasHeight: ' + canvas.height)
-        ctx.clearRect(0, 0, canvas.width, canvas.height)
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+        img.onload = () => {
+          console.log('img.width: ' + img.width + ', img.height: ' + img.height)
+          let avatarContainer = document.getElementById('avatarContainer')
+          let canvas = document.getElementById('avatar')
+          let ctx = canvas.getContext('2d')
+          canvas.width = _that.ifMobileSize || store.state.ifMobileStyle ? _that.$q.screen.width : (img.width > avatarContainer.clientWidth ? avatarContainer.clientWidth : img.width)
+          canvas.height = canvas.width * img.height / img.width
+          console.log('canvasWidth: ' + canvas.width + ', canvasHeight: ' + canvas.height)
+          ctx.clearRect(0, 0, canvas.width, canvas.height)
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
 
-        let avatarImg = document.querySelector('#avatarImg')
-        avatarImg.src = canvas.toDataURL('image/png', 1.0)
-        let marginTop = (_that.$q.screen.height - canvas.height) / 2
-        avatarImg.style.cssText += 'margin-top: ' + (marginTop < 0 ? 0 : marginTop) + 'px'
-        if (store.ifMobile()) {
-          alloyFingerComponent.initImage('#avatarImg')
-          alloyFingerComponent.initLongSingleTap('#avatarContainer', _that.operateAvatar, _that.fullscreenBack)
+          let avatarImg = document.querySelector('#avatarImg')
+          avatarImg.src = canvas.toDataURL('image/png', 1.0)
+          let marginTop = (_that.$q.screen.height - canvas.height) / 2
+          avatarImg.style.cssText += 'margin-top: ' + (marginTop < 0 ? 0 : marginTop) + 'px'
+          if (store.ifMobile()) {
+            alloyFingerComponent.initImage('#avatarImg')
+            alloyFingerComponent.initLongSingleTap('#avatarContainer', _that.operateAvatar, _that.fullscreenBack)
+          }
         }
       })
     },

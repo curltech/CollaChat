@@ -1,12 +1,14 @@
 import { mediaComponent } from '@/libs/base/colla-media'
 import { statusBarComponent } from '@/libs/base/colla-cordova'
-
 import Tos from '@/components/tos'
+
+import SelectChat from '@/components/selectChat'
 
 export default {
   name: 'About',
   components: {
-    tos: Tos
+    tos: Tos,
+    selectChat: SelectChat
   },
   data() {
     return {
@@ -80,7 +82,9 @@ export default {
         }).onOk(async action => {
           // console.log('Action chosen:', action.id)
           if (action.id === 'forward') {
-            // TODO
+            store.state.currentQrCode = await mediaComponent.html2canvasById('qrCodeCard', 'base64')
+            store.selectChatEntry = 'aboutQrCode'
+            _that.subKind = 'selectChat'
           } else if (action.id === 'save') {
             let canvas = await mediaComponent.html2canvasById('qrCodeCard', null)
             window.canvas2ImagePlugin.saveImageDataToLibrary(
@@ -135,10 +139,12 @@ export default {
               id: 'cancel'
             }
           ]
-        }).onOk(action => {
+        }).onOk(async action => {
           // console.log('Action chosen:', action.id)
           if (action.id === 'forward') {
-            // TODO
+            store.state.currentQrCode = await mediaComponent.html2canvasById('qrCodeCard', 'base64')
+            store.selectChatEntry = 'aboutQrCode'
+            _that.subKind = 'selectChat'
           } else if (action.id === 'save') {
             mediaComponent.exportDiv('qrCodeCard', _that.$i18n.t('collaQRCode'))
           }
@@ -156,6 +162,7 @@ export default {
     store.changeAboutSubKind = function (subKind) {
       _that.subKind = subKind
     }
+    store.aboutEnterQRCode = _that.enterQRCode
   },
   mounted() {
     let _that = this

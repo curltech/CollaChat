@@ -35,6 +35,8 @@
         img#selectedImg(v-if="selected && selected.nodeName === 'IMG'" :src="selected.src")
         canvas#selectedCanvas(v-if="selected && selected.nodeName === 'IMG'" class="hidden")
         video#selectedVideo(v-if="selected && selected.nodeName === 'VIDEO'" :src="selected.src" controls webkit-playsinline playsinline x5-playsinline x-webkit-airplay="allow" autoplay)
+      q-tab-panel(name="selectChat" style="padding:0px 0px")
+        selectChat.drawcontent
       q-tab-panel(name="captureMedia" style="padding:0px 0px")
         captureMedia.drawcontent
     q-uploader(style="display:none" ref="articleUpload" @added="files => articleUpload(files)" accept=".jpg, image/*")

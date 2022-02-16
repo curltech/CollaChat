@@ -97,5 +97,7 @@
                 canvas#qrCode
               q-card-section(class="q-pt-none")
                 div(class="text-center text-caption") {{$t('Scan QR code to add me into your contacts')}}
+      q-tab-panel(name="selectChat" style="padding:0px 0px")
+        selectChat.drawcontent
 </template>
 <script src="./about.vue.js" />

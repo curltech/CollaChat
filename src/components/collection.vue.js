@@ -16,8 +16,8 @@ import { mediaCaptureComponent, mediaComponent, alloyFingerComponent, mediaPicke
 import { collectionComponent, SrcChannelType, SrcEntityType, CollectionDataType, CollectionType } from '@/libs/biz/colla-collection'
 import { collectionUtil, blockLogComponent } from '@/libs/biz/colla-collection-util'
 import SelectChat from '@/components/selectChat'
-import MessageContent from '@/components/messageContent'
 import CaptureMedia from '@/components/captureMedia'
+import MessageContent from '@/components/messageContent'
 import NotePreview from '@/components/notePreview'
 import MobileAudio from '@/components/mobileAudio'
 //import CollectionUploadWorker from '@/worker/collectionUpload.worker.js'
@@ -900,29 +900,31 @@ export default {
         if (selected && selected.nodeName === 'IMG') {
           var img = new Image()
           img.src = selected.src
-          console.log('img.width: ' + img.width + ', img.height: ' + img.height)
-          let selectedContainer = document.getElementById('selectedContainer')
-          let canvas = document.getElementById('selectedCanvas')
-          let ctx = canvas.getContext('2d')
-          canvas.width = _that.ifMobileSize || store.state.ifMobileStyle ? _that.$q.screen.width : (img.width > selectedContainer.clientWidth ? selectedContainer.clientWidth : img.width)
-          canvas.height = canvas.width * img.height / img.width
-          ctx.clearRect(0, 0, canvas.width, canvas.height)
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+          img.onload = () => {
+            console.log('img.width: ' + img.width + ', img.height: ' + img.height)
+            let selectedContainer = document.getElementById('selectedContainer')
+            let canvas = document.getElementById('selectedCanvas')
+            let ctx = canvas.getContext('2d')
+            canvas.width = _that.ifMobileSize || store.state.ifMobileStyle ? _that.$q.screen.width : (img.width > selectedContainer.clientWidth ? selectedContainer.clientWidth : img.width)
+            canvas.height = canvas.width * img.height / img.width
+            ctx.clearRect(0, 0, canvas.width, canvas.height)
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
 
-          let selectedImg = document.querySelector('#selectedImg')
-          selectedImg.src = canvas.toDataURL('image/png', 1.0)
-          let marginTop = 0
-          if (store.ifMobile()) {
-            marginTop = (store.screenHeight - canvas.height) / 2 // 不使用_that.$q.screen.height，避免键盘弹出时的影响
-          } else {
-            marginTop = (_that.$q.screen.height - canvas.height) / 2 - 50
-          }
-          marginTop = marginTop < 0 ? 0 : marginTop
-          console.log('$q.screen.Height:' + _that.$q.screen.height + ',canvas.width:' + canvas.width + ',canvas.height:' + canvas.height + ',marginTop:' + marginTop)
-          selectedImg.style.cssText += 'margin-top: ' + marginTop + 'px'
-          if (store.ifMobile()) {
-            alloyFingerComponent.initImage('#selectedImg')
-            alloyFingerComponent.initLongSingleTap('#selectedContainer', _that.imageCommand, _that.fullscreenBack)
+            let selectedImg = document.querySelector('#selectedImg')
+            selectedImg.src = canvas.toDataURL('image/png', 1.0)
+            let marginTop = 0
+            if (store.ifMobile()) {
+              marginTop = (store.screenHeight - canvas.height) / 2 // 不使用_that.$q.screen.height，避免键盘弹出时的影响
+            } else {
+              marginTop = (_that.$q.screen.height - canvas.height) / 2 - 50
+            }
+            marginTop = marginTop < 0 ? 0 : marginTop
+            console.log('$q.screen.Height:' + _that.$q.screen.height + ',canvas.width:' + canvas.width + ',canvas.height:' + canvas.height + ',marginTop:' + marginTop)
+            selectedImg.style.cssText += 'margin-top: ' + marginTop + 'px'
+            if (store.ifMobile()) {
+              alloyFingerComponent.initImage('#selectedImg')
+              alloyFingerComponent.initLongSingleTap('#selectedContainer', _that.imageCommand, _that.fullscreenBack)
+            }
           }
         } else if (selected && selected.nodeName === 'VIDEO') {
           let selectedVideo = document.querySelector('#selectedVideo')
@@ -1201,7 +1203,9 @@ export default {
       }).onOk(async action => {
         // console.log('Action chosen:', action.id)
         if (action.id === 'forward') {
-
+          store.state.currentQrCode = document.getElementById('selectedImg').src
+          store.selectChatEntry = 'collectionImg'
+          _that.subKind = 'selectChat'
         } else if (action.id === 'save') {
           if (store.ifMobile()) {
             window.canvas2ImagePlugin.saveImageDataToLibrary(
@@ -1223,18 +1227,20 @@ export default {
                   color: "warning",
                 })
               },
-              document.getElementById('selectedCanvas'),
+              //document.getElementById('selectedCanvas'),
+              document.getElementById('selectedImg'),
               "jpeg" // format is optional, defaults to 'png'
             )
           } else {
-            let canvas = document.getElementById('selectedCanvas')
+            //let canvas = document.getElementById('selectedCanvas')
+            let canvas = document.getElementById('selectedImg')
             let avatarBase64 = canvas.src
             let arr = avatarBase64.split(',')
             let mime = arr[0].match(/:(.*?);/)[1]
             let extension = mime.split('/')[1]
             let a = document.createElement('a')
             a.href = BlobUtil.blobToUrl(BlobUtil.base64ToBlob(avatarBase64))
-            a.download = _that.$i18n.t('Collection') + new Date().getTime() + '.' + extension
+            a.download = _that.$i18n.t('Collection') + '-' + new Date().getTime() + '.' + extension
             a.click()
           }
         }

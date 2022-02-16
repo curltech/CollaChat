@@ -800,9 +800,9 @@ export default {
             store.state.imageMessageViewDialog = true
             _that.$nextTick(() => {
               if (store.ifMobile()) {
-                setTimeout(function () {
-                  var img = new Image()
-                  img.src = store.state.imageMessageSrc
+                var img = new Image()
+                img.src = store.state.imageMessageSrc
+                img.onload = () => {
                   console.log('img.width: ' + img.width + ', img.height: ' + img.height)
                   let selectedContainer = document.getElementById('dialog-image-container')
                   let canvas = document.getElementById('dialog-image-canvas')
@@ -820,7 +820,7 @@ export default {
                   selectedImg.style.cssText += 'margin-top: ' + marginTop + 'px'
                   alloyFingerComponent.initImage('#dialog-image')
                   alloyFingerComponent.initLongSingleTap('#dialog-image-container', _that.mediaHold, _that.fullscreenBack)
-                }, 0)
+                }
               }
             })
           })

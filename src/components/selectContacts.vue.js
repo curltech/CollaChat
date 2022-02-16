@@ -131,8 +131,12 @@ export default {
             await store.collectionForwardToChat(currentCollection,chatRecord)
           } else if (store.selectChatEntry === 'messageForward') {
             await store.forwardToChat(chatRecord)
-          } else if (store.selectChatEntry === 'accountInformationQrCode' || store.selectChatEntry === 'accountSecurityQrCode') {
-            await store.qrCodeForwardToChat(store.state.currentQrCode,chatRecord)
+          } else if (store.selectChatEntry === 'accountInformationQrCode'
+            || store.selectChatEntry === 'accountSecurityQrCode'
+            || store.selectChatEntry === 'aboutQrCode'
+            || store.selectChatEntry === 'collectionImg'
+            || store.selectChatEntry === 'articleImg') {
+            await store.imgForwardToChat(store.state.currentQrCode,chatRecord)
           } else if (store.selectChatEntry === 'channelForward') {
             await store.channelForwardToChat(store.state.currentChannel,chatRecord)
           } else if (store.selectChatEntry === 'articleForward') {

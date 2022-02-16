@@ -21,7 +21,7 @@ export default {
         myAlias: null
       },
       selectGroupChatFilter: null,
-      includedGroupChat:[],
+      includedGroupChat: [],
       placeholder: '\ue672' + ' ' + this.$i18n.t('Search')
     }
   },
@@ -70,14 +70,14 @@ export default {
       })
       return SelectedLinkmanArray
     },
-    groupChatShortName(){
+    groupChatShortName() {
       return function (groupId) {
         let _that = this
-        let store =_that.$store
-        let chatName = store.getChatName(SubjectType.GROUP_CHAT,groupId)
+        let store = _that.$store
+        let chatName = store.getChatName(SubjectType.GROUP_CHAT, groupId)
         return chatName.length > 3 ? chatName.substr(0, 3) + '...' : chatName
       }
-   }
+    }
   },
   methods: {
     selectGroupChat(groupChat, ifCheckbox) {
@@ -108,18 +108,22 @@ export default {
       let store = _that.$store
       if (store.selectGroupChatEntry === 'selectChat') {
         for (let group of _that.includedGroupChat) {
-          let chatRecord =  await store.getChat(group.groupId)
+          let chatRecord = await store.getChat(group.groupId)
           if (store.selectChatEntry === 'collectionForward') {
             let currentCollection = store.state.currentCollection
-            await store.collectionForwardToChat(currentCollection,chatRecord)
+            await store.collectionForwardToChat(currentCollection, chatRecord)
           } else if (store.selectChatEntry === 'messageForward') {
             await store.forwardToChat(chatRecord)
-          } else if (store.selectChatEntry === 'accountInformationQrCode' || store.selectChatEntry === 'accountSecurityQrCode') {
-            await store.qrCodeForwardToChat(store.state.currentQrCode,chatRecord)
+          } else if (store.selectChatEntry === 'accountInformationQrCode'
+            || store.selectChatEntry === 'accountSecurityQrCode'
+            || store.selectChatEntry === 'aboutQrCode'
+            || store.selectChatEntry === 'collectionImg'
+            || store.selectChatEntry === 'articleImg') {
+            await store.imgForwardToChat(store.state.currentQrCode, chatRecord)
           } else if (store.selectChatEntry === 'channelForward') {
-            await store.channelForwardToChat(store.state.currentChannel,chatRecord)
+            await store.channelForwardToChat(store.state.currentChannel, chatRecord)
           } else if (store.selectChatEntry === 'articleForward') {
-            await store.articleForwardToChat(store.state.currentArticle,chatRecord)
+            await store.articleForwardToChat(store.state.currentArticle, chatRecord)
           }
         }
       }

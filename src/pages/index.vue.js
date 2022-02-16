@@ -1223,8 +1223,7 @@ export default {
       }
       store.changeKind('message')
     },
-    //个人二维码及导出身份二维码共用
-    async qrCodeForwardToChat(item, chat) {
+    async imgForwardToChat(item, chat) {
       let _that = this
       let store = _that.$store
       await store.saveFileAndSendMessage(chat, item, ChatContentType.IMAGE, null)
@@ -4876,7 +4875,7 @@ export default {
     store.collectionForwardToChat = _that.collectionForwardToChat
     store.channelForwardToChat = _that.channelForwardToChat
     store.articleForwardToChat = _that.articleForwardToChat
-    store.qrCodeForwardToChat = _that.qrCodeForwardToChat
+    store.imgForwardToChat = _that.imgForwardToChat
     store.saveFileInMessage = _that.saveFileInMessage
     store.saveFileAndSendMessage = _that.saveFileAndSendMessage
     store.findContacts = _that.findContacts
