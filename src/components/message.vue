@@ -3,11 +3,11 @@
     q-tab-panels(v-model="subKind" animated transition-prev="slide-right" transition-next="slide-left")
       q-tab-panel(name="default" style="padding:0px 0px")
         q-toolbar.header-toolbar.bg-c-grey-message(:class="$store.state.currentChat.subjectId ? '' : 'hidden'")
-          q-btn(:class="ifMobileSize || $store.state.ifMobileStyle ? '' : 'hidden'" flat round icon="keyboard_arrow_left" @click="$store.toggleDrawer(false)")
+          q-btn(:class="ifMobileSize || $store.state.ifMobileStyle ? '' : 'hidden'" flat round icon="keyboard_arrow_left" @click="messageBack")
           q-toolbar-title(align="center" :style="ifMobileSize || $store.state.ifMobileStyle ? '' : 'padding-left:54px'") {{ ChatTitle($store.state.currentChat) }}
           q-btn.text-primary(flat round icon="more_horiz" @click="enterDetail")
         q-separator.c-separator-message.header-mar-top(style="height:1px;margin-left:0px;margin-right:0px")
-        #talk.q-pa-md.bg-c-grey-message.row.justify-center.scroll.q-chat-message(:class=" !$store.ifMobile() && !(ifMobileSize || $store.state.ifMobileStyle) ? 'talk-height-pc' : (keyboardMode ? (ifMobileSize ? (moreMode && Platform.is.ios ? 'talk-height-mobileSize3' : 'talk-height-mobileSize1' ) : (moreMode && Platform.is.ios ? 'talk-height-mobileStyle3' : 'talk-height-mobileStyle1' )) : (ifMobileSize ? 'talk-height-mobileSize2' : 'talk-height-mobileStyle2'))")
+        #talk.q-pa-md.bg-c-grey-message.row.justify-center.scroll.q-chat-message(:class=" !$store.ifMobile() && !(ifMobileSize || $store.state.ifMobileStyle) ? 'talk-height-pc' :(ifMobileSize ? 'talk-height-mobileSize2' : (!moreMode ? 'talk-height-mobileStyle1':(keyboardMode ? 'talk-height-mobileStyle3' : 'talk-height-mobileStyle2') ))")
           q-infinite-scroll(style="width:100%" @load="load_message" debounce="100" reverse :offset="50")
             q-chat-message(v-if="$store.state.currentChat && $store.state.currentChat.noMoreMessageTag" @touchstart="preventDefault" :label="$t('No more messages')")
             template(v-for="(message,index) in $store.state.currentChat.messages")
@@ -56,10 +56,10 @@
                 q-btn.text-primary.btnMessage(flat stack no-caps :label="$t('Cancel')" icon="cancel" @click="cancelMessageMultiSelect")
             q-toolbar.message-operate-wrap(v-if="!messageMultiSelectMode" :class = '$store.ifMobile() || (ifMobileSize || $store.state.ifMobileStyle) ? "message-operate-wrap-mobile" : "message-operate-wrap-pc"')
               q-btn.text-primary.q-mr-sm(v-if="$store.ifMobile() || (ifMobileSize || $store.state.ifMobileStyle)" round flat icon ='add_circle_outline' @click = "more")
-              q-input.c-field.message-editor(type='textarea' autogrow ref='editor' rows='1' filled input-style='resize:none;max-height:98px;' name="editor" id="editor" v-model= '$store.state.currentChat.tempText' :class = '$store.ifMobile() || (ifMobileSize || $store.state.ifMobileStyle) ? "message-editor-mobile" : "message-editor-pc"'
+              q-input.c-field.message-editor(type='textarea' autogrow ref='editor' rows='1' filled input-style='resize:none;max-height:98px;line-height:30px' name="editor" id="editor" v-model= '$store.state.currentChat.tempText' :class = '$store.ifMobile() || (ifMobileSize || $store.state.ifMobileStyle) ? "message-editor-mobile" : "message-editor-pc"'
                 @keyup="editorKeyup" @focus="editorFocus" @blur="editorBlur" @paste="editorPaste" @drop="editorDrop")
               q-btn.text-primary(v-if="$store.ifMobile() || (ifMobileSize || $store.state.ifMobileStyle)" round flat icon="send" @click = "preSend")
-            q-toolbar.no-padding(style='flex-wrap:wrap' v-if="($store.ifMobile() || (ifMobileSize || $store.state.ifMobileStyle)) && !keyboardMode && !messageMultiSelectMode")
+            q-toolbar.no-padding(style='flex-wrap:wrap' v-if="($store.ifMobile() || (ifMobileSize || $store.state.ifMobileStyle)) && moreMode && !keyboardMode && !messageMultiSelectMode")
               .col-12
                 q-carousel(v-model="slide" swipeable animated padding control-text-color="c-grey" style="height: 210px")
                   q-carousel-slide(name="slide1" class="q-pa-md")

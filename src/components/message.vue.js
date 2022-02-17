@@ -85,7 +85,7 @@ export default {
       focusGroupMemberDialog: false,
       emojiShow: false,
       slide: 'slide1',
-      keyboardMode: true,
+      keyboardMode: false,
       moreMode: false,
       //auidoTouch
       eY1: 0,
@@ -1216,6 +1216,9 @@ export default {
               await _that.recursiveMergeMessages(chat, mergeMessage)
             }
             if ((message.contentType === ChatContentType.VIDEO || message.contentType === ChatContentType.FILE || message.contentType === ChatContentType.IMAGE)) {
+              message.thumbnail = singleMessage.thumbnail
+              message.fileSize = singleMessage.fileSize
+              message.fileoriginalMessageId = singleMessage.fileoriginalMessageId
               let fileData = await store.getMessageFile(mergeMessage)
               await store.saveFileInMessage(chat, message, fileData, message.contentType, null, mergeMessage.fileoriginalMessageId)
             }
@@ -1229,6 +1232,16 @@ export default {
             message.contentType = singleMessage.contentType
             message.content = singleMessage.content
             message.title = singleMessage.title
+            if (singleMessage.contentType === ChatContentType.CHAT) {
+              await _that.recursiveMergeMessages(chat, singleMessage)
+            }
+            if ((message.contentType === ChatContentType.VIDEO || message.contentType === ChatContentType.FILE || message.contentType === ChatContentType.IMAGE)) {
+              message.thumbnail = singleMessage.thumbnail
+              message.fileSize = singleMessage.fileSize
+              message.fileoriginalMessageId = singleMessage.fileoriginalMessageId
+              let fileData = await store.getMessageFile(singleMessage)
+              await store.saveFileInMessage(chat, message, fileData, message.contentType, null, singleMessage.fileoriginalMessageId)
+            }
             await store.sendChatMessage(chat, message)
           }
         }
@@ -2576,9 +2589,18 @@ export default {
         _that.$q.loading.hide()
       }
     },
+    messageBack(){
+      let _that = this
+      let store = _that.$store
+      store.toggleDrawer(false)
+      _that.keyboardMode = false
+      _that.moreMode = false
+    },
     async enterDetail() {
       let _that = this
       let store = _that.$store
+      _that.keyboardMode = false
+      _that.moreMode = false
       if (store.state.currentChat.subjectType === SubjectType.GROUP_CHAT) {
         await _that.getMembersInPeerClient()
       }
@@ -2672,24 +2694,9 @@ export default {
     },
     more() {
       let _that = this
-      if (_that.keyboardMode) {
+      _that.moreMode = !_that.moreMode
+      if(_that.keyboardMode){
         _that.keyboardMode = false
-        _that.moreMode = !_that.moreMode
-        if (store.state.ifMobileStyle) {
-          _that.$nextTick(() => {
-            let container = document.getElementById('talk')
-            if (container) {
-              setTimeout(function () {
-                container.scrollTop = container.scrollHeight
-              }, 200)
-            }
-          })
-        }
-      } else {
-        _that.keyboardMode = true
-        if (_that.moreMode) {
-          _that.moreMode = !_that.moreMode
-        }
       }
     },
     cancel: function () {

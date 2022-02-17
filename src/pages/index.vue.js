@@ -832,7 +832,7 @@ export default {
       )*/
       let messages = currentChat.messages
       // Read/UnRead
-      if (store.state.chatMap[subjectId] == store.state.currentChat && store.getKind() === 'message') {
+      if (store.state.chatMap[subjectId] == store.state.currentChat && store.getKind() === 'message' && _that.drawer) {
         message.readTime = new Date()
         if (message.destroyTime) {
           message.opened = false
@@ -990,7 +990,7 @@ export default {
         //if (store.state.linkmanMap[subjectId].activeStatus === ActiveStatus.UP) {
         message.destroyTime = chat.destroyTime
         //}
-        await store.p2pSend(message, subjectId)
+        store.p2pSend(message, subjectId)
       } else if (subjectType === SubjectType.GROUP_CHAT) {
         let groupMembers
         if (message.contentType === ChatContentType.VIDEO_INVITATION || message.contentType === ChatContentType.AUDIO_INVITATION || message.messageType === P2pChatMessageType.CALL_CLOSE) {
@@ -1001,7 +1001,7 @@ export default {
         for (let groupMember of groupMembers) {
           let linkman = store.state.linkmanMap[groupMember.memberPeerId ? groupMember.memberPeerId : groupMember]
           if (!linkman || linkman.peerId !== linkman.ownerPeerId) { // 自己除外
-            await store.p2pSend(message, groupMember.memberPeerId ? groupMember.memberPeerId : groupMember)
+            store.p2pSend(message, groupMember.memberPeerId ? groupMember.memberPeerId : groupMember)
             let receive = {
               ownerPeerId: message.ownerPeerId,
               subjectType: message.subjectType,
