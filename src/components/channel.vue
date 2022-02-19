@@ -15,7 +15,7 @@
                   q-icon(v-else name="cancel" class="cursor-pointer" @click.stop="channelfilter = null")
           q-list
             div(v-for="(channel, index) in ChannelFilteredList" :key="channel.channelId")
-              q-item(clickable v-ripple :active-class="ifMobileSize || $store.state.ifMobileStyle ? 'bg-c-grey-1' : 'bg-c-grey-2'" class="text-c-grey-10" :active="($store.getKind() === 'channelDetails' && channel === $store.state.currentChannel) || channel.top === true" @click="channelSelected(channel, index)")
+              q-item.common-item(clickable v-ripple :active-class="ifMobileSize || $store.state.ifMobileStyle ? 'bg-c-grey-1' : 'bg-c-grey-2'" class="text-c-grey-10" :active="($store.getKind() === 'channelDetails' && channel === $store.state.currentChannel) || channel.top === true" @click="channelSelected(channel, index)")
                 q-item-section(avatar)
                   q-avatar(size="32px")
                     img(:src="channel.avatar ? channel.avatar : $store.defaultActiveAvatar")
