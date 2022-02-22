@@ -57,7 +57,7 @@
           v-for="(peerContact, index) in peerContactsFilteredList",
           :key="index"
         )
-          q-item(clickable, v-ripple)
+          q-item.common-item(clickable, v-ripple)
             q-item-section(
               avatar,
               @click="showPeerContact(peerContact, index)"
