@@ -376,19 +376,22 @@
                 q-icon(color="c-grey-10" :name="groupChatMember.locked ? 'lock' : ''")
             q-separator.c-separator(inset="item" v-if="index < GroupChatMemberFilteredList.length - 1")
             q-separator.c-separator(v-if="index === GroupChatMemberFilteredList.length - 1")
-    q-dialog(v-model="$store.state.imageMessageViewDialog" :maximized = 'ifMobileSize || $store.state.ifMobileStyle')
-      q-card
-          q-card-section#dialog-image-container(class="row items-center" style="padding:0;margin:0")
-              img#dialog-image(:src='$store.state.imageMessageSrc' style="width:100%;margin-top:0")
-              canvas#dialog-image-canvas(class="hidden")
-    q-dialog(v-model="$store.state.videoRecordMessageViewDialog")
+      q-tab-panel.bg-black#messageFullsizeContainer(:style="heightStyle" name="messageFullsize" class="q-pa-none" align="center")
+        q-toolbar(v-if="videoRecordMessageSrc" style="z-index: 999")
+          q-btn.text-primary(flat round icon="close" @click="fullsizeBack")
+          q-space
+          q-btn.text-primary(flat round icon="more_horiz" @click="videoCommand()")
+        q-toolbar(v-if="imageMessageSrc && !$store.ifMobile()" style="z-index: 999")
+          q-btn.text-primary(flat round icon="close" @click="fullsizeBack")
+          q-space
+          q-btn.text-primary(flat round icon="more_horiz" @click="imageCommand()")
+        img#messageFullsizeImg(v-if="imageMessageSrc" :src="imageMessageSrc")
+        canvas#messageFullsizeCanvas(v-if="imageMessageSrc" class="hidden")
+        video#messageFullsizeVideo(v-if="videoRecordMessageSrc" :src="videoRecordMessageSrc" controls webkit-playsinline playsinline x5-playsinline x-webkit-airplay="allow" autoplay)
+    q-dialog(v-model="audioRecordMessageViewDialog")
       q-card
         q-card-section(class="row items-center")
-          video(:src="$store.state.videoRecordMessageSrc" style='max-width:100%' controls="controls" v-touch-hold:2000.mouse="mediaHold")
-    q-dialog(v-model="$store.state.audioRecordMessageViewDialog")
-      q-card
-        q-card-section(class="row items-center")
-          audio(:src="$store.state.audioRecordMessageSrc" style='max-width:100%' controls="controls")
+          audio(:src="audioRecordMessageSrc" style='max-width:100%' controls="controls")
     q-dialog(v-model="audioTouchDialog" seamless)
         q-card.audio-touch-dialog-card()
           q-icon(name="mic" size='40px')

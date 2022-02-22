@@ -83,6 +83,7 @@ export default {
       currentMergeMessage: null,
       selectFocusMemberFilter: null,
       focusGroupMemberDialog: false,
+      fullsizeEntry:false,
       emojiShow: false,
       slide: 'slide1',
       keyboardMode: false,
@@ -95,6 +96,10 @@ export default {
       voiceIdx: null,
       difftime: 0,
       audioTouchDialog: false,
+      videoRecordMessageSrc:null,
+      audioRecordMessageSrc:null,
+      imageMessageSrc:null,
+      audioRecordMessageViewDialog:false,
       localStream: null,
       mediaTimer: null,
       audioTouchHoldStatus: false,
@@ -161,6 +166,11 @@ export default {
     }
   },
   computed: {
+    heightStyle() {
+      return {
+        height: `${this.$q.screen.height}px`
+      }
+    },
     ifMobileSize() {
       return (!window.device && this.$q.screen.width < 481)
     },
@@ -795,39 +805,42 @@ export default {
       try {
         let fileData = await store.getMessageFile(message)
         if (message.contentType === ChatContentType.IMAGE) {
-          store.state.imageMessageSrc = fileData
+          _that.videoRecordMessageSrc = null
+          _that.imageMessageSrc = fileData
           _that.$nextTick(() => {
-            store.state.imageMessageViewDialog = true
+            //store.state.imageMessageViewDialog = true
+            _that.fullsizeEntry = _that.subKind
+            _that.subKind = 'messageFullsize'
             _that.$nextTick(() => {
               if (store.ifMobile()) {
                 var img = new Image()
-                img.src = store.state.imageMessageSrc
+                img.src = _that.imageMessageSrc
                 img.onload = () => {
                   console.log('img.width: ' + img.width + ', img.height: ' + img.height)
-                  let selectedContainer = document.getElementById('dialog-image-container')
-                  let canvas = document.getElementById('dialog-image-canvas')
+                  let selectedContainer = document.getElementById('messageFullsizeContainer')
+                  let canvas = document.getElementById('messageFullsizeCanvas')
                   let ctx = canvas.getContext('2d')
                   canvas.width = _that.ifMobileSize || store.state.ifMobileStyle ? _that.$q.screen.width : (img.width > selectedContainer.clientWidth ? selectedContainer.clientWidth : img.width)
                   canvas.height = canvas.width * img.height / img.width
                   ctx.clearRect(0, 0, canvas.width, canvas.height)
                   ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
-                  let selectedImg = document.querySelector('#dialog-image')
+                  let selectedImg = document.querySelector('#messageFullsizeImg')
                   selectedImg.src = canvas.toDataURL('image/png', 1.0)
                   let marginTop = 0
                   marginTop = (store.screenHeight - canvas.height) / 2 // 不使用_that.$q.screen.height，避免键盘弹出时的影响
                   marginTop = marginTop < 0 ? 0 : marginTop
                   console.log('$q.screen.Height:' + _that.$q.screen.height + ',canvas.width:' + canvas.width + ',canvas.height:' + canvas.height + ',marginTop:' + marginTop)
                   selectedImg.style.cssText += 'margin-top: ' + marginTop + 'px'
-                  alloyFingerComponent.initImage('#dialog-image')
-                  alloyFingerComponent.initLongSingleTap('#dialog-image-container', _that.mediaHold, _that.fullscreenBack)
+                  alloyFingerComponent.initImage('#messageFullsizeImg')
+                  alloyFingerComponent.initLongSingleTap('#messageFullsizeContainer', _that.imageCommand, _that.fullsizeBack)
                 }
               }
             })
           })
         } else if (message.contentType === ChatContentType.AUDIO) {
-          store.state.audioRecordMessageSrc = fileData
+          _that.audioRecordMessageSrc = fileData
           _that.$nextTick(() => {
-            store.state.audioRecordMessageViewDialog = true
+            _that.audioRecordMessageViewDialog = true
           })
         } else if (message.contentType === ChatContentType.VIDEO) {
           if (window.device && window.device.platform === 'iOS' && fileData.indexOf('data:video/webm;base64,') > -1) {
@@ -838,9 +851,12 @@ export default {
               color: "warning",
             })
           } else {
-            store.state.videoRecordMessageSrc = fileData
+            _that.imageMessageSrc = null
+            _that.videoRecordMessageSrc = fileData
+            
             _that.$nextTick(() => {
-              store.state.videoRecordMessageViewDialog = true
+              _that.fullsizeEntry = _that.subKind
+              _that.subKind = 'messageFullsize'
             })
           }
         }
@@ -900,13 +916,6 @@ export default {
         _that.$q.loading.hide()
       }
     },
-    fullscreenBack() {
-      let _that = this
-      let bottomSheet = document.getElementsByClassName('q-bottom-sheet')
-      if (!bottomSheet || !bottomSheet[0] || bottomSheet[0].style.display === 'none') { // 排除longTap触发的singleTapCallback
-        store.state.imageMessageViewDialog = false
-      }
-    },
     /*uploadMobileMessageImage: async function () {
       let _that = this
       let store = _that.$store
@@ -935,6 +944,7 @@ export default {
       }
     },*/
     async uploadMessageFilePC(files) {
+      debugger
       let _that = this
       let store = _that.$store
       if (_that.preCheck()) {
@@ -1519,6 +1529,102 @@ export default {
       _that.$forceUpdate()
       store.state.currentChat.tempText = messageText
       _that.$refs.editor.focus()
+    },
+    imageCommand() {
+      let _that = this
+      let store = _that.$store
+      _that.$q.bottomSheet({
+        actions: [
+          {
+            label: _that.$i18n.t('Save Picture'),
+            icon: 'save',
+            id: 'save'
+          },
+          {},
+          {
+            label: _that.$i18n.t('Cancel'),
+            icon: 'cancel',
+            id: 'cancel'
+          }
+        ]
+      }).onOk(async action => {
+        if (action.id === 'save') {
+          if (store.ifMobile()) {
+            window.canvas2ImagePlugin.saveImageDataToLibrary(
+              function (msg) {
+                console.log(msg)
+                _that.$q.notify({
+                  message: _that.$i18n.t("Save successfully"),
+                  timeout: 3000,
+                  type: "info",
+                  color: "info",
+                })
+              },
+              function (err) {
+                console.log(err)
+                _that.$q.notify({
+                  message: _that.$i18n.t("Save failed"),
+                  timeout: 3000,
+                  type: "warning",
+                  color: "warning",
+                })
+              },
+              document.getElementById('messageFullsizeImg'),
+              "jpeg" // format is optional, defaults to 'png'
+            )
+          } else {
+            //let canvas = document.getElementById('selectedCanvas')
+            let canvas = document.getElementById('messageFullsizeImg')
+            let avatarBase64 = canvas.src
+            let arr = avatarBase64.split(',')
+            let mime = arr[0].match(/:(.*?);/)[1]
+            let extension = mime.split('/')[1]
+            let a = document.createElement('a')
+            a.href = BlobUtil.blobToUrl(BlobUtil.base64ToBlob(avatarBase64))
+            a.download = _that.$i18n.t('Image') + '-' + new Date().getTime() + '.' + extension
+            a.click()
+          }
+        }
+      }).onCancel(() => {
+        // console.log('Dismissed')
+      }).onDismiss(() => {
+        // console.log('I am triggered on both OK and Cancel')
+      })
+    },
+    videoCommand() {
+      let _that = this
+      let store = _that.$store
+      _that.$q.bottomSheet({
+        actions: [
+          {
+            label: _that.$i18n.t('Save Video'),
+            icon: 'save',
+            id: 'save'
+          },
+          {},
+          {
+            label: _that.$i18n.t('Cancel'),
+            icon: 'cancel',
+            id: 'cancel'
+          }
+        ]
+      }).onOk(async action => {
+        // console.log('Action chosen:', action.id)
+        if (action.id === 'save') {
+          _that.saveLocalVideo()
+        }
+      }).onCancel(() => {
+        // console.log('Dismissed')
+      }).onDismiss(() => {
+        // console.log('I am triggered on both OK and Cancel')
+      })
+    },
+    fullsizeBack() {
+      let _that = this
+      let bottomSheet = document.getElementsByClassName('q-bottom-sheet')
+      if (!bottomSheet || !bottomSheet[0] || bottomSheet[0].style.display === 'none') { // 排除longTap触发的singleTapCallback
+        _that.subKind = _that.fullsizeEntry
+      }
     },
     // group chat ///////////////////////////////////////////////////////////////////////////////////
     showModifyGroupChat() {
@@ -2864,41 +2970,6 @@ export default {
         }
       }
     },
-    mediaHold() {
-      let _that = this
-      let store = _that.$store
-      _that.$q.bottomSheet({
-        actions: [
-          {
-            label: _that.$i18n.t('Save'),
-            icon: 'save',
-            color: 'primary',
-            id: 'save'
-          },
-          {},
-          {
-            label: _that.$i18n.t('Cancel'),
-            icon: 'cancel',
-            color: 'primary',
-            id: 'cancel'
-          }
-        ]
-      }).onOk(async action => {
-        if (action.id === 'save') {
-          if (store.state.imageMessageViewDialog) {
-            _that.saveLocalImage()
-          } else if (store.state.videoRecordMessageViewDialog) {
-            await _that.saveLocalVideo()
-          } else if (store.state.audioRecordMessageViewDialog) {
-            //_that.saveLocalAudio()
-          }
-        }
-      }).onCancel(() => {
-        // console.log('Dismissed')
-      }).onDismiss(() => {
-        // console.log('I am triggered on both OK and Cancel')
-      })
-    },
     saveLocalImage() {
       let _that = this
       //save
@@ -2931,14 +3002,25 @@ export default {
     async saveLocalVideo() {
       let _that = this
       let store = _that.$store
-      let albums = await photoLibraryComponent.getAlbums()
-      await photoLibraryComponent.saveVideo(store.state.videoRecordMessageSrc, albums[0])
-      _that.$q.notify({
-        message: _that.$i18n.t("Saved successfully"),
-        timeout: 3000,
-        type: "info",
-        color: "info",
-      })
+      if (store.ifMobile()) {
+        let albums = await photoLibraryComponent.getAlbums()
+        await photoLibraryComponent.saveVideo(_that.videoRecordMessageSrc, albums[0])
+        _that.$q.notify({
+          message: _that.$i18n.t("Saved successfully"),
+          timeout: 3000,
+          type: "info",
+          color: "info",
+        })
+      } else {
+        let base64 = _that.videoRecordMessageSrc
+        let arr = base64.split(',')
+        let mime = arr[0].match(/:(.*?);/)[1]
+        let extension = mime.split('/')[1]
+        let a = document.createElement('a')
+        a.href = BlobUtil.blobToUrl(BlobUtil.base64ToBlob(base64))
+        a.download = _that.$i18n.t('Video') + '-' + new Date().getTime() + '.' + extension
+        a.click()
+      }
     },
     openCollection() {
       let _that = this
