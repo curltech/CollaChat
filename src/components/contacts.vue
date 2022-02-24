@@ -47,7 +47,7 @@
             q-item-label(caption) {{$t('Contacts') + '(' + LinkmanFilteredList.length + ')'}}
         //div(class="q-pl-md q-py-xs") {{$t('Contacts') + '(' + LinkmanFilteredList.length + ')'}}
         div(v-for="(linkman, index) in LinkmanFilteredList" :key="linkman.peerId")
-          q-item.common-item(clickable v-ripple :active-class="ifMobileSize || $store.state.ifMobileStyle ? 'bg-c-grey-1' : 'bg-c-grey-2'" class="text-c-grey-10" :active="$store.getKind() === 'contactsDetails' && linkman === $store.state.currentLinkman" @click="contactsSelected(linkman, index)")
+          q-item(clickable v-ripple :active-class="ifMobileSize || $store.state.ifMobileStyle ? 'bg-c-grey-1' : 'bg-c-grey-2'" class="text-c-grey-10" :active="$store.getKind() === 'contactsDetails' && linkman === $store.state.currentLinkman" @click="contactsSelected(linkman, index)")
             q-item-section(avatar)
                 q-avatar
                   img(:src="linkman.avatar ? linkman.avatar : $store.defaultActiveAvatar")

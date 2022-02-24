@@ -41,7 +41,7 @@
                 q-item-section
                   q-item-label(caption lines="1") {{$t('no internet connection, please check network settings')}}
             div(v-for="(chat, index) in ChatFilteredList" :key="chat.subjectId")
-              q-item.common-item(clickable v-ripple @click="chatSelected(chat, index)" :active="($store.state.currentChat && chat.subjectId == $store.state.currentChat.subjectId) || chat.top === true" :active-class="ifMobileSize || $store.state.ifMobileStyle ? 'bg-c-grey-1' : 'bg-c-grey-2'" class="text-c-grey-10")
+              q-item.q-item-1(clickable v-ripple @click="chatSelected(chat, index)" :active="($store.state.currentChat && chat.subjectId == $store.state.currentChat.subjectId) || chat.top === true" :active-class="ifMobileSize || $store.state.ifMobileStyle ? 'bg-c-grey-1' : 'bg-c-grey-2'" class="text-c-grey-10")
                 q-item-section(avatar)
                   q-avatar(v-if='chat.subjectType === SubjectType.CHAT')
                     img(:src="$store.state.linkmanMap[chat.subjectId].avatar ? $store.state.linkmanMap[chat.subjectId].avatar : $store.defaultActiveAvatar")
@@ -53,11 +53,11 @@
                     span(v-if="chat.subjectType === SubjectType.GROUP_CHAT && chat.focusedMessage && !chat.tempText" style="color:red") 有人@你&nbsp;
                     span(v-if="chat.tempText && chat !== $store.state.currentChat"  style="color:red") {{`[${$t('Draft')}] `}}
                     span {{ chat.tempText && chat !== $store.state.currentChat ? chat.tempText : ChatContent(chat) }}
-                q-item-section(side top style="padding-left:0px")
-                  q-icon(v-if="$store.displayActiveStatus" size="16px" name="person" :color="activeStatus(chat) ? 'secondary' : 'c-grey'")
+                q-item-section(side style="padding-left:0px")
+                  q-item-label(caption lines="1") {{ ChatUpdateTime(chat.updateTime) }}
+                  q-icon(v-if="$store.displayActiveStatus" size="16px" name="person" :color="activeStatus(chat) ? 'secondary' : 'c-grey'" style="padding-top:8px")
                     q-icon(v-if="alertStatus(chat)" size="16px" name="notifications_off")
-                  q-icon(v-if="!$store.displayActiveStatus && alertStatus(chat)" size="16px" name="notifications_off")
-                  q-item-label(caption lines="1" style="padding-top:7px") {{ ChatUpdateTime(chat.updateTime) }}
+                  q-icon(v-if="!$store.displayActiveStatus && alertStatus(chat)" size="16px" name="notifications_off" style="padding-top:8px")
                 //q-menu(touch-position context-menu)
                   q-list(dense)
                     q-item(clickable  @click="deleteChat(chat, index)" v-close-popup)
@@ -129,11 +129,11 @@
                 q-item-section
                   q-item-label(lines="1") {{ ChatName(chat) }}
                   q-item-label(caption lines="1") {{ chat.messageResultList.length + ' ' + $t(' relevant chat records') }}
-                q-item-section(side top style="padding-left:0px")
-                  q-icon(v-if="$store.displayActiveStatus" size="16px" name="person" :color="activeStatus(chat) ? 'secondary' : 'c-grey'")
+                q-item-section(side style="padding-left:0px")
+                  q-item-label(caption lines="1") {{ ChatUpdateTime(chat.updateTime) }}
+                  q-icon(v-if="$store.displayActiveStatus" size="16px" name="person" :color="activeStatus(chat) ? 'secondary' : 'c-grey'" style="padding-top:8px")
                     q-icon(v-if="alertStatus(chat)" size="16px" name="notifications_off")
-                  q-icon(v-if="!$store.displayActiveStatus && alertStatus(chat)" size="16px" name="notifications_off")
-                  q-item-label(caption lines="1" style="padding-top:7px") {{ ChatUpdateTime(chat.updateTime) }}
+                  q-icon(v-if="!$store.displayActiveStatus && alertStatus(chat)" size="16px" name="notifications_off" style="padding-top:8px")
             q-item(v-if="searchResult === 'allResult' && chatResultList && chatResultList.length > 3" clickable v-ripple class="text-c-grey-10" @click="chatResult()")
               q-item-section(side)
                 q-icon(name="search")
