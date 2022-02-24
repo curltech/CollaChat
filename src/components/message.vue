@@ -55,7 +55,7 @@
                 q-btn.text-primary.btnMessage(flat stack no-caps :label="$t('MultiCollection')" icon="bookmarks" @click="multiCollectionMessage()")
                 q-btn.text-primary.btnMessage(flat stack no-caps :label="$t('Cancel')" icon="cancel" @click="cancelMessageMultiSelect")
             q-toolbar.message-operate-wrap(v-if="!messageMultiSelectMode" :class = '$store.ifMobile() || (ifMobileSize || $store.state.ifMobileStyle) ? "message-operate-wrap-mobile" : "message-operate-wrap-pc"')
-              q-btn.text-primary.q-mr-sm(v-if="$store.ifMobile() || (ifMobileSize || $store.state.ifMobileStyle)" round flat icon ='add_circle_outline' @click = "more")
+              q-btn.text-primary(v-if="$store.ifMobile() || (ifMobileSize || $store.state.ifMobileStyle)" round flat icon ='add_circle_outline' @click = "more")
               q-input.c-field.message-editor(type='textarea' autogrow ref='editor' rows='1' filled input-style='resize:none;max-height:98px;line-height:30px;' name="editor" id="editor" v-model= '$store.state.currentChat.tempText' :class = '$store.ifMobile() || (ifMobileSize || $store.state.ifMobileStyle) ? "message-editor-mobile" : "message-editor-pc"'
                 @keyup="editorKeyup" @focus="editorFocus" @blur="editorBlur" @paste="editorPaste" @drop="editorDrop")
               q-btn.text-primary(v-if="$store.ifMobile() || (ifMobileSize || $store.state.ifMobileStyle)" round flat icon="send" @click = "preSend")
