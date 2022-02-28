@@ -198,6 +198,7 @@ export default {
     async setupSocket() {
       let _that = this
       let store = _that.$store
+      let now10 = new Date().getTime()
       try {
         store.state.networkStatus = 'CONNECTING'
         let myselfPeerClient = myself.myselfPeerClient
@@ -256,6 +257,8 @@ export default {
         }
         await p2pPeer.start([_that.connectArray[0].address], { WebSockets: { debug: false, timeoutInterval: 5000, binaryType: 'arraybuffer' } })
         console.info('p2pPeer:' + clientPeerId + ' is started! enjoy it')
+        let now11 = new Date().getTime()
+        console.log('------------------------------------------------------------index setupSocket 1:' + (now11 - now10))
         // 选择连接速度最快的定位器
         /*for (let j = 0; j < _that.connectArray.length; j++) {
           console.log(j + '-ping:' + _that.connectArray[j].address)
@@ -280,6 +283,8 @@ export default {
           }
           CollaUtil.sortByKey(_that.connectArray, 'connectTime', 'desc')
           console.log(_that.connectArray)
+          let now12 = new Date().getTime()
+          console.log('------------------------------------------------------------index setupSocket 2:' + (now12 - now11))
           // test STUN/TURN
           let connectArrayBackup = CollaUtil.clone(_that.connectArray)
           for (let i = _that.connectArray.length - 1; i >= 0; i--) {
@@ -361,6 +366,8 @@ export default {
             _that.connectArray = connectArrayBackup
           }
           console.log(_that.connectArray)
+          let now13 = new Date().getTime()
+          console.log('------------------------------------------------------------index setupSocket 3:' + (now13 - now12))
           await _that.buildSocket()
         }
       } catch (e) {
@@ -370,6 +377,7 @@ export default {
     async buildSocket() {
       let _that = this
       let store = _that.$store
+      let now130 = new Date().getTime()
       if (_that.connectArray.length === 0) {
         return
       }
@@ -389,6 +397,8 @@ export default {
 
       let webSocket = p2pPeer.host.transportManager._transports.get('WebSockets')
       webSocket.onopen = function (evt) {
+        let now131a = new Date().getTime()
+        console.log('------------------------------------------------------------index buildSocket:' + (now131a - now130))
         console.log('WebSocket Connected!')
         console.log(webSocket.ws)
         _that._heartbeatTimer = setInterval(async function () {
@@ -467,6 +477,7 @@ export default {
     async connect(connectAddress) {
       let _that = this
       let store = _that.$store
+      let now1310 = new Date().getTime()
       let myselfPeerClient = myself.myselfPeerClient
       let myselfPeer = myself.myselfPeer
       // 建立primaryEndPoint连接
@@ -510,6 +521,8 @@ export default {
         store.peerClients = peers[1]
         console.log('primaryEndPoint connect success')
         store.state.networkStatus = 'CONNECTED'
+        let now1311 = new Date().getTime()
+        console.log('------------------------------------------------------------index connect:' + (now1311 - now1310))
         // 更新本地身份信息
         let currentDate = new Date()
         myselfPeerClient.connectPeerId = connectAddress
@@ -633,6 +646,8 @@ export default {
         await _that.webrtcInit()
         await store.upgradeVersion('about')
         await _that.cloudSyncP2pChat()
+        let now1312 = new Date().getTime()
+        console.log('------------------------------------------------------------index post-connect:' + (now1312 - now1311))
         return peers[0]
       } else {
         console.log("primaryEndPoint connect failure")
@@ -4639,6 +4654,8 @@ export default {
   async created() {
     let _that = this
     let store = _that.$store
+    let now0 = new Date().getTime()
+    console.log('------------------------------------------------------------index start:' + now0)
     window.store = store
     console.log('screen.availWidth:' + screen.availWidth + ',screen.availHeight:' + screen.availHeight + ',window.devicePixelRatio:' + window.devicePixelRatio)
     store.screenHeight = _that.$q.screen.height
@@ -4938,7 +4955,11 @@ export default {
       console.log('offline')
       await _that.setNetworkStatus(false)
     })
+    let now1 = new Date().getTime()
+    console.log('------------------------------------------------------------index created:' + (now1 - now0))
     await _that.preSetupSocket()
+    let now2 = new Date().getTime()
+    console.log('------------------------------------------------------------index setupSocket:' + (now2 - now1))
   },
   watch: {
     /*tab(val) {

@@ -12,7 +12,7 @@
               q-avatar(size="64px")
                 img(:src="$store.state.currentChannel && $store.state.currentChannel.avatar ? $store.state.currentChannel.avatar : $store.defaultActiveAvatar")
             q-item-section
-              q-item-label(class="text-h5") {{ $store.state.currentChannel ? $store.state.currentChannel.name : '' }}
+              q-item-label(class="text-h6") {{ $store.state.currentChannel ? $store.state.currentChannel.name : '' }}
                 q-icon(:name="$store.state.currentChannel && $store.state.currentChannel.top ? 'star' : ''" color="primary")
             q-item-section(v-if="$store.state.currentChannel && $store.state.currentChannel.creator !== $store.state.myselfPeerClient.peerId" side)
               q-btn.text-primary.bg-c-grey-message(flat @click="follow()" :label="$store.state.currentChannel && $store.state.currentChannel.markDate ? $t('Unfollow') : $t('Follow')" no-caps)
@@ -26,15 +26,15 @@
             q-card-section(class="q-pa-none")
               q-img(:src="article.cover ? article.cover : $store.defaultChannelArticleCover" style="height: 200px; width: 100%")
             q-card-section(class="q-py-md")
-              q-item-label(class="text-h6") {{ article.title }}
-              q-item-label(v-if="article.abstract" class="q-py-sm" caption :style="$q.dark.isActive ? 'color: rgba(255,255,255,0.7)' : ''") {{ article.abstract }}
+              q-item-label(class="note-title") {{ article.title }}
+              q-item-label(v-if="article.abstract" class="q-py-sm" note-caption :style="$q.dark.isActive ? 'color: rgba(255,255,255,0.7)' : ''") {{ article.abstract }}
       q-tab-panel(:style="heightStyle" name="view" class="q-pa-none")
         q-toolbar.header-toolbar
           q-btn(flat round icon="keyboard_arrow_left" @click="articleBack()")
           q-space
           q-btn.text-primary(flat round icon="more_horiz" @click="viewCommand()")
         div.scroll.header-mar-top.bg-c-white(v-if="$store.state.currentArticle" class="q-pl-md" id="scroll-target-view" :class="ifMobileSize || $store.state.ifMobileStyle ? (ifMobileSize ? 'scrollHeightMobileSize-editor' : 'scrollHeightMobileStyle-editor') : 'scrollHeightStyle'")
-          div(class="q-py-md text-h5") {{ $store.state.currentArticle.title }}
+          div(class="q-py-md text-h6") {{ $store.state.currentArticle.title }}
           div(class="q-pb-lg")
             span(class="q-item__label--caption text-caption" :style="$q.dark.isActive ? 'color: rgba(255,255,255,0.7)' : ''") {{ $store.state.currentArticle.author }}
             span(class="q-px-sm text-primary cursor-pointer" @click="channelNameClick") {{ $store.state.channelMap[$store.state.currentArticle.channelId].name }}
