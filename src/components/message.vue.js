@@ -83,11 +83,10 @@ export default {
       currentMergeMessage: null,
       selectFocusMemberFilter: null,
       focusGroupMemberDialog: false,
-      fullsizeEntry:false,
+      fullsizeEntry: false,
       emojiShow: false,
       slide: 'slide1',
-      keyboardMode: false,
-      moreMode: false,
+      keyboardMode: 'keyboard',//'keyboard,more,moreHalf'
       //auidoTouch
       eY1: 0,
       eY2: 0,
@@ -96,10 +95,10 @@ export default {
       voiceIdx: null,
       difftime: 0,
       audioTouchDialog: false,
-      videoRecordMessageSrc:null,
-      audioRecordMessageSrc:null,
-      imageMessageSrc:null,
-      audioRecordMessageViewDialog:false,
+      videoRecordMessageSrc: null,
+      audioRecordMessageSrc: null,
+      imageMessageSrc: null,
+      audioRecordMessageViewDialog: false,
       localStream: null,
       mediaTimer: null,
       audioTouchHoldStatus: false,
@@ -853,7 +852,7 @@ export default {
           } else {
             _that.imageMessageSrc = null
             _that.videoRecordMessageSrc = fileData
-            
+
             _that.$nextTick(() => {
               _that.fullsizeEntry = _that.subKind
               _that.subKind = 'messageFullsize'
@@ -944,7 +943,6 @@ export default {
       }
     },*/
     async uploadMessageFilePC(files) {
-      debugger
       let _that = this
       let store = _that.$store
       if (_that.preCheck()) {
@@ -2695,18 +2693,16 @@ export default {
         _that.$q.loading.hide()
       }
     },
-    messageBack(){
+    messageBack() {
       let _that = this
       let store = _that.$store
       store.toggleDrawer(false)
-      _that.keyboardMode = false
-      _that.moreMode = false
+      _that.keyboardMode = 'keyboard'
     },
     async enterDetail() {
       let _that = this
       let store = _that.$store
-      _that.keyboardMode = false
-      _that.moreMode = false
+      _that.keyboardMode = 'keyboard'
       if (store.state.currentChat.subjectType === SubjectType.GROUP_CHAT) {
         await _that.getMembersInPeerClient()
       }
@@ -2800,9 +2796,10 @@ export default {
     },
     more() {
       let _that = this
-      _that.moreMode = !_that.moreMode
-      if(_that.keyboardMode){
-        _that.keyboardMode = false
+      if (_that.keyboardMode === 'more') {
+        _that.keyboardMode = 'keyboard'
+      } else {
+        _that.keyboardMode = 'more'
       }
     },
     cancel: function () {
@@ -2934,8 +2931,8 @@ export default {
     },
     editorFocus(e) {
       let _that = this
-      if (_that.moreMode) {
-        _that.keyboardMode = true
+      if (_that.keyboardMode === 'more') {
+        _that.keyboardMode = 'moreHalf'
       }
       if (store.state.ifMobileStyle) {
         _that.$nextTick(() => {
@@ -2950,7 +2947,9 @@ export default {
     },
     editorBlur(e) {
       let _that = this
-      _that.moreMode = false
+      if (_that.keyboardMode !== 'more') {
+        _that.keyboardMode = 'keyboard'
+      }
     },
     editorPaste(e) {
       let _that = this
