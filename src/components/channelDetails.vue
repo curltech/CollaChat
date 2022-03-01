@@ -27,7 +27,7 @@
               q-img(:src="article.cover ? article.cover : $store.defaultChannelArticleCover" style="height: 200px; width: 100%")
             q-card-section(class="q-py-md")
               q-item-label(class="note-title") {{ article.title }}
-              q-item-label(v-if="article.abstract" class="q-py-sm" note-caption :style="$q.dark.isActive ? 'color: rgba(255,255,255,0.7)' : ''") {{ article.abstract }}
+              q-item-label(v-if="article.abstract" class="q-py-sm note-caption" :style="$q.dark.isActive ? 'color: rgba(255,255,255,0.7)' : ''") {{ article.abstract }}
       q-tab-panel(:style="heightStyle" name="view" class="q-pa-none")
         q-toolbar.header-toolbar
           q-btn(flat round icon="keyboard_arrow_left" @click="articleBack()")
