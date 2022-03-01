@@ -255,10 +255,10 @@ export default {
             }
           }
         }
-        await p2pPeer.start([_that.connectArray[0].address], { WebSockets: { debug: false, timeoutInterval: 5000, binaryType: 'arraybuffer' } })
+        /*await p2pPeer.start([_that.connectArray[0].address], { WebSockets: { debug: false, timeoutInterval: 5000, binaryType: 'arraybuffer' } })
         console.info('p2pPeer:' + clientPeerId + ' is started! enjoy it')
         let now11 = new Date().getTime()
-        console.log('------------------------------------------------------------index setupSocket 1:' + (now11 - now10))
+        console.log('------------------------------------------------------------index setupSocket 1:' + (now11 - now10))*/
         // 选择连接速度最快的定位器
         /*for (let j = 0; j < _that.connectArray.length; j++) {
           console.log(j + '-ping:' + _that.connectArray[j].address)
@@ -269,7 +269,7 @@ export default {
         CollaUtil.sortByKey(_that.connectArray, 'connectTime', 'asc')
         console.log(_that.connectArray)
         await _that.buildSocket(_that.connectArray[0].address)*/
-        let ps = []
+        /*let ps = []
         for (let i = 0; i < _that.connectArray.length; i++) {
           //let promise = p2pPeer.ping(_that.connectArray[i].address, 6000)
           let promise = p2pPeer.host.ping(_that.connectArray[i].address, 1000)
@@ -284,7 +284,7 @@ export default {
           CollaUtil.sortByKey(_that.connectArray, 'connectTime', 'desc')
           console.log(_that.connectArray)
           let now12 = new Date().getTime()
-          console.log('------------------------------------------------------------index setupSocket 2:' + (now12 - now11))
+          console.log('------------------------------------------------------------index setupSocket 2:' + (now12 - now11))*/
           // test STUN/TURN
           let connectArrayBackup = CollaUtil.clone(_that.connectArray)
           for (let i = _that.connectArray.length - 1; i >= 0; i--) {
@@ -303,6 +303,7 @@ export default {
                 }
                 if (!(stun && turn)) {
                   console.log('timeout: ' + (new Date().getTime() - start.getTime()))
+                  connectArrayBackup[i].stunturnTime = (connectArrayBackup[i].stunTime ? 1000 + connectArrayBackup[i].stunTime : 999999999)
                   resolve(stun) // TODO: TURN test may fail but actually works
                 }
               }, 1000)
@@ -326,12 +327,16 @@ export default {
                 console.log('onicecandidate-candidate.type:' + e.candidate.type)
                 console.log('onicecandidate-candidate.candidate:' + e.candidate.candidate)
                 // If a srflx candidate was found, notify that the STUN server works!
+                let interval = new Date().getTime() - start.getTime()
                 if (e.candidate.type === 'srflx') {
-                  console.log('The STUN server is reachable!' + (new Date().getTime() - start.getTime()))
+                  console.log('The STUN server is reachable!' + interval)
                   console.log('Your Public IP Address is: ' + e.candidate.address)
                   stun = true
                   if (stun && turn) {
+                    connectArrayBackup[i].stunturnTime = interval
                     resolve(true)
+                  } else {
+                    connectArrayBackup[i].stunTime = interval
                   }
                 }
                 // If a relay candidate was found, notify that the TURN server works!
@@ -339,7 +344,10 @@ export default {
                   console.log('The TURN server is reachable!' + (new Date().getTime() - start.getTime()))
                   turn = true
                   if (stun && turn) {
+                    connectArrayBackup[i].stunturnTime = interval
                     resolve(true)
+                  } else {
+                    connectArrayBackup[i].turnTime = interval
                   }
                 }
               }
@@ -355,7 +363,8 @@ export default {
                 pc.setLocalDescription(offer)
               })
             })
-            if (!stunTurn) {
+            //if (!stunTurn) {
+            if (connectArrayBackup[i].stunturnTime > 500) {
               _that.connectArray.splice(i, 1)
             } else {
               break
@@ -364,12 +373,14 @@ export default {
           if (_that.connectArray.length === 0) {
             console.warn('STUN/TURN test all failed, restore connectArray')
             _that.connectArray = connectArrayBackup
+            CollaUtil.sortByKey(_that.connectArray, 'stunturnTime', 'desc')
           }
           console.log(_that.connectArray)
           let now13 = new Date().getTime()
-          console.log('------------------------------------------------------------index setupSocket 3:' + (now13 - now12))
+          //console.log('------------------------------------------------------------index setupSocket 3:' + (now13 - now12))
+          console.log('------------------------------------------------------------index setupSocket 3:' + (now13 - now10))
           await _that.buildSocket()
-        }
+        /*}*/
       } catch (e) {
         await logService.log(e, 'setupSocketError', 'error')
       }
