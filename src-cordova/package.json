@@ -52,7 +52,7 @@
     "sqli-cordova-disk-space-plugin": "^1.0.3"
   },
   "devDependencies": {
-    "@hmscore/cordova-plugin-hms-push": "^5.3.0-305",
+    "@hmscore/cordova-plugin-hms-push": "^6.1.0-300",
     "cordova-android": "^10.1.1",
     "cordova-ios": "^6.2.0",
     "cordova-plugin-android-permissions": "^1.1.2",
