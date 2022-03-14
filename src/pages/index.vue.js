@@ -1351,7 +1351,9 @@ export default {
       message.messageType = P2pChatMessageType.CHAT_LINKMAN
       message.fileSize = StringUtil.getSize(fileData)
       await store.saveFileInMessage(chat, message, fileData, type, name, message.messageId)
-      await store.sendChatMessage(chat, message)
+      if(message.attachBlockId){
+        await store.sendChatMessage(chat, message)
+      }
     },
     async saveAndSendMessage(message, peerId) {
       let _that = this

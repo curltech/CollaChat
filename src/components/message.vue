@@ -385,7 +385,7 @@
           q-btn.text-primary(flat round icon="close" @click="fullsizeBack")
           q-space
           q-btn.text-primary(flat round icon="more_horiz" @click="imageCommand()")
-        img#messageFullsizeImg(v-if="imageMessageSrc" :src="imageMessageSrc")
+        img#messageFullsizeImg(:class="$store.ifMobile() || (ifMobileSize || $store.state.ifMobileStyle) ? '':'messageFullsizeImg-pc'" v-if="imageMessageSrc" :src="imageMessageSrc")
         canvas#messageFullsizeCanvas(v-if="imageMessageSrc" class="hidden")
         video#messageFullsizeVideo(v-if="videoRecordMessageSrc" :src="videoRecordMessageSrc" controls webkit-playsinline playsinline x5-playsinline x-webkit-airplay="allow" autoplay)
     q-dialog(v-model="audioRecordMessageViewDialog")

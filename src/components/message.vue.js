@@ -2922,7 +2922,7 @@ export default {
       if ((!e.shiftKey && e.keyCode == 13) || (store.ios && e.keyCode == 13)) {
         _that.preSend()
       } else {
-        if ((((e.shiftKey || (Platform.is.ios || Platform.is.android)) && e.keyCode == 50)) && store.state.currentChat.subjectType === SubjectType.GROUP_CHAT) {
+        if ((((e.shiftKey || (Platform.is.ios || Platform.is.android)) && e.keyCode == 50 && e.key !== '2')) && store.state.currentChat.subjectType === SubjectType.GROUP_CHAT) {
           _that.focusGroupMemberDialog = true
         } else if (store.state.ifMobileStyle) {
           _that.talkHeight()
