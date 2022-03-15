@@ -15,7 +15,7 @@ export default {
       SubjectType: SubjectType,
       selectChatRecordfilter: null,
       placeholder: '\ue672' + ' ' + this.$i18n.t('Search'),
-      textOnlyFlag: false,
+      textOnlyFlag: true,
       selectAllFlag: false,
       inclContactsInfoFlag: true
     }

@@ -3,7 +3,7 @@
     q-toolbar
       q-btn(flat round icon="keyboard_arrow_left" @click="back")
       q-toolbar-title(align="center") {{ $store.selectChatRecordEntry === 'selectChat' ? $t('Select Chat') : $t('Select Chat Record') }}
-      q-btn(flat round icon="check" :disable="$store.state.includedChatRecords.length < 1" :label="($store.state.includedChatRecords.length > 0 ? '(' + $store.state.includedChatRecords.length + ')' : '')" :class="$store.state.includedChatRecords.length > 0 ? 'text-primary' : 'c-grey-0'" @click="doneSelectChatRecord")
+      q-btn(flat round icon="check" :disable="!inclContactsInfoFlag && $store.state.includedChatRecords.length < 1" :label="($store.state.includedChatRecords.length > 0 ? '(' + $store.state.includedChatRecords.length + ')' : '')" :class="inclContactsInfoFlag || $store.state.includedChatRecords.length > 0 ? 'text-primary' : 'c-grey-0'" @click="doneSelectChatRecord")
     q-toolbar(insert)
       q-input.c-field(debounce="100" filled dense v-model="selectChatRecordfilter" :placeholder="placeholder" input-class="text-center iconfont")
         template(slot="append")
