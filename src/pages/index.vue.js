@@ -772,7 +772,8 @@ export default {
     async insertReceivedMessage(message) {
       let _that = this
       let store = _that.$store
-      if ((message.subjectType === SubjectType.CHAT && !store.state.linkmanMap[message.senderPeerId]) || (message.subjectType === SubjectType.GROUP_CHAT && (!store.state.groupChatMap[message.subjectId] || store.state.groupChatMap[message.subjectId].status === GroupStatus.DISBANDED))) {
+      if ((message.subjectType === SubjectType.CHAT && (!store.state.linkmanMap[message.senderPeerId] || store.state.linkmanMap[message.senderPeerId].status === LinkmanStatus.REQUESTED)) || (message.subjectType === SubjectType.GROUP_CHAT && (!store.state.groupChatMap[message.subjectId] || store.state.groupChatMap[message.subjectId].status === GroupStatus.DISBANDED))) {
+        console.log('ignore messsage, subjectType:' + message.subjectType + ', senderPeerId:' + message.senderPeerId + ', subjectId:' + message.subjectId)
         return
       }
       if (message.messageType == P2pChatMessageType.CHAT_LINKMAN || message.messageType == P2pChatMessageType.CALL_REQUEST) {
@@ -892,7 +893,7 @@ export default {
       }
       await chatComponent.insert(ChatDataType.MESSAGE, message, messages)
       // AutoDownload
-      if (message.subjectType == SubjectType.CHAT && myself.myselfPeerClient.downloadSwitch && (message.contentType === ChatContentType.FILE || message.contentType === ChatContentType.IMAGE)) {
+      if (message.subjectType === SubjectType.CHAT && myself.myselfPeerClient.downloadSwitch && (message.contentType === ChatContentType.FILE || message.contentType === ChatContentType.IMAGE)) {
         await store.getMessageFile(message)
       }
     },
@@ -977,8 +978,6 @@ export default {
         chat.messages = []
         store.state.chats.unshift(chat)
         store.state.chatMap[subjectId] = chat
-
-
       }
       return chat
     },
