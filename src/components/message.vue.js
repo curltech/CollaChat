@@ -1567,7 +1567,7 @@ export default {
                   color: "warning",
                 })
               },
-              document.getElementById('messageFullsizeImg'),
+              document.getElementById('messageFullsizeCanvas'),
               "jpeg" // format is optional, defaults to 'png'
             )
           } else {
@@ -2979,7 +2979,7 @@ export default {
         function (msg) {
           console.log(msg)
           _that.$q.notify({
-            message: _that.$i18n.t("Saved successfully"),
+            message: _that.$i18n.t("Save successfully"),
             timeout: 3000,
             type: "info",
             color: "info",
@@ -3002,10 +3002,19 @@ export default {
       let _that = this
       let store = _that.$store
       if (store.ifMobile()) {
-        let albums = await photoLibraryComponent.getAlbums()
-        await photoLibraryComponent.saveVideo(_that.videoRecordMessageSrc, albums[0])
+        let base64 = _that.videoRecordMessageSrc
+        let dirEntry = await fileComponent.getRootDirEntry('tmp')
+        let dirPath = dirEntry.toInternalURL()
+        let fileName = 'Video' + UUID.string(null, null) + '.' + base64.substring(11, base64.indexOf(';', 11))
+        let fileEntry = await fileComponent.createNewFileEntry(fileName, dirPath)
+        let blob = BlobUtil.base64ToBlob(base64)
+        await fileComponent.writeFile(fileEntry, blob, false).then(async function () {
+          let url = fileEntry.nativeURL
+          console.log('saveVideo url:' + url)
+          await photoLibraryComponent.saveVideo(url, 'Video' + '-' + new Date().getTime())
+        })
         _that.$q.notify({
-          message: _that.$i18n.t("Saved successfully"),
+          message: _that.$i18n.t("Save successfully"),
           timeout: 3000,
           type: "info",
           color: "info",
