@@ -119,7 +119,7 @@
       style="padding:0px 0px",
       align="center"
     )
-      q-toolbar(v-if="!$store.ifMobile()" style="z-index: 999")
+      q-toolbar(style="z-index: 999")
         q-btn.text-primary(flat round icon="close" @click="fullscreenBack")
         q-space
         q-btn.text-primary(flat round icon="more_horiz" @click="operateAvatar")

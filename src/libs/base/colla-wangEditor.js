@@ -670,6 +670,11 @@ var config = {
     // 是否ios
     ios: false,
 
+    // max width
+    imageMaxWidth: '50%',
+    videoMaxWidth: '50%',
+    audioMaxWidth: '50%',
+
     // 上传图片，server 地址（如果有值，则 base64 格式的配置则失效）
     // uploadImgServer: '/upload',
 
@@ -2359,7 +2364,7 @@ Table.prototype = {
                 // 标题
                 title: '编辑表格',
                 // 模板
-                tpl: '<div>\n                        <div class="w-e-button-container" style="border-bottom:1px solid #f1f1f1;padding-bottom:5px;margin-bottom:5px;">\n                            <button id="' + addRowBtnId + '" class="left">\u589E\u52A0\u884C</button>\n                            <button id="' + delRowBtnId + '" class="red left">\u5220\u9664\u884C</button>\n                            <button id="' + addColBtnId + '" class="left">\u589E\u52A0\u5217</button>\n                            <button id="' + delColBtnId + '" class="red left">\u5220\u9664\u5217</button>\n                        </div>\n                        <div class="w-e-button-container">\n                            <button id="' + delTableBtnId + '" class="gray left">\u5220\u9664\u8868\u683C</button>\n                        </dv>\n                    </div>',
+                tpl: '<div>\n                        <div class="w-e-button-container" style="border-bottom:1px solid #f1f1f1;padding-bottom:5px;margin-bottom:5px;">\n                            <button id="' + addRowBtnId + '" class="left">\u589E\u52A0\u884C</button>\n                            <button id="' + delRowBtnId + '" class="red left">\u5220\u9664\u884C</button>\n                            <button id="' + addColBtnId + '" class="left">\u589E\u52A0\u5217</button>\n                            <button id="' + delColBtnId + '" class="red left">\u5220\u9664\u5217</button>\n                        </div>\n                        <div class="w-e-button-container">\n                            <button id="' + delTableBtnId + '" class="gray left">\u5220\u9664\u8868\u683C</button>\n                        </div>\n                    </div>',
                 // 事件绑定
                 events: [{
                     // 增加行
@@ -2628,7 +2633,7 @@ Video.prototype = {
         // tab 配置
         var tabsConfig = [{
             title: '视频显示',
-            tpl: '<div>\n                    <div class="w-e-button-container" style="border-bottom:1px solid #f1f1f1;padding-bottom:5px;margin-bottom:5px;">\n                        <span style="float:left;font-size:14px;margin:4px 5px 0 5px;color:#333;">\u6700\u5927\u5BBD\u5EA6\uFF1A</span>\n                        <button id="' + width30 + '" class="left">30%</button>\n                        <button id="' + width50 + '" class="left">50%</button>\n                        <button id="' + width100 + '" class="left">100%</button>\n                    </div>\n                    <div class="w-e-button-container">\n                        <button id="' + previewBtn + '" class="left" style="font-size:14px;padding-left:4px;">\u9884\u89c8\u89c6\u9891</button>\n                    <button id="' + delBtn + '" class="left" style="font-size:14px;padding-left:4px;padding-left:4px;">\u5220\u9664\u89c6\u9891</button>\n                    </dv>\n                </div>',
+            tpl: '<div>\n                    <div class="w-e-button-container" style="border-bottom:1px solid #f1f1f1;padding-bottom:5px;margin-bottom:5px;">\n                        <span style="float:left;font-size:14px;margin:4px 5px 0 5px;color:#333;">\u6700\u5927\u5BBD\u5EA6\uFF1A</span>\n                        <button id="' + width30 + '" class="left">30%</button>\n                        <button id="' + width50 + '" class="left">50%</button>\n                        <button id="' + width100 + '" class="left">100%</button>\n                    </div>\n                    <div class="w-e-button-container">\n                        <button id="' + previewBtn + '" class="left" style="font-size:14px;padding-left:4px;">\u9884\u89c8\u89c6\u9891</button>\n                    <button id="' + delBtn + '" class="left" style="font-size:14px;padding-left:4px;padding-left:4px;">\u5220\u9664\u89c6\u9891</button>\n                    </div>\n                </div>',
             events: [{
                 selector: '#' + width30,
                 type: 'click',
@@ -2720,12 +2725,62 @@ Video.prototype = {
         var upFileId = getRandom('up-file');
         var linkUrlId = getRandom('link-url');
         var linkBtnId = getRandom('link-btn');
+        var width30 = getRandom('width-30');
+        var width50 = getRandom('width-50');
+        var width100 = getRandom('width-100');
 
         // tabs 的配置
         var tabsConfig = [{
             title: '视频',
-            tpl: '<div class="w-e-up-img-container">\n                    <div id="' + upTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-upload1"></i>\n                    </div>\n                    <div id="' + captureTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-capture-video"></i>\n                    </div>\n                    <div style="display:none;">\n                        <input id="' + upFileId + '" type="file" multiple="multiple" accept="video/mp4,video/mov,video/ogg,video/webm"/>\n                    </div>\n                </div>',
+            tpl: '<div>\n                    <div class="w-e-up-img-container">\n                    <div id="' + upTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-upload1"></i>\n                    </div>\n                    <div id="' + captureTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-capture-video"></i>\n                    </div>\n                    <div style="display:none;">\n                        <input id="' + upFileId + '" type="file" multiple="multiple" accept="video/mp4,video/mov,video/ogg,video/webm"/>\n                    </div>\n                </div>\n' +
+                 '<div class="w-e-button-container" style="border-top:1px solid #f1f1f1;padding-top:5px;margin-top:5px;">\n                        <span style="float:left;font-size:14px;margin:4px 5px 0 5px;color:#333;">\u6700\u5927\u5BBD\u5EA6\uFF1A</span>\n                        <button id="' + width30 + '" class="left" style="color:' + (config.videoMaxWidth === '30%' ? '#19b7c7' : '#333') + '">30%</button>\n                        <button id="' + width50 + '" class="left" style="color:' + (config.videoMaxWidth === '50%' ? '#19b7c7' : '#333') + '">50%</button>\n                        <button id="' + width100 + '" class="left" style="color:' + (config.videoMaxWidth === '100%' ? '#19b7c7' : '#333') + '">100%</button>\n                    </div>\n                </div>',
+            //tpl: '<div class="w-e-up-img-container">\n                    <div id="' + upTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-upload1"></i>\n                    </div>\n                    <div id="' + captureTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-capture-video"></i>\n                    </div>\n                    <div style="display:none;">\n                        <input id="' + upFileId + '" type="file" multiple="multiple" accept="video/mp4,video/mov,video/ogg,video/webm"/>\n                    </div>\n                </div>',
             events: [{
+                selector: '#' + width30,
+                type: 'click',
+                fn: function fn() {
+                    config.videoMaxWidth = '30%';
+                    config.setMaxWidth('video', '30%');
+                    var $video30 = document.getElementById(width30);
+                    var $video50 = document.getElementById(width50);
+                    var $video100 = document.getElementById(width100);
+                    if ($video30 && $video50 && $video100) {
+                        $video30.style.cssText = 'color: #19b7c7';
+                        $video50.style.cssText = 'color: #333';
+                        $video100.style.cssText = 'color: #333';
+                    }
+                }
+            }, {
+                selector: '#' + width50,
+                type: 'click',
+                fn: function fn() {
+                    config.videoMaxWidth = '50%';
+                    config.setMaxWidth('video', '50%');
+                    var $video30 = document.getElementById(width30);
+                    var $video50 = document.getElementById(width50);
+                    var $video100 = document.getElementById(width100);
+                    if ($video30 && $video50 && $video100) {
+                        $video30.style.cssText = 'color: #333';
+                        $video50.style.cssText = 'color: #19b7c7';
+                        $video100.style.cssText = 'color: #333';
+                    }
+                }
+            }, {
+                selector: '#' + width100,
+                type: 'click',
+                fn: function fn() {
+                    config.videoMaxWidth = '100%';
+                    config.setMaxWidth('video', '100%');
+                    var $video30 = document.getElementById(width30);
+                    var $video50 = document.getElementById(width50);
+                    var $video100 = document.getElementById(width100);
+                    if ($video30 && $video50 && $video100) {
+                        $video30.style.cssText = 'color: #333';
+                        $video50.style.cssText = 'color: #333';
+                        $video100.style.cssText = 'color: #19b7c7';
+                    }
+                }
+            }, {
                 // 触发选择视频
                 selector: '#' + upTriggerId,
                 type: 'click',
@@ -2885,7 +2940,7 @@ Image.prototype = {
         // tab 配置
         var tabsConfig = [{
             title: '图片显示',
-            tpl: '<div>\n                    <div class="w-e-button-container" style="border-bottom:1px solid #f1f1f1;padding-bottom:5px;margin-bottom:5px;">\n                        <span style="float:left;font-size:14px;margin:4px 5px 0 5px;color:#333;">\u6700\u5927\u5BBD\u5EA6\uFF1A</span>\n                        <button id="' + width30 + '" class="left">30%</button>\n                        <button id="' + width50 + '" class="left">50%</button>\n                        <button id="' + width100 + '" class="left">100%</button>\n                    </div>\n                    <div class="w-e-button-container">\n                        <button id="' + previewBtn + '" class="left" style="font-size:14px;padding-left:4px;">\u9884\u89c8\u56FE\u7247</button>\n                    <button id="' + delBtn + '" class="left" style="font-size:14px;padding-left:4px;padding-left:4px;">\u5220\u9664\u56FE\u7247</button>\n                    </dv>\n                </div>',
+            tpl: '<div>\n                    <div class="w-e-button-container" style="border-bottom:1px solid #f1f1f1;padding-bottom:5px;margin-bottom:5px;">\n                        <span style="float:left;font-size:14px;margin:4px 5px 0 5px;color:#333;">\u6700\u5927\u5BBD\u5EA6\uFF1A</span>\n                        <button id="' + width30 + '" class="left">30%</button>\n                        <button id="' + width50 + '" class="left">50%</button>\n                        <button id="' + width100 + '" class="left">100%</button>\n                    </div>\n                    <div class="w-e-button-container">\n                        <button id="' + previewBtn + '" class="left" style="font-size:14px;padding-left:4px;">\u9884\u89c8\u56FE\u7247</button>\n                    <button id="' + delBtn + '" class="left" style="font-size:14px;padding-left:4px;padding-left:4px;">\u5220\u9664\u56FE\u7247</button>\n                    </div>\n                </div>',
             events: [{
                 selector: '#' + width30,
                 type: 'click',
@@ -2977,12 +3032,62 @@ Image.prototype = {
         var upFileId = getRandom('up-file');
         var linkUrlId = getRandom('link-url');
         var linkBtnId = getRandom('link-btn');
+        var width30 = getRandom('width-30');
+        var width50 = getRandom('width-50');
+        var width100 = getRandom('width-100');
 
         // tabs 的配置
         var tabsConfig = [{
             title: '图片',
-            tpl: '<div class="w-e-up-img-container">\n                    <div id="' + upTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-upload1"></i>\n                    </div>\n                    <div id="' + captureTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-capture-image"></i>\n                    </div>\n                    <div style="display:none;">\n                        <input id="' + upFileId + '" type="file" multiple="multiple" accept="image/jpg,image/jpeg,image/png,image/gif,image/bmp,image/heic,image/webp,image/svg,image/tiff"/>\n                    </div>\n                </div>',
+            tpl: '<div>\n                    <div class="w-e-up-img-container">\n                    <div id="' + upTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-upload1"></i>\n                    </div>\n                    <div id="' + captureTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-capture-image"></i>\n                    </div>\n                    <div style="display:none;">\n                        <input id="' + upFileId + '" type="file" multiple="multiple" accept="image/jpg,image/jpeg,image/png,image/gif,image/bmp,image/heic,image/webp,image/svg,image/tiff"/>\n                    </div>\n                </div>\n' +
+                 '<div class="w-e-button-container" style="border-top:1px solid #f1f1f1;padding-top:5px;margin-top:5px;">\n                        <span style="float:left;font-size:14px;margin:4px 5px 0 5px;color:#333;">\u6700\u5927\u5BBD\u5EA6\uFF1A</span>\n                        <button id="' + width30 + '" class="left" style="color:' + (config.imageMaxWidth === '30%' ? '#19b7c7' : '#333') + '">30%</button>\n                        <button id="' + width50 + '" class="left" style="color:' + (config.imageMaxWidth === '50%' ? '#19b7c7' : '#333') + '">50%</button>\n                        <button id="' + width100 + '" class="left" style="color:' + (config.imageMaxWidth === '100%' ? '#19b7c7' : '#333') + '">100%</button>\n                    </div>\n                </div>',
+            //tpl: '<div class="w-e-up-img-container">\n                    <div id="' + upTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-upload1"></i>\n                    </div>\n                    <div id="' + captureTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-capture-image"></i>\n                    </div>\n                    <div style="display:none;">\n                        <input id="' + upFileId + '" type="file" multiple="multiple" accept="image/jpg,image/jpeg,image/png,image/gif,image/bmp,image/heic,image/webp,image/svg,image/tiff"/>\n                    </div>\n                </div>',
             events: [{
+                selector: '#' + width30,
+                type: 'click',
+                fn: function fn() {
+                    config.imageMaxWidth = '30%';
+                    config.setMaxWidth('image', '30%');
+                    var $image30 = document.getElementById(width30);
+                    var $image50 = document.getElementById(width50);
+                    var $image100 = document.getElementById(width100);
+                    if ($image30 && $image50 && $image100) {
+                        $image30.style.cssText = 'color: #19b7c7';
+                        $image50.style.cssText = 'color: #333';
+                        $image100.style.cssText = 'color: #333';
+                    }
+                }
+            }, {
+                selector: '#' + width50,
+                type: 'click',
+                fn: function fn() {
+                    config.imageMaxWidth = '50%';
+                    config.setMaxWidth('image', '50%');
+                    var $image30 = document.getElementById(width30);
+                    var $image50 = document.getElementById(width50);
+                    var $image100 = document.getElementById(width100);
+                    if ($image30 && $image50 && $image100) {
+                        $image30.style.cssText = 'color: #333';
+                        $image50.style.cssText = 'color: #19b7c7';
+                        $image100.style.cssText = 'color: #333';
+                    }
+                }
+            }, {
+                selector: '#' + width100,
+                type: 'click',
+                fn: function fn() {
+                    config.imageMaxWidth = '100%';
+                    config.setMaxWidth('image', '100%');
+                    var $image30 = document.getElementById(width30);
+                    var $image50 = document.getElementById(width50);
+                    var $image100 = document.getElementById(width100);
+                    if ($image30 && $image50 && $image100) {
+                        $image30.style.cssText = 'color: #333';
+                        $image50.style.cssText = 'color: #333';
+                        $image100.style.cssText = 'color: #19b7c7';
+                    }
+                }
+            }, {
                 // 触发选择图片
                 selector: '#' + upTriggerId,
                 type: 'click',
@@ -3141,7 +3246,7 @@ Audio.prototype = {
         // tab 配置
         var tabsConfig = [{
             title: '音频显示',
-            tpl: '<div>\n                    <div class="w-e-button-container" style="border-bottom:1px solid #f1f1f1;padding-bottom:5px;margin-bottom:5px;">\n                        <span style="float:left;font-size:14px;margin:4px 5px 0 5px;color:#333;">\u6700\u5927\u5BBD\u5EA6\uFF1A</span>\n                        <button id="' + width30 + '" class="left">30%</button>\n                        <button id="' + width50 + '" class="left">50%</button>\n                        <button id="' + width100 + '" class="left">100%</button>\n                    </div>\n                    <div class="w-e-button-container">\n                        <button id="' + delBtn + '" class="left" style="font-size:14px;padding-left:4px;padding-left:4px;">\u5220\u9664\u97f3\u9891</button>\n                    </dv>\n                </div>',
+            tpl: '<div>\n                    <div class="w-e-button-container" style="border-bottom:1px solid #f1f1f1;padding-bottom:5px;margin-bottom:5px;">\n                        <span style="float:left;font-size:14px;margin:4px 5px 0 5px;color:#333;">\u6700\u5927\u5BBD\u5EA6\uFF1A</span>\n                        <button id="' + width30 + '" class="left">30%</button>\n                        <button id="' + width50 + '" class="left">50%</button>\n                        <button id="' + width100 + '" class="left">100%</button>\n                    </div>\n                    <div class="w-e-button-container">\n                        <button id="' + delBtn + '" class="left" style="font-size:14px;padding-left:4px;padding-left:4px;">\u5220\u9664\u97f3\u9891</button>\n                    </div>\n                </div>',
             events: [{
                 selector: '#' + width30,
                 type: 'click',
@@ -3219,14 +3324,64 @@ Audio.prototype = {
         var upFileId = getRandom('up-file');
         var linkUrlId = getRandom('link-url');
         var linkBtnId = getRandom('link-btn');
+        var width30 = getRandom('width-30');
+        var width50 = getRandom('width-50');
+        var width100 = getRandom('width-100');
 
         // tabs 的配置
         var tabsConfig = [{
             title: '音频',
-            tpl: //'<div class="w-e-up-img-container">\n                    <div id="' + upTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-upload1"></i>\n                    </div>\n                    <div id="' + captureTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-capture-audio"></i>\n                    </div>\n                    <div style="display:none;">\n                        <input id="' + upFileId + '" type="file" multiple="multiple" accept="audio/mp3,audio/wav,audio/webm"/>\n                    </div>\n                </div>',
-                 //'<div class="w-e-up-img-container">\n                    <div id="' + upTriggerId + '" class="w-e-up-btn">\n                        <label for="' + upFileId + '" class="w-e-icon-upload1"></label>\n                    <input id="' + upFileId + '" type="file" multiple="multiple" accept="audio/mp3,audio/wav,audio/webm" class="visually-hidden"/>\n                    </div>\n                    <div id="' + captureTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-capture-audio"></i>\n                    <input id="placeholder" type="file" multiple="multiple" accept="audio/mp3,audio/wav,audio/webm" class="visually-hidden"/>\n                    </div>',
-                 '<div class="w-e-up-img-container">\n                    <div id="' + upTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-upload1"></i>\n                    </div>\n                    <div id="' + captureTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-capture-audio"></i>\n                    </div>\n                    <div style="display:none;">\n                        <input id="' + upFileId + '" type="file" multiple="multiple" accept="audio/mp3,audio/wav,audio/webm,audio/acc"/>\n                    </div>\n                </div>',
+            tpl: '<div>\n                    <div class="w-e-up-img-container">\n                    <div id="' + upTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-upload1"></i>\n                    </div>\n                    <div id="' + captureTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-capture-audio"></i>\n                    </div>\n                    <div style="display:none;">\n                        <input id="' + upFileId + '" type="file" multiple="multiple" accept="audio/mp3,audio/wav,audio/webm,audio/acc"/>\n                    </div>\n                </div>\n' +
+                 '<div class="w-e-button-container" style="border-top:1px solid #f1f1f1;padding-top:5px;margin-top:5px;">\n                        <span style="float:left;font-size:14px;margin:4px 5px 0 5px;color:#333;">\u6700\u5927\u5BBD\u5EA6\uFF1A</span>\n                        <button id="' + width30 + '" class="left" style="color:' + (config.audioMaxWidth === '30%' ? '#19b7c7' : '#333') + '">30%</button>\n                        <button id="' + width50 + '" class="left" style="color:' + (config.audioMaxWidth === '50%' ? '#19b7c7' : '#333') + '">50%</button>\n                        <button id="' + width100 + '" class="left" style="color:' + (config.audioMaxWidth === '100%' ? '#19b7c7' : '#333') + '">100%</button>\n                    </div>\n                </div>',
+            //tpl: //'<div class="w-e-up-img-container">\n                    <div id="' + upTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-upload1"></i>\n                    </div>\n                    <div id="' + captureTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-capture-audio"></i>\n                    </div>\n                    <div style="display:none;">\n                        <input id="' + upFileId + '" type="file" multiple="multiple" accept="audio/mp3,audio/wav,audio/webm"/>\n                    </div>\n                </div>',
+            //      //'<div class="w-e-up-img-container">\n                    <div id="' + upTriggerId + '" class="w-e-up-btn">\n                        <label for="' + upFileId + '" class="w-e-icon-upload1"></label>\n                    <input id="' + upFileId + '" type="file" multiple="multiple" accept="audio/mp3,audio/wav,audio/webm" class="visually-hidden"/>\n                    </div>\n                    <div id="' + captureTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-capture-audio"></i>\n                    <input id="placeholder" type="file" multiple="multiple" accept="audio/mp3,audio/wav,audio/webm" class="visually-hidden"/>\n                    </div>',
+            //      '<div class="w-e-up-img-container">\n                    <div id="' + upTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-upload1"></i>\n                    </div>\n                    <div id="' + captureTriggerId + '" class="w-e-up-btn">\n                        <i class="w-e-icon-capture-audio"></i>\n                    </div>\n                    <div style="display:none;">\n                        <input id="' + upFileId + '" type="file" multiple="multiple" accept="audio/mp3,audio/wav,audio/webm,audio/acc"/>\n                    </div>\n                </div>',
             events: [{
+                selector: '#' + width30,
+                type: 'click',
+                fn: function fn() {
+                    config.audioMaxWidth = '30%';
+                    config.setMaxWidth('audio', '30%');
+                    var $audio30 = document.getElementById(width30);
+                    var $audio50 = document.getElementById(width50);
+                    var $audio100 = document.getElementById(width100);
+                    if ($audio30 && $audio50 && $audio100) {
+                        $audio30.style.cssText = 'color: #19b7c7';
+                        $audio50.style.cssText = 'color: #333';
+                        $audio100.style.cssText = 'color: #333';
+                    }
+                }
+            }, {
+                selector: '#' + width50,
+                type: 'click',
+                fn: function fn() {
+                    config.audioMaxWidth = '50%';
+                    config.setMaxWidth('audio', '50%');
+                    var $audio30 = document.getElementById(width30);
+                    var $audio50 = document.getElementById(width50);
+                    var $audio100 = document.getElementById(width100);
+                    if ($audio30 && $audio50 && $audio100) {
+                        $audio30.style.cssText = 'color: #333';
+                        $audio50.style.cssText = 'color: #19b7c7';
+                        $audio100.style.cssText = 'color: #333';
+                    }
+                }
+            }, {
+                selector: '#' + width100,
+                type: 'click',
+                fn: function fn() {
+                    config.audioMaxWidth = '100%';
+                    config.setMaxWidth('audio', '100%');
+                    var $audio30 = document.getElementById(width30);
+                    var $audio50 = document.getElementById(width50);
+                    var $audio100 = document.getElementById(width100);
+                    if ($audio30 && $audio50 && $audio100) {
+                        $audio30.style.cssText = 'color: #333';
+                        $audio50.style.cssText = 'color: #333';
+                        $audio100.style.cssText = 'color: #19b7c7';
+                    }
+                }
+            }, {
                 // 触发选择音频
                 selector: '#' + upTriggerId,
                 type: 'click',
@@ -4143,7 +4298,7 @@ Text.prototype = {
             var config = editor.config;
             var onImgSelected = config.onImgSelected;
             if (onImgSelected && typeof onImgSelected === 'function') {
-                //onImgSelected($img);
+                onImgSelected($img);
             }
             // Added by wf
         });
@@ -4182,7 +4337,7 @@ Text.prototype = {
             var config = editor.config;
             var onVideoSelected = config.onVideoSelected;
             if (onVideoSelected && typeof onVideoSelected === 'function') {
-                //onVideoSelected($video);
+                onVideoSelected($video);
             }
             // Added by wf
         });

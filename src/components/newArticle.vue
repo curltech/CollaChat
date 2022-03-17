@@ -28,7 +28,7 @@
           q-btn.text-primary(flat round icon="close" @click="fullscreenBack")
           q-space
           q-btn.text-primary(flat round icon="more_horiz" @click="videoCommand()")
-        q-toolbar(v-if="selected && selected.nodeName === 'IMG' && !$store.ifMobile()" style="z-index: 999")
+        q-toolbar(v-if="selected && selected.nodeName === 'IMG'" style="z-index: 999")
           q-btn.text-primary(flat round icon="close" @click="fullscreenBack")
           q-space
           q-btn.text-primary(flat round icon="more_horiz" @click="imageCommand()")

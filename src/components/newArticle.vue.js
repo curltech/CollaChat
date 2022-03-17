@@ -1,10 +1,12 @@
 import { UUID } from 'libcolla'
 import { myself } from 'libcolla'
 import { BlockType } from 'libcolla'
-import { CollaUtil } from 'libcolla'
+import { CollaUtil, BlobUtil } from 'libcolla'
 
 import E from '@/libs/base/colla-wangEditor'
 import pinyinUtil from '@/libs/base/colla-pinyin'
+import { fileComponent, photoLibraryComponent } from '@/libs/base/colla-cordova'
+import { mediaCaptureComponent, mediaPickerComponent, alloyFingerComponent } from '@/libs/base/colla-media'
 import { channelComponent, ChannelDataType } from '@/libs/biz/colla-channel'
 import { collectionUtil } from '@/libs/biz/colla-collection-util'
 import SelectChat from '@/components/selectChat'
@@ -46,7 +48,7 @@ export default {
       try {
         let clientPeerId = myself.myselfPeerClient.peerId
         let currentTime = new Date().getTime()
-        let content = store.state.articleData.content
+        let content = store.state.articleData.content ? store.state.articleData.content : ''
         let plainContent = content ? content.replace(/<[^>]+>/g, '').replace(/^\s*/g, '') : ''
         let pyPlainContent = pinyinUtil.getPinyin(plainContent)
         let current
@@ -222,6 +224,9 @@ export default {
         editor.customConfig.ios = store.ios // 是否ios
         editor.customConfig.uploadImgMaxSize = store.uploadFileSizeLimit * 1024 * 1024 // 上传文件大小限制（单位：M）
         editor.customConfig.uploadImgMaxLength = store.uploadFileNumLimit // 同时上传文件数量限制
+        editor.customConfig.imageMaxWidth = store.imageMaxWidth
+        editor.customConfig.videoMaxWidth = store.videoMaxWidth
+        editor.customConfig.audioMaxWidth = store.audioMaxWidth
         editor.customConfig.customAlert = (alertInfo) => {
           let message
           let arr = alertInfo.split(',')
@@ -270,9 +275,21 @@ export default {
         editor.customConfig.onchange = (html) => {
           store.state.articleData.content = html
         }
+        editor.customConfig.setMaxWidth = (type, width) => {
+          _that.setMaxWidth(type, width)
+        }
         editor.create()
-        editor.txt.html(store.state.articleData.content)
+        editor.txt.html(store.state.articleData.content ? store.state.articleData.content : '')
       })
+    },
+    setMaxWidth(type, width) {
+      if (type === 'image') {
+        store.imageMaxWidth = width
+      } else if (type === 'video') {
+        store.videoMaxWidth = width
+      } else if (type === 'audio') {
+        store.audioMaxWidth = width
+      }
     },
     showFullscreen(selected) {
       let _that = this
@@ -352,12 +369,12 @@ export default {
       let store = _that.$store
       _that.$q.bottomSheet({
         actions: [
-          {
+          /*{
             label: _that.$i18n.t('Forward'),
             icon: 'forward',
             id: 'forward'
           },
-          {},
+          {},*/
           {
             label: _that.$i18n.t('Save Picture'),
             icon: 'save',
@@ -372,11 +389,11 @@ export default {
         ]
       }).onOk(async action => {
         // console.log('Action chosen:', action.id)
-        if (action.id === 'forward') {
+        /*if (action.id === 'forward') {
           store.state.currentQrCode = document.getElementById('selectedImg').src
           store.selectChatEntry = 'articleImg'
           _that.subKind = 'selectChat'
-        } else if (action.id === 'save') {
+        } else */if (action.id === 'save') {
           if (store.ifMobile()) {
             window.canvas2ImagePlugin.saveImageDataToLibrary(
               function (msg) {
@@ -397,8 +414,7 @@ export default {
                   color: "warning",
                 })
               },
-              //document.getElementById('selectedCanvas'),
-              document.getElementById('selectedImg'),
+              document.getElementById('selectedCanvas'),
               "jpeg" // format is optional, defaults to 'png'
             )
           } else {
@@ -425,12 +441,12 @@ export default {
       let store = _that.$store
       _that.$q.bottomSheet({
         actions: [
-          {
+          /*{
             label: _that.$i18n.t('Forward'),
             icon: 'forward',
             id: 'forward'
           },
-          {},
+          {},*/
           {
             label: _that.$i18n.t('Save Video'),
             icon: 'save',
@@ -445,10 +461,37 @@ export default {
         ]
       }).onOk(async action => {
         // console.log('Action chosen:', action.id)
-        if (action.id === 'forward') {
+        /*if (action.id === 'forward') {
 
-        } else if (action.id === 'save') {
-
+        } else */if (action.id === 'save') {
+          if (store.ifMobile()) {
+            let base64 = _that.selected.src
+            let dirEntry = await fileComponent.getRootDirEntry('tmp')
+            let dirPath = dirEntry.toInternalURL()
+            let fileName = 'Video' + UUID.string(null, null) + '.' + base64.substring(11, base64.indexOf(';', 11))
+            let fileEntry = await fileComponent.createNewFileEntry(fileName, dirPath)
+            let blob = BlobUtil.base64ToBlob(base64)
+            await fileComponent.writeFile(fileEntry, blob, false).then(async function () {
+              let url = fileEntry.nativeURL
+              console.log('saveVideo url:' + url)
+              await photoLibraryComponent.saveVideo(url, 'Video' + '-' + new Date().getTime())
+            })
+            _that.$q.notify({
+              message: _that.$i18n.t("Save successfully"),
+              timeout: 3000,
+              type: "info",
+              color: "info",
+            })
+          } else {
+            let base64 = _that.videoRecordMessageSrc
+            let arr = base64.split(',')
+            let mime = arr[0].match(/:(.*?);/)[1]
+            let extension = mime.split('/')[1]
+            let a = document.createElement('a')
+            a.href = BlobUtil.blobToUrl(BlobUtil.base64ToBlob(base64))
+            a.download = _that.$i18n.t('Video') + '-' + new Date().getTime() + '.' + extension
+            a.click()
+          }
         }
       }).onCancel(() => {
         // console.log('Dismissed')
@@ -458,7 +501,7 @@ export default {
     },
     async insertEditor(files) {
       let insertHtml = await collectionUtil.getInsertHtml(files)
-      let html = this.$store.state.articleData.content
+      let html = this.$store.state.articleData.content ? store.state.articleData.content : ''
       html = html.replace('([{PHFI}])', insertHtml)
       this.$store.state.articleData.content = html
       editor.txt.html(html)
@@ -521,7 +564,7 @@ export default {
             this.videoUrl = await mediaPickerComponent.getMedias(args)
           } else if (type === 'audio') {
             let insertHtml = ''
-            let html = this.$store.state.articleData.content
+            let html = this.$store.state.articleData.content ? this.$store.state.articleData.content : ''
             html = html.replace('([{PHFI}])', insertHtml)
             this.$store.state.articleData.content = html
             editor.txt.html(html)
@@ -569,7 +612,7 @@ export default {
     cancelSelectArticleCaptureMedia() {
       let _that = this
       let store = _that.$store
-      let html = store.state.articleData.content
+      let html = store.state.articleData.content ? store.state.articleData.content : ''
       html = html.replace('<p>\(\[\{PHFI\}\]\)<br></p>', '')
       html = html.replace('\(\[\{PHFI\}\]\)', '')
       store.state.articleData.content = html

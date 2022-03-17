@@ -4812,6 +4812,9 @@ export default {
     store.uploadFileSizeLimit = 100 // 上传文件大小限制（单位：M）
     store.uploadFileNumLimit = 10 // 同时上传文件数量限制
     store.displayActiveStatus = false // 是否显示在线状态
+    store.imageMaxWidth = '50%'
+    store.videoMaxWidth = '50%'
+    store.audioMaxWidth = '50%'
     let linkmanRequestDBItems = await contactComponent.loadLinkmanRequest({
       ownerPeerId: myself.myselfPeerClient.peerId,
       requestType: RequestType.ADD_LINKMAN,
