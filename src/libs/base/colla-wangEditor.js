@@ -675,6 +675,11 @@ var config = {
     videoMaxWidth: '50%',
     audioMaxWidth: '50%',
 
+    // click timer
+    imageClickTimer: null,
+    videoClickTimer: null,
+    audioClickTimer: null,
+
     // 上传图片，server 地址（如果有值，则 base64 格式的配置则失效）
     // uploadImgServer: '/upload',
 
@@ -3631,7 +3636,18 @@ Menus.prototype = {
 
             // 下拉框，例如 head
             if (type === 'droplist' && droplist) {
-                $elem.on('mouseenter', function (e) {
+                $elem.on('click', function (e) {
+                    if (droplist._show) {
+                        // 隐藏
+                        droplist.hide();
+                    } else {
+                        if (editor.selection.getRange() == null) {
+                            return;
+                        }
+                        // 显示
+                        droplist.show();
+                    }
+                }).on('mouseenter', function (e) {
                     if (editor.selection.getRange() == null) {
                         return;
                     }
@@ -4286,21 +4302,43 @@ Text.prototype = {
                 return;
             }
 
-            // 记录当前点击过的图片
-            editor._selectedImg = $img;
-
-            // 修改选区并 restore ，防止用户此时点击退格键，会删除其他内容
-            editor.selection.createRangeByElem($img);
-            editor.selection.restoreSelection();
-
             // Added by wf
             // -------- 绑定 onImgSelected 事件 --------
             var config = editor.config;
             var onImgSelected = config.onImgSelected;
-            if (onImgSelected && typeof onImgSelected === 'function') {
-                onImgSelected($img);
+            if (config.imageClickTimer) {
+                clearTimeout(config.imageClickTimer)
+                config.imageClickTimer = null
+                if (onImgSelected && typeof onImgSelected === 'function') {
+                    console.log('2clickimg')
+                    onImgSelected($img);
+                }
+            } else {
+                config.imageClickTimer = setTimeout(() => {
+                    config.imageClickTimer = null
+                }, 500)
+                // 记录当前点击过的图片
+                editor._selectedImg = $img;
+
+                // 修改选区并 restore ，防止用户此时点击退格键，会删除其他内容
+                editor.selection.createRangeByElem($img);
+                editor.selection.restoreSelection();
             }
             // Added by wf
+        });
+        $textElem.on('dblclick', 'img', function (e) {
+            var img = this;
+            var $img = $(img);
+            var config = editor.config;
+            var onImgSelected = config.onImgSelected;
+            if (config.imageClickTimer) {
+                clearTimeout(config.imageClickTimer)
+                config.imageClickTimer = null
+                if (onImgSelected && typeof onImgSelected === 'function') {
+                    console.log('dblclickimg')
+                    onImgSelected($img);
+                }
+            }
         });
 
         // 去掉图片的 selected 样式
@@ -4325,21 +4363,43 @@ Text.prototype = {
             var video = this;
             var $video = $(video);
 
-            // 记录当前点击过的视频
-            editor._selectedVideo = $video;
-
-            // 修改选区并 restore ，防止用户此时点击退格键，会删除其他内容
-            editor.selection.createRangeByElem($video);
-            editor.selection.restoreSelection();
-
             // Added by wf
             // -------- 绑定 onVideoSelected 事件 --------
             var config = editor.config;
             var onVideoSelected = config.onVideoSelected;
-            if (onVideoSelected && typeof onVideoSelected === 'function') {
-                onVideoSelected($video);
+            if (config.videoClickTimer) {
+                clearTimeout(config.videoClickTimer)
+                config.videoClickTimer = null
+                if (onVideoSelected && typeof onVideoSelected === 'function') {
+                    console.log('2clickvideo')
+                    onVideoSelected($video);
+                }
+            } else {
+                config.videoClickTimer = setTimeout(() => {
+                    config.videoClickTimer = null
+                }, 500)
+                // 记录当前点击过的视频
+                editor._selectedVideo = $video;
+
+                // 修改选区并 restore ，防止用户此时点击退格键，会删除其他内容
+                editor.selection.createRangeByElem($video);
+                editor.selection.restoreSelection();
             }
             // Added by wf
+        });
+        $textElem.on('dblclick', 'video', function (e) {
+            var video = this;
+            var $video = $(video);
+            var config = editor.config;
+            var onVideoSelected = config.onVideoSelected;
+            if (config.videoClickTimer) {
+                clearTimeout(config.videoClickTimer)
+                config.videoClickTimer = null
+                if (onVideoSelected && typeof onVideoSelected === 'function') {
+                    console.log('dblclickvideo')
+                    onVideoSelected($video);
+                }
+            }
         });
 
         // 去掉视频的 selected 样式
@@ -4365,21 +4425,43 @@ Text.prototype = {
             var audio = this;
             var $audio = $(audio);
 
-            // 记录当前点击过的音频
-            editor._selectedAudio = $audio;
-
-            // 修改选区并 restore ，防止用户此时点击退格键，会删除其他内容
-            editor.selection.createRangeByElem($audio);
-            editor.selection.restoreSelection();
-
             // Added by wf
             // -------- 绑定 onAudioSelected 事件 --------
             var config = editor.config;
             var onAudioSelected = config.onAudioSelected;
-            if (onAudioSelected && typeof onAudioSelected === 'function') {
-                //onAudioSelected($audio);
+            if (config.audioClickTimer) {
+                clearTimeout(config.audioClickTimer)
+                config.audioClickTimer = null
+                if (onAudioSelected && typeof onAudioSelected === 'function') {
+                    console.log('2clickaudio')
+                    //onAudioSelected($audio);
+                }
+            } else {
+                config.audioClickTimer = setTimeout(() => {
+                    config.audioClickTimer = null
+                }, 500)
+                // 记录当前点击过的音频
+                editor._selectedAudio = $audio;
+
+                // 修改选区并 restore ，防止用户此时点击退格键，会删除其他内容
+                editor.selection.createRangeByElem($audio);
+                editor.selection.restoreSelection();
             }
             // Added by wf
+        });
+        $textElem.on('dblclick', 'audio', function (e) {
+            var audio = this;
+            var $audio = $(audio);
+            var config = editor.config;
+            var onAudioSelected = config.onAudioSelected;
+            if (config.audioClickTimer) {
+                clearTimeout(config.audioClickTimer)
+                config.audioClickTimer = null
+                if (onAudioSelected && typeof onAudioSelected === 'function') {
+                    console.log('dblclickaudio')
+                    //onAudioSelected($audio);
+                }
+            }
         });
 
         // 去掉音频的 selected 样式
