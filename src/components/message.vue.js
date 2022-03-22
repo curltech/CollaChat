@@ -521,10 +521,13 @@ export default {
         await chatComponent.update(ChatDataType.MESSAGE, unReadMessages)
       }
     },
-    async load_message(done) {
+    async load_message(index,done) {
       let _that = this
       let store = _that.$store
-      if (!store.state.currentChat || !store.state.currentChat.messages || store.state.currentChat.messages.length == 0) {
+      if (!store.state.currentChat || !store.state.currentChat.messages || store.state.currentChat.messages.length == 0 || store.state.currentChat.noMoreMessageTag) {
+        if (typeof done == 'function') {
+          done()
+        }
         return
       }
       let messages = await chatComponent.loadMessage(
@@ -534,6 +537,8 @@ export default {
           //messageType: P2pChatMessageType.CHAT_LINKMAN,
         }, [{ _id: 'desc' }], store.state.currentChat.messages.length > 0 ? store.state.currentChat.messages[0].receiveTime : null, 10
       )
+     
+      console.log(messages)
       CollaUtil.sortByKey(messages, 'receiveTime', 'asc')
       if (messages && messages.length > 0) {
         store.state.currentChat.messages = messages.concat(store.state.currentChat.messages)
@@ -3155,6 +3160,7 @@ export default {
           }
         }*/
         let messageResults = await chatComponent.searchPhase(ChatDataType.MESSAGE, _that.searchText/*, filter*/)
+        debugger
         console.info(messageResults)
         if (messageResults && messageResults.rows && messageResults.rows.length > 0) {
           for (let messageResult of messageResults.rows) {

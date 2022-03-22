@@ -8,7 +8,10 @@
           q-btn.text-primary(flat round icon="more_horiz" @click="enterDetail")
         q-separator.c-separator-message.header-mar-top(style="height:1px;margin-left:0px;margin-right:0px")
         #talk.q-pa-md.bg-c-grey-message.row.justify-center.scroll.q-chat-message(:class=" !$store.ifMobile() && !(ifMobileSize || $store.state.ifMobileStyle) ? 'talk-height-pc' :(ifMobileSize ? 'talk-height-mobileSize2' : (keyboardMode ==='keyboard' ? 'talk-height-mobileStyle1':(keyboardMode ==='moreHalf'  ? 'talk-height-mobileStyle3' : 'talk-height-mobileStyle2') ))")
-          q-infinite-scroll(style="width:100%" @load="load_message" debounce="100" reverse :offset="50")
+          q-infinite-scroll(style="width:100%" @load="load_message" reverse debounce="500" :offset="50")
+            template(slot="loading")
+              .row.justify-center.q-my-md
+                q-spinner(color="primary" name="dots" size="40px")
             q-chat-message(v-if="$store.state.currentChat && $store.state.currentChat.noMoreMessageTag" @touchstart="preventDefault" :label="$t('No more messages')")
             template(v-for="(message,index) in $store.state.currentChat.messages")
               div.chat-message(:class="messageMultiSelectMode?'message_multiselect_checkboxwrap':''")
