@@ -3424,14 +3424,15 @@ export default {
       }
     },
     async getSignalSession(peerId) {
-      let signalSession
+      let signalSession,clientId
       let linkman = store.state.linkmanMap[peerId]
       let webrtcPeers = webrtcPeerPool.getConnected(peerId)
       if (linkman && linkman.signalPublicKey && webrtcPeers && webrtcPeers.length > 0) {
+        clientId = webrtcPeers[0].clientId
         if (!signalProtocol.signalPublicKeys.get(peerId)) {
           signalProtocol.signalPublicKeys.set(peerId, linkman.signalPublicKey)
         }
-        signalSession = await signalProtocol.get(peerId, linkman.connectPeerId, linkman.connectSessionId)
+        signalSession = await signalProtocol.get(peerId, clientId)
       }
       return signalSession
     },
