@@ -521,7 +521,7 @@ export default {
         await chatComponent.update(ChatDataType.MESSAGE, unReadMessages)
       }
     },
-    async load_message(index,done) {
+    async load_message(index, done) {
       let _that = this
       let store = _that.$store
       if (!store.state.currentChat || !store.state.currentChat.messages || store.state.currentChat.messages.length == 0 || store.state.currentChat.noMoreMessageTag) {
@@ -537,7 +537,7 @@ export default {
           //messageType: P2pChatMessageType.CHAT_LINKMAN,
         }, [{ _id: 'desc' }], store.state.currentChat.messages.length > 0 ? store.state.currentChat.messages[0].receiveTime : null, 10
       )
-     
+
       console.log(messages)
       CollaUtil.sortByKey(messages, 'receiveTime', 'asc')
       if (messages && messages.length > 0) {
@@ -2500,7 +2500,7 @@ export default {
       _that.chatMessageResultList.splice(0)
       await _that.getChatHistory()
     },
-    async getChatHistory(done) {
+    async getChatHistory(index, done) {
       let _that = this
       let store = _that.$store
       let selector = {
@@ -2520,18 +2520,21 @@ export default {
       if (_that.nonsysChatContentTypeIndex !== 0) {
         selector.contentType = _that.nonsysChatContentTypes[_that.nonsysChatContentTypeIndex].value
       }
-      selector.createDate = { $lt: _that.chatMessageResultList.length > 0 ? _that.chatMessageResultList[0].createDate : null }
+      //selector.createDate = { $lt: _that.chatMessageResultList.length > 0 ? _that.chatMessageResultList[0].createDate : null }
       let messages = await chatComponent.loadMessage(
         selector,
-        [{ createDate: 'desc' }], null, 10
+        [{ _id: 'desc' }], _that.chatMessageResultList.length > 0 ? _that.chatMessageResultList[_that.chatMessageResultList.length - 1].receiveTime : null, 10
       )
-      CollaUtil.sortByKey(messages, 'createDate', 'asc')
-      console.log(messages)
+
+      // [{ _id: 'desc' }], store.state.currentChat.messages.length > 0 ? store.state.currentChat.messages[0].receiveTime : null, 10
+      //CollaUtil.sortByKey(messages, 'createDate', 'asc')
       if (messages && messages.length > 0) {
-        _that.chatMessageResultList = messages.concat(_that.chatMessageResultList)
+        _that.chatMessageResultList = _that.chatMessageResultList.concat(messages)
       }
       if (typeof done == 'function') {
-        done()
+        let stop = false
+        if (messages.length === 0) stop = true
+        done(stop)
       }
     },
     async changeChatContentType(item, index) {
@@ -3160,7 +3163,6 @@ export default {
           }
         }*/
         let messageResults = await chatComponent.searchPhase(ChatDataType.MESSAGE, _that.searchText/*, filter*/)
-        debugger
         console.info(messageResults)
         if (messageResults && messageResults.rows && messageResults.rows.length > 0) {
           for (let messageResult of messageResults.rows) {

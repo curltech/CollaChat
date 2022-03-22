@@ -306,7 +306,7 @@
             template(v-slot:append)
               q-icon(v-if="searchSenderName" name="cancel" class="cursor-pointer" @click.stop="cleanSearchSender")
               q-icon(name="person" color="primary" class="cursor-pointer" @click="selectSearchSender")
-        q-infinite-scroll(v-if="$store.messageEntry !== 'search' && !searchText" @load="getChatHistory" debounce="100" reverse :offset="50")
+        q-infinite-scroll.chat-history-scroll(v-if="$store.messageEntry !== 'search' && !searchText" @load="getChatHistory" debounce="500")
           template(v-for="(message, index) in chatMessageResultList")
             messageContent(v-if='message.messageType === P2pChatMessageType.CHAT_LINKMAN' v-bind:message = "message" entry = "historyMessage" v-bind:showContacts='showContacts')
         q-list(v-if="searching")
