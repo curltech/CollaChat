@@ -233,15 +233,18 @@ q-layout
       q-card-actions(align="around")
         q-btn.text-primary(unelevated :label="$t('Confirm')" no-caps @click="acceptMigrate")
         q-btn.text-primary(unelevated :label="$t('Cancel')" no-caps @click="closeMigrate")
-  q-dialog(v-model="initBackupDialog" persistent)
-    q-card(style="width: 250px")
+  q-dialog(v-model="initBackupDialog" persistent maximized)
+    q-card(flat class="fixed-center q-pa-none")
       q-bar(class="bg-primary text-c-grey-0")
         q-item-label {{$t('Backup (Mobile to PC)')}}
         //q-space
         //q-btn(dense flat icon="close" v-close-popup)
       q-card-section(class="q-pa-lg")
+        q-item-label {{$t('Please login on your computer first, then confirm to initiate the backup')}}
+      //q-card-section(class="q-pa-lg")
         q-item-label {{$t('Please confirm on your computer to start the backup')}}
       q-card-actions(align="center")
+        q-btn.text-primary(unelevated :label="$t('Confirm')" no-caps @click="initBackup")
         q-btn.text-primary(unelevated :label="$t('Cancel')" no-caps v-close-popup @click="cancelInitBackup")
   q-dialog(v-model="backupDialog" persistent)
     q-card(style="width: 250px")

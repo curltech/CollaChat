@@ -330,6 +330,7 @@
   "Chat Records Backup and Migration": "チャット記録のバックアップと移転",
   "incl. Contacts Info": "連絡先情報を含める",
   "Please confirm on your computer to start the backup": "コンピュータで確認してバックアップを開始してください",
+  "Please login on your computer first, then confirm to initiate the backup": "最初にコンピュータにログインしてから、バックアップを開始することを確認してください",
   "Please confirm to receive the backup from your mobile": "携帯電話からバックアップを受け取ることを確認してください",
   "Please scan the QR code using another mobile to start the migration": "別の携帯電話を使用してQRコードをスキャンし、移行を開始してください",
   "Please confirm to receive the migration from another mobile": "別の携帯電話からの移行を受け取ることを確認してください",

@@ -329,6 +329,7 @@
   "Chat Records Backup and Migration": "聊天記錄備份與遷移",
   "incl. Contacts Info": "含聯繫人信息",
   "Please confirm on your computer to start the backup": "請在電腦上確認，以開始備份",
+  "Please login on your computer first, then confirm to initiate the backup": "請先登錄您的計算機，然後確認啟動備份",
   "Please confirm to receive the backup from your mobile": "請確認以接收來自手機的備份",
   "Please scan the QR code using another mobile to start the migration": "請使用另一個手機掃描二維碼以開始遷移",
   "Please confirm to receive the migration from another mobile": "請確認以接收來自另一個手機的遷移",

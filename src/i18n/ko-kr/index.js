@@ -330,6 +330,7 @@
   "Chat Records Backup and Migration": "채 팅 기록 백업 및 이전",
   "incl. Contacts Info": "연락처 정보 포함",
   "Please confirm on your computer to start the backup": "백업을 시작하려면 컴퓨터에서 확인하세요",
+  "Please login on your computer first, then confirm to initiate the backup": "먼저 컴퓨터에 로그인한 다음 백업 시작을 확인하십시오",
   "Please confirm to receive the backup from your mobile": "모바일에서 백업을 받으려면 확인하십시오",
   "Please scan the QR code using another mobile to start the migration": "이전을 시작하려면 다른 모바일을 사용하여 QR 코드를 스캔하세요",
   "Please confirm to receive the migration from another mobile": "다른 모바일에서 이전을 수신하려면 확인하세요",

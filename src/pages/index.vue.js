@@ -97,6 +97,8 @@ export default {
       migrateDialog: false,
       migrateQRContent: null,
       initBackupDialog: false,
+      initBackupUrl: null,
+      initBackupFilename: null,
       backupDialog: false,
       backupUrl: null,
       backupFilename: null,
@@ -1788,7 +1790,7 @@ export default {
       if (data) {
         _that.logoutData = data
       }
-      if (!_that.initMigrateDialog) {
+      if (!_that.initMigrateDialog && !_that.initBackupDialog) {
         _that.gotoLogin()
       }
     },
@@ -1870,7 +1872,7 @@ export default {
       }
       console.info('receive chat type: ' + type + ' from srcClientId: ' + srcClientId + ', srcPeerId: ' + srcPeerId)
       if (type === ChatMessageType.LOGOUT) {
-        if (data && data.srcClientDevice === myselfPeerClient.clientDevice) {
+        if (data/* && data.srcClientDevice === myselfPeerClient.clientDevice*/) {
           await store.logout(data)
         }
       } else if (type === ChatMessageType.MIGRATE) { // unreachable
@@ -3655,6 +3657,9 @@ export default {
     cancelInitBackup: function () {
       let _that = this
       _that.initBackupDialog = false
+      if (_that.logoutFlag) {
+        _that.gotoLogin()
+      }
     },
     acceptBackup: async function () {
       let _that = this
@@ -4221,14 +4226,8 @@ export default {
           if (type === 'migrate') {
             await store.showInitMigrateDialog(url, filename)
           } else if (type === 'backup') {
-            let clientPeerId = myself.myselfPeerClient.peerId
-            let newPayload = {}
-            newPayload.type = ChatMessageType.BACKUP
-            newPayload.srcClientId = myself.myselfPeerClient.clientId
-            newPayload.srcPeerId = clientPeerId
-            newPayload.url = url
-            newPayload.filename = filename
-            await chatAction.chat(null, newPayload, clientPeerId)
+            _that.initBackupUrl = url
+            _that.initBackupFilename = filename
             store.changeBackupMigrationSubKind('default')
             store.showInitBackupDialog()
           } else if (type === 'restore') {
@@ -4246,6 +4245,18 @@ export default {
       }, async function (error) {
         await logService.log(error, 'startServerError', 'error')
       })
+    },
+    async initBackup() {
+      let _that = this
+      let store = _that.$store
+      let clientPeerId = myself.myselfPeerClient.peerId
+      let newPayload = {}
+      newPayload.type = ChatMessageType.BACKUP
+      newPayload.srcClientId = myself.myselfPeerClient.clientId
+      newPayload.srcPeerId = clientPeerId
+      newPayload.url = _that.initBackupUrl
+      newPayload.filename = _that.initBackupFilename
+      await chatAction.chat(null, newPayload, clientPeerId)
     },
     async cloudSyncChannelArticle(channelId) {
       let _that = this
