@@ -424,7 +424,7 @@ export default {
         }, 55 * 1000)
         _that._cloudSyncTimer = setInterval(async function () {
           await store.cloudSyncChannel(true)
-        }, 300 * 1000)
+        }, 600 * 1000)
       }
       webSocket.onmessage = function (evt) {
         //console.log('WebSocket Message!')

@@ -510,14 +510,17 @@ DomElement.prototype = {
         if (!referenceNode) {
             return this;
         }
+        var anchorNode = referenceNode && referenceNode.nextSibling;
         return this.forEach(function (elem) {
             var parent = referenceNode.parentNode;
-            if (parent.lastChild === referenceNode) {
+            //if (parent.lastChild === referenceNode) {
+            if (!anchorNode) {
                 // 最后一个元素
                 parent.appendChild(elem);
             } else {
                 // 不是最后一个元素
-                parent.insertBefore(elem, referenceNode.nextSibling);
+                //parent.insertBefore(elem, referenceNode.nextSibling);
+                parent.insertBefore(elem, anchorNode);
             }
         });
     }
@@ -835,7 +838,7 @@ Bold.prototype = {
 
         var editor = this.editor;
         var isSeleEmpty = editor.selection.isSelectionEmpty();
-
+        console.log('bold click start html:' + editor.$textElem.html())
         if (isSeleEmpty) {
             // 选区是空的，插入并选中一个“空白”
             editor.selection.createEmptyRange();
@@ -843,11 +846,13 @@ Bold.prototype = {
 
         // 执行 bold 命令
         editor.cmd.do('bold');
+        console.log('bold click cmd.do html:' + editor.$textElem.html().replace(/\u200b/gm, '&#8203'))
 
         if (isSeleEmpty) {
             // 需要将选取折叠起来
             editor.selection.collapseRange();
             editor.selection.restoreSelection();
+            console.log('bold click restoreSelection html:' + editor.$textElem.html().replace(/\u200b/gm, '&#8203'))
         }
     },
 
@@ -3957,6 +3962,7 @@ Text.prototype = {
         }
         // 按键后保存
         $textElem.on('keyup', saveRange);
+        $textElem.on('touchend', saveRange);
         $textElem.on('mousedown', function (e) {
             // mousedown 状态下，鼠标滑动到编辑区域外面，也需要保存选区
             $textElem.on('mouseleave', saveRange);
@@ -4640,7 +4646,7 @@ API.prototype = {
 
         // 判断选区内容是否在编辑内容之内
         var $containerElem = this.getSelectionContainerElem(range);
-        if (!$containerElem) {
+        if (!$containerElem || !$containerElem.length) {
             return;
         }
 
@@ -4652,6 +4658,14 @@ API.prototype = {
         var editor = this.editor;
         var $textElem = editor.$textElem;
         if ($textElem.isContain($containerElem)) {
+            if ($textElem[0] === $containerElem[0]) {
+                if ($textElem.html().trim() === '<p data-we-empty-p=""><br></p>') {
+                    var $children = $textElem.children();
+                    var $last = $children.last();
+                    editor.selection.createRangeByElem($last, true, true);
+                    editor.selection.restoreSelection();
+                }
+            }
             // 是编辑内容之内的
             this._currentRange = range;
         }
@@ -4673,7 +4687,7 @@ API.prototype = {
     getSelectionText: function getSelectionText() {
         var range = this._currentRange;
         if (range) {
-            return this._currentRange.toString();
+            return this.range.toString();
         } else {
             return '';
         }
@@ -4721,8 +4735,11 @@ API.prototype = {
     // 恢复选区
     restoreSelection: function restoreSelection() {
         var selection = window.getSelection();
-        selection.removeAllRanges();
-        selection.addRange(this._currentRange);
+        var r = this._currentRange;
+        if (selection && r) {
+            selection.removeAllRanges();
+            selection.addRange(r);
+        }
     },
 
     // 创建一个空白（即 &#8203 字符）选区
@@ -4745,10 +4762,33 @@ API.prototype = {
             if (UA.isWebkit()) {
                 // 插入 &#8203
                 editor.cmd.do('insertHTML', '&#8203;');
-                // 修改 offset 位置
-                range.setEnd(range.endContainer, range.endOffset + 1);
-                // 存储
-                this.saveRange(range);
+                var html = editor.$textElem.html();
+                console.log('createEmptyRange insertHTML html:' + html.replace(/\u200b/gm, '&#8203'))
+                if (html.indexOf('<span style="-webkit-text-size-adjust: 100%;">') > -1) {
+                    html = html.replace(new RegExp('<span style="-webkit-text-size-adjust: 100%;">(.*?)<\/span>', 'gim'), '$1');
+                    var offset = this.getRangeOffset(editor.$textElem[0]);
+                    console.log('offset:' + offset[0] + ',' + offset[1])
+                    editor.$textElem.html(html);
+                    console.log('createEmptyRange replace htm:' + editor.$textElem.html().replace(/\u200b/gm, '&#8203'))
+                    var r = document.createRange();
+                    var nodes = this.getNodeAndOffset(editor.$textElem[0], offset[0], offset[1]);
+                    r.setStart(nodes[0], nodes[1]);
+                    r.setEnd(nodes[2], nodes[3]);
+                    console.log('startNode:' + nodes[0] + ',start:' + nodes[1])
+                    console.log('endNode:' + nodes[2] + ',end:' + nodes[3])
+                    window.getSelection().removeAllRanges();
+                    window.getSelection().addRange(r);
+                    this.saveRange(r);
+                    // 修改 offset 位置
+                    //r.setEnd(nodes[2], nodes[3] + 1);
+                    // 存储
+                    //this.saveRange(r);
+                } else {
+                    // 修改 offset 位置
+                    range.setEnd(range.endContainer, range.endOffset + 1);
+                    // 存储
+                    this.saveRange(range);
+                }
             } else {
                 $elem = $('<strong>&#8203;</strong>');
                 editor.cmd.do('insertElem', $elem);
@@ -4756,7 +4796,59 @@ API.prototype = {
             }
         } catch (ex) {
             // 部分情况下会报错，兼容一下
+            console.log('createEmptyRange ex:' + ex)
         }
+    },
+
+    getRangeOffset: function getRangeOffset(wrap_dom) {
+        const txtList = [];
+        const map = function(chlids) {
+            [...chlids].forEach(el => {
+                if (el.nodeName === '#text') {
+                    txtList.push(el);
+                } else {
+                    map(el.childNodes);
+                }
+            })
+        }
+        // 递归遍历，提取出所有 #text
+        map(wrap_dom.childNodes);
+        // 计算文本的位置区间 [0,3]、[3, 8]、[8,10]
+        const clips = txtList.reduce((arr,item,index) => {
+            const end = item.textContent.length + (arr[index-1] ? arr[index-1][2] : 0);
+            arr.push([item, end - item.textContent.length, end]);
+            return arr;
+        }, [])
+        const range = window.getSelection().getRangeAt(0);
+        // 匹配选区与区间的#text，计算出整体偏移量
+        const startOffset = (clips.find(el => range.startContainer === el[0]))[1] + range.startOffset;
+        const endOffset = (clips.find(el => range.endContainer === el[0]))[1] + range.endOffset;
+        return [startOffset, endOffset];
+    },
+
+    getNodeAndOffset: function getNodeAndOffset(wrap_dom, start=0, end=0) {
+        const txtList = [];
+        const map = function(chlids) {
+            [...chlids].forEach(el => {
+                if (el.nodeName === '#text') {
+                    txtList.push(el);
+                } else {
+                    map(el.childNodes);
+                }
+            })
+        }
+        // 递归遍历，提取出所有 #text
+        map(wrap_dom.childNodes);
+        // 计算文本的位置区间 [0,3]、[3, 8]、[8,10]
+        const clips = txtList.reduce((arr,item,index) => {
+            const end = item.textContent.length + (arr[index-1] ? arr[index-1][2] : 0);
+            arr.push([item, end - item.textContent.length, end]);
+            return arr;
+        }, [])
+        // 查找满足条件的范围区间
+        const startNode = clips.find(el => start >= el[1] && start <= el[2]);
+        const endNode = clips.find(el => end >= el[1] && end <= el[2]);
+        return [startNode[0], start - startNode[1], endNode[0], end - endNode[1]];
     },
 
     // 根据 $Elem 设置选区
@@ -4779,10 +4871,41 @@ API.prototype = {
 
         if (typeof toStart === 'boolean') {
             range.collapse(toStart);
+
+            if (!toStart) {
+                this.saveRange(range);
+                this.editor.selection.moveCursor(elem);
+            }
         }
 
         // 存储 range
         this.saveRange(range);
+    },
+
+    // 移动光标位置,默认情况下在尾部
+    // 有一个特殊情况是firefox下的文本节点会自动补充一个br元素，会导致自动换行
+    // 所以默认情况下在firefox下的文本节点会自动移动到br前面
+    moveCursor: function moveCursor(node, position) {
+        // node 元素节点
+        // position 光标的位置
+        const range = this.getRange();
+        //对文本节点特殊处理
+        let len = node.nodeType === 3 ? node.nodeValue.length : node.childNodes.length;
+        if ((UA.isFirefox || UA.isIE()) && len !== 0) {
+            // firefox下在节点为文本节点和节点最后一个元素为文本节点的情况下
+            if (node.nodeType === 3 || node.childNodes[len - 1].nodeName === 'BR') {
+                len = len - 1;
+            }
+        }
+        let pos = (position || position === 0) ? position : len;
+        if (!range) {
+            return;
+        }
+        if (node) {
+            range.setStart(node, pos);
+            range.setEnd(node, pos);
+            this.restoreSelection();
+        }
     }
 };
 
