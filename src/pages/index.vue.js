@@ -3449,7 +3449,9 @@ export default {
         }
         let response = await p2pChatAction.chat(null, dataBlock, peerId)
         if (response && response.MessageType === MsgType.CONSENSUS_REPLY && response.Payload === MsgType.OK) {
-           await _that.receiveMessageBlockReply(blockId)
+          let actualReceiveTime = new Date().getTime()
+          message.actualReceiveTime = actualReceiveTime
+          await _that.receiveMessageBlockReply(blockId, actualReceiveTime)
         }
       } catch (e) {
         await logService.log(e, 'p2pSendError', 'error')
@@ -3575,11 +3577,13 @@ export default {
         } else if (consensusLog.blockType === BlockType.P2pChat && consensusLog.peerId) { // this is a create (otherwise delete) P2pChat consensus reply
           // 标记发送回执
           let blockId = data.Payload.blockId
-          await _that.receiveMessageBlockReply(blockId)
+          let actualReceiveTime = new Date().getTime()
+          // TODO: 内存中对应message.actualReceiveTime更新？
+          await _that.receiveMessageBlockReply(blockId, actualReceiveTime)
         }
       }
     },
-    async receiveMessageBlockReply(blockId){
+    async receiveMessageBlockReply(blockId, actualReceiveTime) {
       let messages = await chatComponent.loadMessage(
         {
           ownerPeerId: myself.myselfPeerClient.peerId,
@@ -3588,7 +3592,7 @@ export default {
       if (messages && messages.length > 0) {
         let currentMes = messages[0]
         currentMes.receiveTag = true
-        currentMes.actualReceiveTime = new Date().getTime()
+        currentMes.actualReceiveTime = actualReceiveTime
         await chatComponent.update(ChatDataType.MESSAGE, currentMes, null)
       } else {
         let receives = await chatComponent.loadReceive(
@@ -3598,7 +3602,7 @@ export default {
         if (receives && receives.length > 0) {
           let currentRec = receives[0]
           currentRec.receiveTag = true
-          currentRec.actualReceiveTime = new Date().getTime()
+          currentRec.actualReceiveTime = actualReceiveTime
           await chatComponent.update(ChatDataType.RECEIVE, currentRec, null)
         }
       }
