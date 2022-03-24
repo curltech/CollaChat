@@ -1768,6 +1768,10 @@ export default {
     async logout(data) {
       let _that = this
       let store = _that.$store
+      _that.logoutFlag = true
+      if (_that.initBackupDialog || _that.initRestoreDialog) {
+        return
+      }
       // save logout time
       myself.myselfPeer.updateDate = new Date()
       // remove loginStatus and password
@@ -1776,7 +1780,6 @@ export default {
         myself.myselfPeer.password = null
       }
       await myselfPeerService.update(myself.myselfPeer)
-      _that.logoutFlag = true
       store.peers = null
       if (store.state.linkmans && store.state.linkmans.length > 0) {
         webrtcPeerPool.clear()
@@ -1791,7 +1794,7 @@ export default {
       if (data) {
         _that.logoutData = data
       }
-      if (!_that.initMigrateDialog && !_that.initBackupDialog && !_that.initRestoreDialog) {
+      if (!_that.initMigrateDialog) {
         _that.gotoLogin()
       }
     },
@@ -1895,7 +1898,7 @@ export default {
           _that.backupDialog = true
         } else {
           if (data.operation) {
-            _that.initBackupDialog = false
+            await _that.closeInitBackup()
             if (data.operation === 'Accept') {
               _that.$q.notify({
                 message: _that.$i18n.t("Backup successfully"),
@@ -1955,7 +1958,7 @@ export default {
           if (!data.operation) {
             _that.startServer('restore', null)
           } else {
-            _that.initRestoreDialog = false
+            await _that.closeInitRestore()
             if (data.operation === 'Accept') {
               _that.$q.notify({
                 message: _that.$i18n.t("Restore successfully"),
@@ -3676,11 +3679,11 @@ export default {
       let _that = this
       _that.initBackupDialog = true
     },
-    cancelInitBackup: function () {
+    closeInitBackup: async function () {
       let _that = this
       _that.initBackupDialog = false
       if (_that.logoutFlag) {
-        _that.gotoLogin()
+        await _that.logout()
       }
     },
     async initBackup() {
@@ -3754,11 +3757,11 @@ export default {
       let _that = this
       _that.initRestoreDialog = true
     },
-    cancelInitRestore: function () {
+    closeInitRestore: async function () {
       let _that = this
       _that.initRestoreDialog = false
       if (_that.logoutFlag) {
-        _that.gotoLogin()
+        await _that.logout()
       }
     },
     async initRestore() {

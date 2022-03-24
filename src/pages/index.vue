@@ -243,7 +243,7 @@ q-layout
         q-item-label {{$t('Please login on your computer first, then confirm to initiate the backup')}}
       q-card-actions(align="center")
         q-btn.text-primary(unelevated :label="$t('Confirm')" no-caps @click="initBackup")
-        q-btn.text-primary(unelevated :label="$t('Cancel')" no-caps v-close-popup @click="cancelInitBackup")
+        q-btn.text-primary(unelevated :label="$t('Cancel')" no-caps v-close-popup @click="closeInitBackup")
   q-dialog(v-model="backupDialog" persistent)
     q-card(style="width: 250px")
       q-bar(class="bg-primary text-c-grey-0")
@@ -267,7 +267,7 @@ q-layout
         q-item-label {{$t('Please login on your mobile first, then confirm to initiate the restore')}}
       q-card-actions(align="center")
         q-btn.text-primary(unelevated :label="$t('Confirm')" no-caps @click="initRestore")
-        q-btn.text-primary(unelevated :label="$t('Cancel')" no-caps v-close-popup @click="cancelInitRestore")
+        q-btn.text-primary(unelevated :label="$t('Cancel')" no-caps v-close-popup @click="closeInitRestore")
   q-dialog(v-model="restoreDialog" persistent)
     q-card(style="width: 250px")
       q-bar(class="bg-primary text-c-grey-0")
