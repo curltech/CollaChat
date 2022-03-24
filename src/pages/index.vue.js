@@ -102,6 +102,7 @@ export default {
       backupDialog: false,
       backupUrl: null,
       backupFilename: null,
+      initRestoreDialog: false,
       restoreDialog: false,
       restoreFilename: null,
       logoutData: null,
@@ -1790,7 +1791,7 @@ export default {
       if (data) {
         _that.logoutData = data
       }
-      if (!_that.initMigrateDialog && !_that.initBackupDialog) {
+      if (!_that.initMigrateDialog && !_that.initBackupDialog && !_that.initRestoreDialog) {
         _that.gotoLogin()
       }
     },
@@ -1878,6 +1879,14 @@ export default {
       } else if (type === ChatMessageType.MIGRATE) { // unreachable
         console.log('MIGRATE')
         _that.initMigrateDialog = false
+        if (data.operation === 'Accept') {
+          _that.$q.notify({
+            message: _that.$i18n.t("Migrate successfully"),
+            timeout: 3000,
+            type: "info",
+            color: "info",
+          })
+        }
       } else if (type === ChatMessageType.BACKUP) {
         console.log('BACKUP, url:' + data.url + ', filename:' + data.filename)
         if (data.url && data.filename) {
@@ -1885,15 +1894,16 @@ export default {
           _that.backupFilename = data.filename
           _that.backupDialog = true
         } else {
-          _that.initBackupDialog = false
-          if (data.operation !== 'Cancel') {
-            _that.closeRestore()
-            _that.$q.notify({
-              message: _that.$i18n.t("Backup successfully"),
-              timeout: 3000,
-              type: "info",
-              color: "info",
-            })
+          if (data.operation) {
+            _that.initBackupDialog = false
+            if (data.operation === 'Accept') {
+              _that.$q.notify({
+                message: _that.$i18n.t("Backup successfully"),
+                timeout: 3000,
+                type: "info",
+                color: "info",
+              })
+            }
           }
         }
       } else if (type === ChatMessageType.RESTORE) {
@@ -1942,7 +1952,19 @@ export default {
           _that.restoreFilename = data.filename
           _that.restoreDialog = true
         } else if (!data.url && !data.filename) {
-          _that.startServer('restore', null)
+          if (!data.operation) {
+            _that.startServer('restore', null)
+          } else {
+            _that.initRestoreDialog = false
+            if (data.operation === 'Accept') {
+              _that.$q.notify({
+                message: _that.$i18n.t("Restore successfully"),
+                timeout: 3000,
+                type: "info",
+                color: "info",
+              })
+            }
+          }
         }
       }
     },
@@ -3628,8 +3650,7 @@ export default {
           }
           if (json) {
             await store.restoreChatRecord(json)
-            await _that.closeMigrate()
-            _that.closeRestore()
+            await _that.closeMigrate('Accept')
             _that.$q.notify({
               message: _that.$i18n.t("Migrate successfully"),
               timeout: 3000,
@@ -3640,13 +3661,14 @@ export default {
         }
       }
     },
-    closeMigrate: async function () {
+    closeMigrate: async function (operation) {
       let _that = this
       let clientPeerId = myself.myselfPeerClient.peerId
       let newPayload = {}
       newPayload.type = ChatMessageType.MIGRATE
       newPayload.srcClientId = myself.myselfPeerClient.clientId
       newPayload.srcPeerId = clientPeerId
+      newPayload.operation = operation
       await chatAction.chat(null, newPayload, clientPeerId)
       _that.migrateDialog = false
     },
@@ -3660,6 +3682,18 @@ export default {
       if (_that.logoutFlag) {
         _that.gotoLogin()
       }
+    },
+    async initBackup() {
+      let _that = this
+      let store = _that.$store
+      let clientPeerId = myself.myselfPeerClient.peerId
+      let newPayload = {}
+      newPayload.type = ChatMessageType.BACKUP
+      newPayload.srcClientId = myself.myselfPeerClient.clientId
+      newPayload.srcPeerId = clientPeerId
+      newPayload.url = _that.initBackupUrl
+      newPayload.filename = _that.initBackupFilename
+      await chatAction.chat(null, newPayload, clientPeerId)
     },
     acceptBackup: async function () {
       let _that = this
@@ -3716,6 +3750,27 @@ export default {
       await chatAction.chat(null, newPayload, clientPeerId)
       _that.backupDialog = false
     },
+    showInitRestoreDialog: function () {
+      let _that = this
+      _that.initRestoreDialog = true
+    },
+    cancelInitRestore: function () {
+      let _that = this
+      _that.initRestoreDialog = false
+      if (_that.logoutFlag) {
+        _that.gotoLogin()
+      }
+    },
+    async initRestore() {
+      let _that = this
+      let store = _that.$store
+      let clientPeerId = myself.myselfPeerClient.peerId
+      let newPayload = {}
+      newPayload.type = ChatMessageType.RESTORE
+      newPayload.srcClientId = myself.myselfPeerClient.clientId
+      newPayload.srcPeerId = clientPeerId
+      await chatAction.chat(null, newPayload, clientPeerId)
+    },
     acceptRestore: async function () {
       let _that = this
       let store = _that.$store
@@ -3726,7 +3781,7 @@ export default {
       let json = await fileComponent.readFile(fileEntry, { format: 'txt' })
       if (json) {
         await store.restoreChatRecord(json)
-        _that.closeRestore()
+        await _that.closeRestore('Accept')
         _that.$q.notify({
           message: _that.$i18n.t("Restore successfully"),
           timeout: 3000,
@@ -3735,8 +3790,15 @@ export default {
         })
       }
     },
-    closeRestore: function () {
+    closeRestore: async function (operation) {
       let _that = this
+      let clientPeerId = myself.myselfPeerClient.peerId
+      let newPayload = {}
+      newPayload.type = ChatMessageType.RESTORE
+      newPayload.srcClientId = myself.myselfPeerClient.clientId
+      newPayload.srcPeerId = clientPeerId
+      newPayload.operation = operation
+      await chatAction.chat(null, newPayload, clientPeerId)
       _that.restoreDialog = false
     },
     restoreChatRecord: async function (txt) {
@@ -4245,18 +4307,6 @@ export default {
       }, async function (error) {
         await logService.log(error, 'startServerError', 'error')
       })
-    },
-    async initBackup() {
-      let _that = this
-      let store = _that.$store
-      let clientPeerId = myself.myselfPeerClient.peerId
-      let newPayload = {}
-      newPayload.type = ChatMessageType.BACKUP
-      newPayload.srcClientId = myself.myselfPeerClient.clientId
-      newPayload.srcPeerId = clientPeerId
-      newPayload.url = _that.initBackupUrl
-      newPayload.filename = _that.initBackupFilename
-      await chatAction.chat(null, newPayload, clientPeerId)
     },
     async cloudSyncChannelArticle(channelId) {
       let _that = this
@@ -4931,6 +4981,7 @@ export default {
     store.refreshData = _that.refreshData
     store.getArticleList = _that.getArticleList
     store.showInitBackupDialog = _that.showInitBackupDialog
+    store.showInitRestoreDialog = _that.showInitRestoreDialog
     store.showInitMigrateDialog = _that.showInitMigrateDialog
     store.restoreChatRecord = _that.restoreChatRecord
     store.startServer = _that.startServer

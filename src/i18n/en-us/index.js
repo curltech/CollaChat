@@ -321,8 +321,8 @@ export default {
   // General
   "Chat Records Backup and Migration": "Chat Records Backup and Migration",
   "incl. Contacts Info": "incl. Contacts Info",
-  "Please confirm on your computer to start the backup": "Please confirm on your computer to start the backup",
   "Please login on your computer first, then confirm to initiate the backup": "Please login on your computer first, then confirm to initiate the backup",
+  "Please login on your mobile first, then confirm to initiate the restore": "Please login on your mobile first, then confirm to initiate the restore",
   "Please confirm to receive the backup from your mobile": "Please confirm to receive the backup from your mobile",
   "Please scan the QR code using another mobile to start the migration": "Please scan the QR code using another mobile to start the migration",
   "Please confirm to receive the migration from another mobile": "Please confirm to receive the migration from another mobile",

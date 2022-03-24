@@ -146,17 +146,12 @@ export default {
       let store = _that.$store
       _that.$refs.restoreUpload.pickFiles()
     },
-    restoreUpload: async function(files) {
+    restoreUpload: function(files) {
       let _that = this
       let store = _that.$store
       store.restoreFile = files[0]
       _that.$refs.restoreUpload.reset()
-      let clientPeerId = myself.myselfPeerClient.peerId
-      let newPayload = {}
-      newPayload.type = ChatMessageType.RESTORE
-      newPayload.srcClientId = myself.myselfPeerClient.clientId
-      newPayload.srcPeerId = clientPeerId
-      await chatAction.chat(null, newPayload, clientPeerId)
+      store.showInitRestoreDialog()
     },
     exportJson: async function() {
       let _that = this

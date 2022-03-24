@@ -329,8 +329,8 @@ export default {
   // General
   "Chat Records Backup and Migration": "聊天记录备份与迁移",
   "incl. Contacts Info": "含联系人信息",
-  "Please confirm on your computer to start the backup": "请在电脑上确认，以开始备份",
   "Please login on your computer first, then confirm to initiate the backup": "请先登录您的计算机，然后确认启动备份",
+  "Please login on your mobile first, then confirm to initiate the restore": "请先在手机上登录，然后确认开始恢复",
   "Please confirm to receive the backup from your mobile": "请确认以接收来自手机的备份",
   "Please scan the QR code using another mobile to start the migration": "请使用另一个手机扫描二维码以开始迁移",
   "Please confirm to receive the migration from another mobile": "请确认以接收来自另一个手机的迁移",

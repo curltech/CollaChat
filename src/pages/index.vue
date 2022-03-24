@@ -232,17 +232,15 @@ q-layout
         q-item-label {{$t('Please confirm to receive the migration from another mobile')}}
       q-card-actions(align="around")
         q-btn.text-primary(unelevated :label="$t('Confirm')" no-caps @click="acceptMigrate")
-        q-btn.text-primary(unelevated :label="$t('Cancel')" no-caps @click="closeMigrate")
-  q-dialog(v-model="initBackupDialog" persistent maximized)
-    q-card(flat class="fixed-center q-pa-none")
+        q-btn.text-primary(unelevated :label="$t('Cancel')" no-caps @click="closeMigrate('Cancel')")
+  q-dialog(v-model="initBackupDialog" persistent)
+    q-card(style="width: 250px")
       q-bar(class="bg-primary text-c-grey-0")
         q-item-label {{$t('Backup (Mobile to PC)')}}
         //q-space
         //q-btn(dense flat icon="close" v-close-popup)
       q-card-section(class="q-pa-lg")
         q-item-label {{$t('Please login on your computer first, then confirm to initiate the backup')}}
-      //q-card-section(class="q-pa-lg")
-        q-item-label {{$t('Please confirm on your computer to start the backup')}}
       q-card-actions(align="center")
         q-btn.text-primary(unelevated :label="$t('Confirm')" no-caps @click="initBackup")
         q-btn.text-primary(unelevated :label="$t('Cancel')" no-caps v-close-popup @click="cancelInitBackup")
@@ -259,6 +257,17 @@ q-layout
       q-card-actions(align="around")
         q-btn.text-primary(unelevated :label="$t('Confirm')" no-caps @click="acceptBackup")
         q-btn.text-primary(unelevated :label="$t('Cancel')" no-caps @click="closeBackup('Cancel')")
+  q-dialog(v-model="initRestoreDialog" persistent)
+    q-card(style="width: 250px")
+      q-bar(class="bg-primary text-c-grey-0")
+        q-item-label {{$t('Restore (PC to Mobile)')}}
+        //q-space
+        //q-btn(dense flat icon="close" v-close-popup)
+      q-card-section(class="q-pa-lg")
+        q-item-label {{$t('Please login on your mobile first, then confirm to initiate the restore')}}
+      q-card-actions(align="center")
+        q-btn.text-primary(unelevated :label="$t('Confirm')" no-caps @click="initRestore")
+        q-btn.text-primary(unelevated :label="$t('Cancel')" no-caps v-close-popup @click="cancelInitRestore")
   q-dialog(v-model="restoreDialog" persistent)
     q-card(style="width: 250px")
       q-bar(class="bg-primary text-c-grey-0")
@@ -269,7 +278,7 @@ q-layout
         q-item-label {{$t('Please confirm to restore using the backup from your PC')}}
       q-card-actions(align="around")
         q-btn.text-primary(unelevated :label="$t('Confirm')" no-caps @click="acceptRestore")
-        q-btn.text-primary(unelevated :label="$t('Cancel')" no-caps @click="closeRestore")
+        q-btn.text-primary(unelevated :label="$t('Cancel')" no-caps @click="closeRestore('Cancel')")
 </template>
 <script src="./index.vue.js" />
 <style lang="stylus" src="../css/index.styl"/>
