@@ -3448,8 +3448,7 @@ export default {
           linkman.lastWebrtcRequestTime = createTimestamp
         }
         let response = await p2pChatAction.chat(null, dataBlock, peerId)
-        if (response && response.MessageType === "CONSENSUS_REPLY" && response.Payload === 'OK'){
-           message.actualReceiveTime = new Date().getTime()
+        if (response && response.MessageType === MsgType.CONSENSUS_REPLY && response.Payload === MsgType.OK) {
            await _that.receiveMessageBlockReply(blockId)
         }
       } catch (e) {
@@ -3576,7 +3575,7 @@ export default {
         } else if (consensusLog.blockType === BlockType.P2pChat && consensusLog.peerId) { // this is a create (otherwise delete) P2pChat consensus reply
           // 标记发送回执
           let blockId = data.Payload.blockId
-          _that.receiveMessageBlockReply(blockId)
+          await _that.receiveMessageBlockReply(blockId)
         }
       }
     },
