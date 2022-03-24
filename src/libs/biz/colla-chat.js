@@ -290,6 +290,11 @@ export class ChatComponent {
       q['messageType'] = originCondition.messageType
       qs.push(q)
     }
+    if (originCondition.blockId) {
+      let q = {}
+      q['blockId'] = originCondition.blockId
+      qs.push(q)
+    }
     if (originCondition.contentType && originCondition.contentType !== ChatContentType.ALL) {
       let q = {}
       q['contentType'] = originCondition.contentType

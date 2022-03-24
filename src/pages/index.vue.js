@@ -1014,12 +1014,17 @@ export default {
       } else {
         message.actualReceiveTime = message.createDate
       }
+      if (message.messageType === P2pChatMessageType.CHAT_LINKMAN) {
+        await store.handleChatTime(message, chat)
+      }
       if (subjectType === SubjectType.CHAT && subjectId !== myselfPeerId) {
         //if (store.state.linkmanMap[subjectId].activeStatus === ActiveStatus.UP) {
         message.destroyTime = chat.destroyTime
         //}
+        await chatComponent.insert(ChatDataType.MESSAGE, message, chat.messages)
         store.p2pSend(message, subjectId)
       } else if (subjectType === SubjectType.GROUP_CHAT) {
+        await chatComponent.insert(ChatDataType.MESSAGE, message, chat.messages)
         let groupMembers
         if (message.contentType === ChatContentType.VIDEO_INVITATION || message.contentType === ChatContentType.AUDIO_INVITATION || message.messageType === P2pChatMessageType.CALL_CLOSE) {
           groupMembers = message.content
@@ -1029,7 +1034,6 @@ export default {
         for (let groupMember of groupMembers) {
           let linkman = store.state.linkmanMap[groupMember.memberPeerId ? groupMember.memberPeerId : groupMember]
           if (!linkman || linkman.peerId !== linkman.ownerPeerId) { // 自己除外
-            store.p2pSend(message, groupMember.memberPeerId ? groupMember.memberPeerId : groupMember)
             let receive = {
               ownerPeerId: message.ownerPeerId,
               subjectType: message.subjectType,
@@ -1044,6 +1048,7 @@ export default {
             if (message.messageType !== P2pChatMessageType.CALL_CLOSE) {
               await chatComponent.insert(ChatDataType.RECEIVE, receive, null)
             }
+            store.p2pSend(message, groupMember.memberPeerId ? groupMember.memberPeerId : groupMember)
           }
         }
       }
@@ -1051,16 +1056,13 @@ export default {
         return
       }
       if (message.messageType === P2pChatMessageType.CHAT_LINKMAN) {
-        await store.handleChatTime(message, chat)
+        //await store.handleChatTime(message, chat)
         chat.content = store.getChatContent(message.contentType, message.content)
         chat.updateTime = message.createDate
         let db_chat = await chatComponent.get(ChatDataType.CHAT, chat._id)
         db_chat.content = chat.content
         db_chat.updateTime = chat.updateTime
         await chatComponent.update(ChatDataType.CHAT, db_chat)
-      }
-      await chatComponent.insert(ChatDataType.MESSAGE, message, chat.messages)
-      if (message.messageType === P2pChatMessageType.CHAT_LINKMAN) {
         _that.$nextTick(() => {
           let container = _that.$el.querySelector('#talk')
           if (container) {
@@ -3445,7 +3447,11 @@ export default {
           await webrtcPeerPool.create(linkman.peerId, option)
           linkman.lastWebrtcRequestTime = createTimestamp
         }
-        await p2pChatAction.chat(null, dataBlock, peerId)
+        let response = await p2pChatAction.chat(null, dataBlock, peerId)
+        if (response && response.MessageType === "CONSENSUS_REPLY" && response.Payload === 'OK'){
+           message.actualReceiveTime = new Date().getTime()
+           await _that.receiveMessageBlockReply(blockId)
+        }
       } catch (e) {
         await logService.log(e, 'p2pSendError', 'error')
       }
@@ -3570,25 +3576,31 @@ export default {
         } else if (consensusLog.blockType === BlockType.P2pChat && consensusLog.peerId) { // this is a create (otherwise delete) P2pChat consensus reply
           // 标记发送回执
           let blockId = data.Payload.blockId
-          let messages = await chatComponent.loadMessage(
-            {
-              blockId: blockId
-            })
-          if (messages && messages.length > 0) {
-            let currentMes = messages[0]
-            currentMes.receiveTag = true
-            await chatComponent.update(ChatDataType.MESSAGE, currentMes, null)
-          } else {
-            let receives = await chatComponent.loadReceive(
-              {
-                blockId: blockId
-              })
-            if (receives && receives.length > 0) {
-              let currentRec = receives[0]
-              currentRec.receiveTag = true
-              await chatComponent.update(ChatDataType.RECEIVE, currentRec, null)
-            }
-          }
+          _that.receiveMessageBlockReply(blockId)
+        }
+      }
+    },
+    async receiveMessageBlockReply(blockId){
+      let messages = await chatComponent.loadMessage(
+        {
+          ownerPeerId: myself.myselfPeerClient.peerId,
+          blockId: blockId
+        })
+      if (messages && messages.length > 0) {
+        let currentMes = messages[0]
+        currentMes.receiveTag = true
+        currentMes.actualReceiveTime = new Date().getTime()
+        await chatComponent.update(ChatDataType.MESSAGE, currentMes, null)
+      } else {
+        let receives = await chatComponent.loadReceive(
+          {
+            blockId: blockId
+          })
+        if (receives && receives.length > 0) {
+          let currentRec = receives[0]
+          currentRec.receiveTag = true
+          currentRec.actualReceiveTime = new Date().getTime()
+          await chatComponent.update(ChatDataType.RECEIVE, currentRec, null)
         }
       }
     },
