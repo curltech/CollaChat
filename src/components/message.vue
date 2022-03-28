@@ -384,13 +384,13 @@
           q-btn.text-primary(flat round icon="close" @click="fullsizeBack")
           q-space
           q-btn.text-primary(flat round icon="more_horiz" @click="videoCommand()")
-        q-toolbar(v-if="imageMessageSrc && !$store.ifMobile()" style="z-index: 999")
+        q-toolbar(v-if="imageMessageSrc" style="z-index: 999")
           q-btn.text-primary(flat round icon="close" @click="fullsizeBack")
           q-space
           q-btn.text-primary(flat round icon="more_horiz" @click="imageCommand()")
-        img#messageFullsizeImg(:class="$store.ifMobile() || (ifMobileSize || $store.state.ifMobileStyle) ? '':'messageFullsizeImg-pc'" v-if="imageMessageSrc" :src="imageMessageSrc")
+        img#messageFullsizeImg(v-if="imageMessageSrc" :src="imageMessageSrc" :style="fullscreenStyle")
         canvas#messageFullsizeCanvas(v-if="imageMessageSrc" class="hidden")
-        video#messageFullsizeVideo(v-if="videoRecordMessageSrc" :src="videoRecordMessageSrc" controls webkit-playsinline playsinline x5-playsinline x-webkit-airplay="allow" autoplay)
+        video#messageFullsizeVideo(v-if="videoRecordMessageSrc" :src="videoRecordMessageSrc" :style="fullscreenStyle" controls webkit-playsinline playsinline x5-playsinline x-webkit-airplay="allow" autoplay)
     q-dialog(v-model="audioRecordMessageViewDialog")
       q-card
         q-card-section(class="row items-center")

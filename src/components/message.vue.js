@@ -170,6 +170,9 @@ export default {
         height: `${this.$q.screen.height}px`
       }
     },
+    fullscreenStyle() {
+      return 'max-width: 100%;max-height: ' + (this.$q.screen.height - 50) + 'px;'
+    },
     ifMobileSize() {
       return (!window.device && this.$q.screen.width < 481)
     },
@@ -815,31 +818,30 @@ export default {
             //store.state.imageMessageViewDialog = true
             _that.fullsizeEntry = _that.subKind
             _that.subKind = 'messageFullsize'
-            _that.$nextTick(() => {
-              if (store.ifMobile()) {
-                var img = new Image()
-                img.src = _that.imageMessageSrc
-                img.onload = () => {
-                  console.log('img.width: ' + img.width + ', img.height: ' + img.height)
-                  let selectedContainer = document.getElementById('messageFullsizeContainer')
-                  let canvas = document.getElementById('messageFullsizeCanvas')
-                  let ctx = canvas.getContext('2d')
-                  canvas.width = _that.ifMobileSize || store.state.ifMobileStyle ? _that.$q.screen.width : (img.width > selectedContainer.clientWidth ? selectedContainer.clientWidth : img.width)
-                  canvas.height = canvas.width * img.height / img.width
-                  ctx.clearRect(0, 0, canvas.width, canvas.height)
-                  ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
-                  let selectedImg = document.querySelector('#messageFullsizeImg')
-                  selectedImg.src = canvas.toDataURL('image/png', 1.0)
-                  let marginTop = 0
-                  marginTop = (store.screenHeight - canvas.height) / 2 // 不使用_that.$q.screen.height，避免键盘弹出时的影响
-                  marginTop = marginTop < 0 ? 0 : marginTop
-                  console.log('$q.screen.Height:' + _that.$q.screen.height + ',canvas.width:' + canvas.width + ',canvas.height:' + canvas.height + ',marginTop:' + marginTop)
-                  selectedImg.style.cssText += 'margin-top: ' + marginTop + 'px'
+            if (_that.imageMessageSrc) {
+              var img = new Image()
+              img.src = _that.imageMessageSrc
+              img.onload = () => {
+                console.log('img.width: ' + img.width + ', img.height: ' + img.height)
+                let selectedContainer = document.getElementById('messageFullsizeContainer')
+                let selectedImg = document.querySelector('#messageFullsizeImg')
+                let canvasWidth = _that.ifMobileSize || store.state.ifMobileStyle ? _that.$q.screen.width : (img.width > selectedContainer.clientWidth ? selectedContainer.clientWidth : img.width)
+                let canvasHeight = canvasWidth * img.height / img.width
+                let marginTop = 0
+                if (store.ifMobile()) {
+                  marginTop = (store.screenHeight - canvasHeight) / 2 - 50 // 不使用_that.$q.screen.height，避免键盘弹出时的影响
+                } else {
+                  marginTop = (_that.$q.screen.height - canvasHeight) / 2 - 50
+                }
+                marginTop = marginTop < 0 ? 0 : marginTop
+                console.log('screenHeight:' + (store.ifMobile() ? store.screenHeight : _that.$q.screen.height) + ',canvasWidth:' + canvasWidth + ',canvasHeight:' + canvasHeight + ',marginTop:' + marginTop)
+                selectedImg.style.cssText += 'margin-top: ' + marginTop + 'px'
+                if (store.ifMobile()) {
                   alloyFingerComponent.initImage('#messageFullsizeImg')
                   alloyFingerComponent.initLongSingleTap('#messageFullsizeContainer', _that.imageCommand, _that.fullsizeBack)
                 }
               }
-            })
+            }
           })
         } else if (message.contentType === ChatContentType.AUDIO) {
           _that.audioRecordMessageSrc = fileData
@@ -857,10 +859,35 @@ export default {
           } else {
             _that.imageMessageSrc = null
             _that.videoRecordMessageSrc = fileData
-
             _that.$nextTick(() => {
               _that.fullsizeEntry = _that.subKind
               _that.subKind = 'messageFullsize'
+              let selectedVideo = document.querySelector('#messageFullsizeVideo')
+              selectedVideo.addEventListener('canplay', function () {
+                let width = this.videoWidth
+                let height = this.videoHeight
+                let initWidth = width //_that.$q.screen.width < 481 ? _that.$q.screen.width : 480
+                let initHeight = height //initWidth * height / width
+                let marginTop = 0
+                if (store.ifMobile()) { // 不使用_that.$q.screen.height，避免键盘弹出时的影响
+                  if (initHeight > store.screenHeight) {
+                    initHeight = store.screenHeight
+                    initWidth = initHeight * width / height
+                  }
+                  marginTop = (store.screenHeight - initHeight) / 2 - 50
+                } else {
+                  if (initHeight > _that.$q.screen.height) {
+                    initHeight = _that.$q.screen.height
+                    initWidth = initHeight * width / height
+                  }
+                  marginTop = (_that.$q.screen.height - initHeight) / 2 - 50
+                }
+                console.log('screenHeight:' + (store.ifMobile() ? store.screenHeight : _that.$q.screen.height) + ',initWidth:' + initWidth + ',initHeight:' + initHeight + ',marginTop:' + marginTop)
+                selectedVideo.style.cssText += 'margin-top: ' + marginTop + 'px'
+                if (store.ifMobile()) {
+                  alloyFingerComponent.initLongSingleTap('#messageFullsizeContainer', _that.videoCommand)
+                }
+              })
             })
           }
         }
@@ -1552,7 +1579,9 @@ export default {
         ]
       }).onOk(async action => {
         if (action.id === 'save') {
+          let img = document.getElementById('messageFullsizeImg')
           if (store.ifMobile()) {
+            let canvas = mediaComponent.image2canvas(img)
             window.canvas2ImagePlugin.saveImageDataToLibrary(
               function (msg) {
                 console.log(msg)
@@ -1572,13 +1601,11 @@ export default {
                   color: "warning",
                 })
               },
-              document.getElementById('messageFullsizeCanvas'),
+              canvas,
               "jpeg" // format is optional, defaults to 'png'
             )
           } else {
-            //let canvas = document.getElementById('selectedCanvas')
-            let canvas = document.getElementById('messageFullsizeImg')
-            let avatarBase64 = canvas.src
+            let avatarBase64 = img.src
             let arr = avatarBase64.split(',')
             let mime = arr[0].match(/:(.*?);/)[1]
             let extension = mime.split('/')[1]
@@ -2979,10 +3006,8 @@ export default {
     },
     saveLocalImage() {
       let _that = this
-      //save
-      let imageDom = document.getElementById('dialog-image')
-      let canvas = mediaComponent.image2canvas(imageDom)
-      console.log(canvas)
+      let img = document.getElementById('dialog-image')
+      let canvas = mediaComponent.image2canvas(img)
       window.canvas2ImagePlugin.saveImageDataToLibrary(
         function (msg) {
           console.log(msg)

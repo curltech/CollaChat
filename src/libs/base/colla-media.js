@@ -1166,10 +1166,8 @@ class MediaComponent {
   image2canvas(img) {
     let canvas = document.createElement('canvas')
     let ctx = canvas.getContext('2d')
-    let imgWidth = img.width
-    let imgHeight = img.height
-    canvas.width = imgWidth
-    canvas.height = imgHeight
+    canvas.width = img.width
+    canvas.height = img.height
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
     return canvas
