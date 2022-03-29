@@ -306,17 +306,21 @@ export default {
           img.src = selected.src
           img.onload = () => {
             console.log('img.width: ' + img.width + ', img.height: ' + img.height)
-            let selectedContainer = document.getElementById('selectedContainer')
             let selectedImg = document.querySelector('#selectedImg')
+            /*let selectedContainer = document.getElementById('selectedContainer')
             let canvasWidth = _that.ifMobileSize || store.state.ifMobileStyle ? _that.$q.screen.width : (img.width > selectedContainer.clientWidth ? selectedContainer.clientWidth : img.width)
-            let canvasHeight = canvasWidth * img.height / img.width
+            let canvasHeight = canvasWidth * img.height / img.width*/
+            let canvasWidth = selectedImg.width
+            let canvasHeight = selectedImg.height
             let marginTop = 0
-            if (store.ifMobile()) {
-              marginTop = (store.screenHeight - canvasHeight) / 2 - 50 // 不使用_that.$q.screen.height，避免键盘弹出时的影响
+            if (store.ifMobile()) { // 不使用_that.$q.screen.height，避免键盘弹出时的影响
+              //marginTop = (store.screenHeight - canvasHeight) / 2 - 50
+              marginTop = (store.screenHeight - canvasHeight - 50) / 2
             } else {
-              marginTop = (_that.$q.screen.height - canvasHeight) / 2 - 50
+              //marginTop = (_that.$q.screen.height - canvasHeight) / 2 - 50
+              marginTop = (_that.$q.screen.height - canvasHeight - 50) / 2
             }
-            marginTop = marginTop < 0 ? 0 : marginTop
+            //marginTop = marginTop < 0 ? 0 : marginTop
             console.log('screenHeight:' + (store.ifMobile() ? store.screenHeight : _that.$q.screen.height) + ',canvas.width:' + canvas.width + ',canvas.height:' + canvas.height + ',marginTop:' + marginTop)
             selectedImg.style.cssText += 'margin-top: ' + marginTop + 'px'
             if (store.ifMobile()) {
@@ -332,33 +336,40 @@ export default {
               type: "warning",
               color: "warning",
             })
+          }
+        }
+      })
+    },
+    canPlay() {
+      let _that = this
+      let store = _that.$store
+      _that.$nextTick(() => {
+        let selectedVideo = document.querySelector('#selectedVideo')
+        if (selectedVideo) {
+          /*let width = selectedVideo.videoWidth
+          let height = selectedVideo.videoHeight
+          let initWidth = width //_that.$q.screen.width < 481 ? _that.$q.screen.width : 480
+          let initHeight = height //initWidth * height / width*/
+          let initWidth = selectedVideo.offsetWidth
+          let initHeight = selectedVideo.offsetHeight
+          let marginTop = 0
+          if (store.ifMobile()) { // 不使用_that.$q.screen.height，避免键盘弹出时的影响
+            /*if (initHeight > store.screenHeight - 50) {
+              initHeight = store.screenHeight - 50
+              initWidth = initHeight * width / height
+            }*/
+            marginTop = (store.screenHeight - initHeight - 50) / 2
           } else {
-            let selectedVideo = document.querySelector('#selectedVideo')
-            selectedVideo.addEventListener('canplay', function () {
-              let width = this.videoWidth
-              let height = this.videoHeight
-              let initWidth = width //_that.$q.screen.width < 481 ? _that.$q.screen.width : 480
-              let initHeight = height //initWidth * height / width
-              let marginTop = 0
-              if (store.ifMobile()) {
-                if (initHeight > store.screenHeight) { // 不使用_that.$q.screen.height，避免键盘弹出时的影响
-                  initHeight = store.screenHeight
-                  initWidth = initHeight * width / height
-                }
-                marginTop = (store.screenHeight - initHeight) / 2 - 50
-              } else {
-                if (initHeight > _that.$q.screen.height) { // 不使用_that.$q.screen.height，避免键盘弹出时的影响
-                  initHeight = _that.$q.screen.height
-                  initWidth = initHeight * width / height
-                }
-                marginTop = (_that.$q.screen.height - initHeight) / 2 - 50
-              }
-              console.log('$q.screen.Height:' + _that.$q.screen.height + ',initWidth:' + initWidth + ',initHeight:' + initHeight + ',marginTop:' + marginTop)
-              selectedVideo.style.cssText += 'margin-top: ' + marginTop + 'px'
-              if (store.ifMobile()) {
-                alloyFingerComponent.initLongSingleTap('#selectedContainer', _that.videoCommand)
-              }
-            })
+            /*if (initHeight > _that.$q.screen.height - 50) {
+              initHeight = _that.$q.screen.height - 50
+              initWidth = initHeight * width / height
+            }*/
+            marginTop = (_that.$q.screen.height - initHeight - 50) / 2
+          }
+          console.log('screenHeight:' + (store.ifMobile() ? store.screenHeight : _that.$q.screen.height) + ',initWidth:' + initWidth + ',initHeight:' + initHeight + ',marginTop:' + marginTop)
+          selectedVideo.style.cssText += 'margin-top: ' + marginTop + 'px'
+          if (store.ifMobile()) {
+            alloyFingerComponent.initLongSingleTap('#selectedContainer', _that.videoCommand)
           }
         }
       })
@@ -506,10 +517,12 @@ export default {
       })
     },
     async insertEditor(files) {
-      let insertHtml = await collectionUtil.getInsertHtml(files)
-      let html = this.$store.state.articleData.content ? store.state.articleData.content : ''
+      let _that = this
+      let store = _that.$store
+      let insertHtml = await collectionUtil.getInsertHtml(files, store.imageMaxWidth, store.videoMaxWidth, store.audioMaxWidth)
+      let html = store.state.articleData.content ? store.state.articleData.content : ''
       html = html.replace('([{PHFI}])', insertHtml)
-      this.$store.state.articleData.content = html
+      store.state.articleData.content = html
       editor.txt.html(html)
     },
     /**
@@ -520,7 +533,7 @@ export default {
       let _that = this
       let store = _that.$store
       _that.captureType = type
-      if (store.ios === true || (store.android === true && (store.useNativeAndroid === true || type === 'video'))) {
+      if (store.ios === true || (store.android === true && store.useNativeAndroid === true)) {
         try {
           if (type === 'image') {
             _that.imageUrl = await mediaCaptureComponent.captureImage()

@@ -39,14 +39,12 @@
     mounted() {
       let _that = this
       _that.audio = new Audio()
-      
       _that.audio.addEventListener('canplaythrough', async() => {
         while(_that.audio.duration === Infinity) {
           await new Promise(r => setTimeout(r, 500));
-          _that.audio.currentTime = 10000000*Math.random();
+          _that.audio.currentTime = 10000000 * Math.random();
         }
         _that.duration = CollaUtil.formatSeconds(_that.audio.duration) //_that.format(_that.audio.duration)
-        
       })
       this.audio.src = this.src
       this.audio.load()

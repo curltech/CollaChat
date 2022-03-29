@@ -1,3 +1,6 @@
+import Recorder from 'recorder-core/recorder.mp3.min' // 已包含recorder-core和mp3格式支持
+import 'recorder-core/src/engine/beta-amr-engine.js'
+
 import { EntityState } from 'libcolla'
 import { CollaUtil, TypeUtil, BlobUtil, UUID } from 'libcolla'
 import { myself, consensusAction, putValueAction, DataBlockService, dataBlockService, BlockType, MsgType, PayloadType } from 'libcolla'
@@ -7,7 +10,6 @@ import pinyinUtil from '@/libs/base/colla-pinyin'
 import { mediaComponent, audioMediaComponent } from '@/libs/base/colla-media'
 import { fileComponent } from '@/libs/base/colla-cordova'
 import { collectionComponent, CollectionType } from '@/libs/biz/colla-collection'
-import store from '@/store'
 
 /**
  * message和collection复用功能
@@ -267,7 +269,7 @@ export class CollectionUtil {
       }
     }
   }
-  async getInsertHtml(files) {
+  async getInsertHtml(files, imageMaxWidth, videoMaxWidth, audioMaxWidth) {
     let insertHtml = ''
     for (let file of files) {
       let mimeType = null
@@ -302,12 +304,12 @@ export class CollectionUtil {
       }
       if (content) {
         if (type === 'image') {
-          insertHtml += '<p><br></p>' + '<img src="' + content + '" style="max-width:' + store.imageMaxWidth + ';width:100%;"></img>' + '<p><br></p>'
+          insertHtml += '<p><br></p>' + '<img src="' + content + '" style="max-width:' + imageMaxWidth + ';width:100%;"></img>' + '<p><br></p>'
         } else if (type === 'video') {
           let thumbnail = await mediaComponent.createVideoThumbnailByBase64(content)
-          insertHtml += '<p><br></p>' + '<video src="' + content + '" poster="' + thumbnail + '" style="max-width:' + store.videoMaxWidth + ';width:100%;" controls webkit-playsinline playsinline x5-playsinline x-webkit-airplay="allow"></video>' + '<p><br></p>'
+          insertHtml += '<p><br></p>' + '<video src="' + content + '" poster="' + thumbnail + '" style="max-width:' + videoMaxWidth + ';width:100%;" controls webkit-playsinline playsinline x5-playsinline x-webkit-airplay="allow"></video>' + '<p><br></p>'
         } else if (type === 'audio') {
-          insertHtml += '<p><br></p>' + '<audio src="' + content + '" style="max-width:' + store.audioMaxWidth + ';width:100%;" controls></audio>' + '<p><br></p>'
+          insertHtml += '<p><br></p>' + '<audio src="' + content + '" style="max-width:' + audioMaxWidth + ';width:100%;" controls></audio>' + '<p><br></p>'
         } else {
           insertHtml += '<p><br></p>' + '<p>' + content + '</p>' + '<p><br></p>'
         }
@@ -478,10 +480,10 @@ export class CollectionUtil {
     return dbLogs
   }
   /**
-	 * 云端下载方法，也可以参考这里的实现通过web worker等其它方法自行处理
-	 *
-	 * @param {*} downloadList: 分片粒度的block记录
-	 */
+   * 云端下载方法，也可以参考这里的实现通过web worker等其它方法自行处理
+   *
+   * @param {*} downloadList: 分片粒度的block记录
+   */
   async download(downloadList) {
     let responses = null
     if (downloadList && downloadList.length > 0) {
@@ -551,7 +553,7 @@ export class CollectionUtil {
               if (base64) {
                 let dirEntry = await fileComponent.getRootDirEntry('tmp')
                 let dirPath = dirEntry.toInternalURL()
-                let fileName = 'thumbnail' + UUID.string(null, null) + '.' + base64.substring(11, base64.indexOf(';', 11))
+                let fileName = 'video' + UUID.string(null, null) + '.' + base64.substring(11, base64.indexOf(';', 11))
                 fileEntry = await fileComponent.createNewFileEntry(fileName, dirPath)
                 blob = BlobUtil.base64ToBlob(base64)
                 await fileComponent.writeFile(fileEntry, blob, false)
@@ -560,6 +562,37 @@ export class CollectionUtil {
                 type = 'video/mp4'
               }
             }
+          }
+          if (localURL.toUpperCase().indexOf('.AMR') > -1) {
+            let fileEntry = await fileComponent.getFileEntry(localURL)
+            blob = await fileComponent.readFile(fileEntry, { format: 'blob', type: type })
+            let reader = new FileReader()
+            reader.onload = function () {
+              let amr = new Uint8Array(reader.result)
+              Recorder.AMR.decode(amr, function (pcm) {
+                let set = {
+                  type: "mp3",
+                  sampleRate: 16000,
+                  bitRate: 16
+                }
+                let rec = Recorder(set).mock(pcm, 8000)
+                rec.stop(async function (mp3Blob, duration) {
+                  let dirEntry = await fileComponent.getRootDirEntry('tmp')
+                  let dirPath = dirEntry.toInternalURL()
+                  let fileName = 'audio' + UUID.string(null, null) + '.mp3'
+                  fileEntry = await fileComponent.createNewFileEntry(fileName, dirPath)
+                  await fileComponent.writeFile(fileEntry, mp3Blob, false)
+                  localURL = dirEntry.toInternalURL() + fileName
+                  console.log('localURL2:' + localURL)
+                }, function (err) {
+                  console.error(err)
+                })
+              }, function (err) {
+                console.error(err)
+              })
+            }
+            reader.readAsArrayBuffer(blob)
+            type = 'audio/mp3'
           }
           let fileEntry = await fileComponent.getFileEntry(localURL)
           blob = await fileComponent.readFile(fileEntry, { format: 'blob', type: type })

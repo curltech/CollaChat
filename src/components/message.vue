@@ -390,7 +390,7 @@
           q-btn.text-primary(flat round icon="more_horiz" @click="imageCommand()")
         img#messageFullsizeImg(v-if="imageMessageSrc" :src="imageMessageSrc" :style="fullscreenStyle")
         canvas#messageFullsizeCanvas(v-if="imageMessageSrc" class="hidden")
-        video#messageFullsizeVideo(v-if="videoRecordMessageSrc" :src="videoRecordMessageSrc" :style="fullscreenStyle" controls webkit-playsinline playsinline x5-playsinline x-webkit-airplay="allow" autoplay)
+        video#messageFullsizeVideo(v-if="videoRecordMessageSrc" @canplay="canPlay" :src="videoRecordMessageSrc" :style="fullscreenStyle" controls webkit-playsinline playsinline x5-playsinline x-webkit-airplay="allow" autoplay)
     q-dialog(v-model="audioRecordMessageViewDialog")
       q-card
         q-card-section(class="row items-center")

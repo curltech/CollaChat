@@ -1,4 +1,4 @@
-import Recorder from 'recorder-core/recorder.mp3.min' //已包含recorder-core和mp3格式支持
+import Recorder from 'recorder-core/recorder.mp3.min' // 已包含recorder-core和mp3格式支持
 import 'recorder-core/src/extensions/frequency.histogram.view'
 import 'recorder-core/src/extensions/lib.fft.js'
 
@@ -53,7 +53,6 @@ export default {
           } else {
             _that.initHeight = videoContainer.clientHeight - 50 - 80
           }
-          let srcVideo = _that.$refs['srcVideo']
           _that.constraints = {
             audio: {
               echoCancellation: { exact: true },
@@ -67,35 +66,38 @@ export default {
               facingMode: 'environment'
             }
           }
-          try {
-            await mediaStreamComponent.play(srcVideo, _that.constraints).then(function (stream) {
-              _that.srcStream = stream
+          let srcVideo = _that.$refs['srcVideo']
+          if (srcVideo) {
+            try {
+              await mediaStreamComponent.play(srcVideo, _that.constraints).then(function (stream) {
+                _that.srcStream = stream
+              })
+            } catch (e) {
+              console.error(e)
+            }
+            srcVideo.addEventListener('canplay', function () {
+              let width = this.videoWidth
+              let height = this.videoHeight
+              /*let initWidth = _that.$q.screen.width < 481 ? _that.$q.screen.width : 480
+              let initHeight = initWidth * height / width
+              if (initHeight > store.screenHeight - 50 - 80) { // 不使用_that.$q.screen.height，避免键盘弹出时的影响
+                initHeight = store.screenHeight - 50 - 80
+                initWidth = initHeight * width / height
+              }
+              _that.initWidth = initWidth
+              _that.initHeight = initHeight*/
+              _that.initWidth = width
+              _that.initHeight = height
+              //let marginTop = (store.screenHeight - _that.initHeight - 50 - 80) / 2
+              //console.log('initWidth:' + _that.initWidth + ',initHeight:' + _that.initHeight + ',marginTop:' + marginTop)
+              let videoCarousel = document.querySelector('#videoCarousel')
+              if (videoCarousel) {
+                videoCarousel.style.cssText += 'width: ' + _that.initWidth + 'px'
+                videoCarousel.style.cssText += 'height: ' + _that.initHeight + 'px !important'
+                //videoCarousel.style.cssText += 'margin-top: ' + marginTop + 'px'
+              }
             })
-          } catch (e) {
-            console.error(e)
           }
-          srcVideo.addEventListener('canplay', function () {
-            let width = this.videoWidth
-            let height = this.videoHeight
-            /*let initWidth = _that.$q.screen.width < 481 ? _that.$q.screen.width : 480
-            let initHeight = initWidth * height / width
-            if (initHeight > store.screenHeight - 50 - 80) { // 不使用_that.$q.screen.height，避免键盘弹出时的影响
-              initHeight = store.screenHeight - 50 - 80
-              initWidth = initHeight * width / height
-            }
-            _that.initWidth = initWidth
-            _that.initHeight = initHeight*/
-            _that.initWidth = width
-            _that.initHeight = height
-            //let marginTop = (store.screenHeight - _that.initHeight - 50 - 80) / 2
-            //console.log('initWidth:' + _that.initWidth + ',initHeight:' + _that.initHeight + ',marginTop:' + marginTop)
-            let videoCarousel = document.querySelector('#videoCarousel')
-            if (videoCarousel) {
-              videoCarousel.style.cssText += 'width: ' + _that.initWidth + 'px'
-              videoCarousel.style.cssText += 'height: ' + _that.initHeight + 'px !important'
-              //videoCarousel.style.cssText += 'margin-top: ' + marginTop + 'px'
-            }
-          })
         } else if (captureType === 'audio') {
           let newRec = Recorder({
             type: "mp3",

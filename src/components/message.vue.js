@@ -556,22 +556,23 @@ export default {
       let _that = this
       let store = _that.$store
       _that.captureType = type
-      if (store.ios === true || store.android === true) {
-        let mediaFiles = null
-        if (type === 'image') {
-          _that.mobileTakePhoto()
+      if (store.ios === true || (store.android === true && store.useNativeAndroid === true)) {
+        try {
+          if (type === 'image') {
+            //_that.mobileTakePhoto()
+            _that.imageUrl = await mediaCaptureComponent.captureImage()
+          }
+          if (type === 'video') {
+            _that.videoUrl = await mediaCaptureComponent.captureVideo()
+          }
+          await _that.saveChatMediaFile()
+        } catch (e) {
+          console.log(e)
         }
-        if (type === 'video') {
-          mediaFiles = await mediaCaptureComponent.captureVideo()
-          _that.videoUrl = mediaFiles
-        }
-        _that.saveChatMediaFile()
       } else if (store.chrome === true || store.safari === true) {
         store.captureMediaEntry = 'message'
         store.captureType = type
         _that.subKind = 'captureMedia'
-      } else {
-        console.error('Not support browser safari!')
       }
     },
     async saveChatMediaFile() {
@@ -607,7 +608,6 @@ export default {
       } else {
         urls = url
       }
-      let files = []
       for (let u of urls) {
         if (u) {
           let blob = null
@@ -637,7 +637,9 @@ export default {
             blob = await fileComponent.readFile(fileEntry, { format: 'blob', type: type })
             if (blob.type.indexOf('audio/webm') > -1) {
               _that.audioBlobMessageHandle(blob)
-            } else {
+            } else if (blob.type.indexOf('image') > -1) {
+              _that.imageBlobMessageHandle(blob)
+            } else if (blob.type.indexOf('video') > -1) {
               _that.videoBlobMessageHandle(blob)
             }
           } else {
@@ -659,9 +661,6 @@ export default {
     audioBlobMessageHandle(blob) {
       let _that = this
       let store = _that.$store
-      if (!_that.preCheck()) {
-        return
-      }
       let audio = new FileReader()
       audio.onload = async function (e) {
         _that.audioUrl = e.target.result
@@ -677,6 +676,22 @@ export default {
       message.thumbnail = _that.audioUrl
       message.contentType = ChatContentType.VOICE
       await store.sendChatMessage(store.state.currentChat, message)
+    },
+    imageBlobMessageHandle(blob) {
+      let _that = this
+      let store = _that.$store
+      let image = new FileReader()
+      image.onload = async function (e) {
+        _that.imageUrl = e.target.result
+        await _that.imageMessageSend()
+      }
+      image.readAsDataURL(blob)
+    },
+    async imageMessageSend() {
+      let _that = this
+      let store = _that.$store
+      let fileData = _that.imageUrl
+      await store.saveFileAndSendMessage(store.state.currentChat, fileData, ChatContentType.IMAGE, null)
     },
     videoBlobMessageHandle(blob) {
       let _that = this
@@ -823,17 +838,21 @@ export default {
               img.src = _that.imageMessageSrc
               img.onload = () => {
                 console.log('img.width: ' + img.width + ', img.height: ' + img.height)
-                let selectedContainer = document.getElementById('messageFullsizeContainer')
                 let selectedImg = document.querySelector('#messageFullsizeImg')
+                /*let selectedContainer = document.getElementById('messageFullsizeContainer')
                 let canvasWidth = _that.ifMobileSize || store.state.ifMobileStyle ? _that.$q.screen.width : (img.width > selectedContainer.clientWidth ? selectedContainer.clientWidth : img.width)
-                let canvasHeight = canvasWidth * img.height / img.width
+                let canvasHeight = canvasWidth * img.height / img.width*/
+                let canvasWidth = selectedImg.width
+                let canvasHeight = selectedImg.height
                 let marginTop = 0
-                if (store.ifMobile()) {
-                  marginTop = (store.screenHeight - canvasHeight) / 2 - 50 // 不使用_that.$q.screen.height，避免键盘弹出时的影响
+                if (store.ifMobile()) { // 不使用_that.$q.screen.height，避免键盘弹出时的影响
+                  //marginTop = (store.screenHeight - canvasHeight) / 2 - 50
+                  marginTop = (store.screenHeight - canvasHeight - 50) / 2
                 } else {
-                  marginTop = (_that.$q.screen.height - canvasHeight) / 2 - 50
+                  //marginTop = (_that.$q.screen.height - canvasHeight) / 2 - 50
+                  marginTop = (_that.$q.screen.height - canvasHeight - 50) / 2
                 }
-                marginTop = marginTop < 0 ? 0 : marginTop
+                //marginTop = marginTop < 0 ? 0 : marginTop
                 console.log('screenHeight:' + (store.ifMobile() ? store.screenHeight : _that.$q.screen.height) + ',canvasWidth:' + canvasWidth + ',canvasHeight:' + canvasHeight + ',marginTop:' + marginTop)
                 selectedImg.style.cssText += 'margin-top: ' + marginTop + 'px'
                 if (store.ifMobile()) {
@@ -859,39 +878,10 @@ export default {
           } else {
             _that.imageMessageSrc = null
             _that.videoRecordMessageSrc = fileData
-            _that.$nextTick(() => {
-              _that.fullsizeEntry = _that.subKind
-              _that.subKind = 'messageFullsize'
-              let selectedVideo = document.querySelector('#messageFullsizeVideo')
-              selectedVideo.addEventListener('canplay', function () {
-                let width = this.videoWidth
-                let height = this.videoHeight
-                let initWidth = width //_that.$q.screen.width < 481 ? _that.$q.screen.width : 480
-                let initHeight = height //initWidth * height / width
-                let marginTop = 0
-                if (store.ifMobile()) { // 不使用_that.$q.screen.height，避免键盘弹出时的影响
-                  if (initHeight > store.screenHeight) {
-                    initHeight = store.screenHeight
-                    initWidth = initHeight * width / height
-                  }
-                  marginTop = (store.screenHeight - initHeight) / 2 - 50
-                } else {
-                  if (initHeight > _that.$q.screen.height) {
-                    initHeight = _that.$q.screen.height
-                    initWidth = initHeight * width / height
-                  }
-                  marginTop = (_that.$q.screen.height - initHeight) / 2 - 50
-                }
-                console.log('screenHeight:' + (store.ifMobile() ? store.screenHeight : _that.$q.screen.height) + ',initWidth:' + initWidth + ',initHeight:' + initHeight + ',marginTop:' + marginTop)
-                selectedVideo.style.cssText += 'margin-top: ' + marginTop + 'px'
-                if (store.ifMobile()) {
-                  alloyFingerComponent.initLongSingleTap('#messageFullsizeContainer', _that.videoCommand)
-                }
-              })
-            })
+            _that.fullsizeEntry = _that.subKind
+            _that.subKind = 'messageFullsize'
           }
-        }
-        else if (message.contentType === ChatContentType.FILE) {
+        } else if (message.contentType === ChatContentType.FILE) {
           let filename = message.content
           if (store.ios === true || store.android === true) {
             let dirPath
@@ -946,6 +936,40 @@ export default {
       } finally {
         _that.$q.loading.hide()
       }
+    },
+    canPlay() {
+      let _that = this
+      let store = _that.$store
+      _that.$nextTick(() => {
+        let selectedVideo = document.querySelector('#messageFullsizeVideo')
+        if (selectedVideo) {
+          /*let width = selectedVideo.videoWidth
+          let height = selectedVideo.videoHeight
+          let initWidth = width //_that.$q.screen.width < 481 ? _that.$q.screen.width : 480
+          let initHeight = height //initWidth * height / width*/
+          let initWidth = selectedVideo.offsetWidth
+          let initHeight = selectedVideo.offsetHeight
+          let marginTop = 0
+          if (store.ifMobile()) { // 不使用_that.$q.screen.height，避免键盘弹出时的影响
+            /*if (initHeight > store.screenHeight - 50) {
+              initHeight = store.screenHeight - 50
+              initWidth = initHeight * width / height
+            }*/
+            marginTop = (store.screenHeight - initHeight - 50) / 2
+          } else {
+            /*if (initHeight > _that.$q.screen.height - 50) {
+              initHeight = _that.$q.screen.height - 50
+              initWidth = initHeight * width / height
+            }*/
+            marginTop = (_that.$q.screen.height - initHeight - 50) / 2
+          }
+          console.log('screenHeight:' + (store.ifMobile() ? store.screenHeight : _that.$q.screen.height) + ',initWidth:' + initWidth + ',initHeight:' + initHeight + ',marginTop:' + marginTop)
+          selectedVideo.style.cssText += 'margin-top: ' + marginTop + 'px'
+          if (store.ifMobile()) {
+            alloyFingerComponent.initLongSingleTap('#messageFullsizeContainer', _that.videoCommand)
+          }
+        }
+      })
     },
     /*uploadMobileMessageImage: async function () {
       let _that = this
@@ -1076,9 +1100,6 @@ export default {
     mobileTakePhoto() {
       let _that = this
       let store = _that.$store
-      let message = {}
-      message.messageId = UUID.string(null, null)
-      message.messageType = P2pChatMessageType.CHAT_LINKMAN
       let params = null //{ targetHeight: 256, targetWidth: 256 }
       cameraComponent.getPicture(Camera.PictureSourceType.CAMERA, params).then(async function (imageUri) {
         let fileData = "data:image/jpeg;base64," + imageUri
@@ -1485,7 +1506,7 @@ export default {
           if (content) {
             files.push(content)
           }
-          inserted.content = message.contentType !== ChatContentType.FILE ? await collectionUtil.getInsertHtml(files) : content
+          inserted.content = message.contentType !== ChatContentType.FILE ? await collectionUtil.getInsertHtml(files, store.imageMaxWidth, store.videoMaxWidth, store.audioMaxWidth) : content
         }
         await collectionUtil.save('collection', inserted)
         // 云端cloud保存

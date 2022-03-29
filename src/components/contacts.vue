@@ -1,5 +1,5 @@
 <template lang="pug">
-  div(:class="ifMobileSize || $store.state.ifMobileStyle ? (ifMobileSize ? 'bg-c-grey-1 heightMobileSize' : 'bg-c-grey-1 heightMobileStyle') : 'bg-c-grey-1 heightStyle'")
+  div(:class="ifMobileSize || $store.state.ifMobileStyle ? (ifMobileSize ? 'bg-c-grey-1 heightMobileSize-me' : 'bg-c-grey-1 heightMobileStyle-me') : 'bg-c-grey-1 heightStyle-me'")
     q-toolbar.header-toolbar(:class="ifMobileSize || $store.state.ifMobileStyle ? 'bg-c-grey-1' : 'bg-c-grey-1'")
       q-btn.text-primary(flat round :icon="$store.state.lockContactsSwitch ? 'visibility_off' : 'visibility'" @click="showLockContactsSwitchDialog")
       q-toolbar-title(align="center" class="text-c-grey-10") {{$t('Contacts')}}

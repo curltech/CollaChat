@@ -1355,7 +1355,7 @@ export default {
       message.messageType = P2pChatMessageType.CHAT_LINKMAN
       message.fileSize = StringUtil.getSize(fileData)
       await store.saveFileInMessage(chat, message, fileData, type, name, message.messageId)
-      if(message.attachBlockId){
+      if (message.attachBlockId) {
         await store.sendChatMessage(chat, message)
       }
     },
@@ -3458,7 +3458,7 @@ export default {
       }
     },
     async getSignalSession(peerId) {
-      let signalSession,clientId
+      let signalSession, clientId
       let linkman = store.state.linkmanMap[peerId]
       let webrtcPeers = webrtcPeerPool.getConnected(peerId)
       if (linkman && linkman.signalPublicKey && webrtcPeers && webrtcPeers.length > 0) {
@@ -4888,7 +4888,7 @@ export default {
     if (store.ios === true || store.safari === true) {
       store.collectionWorkerEnabler = false
     }
-    store.useNativeAndroid = false // 是否使用Android原生拍照、拍摄、相册等功能
+    store.useNativeAndroid = true // 是否使用Android原生拍照、拍摄、相册等功能
     store.uploadFileSizeLimit = 100 // 上传文件大小限制（单位：M）
     store.uploadFileNumLimit = 10 // 同时上传文件数量限制
     store.displayActiveStatus = false // 是否显示在线状态
