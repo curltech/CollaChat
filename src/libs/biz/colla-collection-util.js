@@ -1,5 +1,6 @@
-import Recorder from 'recorder-core/recorder.mp3.min' // 已包含recorder-core和mp3格式支持
+/*import Recorder from 'recorder-core/recorder.mp3.min' // 已包含recorder-core和mp3格式支持
 import 'recorder-core/src/engine/beta-amr-engine.js'
+import 'recorder-core/src/engine/wav.js'*/
 
 import { EntityState } from 'libcolla'
 import { CollaUtil, TypeUtil, BlobUtil, UUID } from 'libcolla'
@@ -563,7 +564,8 @@ export class CollectionUtil {
               }
             }
           }
-          if (localURL.toUpperCase().indexOf('.AMR') > -1) {
+          /*if (localURL.toUpperCase().indexOf('.AMR') > -1) {
+            let targetType = 'mp3'
             let fileEntry = await fileComponent.getFileEntry(localURL)
             blob = await fileComponent.readFile(fileEntry, { format: 'blob', type: type })
             let reader = new FileReader()
@@ -571,17 +573,17 @@ export class CollectionUtil {
               let amr = new Uint8Array(reader.result)
               Recorder.AMR.decode(amr, function (pcm) {
                 let set = {
-                  type: "mp3",
+                  type: targetType,
                   sampleRate: 16000,
                   bitRate: 16
                 }
                 let rec = Recorder(set).mock(pcm, 8000)
-                rec.stop(async function (mp3Blob, duration) {
+                rec.stop(async function (blob2, duration) {
                   let dirEntry = await fileComponent.getRootDirEntry('tmp')
                   let dirPath = dirEntry.toInternalURL()
-                  let fileName = 'audio' + UUID.string(null, null) + '.mp3'
+                  let fileName = 'audio' + UUID.string(null, null) + '.' + targetType
                   fileEntry = await fileComponent.createNewFileEntry(fileName, dirPath)
-                  await fileComponent.writeFile(fileEntry, mp3Blob, false)
+                  await fileComponent.writeFile(fileEntry, blob2, false)
                   localURL = dirEntry.toInternalURL() + fileName
                   console.log('localURL2:' + localURL)
                 }, function (err) {
@@ -592,8 +594,8 @@ export class CollectionUtil {
               })
             }
             reader.readAsArrayBuffer(blob)
-            type = 'audio/mp3'
-          }
+            type = 'audio/' + targetType
+          }*/
           let fileEntry = await fileComponent.getFileEntry(localURL)
           blob = await fileComponent.readFile(fileEntry, { format: 'blob', type: type })
         } else {

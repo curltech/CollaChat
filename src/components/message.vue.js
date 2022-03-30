@@ -556,7 +556,7 @@ export default {
       let _that = this
       let store = _that.$store
       _that.captureType = type
-      if (store.ios === true || (store.android === true && store.useNativeAndroid === true)) {
+      if (store.ios === true || (store.android === true && store.useNativeAndroid === true && type !== 'audio')) {
         try {
           if (type === 'image') {
             //_that.mobileTakePhoto()
