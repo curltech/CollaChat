@@ -1018,13 +1018,12 @@ export default {
         await store.handleChatTime(message, chat)
       }
       if (subjectType === SubjectType.CHAT && subjectId !== myselfPeerId) {
-        //if (store.state.linkmanMap[subjectId].activeStatus === ActiveStatus.UP) {
         message.destroyTime = chat.destroyTime
-        //}
-        await chatComponent.insert(ChatDataType.MESSAGE, message, chat.messages)
+      } 
+      await chatComponent.insert(ChatDataType.MESSAGE, message, chat.messages)
+      if (subjectType === SubjectType.CHAT && subjectId !== myselfPeerId) {
         store.p2pSend(message, subjectId)
       } else if (subjectType === SubjectType.GROUP_CHAT) {
-        await chatComponent.insert(ChatDataType.MESSAGE, message, chat.messages)
         let groupMembers
         if (message.contentType === ChatContentType.VIDEO_INVITATION || message.contentType === ChatContentType.AUDIO_INVITATION || message.messageType === P2pChatMessageType.CALL_CLOSE) {
           groupMembers = message.content
@@ -3463,6 +3462,9 @@ export default {
       let webrtcPeers = webrtcPeerPool.getConnected(peerId)
       if (linkman && linkman.signalPublicKey && webrtcPeers && webrtcPeers.length > 0) {
         clientId = webrtcPeers[0].clientId
+        if(!clientId){
+          return
+        }
         if (!signalProtocol.signalPublicKeys.get(peerId)) {
           signalProtocol.signalPublicKeys.set(peerId, linkman.signalPublicKey)
         }
