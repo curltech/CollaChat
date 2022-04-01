@@ -3462,9 +3462,6 @@ export default {
       let webrtcPeers = webrtcPeerPool.getConnected(peerId)
       if (linkman && linkman.signalPublicKey && webrtcPeers && webrtcPeers.length > 0) {
         clientId = webrtcPeers[0].clientId
-        if(!clientId){
-          return
-        }
         if (!signalProtocol.signalPublicKeys.get(peerId)) {
           signalProtocol.signalPublicKeys.set(peerId, linkman.signalPublicKey)
         }
