@@ -13,7 +13,8 @@ export default {
       password: null,
       contactsfilter: null,
       ifScrollTop: true,
-      placeholder: '\ue672' + ' ' + this.$i18n.t('Search')
+      placeholder: '\ue672' + ' ' + this.$i18n.t('Search'),
+      subKind: 'default'
     }
   },
   methods: {
