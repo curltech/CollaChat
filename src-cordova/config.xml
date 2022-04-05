@@ -5,7 +5,7 @@
     <author email="hujs@colla.cc" href="https://curltech.io">
         CURL TECH PTE. LTD.
     </author>
-    <content src="index.html" />
+    <content src="http://192.168.0.104:8089" />
     <access origin="*" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
@@ -120,4 +120,5 @@
     <plugin name="cordova-plugin-statusbar" spec="~2.4.3" />
     <plugin name="cordova-plugin-vibration" spec="~3.1.1" />
     <plugin name="cordova-plugin-qrscanner" spec="~3.0.1" />
+    <allow-navigation href="http://192.168.0.104:8089" />
 </widget>
