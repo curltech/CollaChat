@@ -1,11 +1,11 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="io.curltech.colla" version="1.1.9" xmlns="http://www.w3.org/ns/widgets" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="io.curltech.colla" version="1.1.10" xmlns="http://www.w3.org/ns/widgets" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>Colla</name>
     <description>CollaChat</description>
     <author email="hujs@colla.cc" href="https://curltech.io">
         CURL TECH PTE. LTD.
     </author>
-    <content src="http://192.168.0.104:8089" />
+    <content src="index.html" />
     <access origin="*" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
@@ -120,5 +120,4 @@
     <plugin name="cordova-plugin-statusbar" spec="~2.4.3" />
     <plugin name="cordova-plugin-vibration" spec="~3.1.1" />
     <plugin name="cordova-plugin-qrscanner" spec="~3.0.1" />
-    <allow-navigation href="http://192.168.0.104:8089" />
 </widget>
