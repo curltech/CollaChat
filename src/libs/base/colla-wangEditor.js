@@ -1488,7 +1488,7 @@ Link.prototype = {
             checkResult = linkCheck(text, link);
         }
         if (checkResult === true) {
-            editor.cmd.do('insertHTML', '<a href="' + link + '" target="_blank">' + text + '</a>');
+            editor.cmd.do('insertHTML', '<a href="javascript:void(0);" class="collectionLink" target="' + link + '">' + text + '</a>');
         } else {
             alert(checkResult);
         }

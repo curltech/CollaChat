@@ -11,7 +11,7 @@ import { myself, BlockType, queryValueAction, dataBlockService, MsgType } from '
 
 import E from '@/libs/base/colla-wangEditor'
 import pinyinUtil from '@/libs/base/colla-pinyin'
-import { fileComponent, photoLibraryComponent, statusBarComponent } from '@/libs/base/colla-cordova'
+import { fileComponent, photoLibraryComponent, statusBarComponent, inAppBrowserComponent } from '@/libs/base/colla-cordova'
 import { mediaCaptureComponent, alloyFingerComponent, mediaPickerComponent, mediaComponent } from '@/libs/base/colla-media'
 import { collectionComponent, SrcChannelType, SrcEntityType, CollectionDataType, CollectionType } from '@/libs/biz/colla-collection'
 import { collectionUtil, blockLogComponent } from '@/libs/biz/colla-collection-util'
@@ -1737,6 +1737,11 @@ export default {
           _that.cloudSyncing = false
           _that.$q.loading.hide()
         }
+      }
+    },
+    clickContentHTML(event) {
+      if (event.target.className === "collectionLink") {
+        let inAppBrowser = inAppBrowserComponent.open(event.target.target, '_blank', 'location=no,footer=yes')
       }
     },
     /*initCollectionUploadWorker() {
