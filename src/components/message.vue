@@ -16,7 +16,7 @@
             template(v-for="(message,index) in $store.state.currentChat.messages")
               div.chat-message(:class="messageMultiSelectMode?'message_multiselect_checkboxwrap':''")
                 q-checkbox.message_multiselect_checkbox(dense v-model="messageMultiSelectedVal" v-if='message.messageType === P2pChatMessageType.CHAT_LINKMAN && messageMultiSelectMode' :val="message")
-                messageContent(v-if='message.messageType === P2pChatMessageType.CHAT_LINKMAN || message.messageType === P2pChatMessageType.CALL_REQUEST' v-bind:message = "message" entry = "message" v-bind:showContacts='showContacts')
+                messageContent(v-if='message.messageType === P2pChatMessageType.CHAT_LINKMAN || (message.messageType === P2pChatMessageType.CALL_REQUEST && message.contentType !== ChatContentType.CALL_JOIN_REQUEST)' v-bind:message = "message" entry = "message" v-bind:showContacts='showContacts')
                 q-menu(touch-position context-menu v-if='message.messageType === P2pChatMessageType.CHAT_LINKMAN && message.status === ChatMessageStatus.NORMAL')
                   q-list(dense style="min-width: 100px")
                     q-item(v-if='message.contentType === ChatContentType.TEXT && !message.countDown' clickable @click="copyMessage(message,index)" v-close-popup)

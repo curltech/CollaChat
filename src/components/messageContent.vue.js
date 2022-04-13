@@ -5,7 +5,7 @@ import { peerClientService } from 'libcolla'
 import { ChatDataType, chatComponent, ChatMessageStatus, ChatContentType, P2pChatMessageType, SubjectType } from '@/libs/biz/colla-chat'
 import { ActiveStatus, LinkmanStatus } from '@/libs/biz/colla-contact'
 import { channelComponent } from '@/libs/biz/colla-channel'
-
+import { inAppBrowserComponent } from '@/libs/base/colla-cordova'
 import NotePreview from '@/components/notePreview'
 import MobileAudio from '@/components/mobileAudio'
 
@@ -278,6 +278,32 @@ export default {
       } finally {
         _that.$q.loading.hide()
       }
+    },
+    htmlConvert(text) {
+      let _text = []
+      let reg = /(https?|http|ftp|file):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]/g;
+      let urlArray = text.match(reg);
+      let surplus = text
+      if (urlArray && urlArray.length > 0) {
+        let i = 0
+        for (let url of urlArray) {
+          let _index = surplus.indexOf(url)
+          if (_index !== 0) {
+            _text.push({ type: 'text', text: surplus.substring(0, _index) })
+          }
+          _text.push({ type: 'link', text: surplus.slice(_index, _index + url.length) })
+          surplus = surplus.slice(_index + url.length)
+        }
+        if (surplus) {
+          _text.push({ type: 'text', text: surplus })
+        }
+      } else {
+        _text.push({ type: 'text', text: text })
+      }
+      return _text
+    },
+    openInnerBrowers(htmlPart) {
+      let inAppBrowser = inAppBrowserComponent.open(htmlPart.text, '_blank', 'location=no,footer=yes')
     },
     avatarClick(mouseEvent, message) {
       if (this.entry === 'message' && mouseEvent.target && mouseEvent.target.getAttribute("class") && mouseEvent.target.getAttribute("class").indexOf('q-message-avatar') > -1) {

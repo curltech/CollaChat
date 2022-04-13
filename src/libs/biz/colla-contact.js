@@ -3,7 +3,7 @@
  */
 import { pounchDb, EntityState } from 'libcolla'
 import { myself, peerClientService } from 'libcolla'
-import { TypeUtil, MobileNumberUtil } from 'libcolla'
+import { TypeUtil, MobileNumberUtil ,logService } from 'libcolla'
 
 import { phoneContactComponent } from '@/libs/base/colla-cordova'
 import pinyinUtil from '@/libs/base/colla-pinyin'
@@ -647,11 +647,17 @@ class ContactComponent {
     if (!entities) {
       return
     }
-    if (!TypeUtil.isArray(entities)) {
-      return await pounchDb.run(tables[dataType], entities, null, parent)
-    } else {
-      return await pounchDb.execute(tables[dataType], entities, null, parent)
+    try {
+      if (!TypeUtil.isArray(entities)) {
+        return await pounchDb.run(tables[dataType], entities, null, parent)
+      } else {
+        return await pounchDb.execute(tables[dataType], entities, null, parent)
+      }
+    } catch (error) {
+      console.log(entities)
+			logService.log(JSON.stringify(entities), 'DBError', 'error')
     }
+    
   }
   async insert(dataType, entities, parent) {
     if (!TypeUtil.isArray(entities)) {

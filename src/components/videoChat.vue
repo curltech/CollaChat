@@ -2,11 +2,11 @@
     q-dialog.bg-c-grey-0.text-c-grey-10(v-model="$store.state.videoDialog" id='videoDialog' persistent :maximized = 'ifMobileSize || $store.state.ifMobileStyle || fullSize')
         // single video
         q-card.message-dialog-card(:class="Platform.is.ios?'ios-linkman-video':'linkman-video'" v-if="$store.state.currentCallChat && ($store.state.currentCallChat.subjectType === SubjectType.CHAT) && $store.state.currentCallChat.callType === 'video'")
-            q-toolbar-title.media-timer.single-video-media-timer(v-if="!Platform.is.ios && $store.state.currentCallChat && $store.state.currentCallChat.stream")
+            q-toolbar-title.media-timer.single-video-media-timer(v-show="!Platform.is.ios && $store.state.currentCallChat && $store.state.currentCallChat.stream")
                 span.text-primary(ref="mediaTimer")
             q-card-section.row.zoom-video-section.zoom-video-section-ios(v-if="Platform.is.ios" @click="zoomVideoChange" v-show = "$store.state.currentCallChat && $store.state.currentCallChat.stream")
                 .col-9
-                    q-toolbar-title.ios-single-video-media-timer(v-if="$store.state.currentCallChat && $store.state.currentCallChat.stream" align="center" style="line-height:20vh;")
+                    q-toolbar-title.ios-single-video-media-timer(v-show="$store.state.currentCallChat && $store.state.currentCallChat.stream" align="center" style="line-height:20vh;")
                         span.text-primary(ref="mediaTimer")
                 .col-3
                     video(ref='zoomVideo' autoplay='autoplay' style="float:right;height:20vh;width:auto;max-width:100%;")
@@ -39,7 +39,7 @@
         // group video or audio
         q-card.message-dialog-card(v-if="$store.state.currentCallChat && $store.state.currentCallChat.subjectType === SubjectType.GROUP_CHAT")
             q-card-section.group-video-section
-                q-toolbar-title.media-timer-group(v-if="!Platform.is.ios || $store.state.currentCallChat.callType == 'audio'")
+                q-toolbar-title.media-timer-group(v-show="!Platform.is.ios || $store.state.currentCallChat.callType == 'audio'")
                     span.text-primary(ref="mediaTimer")
                 // ios-video
                 q-card(flat v-if="Platform.is.ios && $store.state.currentCallChat.callType == 'video' && $store.state.currentCallChat && $store.state.currentCallChat.stream")
@@ -83,7 +83,8 @@
                                 span {{$store.state.currentCallChat.stream.length}}
                                 span {{addStreamCount}}
                             q-item-section.group-video-par(style="width:100%" v-if="$store.state.currentCallChat.callType == 'video' && ($store.state.currentCallChat.streamMap && $store.state.currentCallChat.streamMap[memberPeerId]) && !Platform.is.ios")
-                                video.groupVideo(:ref='`memberVideo${memberPeerId}`' @canplay="groupVideoOnplay" autoplay = 'autoplay')
+                                //video.groupVideo(:ref='`memberVideo${memberPeerId}`' @canplay="groupVideoOnplay" autoplay = 'autoplay')
+                                video.groupVideo(:ref='`memberVideo${memberPeerId}`' autoplay = 'autoplay')
                                 //video(:ref='`memberVideo${memberPeerId}`' autoplay = 'autoplay')
                             q-item-section.group-video-par-else(v-else)
                                 q-avatar(style = 'width:100%;height:auto;')
@@ -109,7 +110,7 @@
                 q-btn.text-primary(v-if = "$store.state.currentCallChat.stream && $store.state.currentCallChat.stream.length > 1" unelevated round  color="primary" :icon="chatMic?'mic':'mic_off'" @click="changeChatMic")
         // single audio
         q-card.message-dialog-card(:class="Platform.is.ios?'ios-linkman-video':'linkman-video'" v-if="$store.state.currentCallChat && ($store.state.currentCallChat.subjectType === SubjectType.CHAT) && $store.state.currentCallChat.callType === 'audio'")
-            q-toolbar(v-if='$store.state.currentCallChat && $store.state.currentCallChat.stream')
+            q-toolbar(v-show='$store.state.currentCallChat && $store.state.currentCallChat.stream')
                 q-toolbar-title.media-timer.single-video-media-timer
                     span.text-primary(ref="mediaTimer")
             q-card-section.linkman-avatar-section

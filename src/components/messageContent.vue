@@ -6,7 +6,10 @@
         q-btn(dark-percentage unelevated color="secondary" text-color="grey-1" @click="openDestroyMessage(message)")
             span {{$t('Open Timing Message')}}
     q-chat-message(v-else-if="message.status !== ChatMessageStatus.RECALL" @click ='avatarClick($event,message)' :class = "entry === 'message'?'':'list-message'" :name = "getName(message)" :avatar = "getAvatar(message)" :stamp= "getStamp(message)"  :sent="isSent(message)" text-color="grey-10" bg-color="primary")
-      span.message-text(v-if="message.contentType === ChatContentType.TEXT" v-html="message.content")
+      div.message-text(v-if="message.contentType === ChatContentType.TEXT" )
+        template(v-for="(htmlPart, index) in htmlConvert(message.content)")
+          span(v-html='htmlPart.text' v-if="htmlPart.type === 'text'")
+          span.message-text-link(v-html='htmlPart.text' v-if="htmlPart.type === 'link'" @click='openInnerBrowers(htmlPart)')
       div(v-if="message.contentType === ChatContentType.AUDIO_HISTORY || message.contentType === ChatContentType.VIDEO_HISTORY")
         q-icon(:name="message.contentType === ChatContentType.VIDEO_HISTORY?'videocam':'call'")
         span  {{message.content}}
@@ -18,7 +21,11 @@
       div(v-if = "message.contentType === ChatContentType.VIDEO"  @click = '$store.getMessageFileAndOpen(message)')
         q-img(:src="message.thumbnail" style="width: 100px;")
           q-icon(size="32px" name="play_circle_outline" color="white" style="top: 50%; left: 50%; margin-top: -16px; margin-left: -16px;")
-      q-btn(v-if = "message.contentType === ChatContentType.VIDEO_INVITATION ||message.contentType == ChatContentType.AUDIO_INVITATION" color="secondary" text-color="grey-1" @click="acceptGroupCall(message)" :icon="message.contentType=='videoInvitation'?'videocam':'call'" style="width: 100%")
+      div(v-if="message.subjectType === SubjectType.CHAT && (message.contentType === ChatContentType.VIDEO_INVITATION ||message.contentType == ChatContentType.AUDIO_INVITATION)")
+        q-icon(:name="message.contentType === ChatContentType.VIDEO_INVITATION?'videocam':'call'")
+        span(v-if="message.contentType === ChatContentType.VIDEO_INVITATION") {{$t('videoInvitation')}}
+        span(v-if="message.contentType === ChatContentType.AUDIO_INVITATION") {{$t('audioInvitation')}}
+      q-btn(v-if = "message.subjectType === SubjectType.GROUP_CHAT && (message.contentType === ChatContentType.VIDEO_INVITATION ||message.contentType == ChatContentType.AUDIO_INVITATION)" color="secondary" text-color="grey-1" @click="acceptGroupCall(message)" :icon="message.contentType=='videoInvitation'?'videocam':'call'" style="width: 100%")
         span(v-if="message.contentType === ChatContentType.VIDEO_INVITATION") {{$t('join video')}}
         span(v-if="message.contentType === ChatContentType.AUDIO_INVITATION") {{$t('join audio')}}
       q-card.personal-card(v-if="message.contentType === ChatContentType.CARD" @click="openCard(message)")

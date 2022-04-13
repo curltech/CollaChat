@@ -2,8 +2,8 @@
  * 聊天的定义
  */
 import { pounchDb, EntityState } from 'libcolla'
-import { CollaUtil, StringUtil, TypeUtil } from 'libcolla'
-import { myself, BlockType, SecurityPayload } from 'libcolla'
+import { CollaUtil, TypeUtil } from 'libcolla'
+import { myself, BlockType, SecurityPayload,logService } from 'libcolla'
 
 import { collectionUtil } from '@/libs/biz/colla-collection-util'
 
@@ -537,10 +537,15 @@ export class ChatComponent {
     }
   }
   async _save(table, entities, ignore, parent) {
-    if (entities.length > 0 && entities.length === 1) {
-      await pounchDb.run(table, entities[0], ignore, parent)
-    } else if (entities.length > 0 && entities.length > 1) {
-      await pounchDb.execute(table, entities, ignore, parent)
+    try {
+      if (entities.length > 0 && entities.length === 1) {
+        await pounchDb.run(table, entities[0], ignore, parent)
+      } else if (entities.length > 0 && entities.length > 1) {
+        await pounchDb.execute(table, entities, ignore, parent)
+      }
+    } catch (error) {
+        console.log(entities)
+				logService.log(JSON.stringify(entities), 'DBError', 'error')
     }
   }
   async insert(dataType, entities, parent) {

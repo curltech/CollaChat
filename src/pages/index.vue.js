@@ -1009,7 +1009,7 @@ export default {
       message.status = ChatMessageStatus.NORMAL
       message.countDown = 0
       message.receiveTime = message.createDate
-      if (subjectId !== myselfPeerId && (message.messageType !== P2pChatMessageType.CALL_REQUEST)) {
+      if (subjectId !== myselfPeerId && (message.messageType !== P2pChatMessageType.CALL_REQUEST) && (message.messageType !== P2pChatMessageType.CALL_CLOSE)) {
         message.actualReceiveTime = null
       } else {
         message.actualReceiveTime = message.createDate
@@ -1043,6 +1043,11 @@ export default {
               receiverPeerId: groupMember.memberPeerId ? groupMember.memberPeerId : groupMember,
               receiveTime: null
               //receiveTime: _that.ifOnlySocketConnected(subjectId) ? message.createDate : null
+            }
+            if ((message.messageType !== P2pChatMessageType.CALL_REQUEST) && (message.messageType !== P2pChatMessageType.CALL_CLOSE)) {
+              receive.receiveTime = null
+            } else {
+              receive.receiveTime = message.createDate
             }
             if (message.messageType !== P2pChatMessageType.CALL_CLOSE) {
               await chatComponent.insert(ChatDataType.RECEIVE, receive, null)

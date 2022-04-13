@@ -296,6 +296,10 @@ export default {
       store.state.currentCallChat.callMessage.senderPeerId = ownerPeerId
       _that.showVideoDialog(true)
       _that.$nextTick(async () => {
+        systemAudioComponent.mediaInvitationAudioPlay()
+        setTimeout(function(){
+          systemAudioComponent.mediaInvitationAudioStop()
+        },5000)
         let localStream = await mediaStreamComponent.openUserMedia(store.state.currentCallChat.options)
         _that.saveStream(ownerPeerId, localStream)
         store.state.currentCallChat.callMessage.content = []
@@ -388,14 +392,21 @@ export default {
         store.state.currentCallChat.callMessage = message
         systemAudioComponent.mediaInvitationAudioPlay()
         _that.showVideoDialog(true)
-      }
-      else {
-        if (message.contentType === ChatContentType.CALL_JOIN_REQUEST) {
-          _that.receiveJoinGroupCallRequest(message)
-        } else {
-          store.insertReceivedMessage(message)
+      }else { 
+        if(message.contentType !== ChatContentType.CALL_JOIN_REQUEST){
+          systemAudioComponent.mediaInvitationAudioPlay()
+          setTimeout(function(){
+            systemAudioComponent.mediaInvitationAudioStop()
+          },5000)
         }
+        
       }
+      if (message.contentType === ChatContentType.CALL_JOIN_REQUEST) {
+        _that.receiveJoinGroupCallRequest(message)
+      } else {
+        store.insertReceivedMessage(message)
+      }
+      
     },
     acceptSingleCall() { // linkman
       let _that = this
@@ -682,6 +693,7 @@ export default {
               type: "warning",
               color: "warning",
             })
+            alert('pending')
             await _that.closeCall(true)
           } else if (currentCallChat.subjectType === SubjectType.GROUP_CHAT) {
             await _that.removeStream(peerId)
@@ -698,7 +710,7 @@ export default {
         if (!callChat) return
         systemAudioComponent.mediaInvitationAudioStop()
         systemAudioComponent.mediaCloseAudioPlay()
-        if (callChat.subjectType === SubjectType.CHAT) {
+        //if (callChat.subjectType === SubjectType.CHAT) {
           let message = {}
           message.messageType = P2pChatMessageType.CHAT_LINKMAN
           if (callChat.callMessage.contentType === ChatContentType.VIDEO_INVITATION) {
@@ -713,7 +725,7 @@ export default {
           }
           message.actualReceiveTime = new Date().getTime()
           await store.addCHATSYSMessage(callChat, message)
-        }
+        //}
         if (isReceived !== true) {
           let members = []
           if (callChat.subjectType === SubjectType.GROUP_CHAT) {

@@ -515,6 +515,10 @@ class InAppBrowserComponent {
     constructor() {
     }
     open(url, target, options) {
+        if(!window.cordova){
+            window.open(url,"_blank")
+            return
+        }
         let inAppBrowser = cordova.InAppBrowser.open(url, target, options)
 
         return inAppBrowser
