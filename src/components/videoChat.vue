@@ -83,8 +83,8 @@
                                 span {{$store.state.currentCallChat.stream.length}}
                                 span {{addStreamCount}}
                             q-item-section.group-video-par(style="width:100%" v-if="$store.state.currentCallChat.callType == 'video' && ($store.state.currentCallChat.streamMap && $store.state.currentCallChat.streamMap[memberPeerId]) && !Platform.is.ios")
-                                //video.groupVideo(:ref='`memberVideo${memberPeerId}`' @canplay="groupVideoOnplay" autoplay = 'autoplay')
-                                video.groupVideo(:ref='`memberVideo${memberPeerId}`' autoplay = 'autoplay')
+                                video.groupVideo(:ref='`memberVideo${memberPeerId}`' @canplay="groupVideoOnplay" autoplay = 'autoplay')
+                                //video.groupVideo(:ref='`memberVideo${memberPeerId}`' autoplay = 'autoplay')
                                 //video(:ref='`memberVideo${memberPeerId}`' autoplay = 'autoplay')
                             q-item-section.group-video-par-else(v-else)
                                 q-avatar(style = 'width:100%;height:auto;')
