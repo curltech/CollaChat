@@ -693,7 +693,6 @@ export default {
               type: "warning",
               color: "warning",
             })
-            alert('pending')
             await _that.closeCall(true)
           } else if (currentCallChat.subjectType === SubjectType.GROUP_CHAT) {
             await _that.removeStream(peerId)
