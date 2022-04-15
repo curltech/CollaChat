@@ -1605,6 +1605,9 @@ class SystemAudioComponent {
     this.mediaCloseAudio = new Audio()
     this.mediaCloseAudio.src = mediaCloseAudioSrc
 
+    this.mediaInvitationAudio = new Audio()
+    this.mediaInvitationAudio.src = mediaInvitationAudioSrc
+    this.mediaInvitationAudio.loop = 'loop'
 
 
     this.scanAudio = new Audio()
@@ -1632,16 +1635,13 @@ class SystemAudioComponent {
     this.mediaCloseAudio.currentTime = 0
   }
   mediaInvitationAudioPlay() {
-    this.mediaInvitationAudio = new Audio()
-    this.mediaInvitationAudio.src = mediaInvitationAudioSrc
-    this.mediaInvitationAudio.loop = 'loop'
     this.mediaInvitationAudio.play()
   }
   mediaInvitationAudioStop() {
-    if (this.mediaInvitationAudio) {
+    //if (this.mediaInvitationAudio) {
       this.mediaInvitationAudio.pause()
-      this.mediaInvitationAudio = null
-    }
+     // this.mediaInvitationAudio = null
+    //}
   }
   scanAudioPlay() {
     this.scanAudio.play()

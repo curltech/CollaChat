@@ -3414,12 +3414,13 @@ export default {
             await chatComponent.update(ChatDataType.RECEIVE, receives[0], null)
           }
         }
-        if (typeof message === "object" && message.messageType !== P2pChatMessageType.SYNC_LINKMAN_INFO && message.messageType !== P2pChatMessageType.CALL_REQUEST) {
-          let signalSession = await _that.getSignalSession(peerId)
-          if (signalSession) {
-            message = await signalSession.encrypt(JSON.stringify(message))
-          }
-        }
+        //todo 暂时取消signal加密，解决问题后启用
+        // if (typeof message === "object" && message.messageType !== P2pChatMessageType.SYNC_LINKMAN_INFO && message.messageType !== P2pChatMessageType.CALL_REQUEST) {
+        //   let signalSession = await _that.getSignalSession(peerId)
+        //   if (signalSession) {
+        //     message = await signalSession.encrypt(JSON.stringify(message))
+        //   }
+        // }
         let messageString = JSON.stringify(message)
         let createTimestamp = new Date().getTime()
         let expireDate = new Date().getTime() + 1000 * 3600 * 24 * 365 * 100 // 100 years
