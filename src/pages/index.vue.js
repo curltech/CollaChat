@@ -3641,7 +3641,7 @@ export default {
             const httpsAgent = new https.Agent({
               rejectUnauthorized: false
             })
-            let _client = axios.create({ httpsAgent })
+            let _client = axios.create({ httpsAgent: httpsAgent })
             if (_client) {
               let serviceData = await _client.get(url)
               if (serviceData) {
