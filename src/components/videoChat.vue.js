@@ -212,6 +212,7 @@ export default {
           if (webrtcPeers && webrtcPeers.length > 0) {
             for (let webrtcPeer of webrtcPeers) {
               webrtcPeer.removeStream()
+              webrtcPeer.destroy({})
             }
           }
           if (_peerId === myself.myselfPeerClient.peerId && callChat.streamMap[_peerId] && callChat.streamMap[_peerId].stream) {
@@ -219,10 +220,8 @@ export default {
               track.stop()
             })
           }
-          if (callChat.subjectType === SubjectType.GROUP_CHAT) {
-            if (callChat.callMessage.hasAddStream && callChat.callMessage.hasAddStream[_peerId]) {
-              callChat.callMessage.hasAddStream[_peerId] = null
-            }
+          if (callChat.callMessage.hasAddStream && callChat.callMessage.hasAddStream[_peerId]) {
+            callChat.callMessage.hasAddStream[_peerId] = null
           }
           if (_that.localCloneStream[_peerId]) {
             _that.localCloneStream[_peerId].getTracks().forEach((track) => {
@@ -581,6 +580,7 @@ export default {
       if (!callChat) {
         return
       }
+      systemAudioComponent.mediaInvitationAudioStop()
       if (callChat.subjectType === SubjectType.GROUP_CHAT) {
         if (!(callChat.callMessage.hasAddStream && callChat.callMessage.hasAddStream[peerId]) || (callChat.streamMap && callChat.streamMap[peerId] && callChat.streamMap[peerId].pending)) { // 发起方--这里需要addStream给对方
           if(callChat.streamMap && callChat.streamMap[peerId] && callChat.streamMap[peerId].pending){
