@@ -9,7 +9,7 @@ import { webrtcPeerPool } from 'libcolla'
 import { signalProtocol } from 'libcolla'
 import { PeerEndpoint, peerEndpointService } from 'libcolla'
 import { libp2pClientPool, config, peerClientService, p2pPeer, myself, myselfPeerService, ChatMessageType, pingAction, chatAction, p2pChatAction, consensusAction, logService } from 'libcolla'
-import { BlockType, MsgType, PayloadType, dataBlockService, DataBlockService, queryValueAction } from 'libcolla'
+import { BlockType, MsgType, PayloadType, dataBlockService, DataBlockService, queryValueAction, connectAction } from 'libcolla'
 import { EntityState } from 'libcolla'
 import { SecurityPayload } from 'libcolla'
 import { MobileNumberUtil } from 'libcolla'
@@ -494,6 +494,7 @@ export default {
       let now1310 = new Date().getTime()
       let myselfPeerClient = myself.myselfPeerClient
       let myselfPeer = myself.myselfPeer
+      myselfPeerClient.connectPeerId = connectAddress
       // 建立primaryEndPoint连接
       let backupMobile = null
       if (myselfPeerClient.visibilitySetting && myselfPeerClient.visibilitySetting.substring(1, 2) === 'N') {
@@ -528,15 +529,16 @@ export default {
         }).onOk(() => {
         }).onCancel(() => {
         })
-        return
-      } else if (peers && peers.length === 2 && peers[0] && peers[0].length > 0 && peers[1] && peers[1].length > 0) {
+        return null
+      //} else if (peers && peers.length === 2 && peers[0] && peers[0].length > 0 && peers[1] && peers[1].length > 0) {
+      } else if (peers === MsgType[MsgType.OK]) {
         // 标志primaryEndPoint连接成功
-        store.peers = peers[0]
-        store.peerClients = peers[1]
         console.log('primaryEndPoint connect success')
         store.state.networkStatus = 'CONNECTED'
         let now1311 = new Date().getTime()
         console.log('------------------------------------------------------------index connect:' + (now1311 - now1310))
+        /*store.peers = peers[0]
+        store.peerClients = peers[1]
         // 更新本地身份信息
         let currentDate = new Date()
         myselfPeerClient.connectPeerId = connectAddress
@@ -615,9 +617,9 @@ export default {
             if (peer.discoveryAddress === myPEP.address) {
               ifExists = true
               if (peer.discoveryAddress === myselfPeerClient.connectPeerId) {
-                /*if (myPEP.priority !== 1) {
-                  throw new Error('myPEP.priority does not equal to 1!')
-                }*/
+                //if (myPEP.priority !== 1) {
+                //  throw new Error('myPEP.priority does not equal to 1!')
+                //}
                 myPEP.lastConnectTime = new Date()
               }
               myPEP.peerId = peer.peerId
@@ -656,17 +658,153 @@ export default {
         condition['priority'] = { $gt: null }
         ret = await peerEndpointService.find(condition, [{ priority: 'asc' }], null, null, null)
         let result = ret ? ret : []
-        console.log(result)
+        console.log(result)*/
         await _that.webrtcInit()
         await store.upgradeVersion('about')
         await _that.cloudSyncP2pChat()
         let now1312 = new Date().getTime()
         console.log('------------------------------------------------------------index post-connect:' + (now1312 - now1311))
-        return peers[0]
+        //return peers[0]
+        return peers
       } else {
         console.log("primaryEndPoint connect failure")
         return null
       }
+    },
+    async connectReceiver(data) {
+      let _that = this
+      let store = _that.$store
+      let start = new Date().getTime()
+      if (data && data.MessageType === MsgType[MsgType.CONNECT]) {
+        let peers = data.Payload
+        if (peers && peers.length === 2 && peers[0] && peers[0].length > 0 && peers[1] && peers[1].length > 0) {
+          store.peers = peers[0]
+          store.peerClients = peers[1]
+          // 更新本地身份信息
+          let myselfPeerClient = myself.myselfPeerClient
+          let myselfPeer = myself.myselfPeer
+          let currentDate = new Date()
+          let linkmanPeerId = myselfPeerClient.peerId
+          let linkman = store.state.linkmanMap[linkmanPeerId]
+          let linkmanRecord = null
+          let i = 0
+          for (let peer of store.peerClients) {
+            if (peer.clientId === myselfPeerClient.clientId && peer.peerId === myselfPeerClient.peerId) {
+              myselfPeerClient.lastAccessTime = peer.lastAccessTime
+              if (Date.parse(peer.lastUpdateTime) > Date.parse(myselfPeerClient.lastUpdateTime)) {
+                //myselfPeerClient.mobile = peer.mobile
+                //myselfPeerClient.publicKey = peer.publicKey
+                //myselfPeerClient.privateKey = peer.privateKey
+  
+                //myselfPeer.mobile = peer.mobile
+                //myselfPeer.publicKey = peer.publicKey
+                //myselfPeer.privateKey = peer.privateKey
+  
+                // 更新对应linkman
+                if (myselfPeerClient.visibilitySetting !== peer.visibilitySetting
+                  || myselfPeerClient.avatar !== peer.avatar
+                  || myselfPeerClient.name !== peer.name) {
+                  myselfPeerClient.visibilitySetting = peer.visibilitySetting
+                  myselfPeerClient.avatar = peer.avatar
+                  myselfPeerClient.name = peer.name
+                  myselfPeerClient.lastUpdateTime = peer.lastUpdateTime
+  
+                  myselfPeer.visibilitySetting = peer.visibilitySetting
+                  myselfPeer.avatar = peer.avatar
+                  myselfPeer.name = peer.name
+                  myselfPeer.lastUpdateTime = peer.lastUpdateTime
+  
+                  linkman.avatar = peer.avatar
+                  linkman.name = peer.name
+                  linkman.pyName = pinyinUtil.getPinyin(peer.name)
+  
+                  linkmanRecord = await contactComponent.get(ContactDataType.LINKMAN, linkman._id)
+                  linkmanRecord.avatar = linkman.avatar
+                  linkmanRecord.name = linkman.name
+                  linkmanRecord.pyName = linkman.pyName
+                }
+              }
+              store.peerClients.splice(i, 1)
+              break
+            } else {
+              i++
+            }
+          }
+          store.state.myselfPeerClient = myselfPeerClient
+          myselfPeer.updateDate = currentDate
+          myselfPeer = await myselfPeerService.update(myselfPeer)
+          myself.myselfPeer = myselfPeer
+          if (linkmanRecord) {
+            store.state.linkmanMap[linkmanPeerId] = linkman
+            await contactComponent.update(ContactDataType.LINKMAN, linkmanRecord)
+          }
+          // 判断更新primaryEndPoint的公钥
+          let clientPeerId = myselfPeerClient.peerId
+          let condition = {}
+          condition['ownerPeerId'] = clientPeerId
+          condition['priority'] = { $gt: null }
+          let ret = await peerEndpointService.find(condition, [{ priority: 'asc' }], null, null, null)
+          let myPEPs = ret ? ret : []
+          // 重置MPEP
+          if (ret && ret.length > 0 && store.resetConnectAddress) {
+            await peerEndpointService.delete(ret)
+            myPEPs = []
+          }
+          let maxPriority = myPEPs.length
+          let increment = 1
+          let processedPriority1 = false
+          for (let peer of store.peers) {
+            let ifExists = false
+            for (let myPEP of myPEPs) {
+              if (peer.discoveryAddress === myPEP.address) {
+                ifExists = true
+                if (peer.discoveryAddress === myselfPeerClient.connectPeerId) {
+                  //if (myPEP.priority !== 1) {
+                  //  throw new Error('myPEP.priority does not equal to 1!')
+                  //}
+                  myPEP.lastConnectTime = new Date()
+                }
+                myPEP.peerId = peer.peerId
+                myPEP.publicKey = peer.publicKey
+                myPEP.creditScore = peer.creditScore
+                await peerEndpointService.update(myPEP)
+              }
+            }
+            if (!ifExists) {
+              let newPeer = new PeerEndpoint()
+              newPeer.ownerPeerId = clientPeerId
+              newPeer.peerId = peer.peerId
+              newPeer.publicKey = peer.publicKey
+              newPeer.address = peer.discoveryAddress
+              newPeer.creditScore = peer.creditScore
+              if (peer.discoveryAddress === myselfPeerClient.connectPeerId) {
+                if (maxPriority !== 0) {
+                  throw new Error('maxPriority does not equal to 0!')
+                }
+                newPeer.priority = 1
+                newPeer.lastConnectTime = new Date()
+                processedPriority1 = true
+              } else {
+                if (maxPriority === 0 && !processedPriority1) {
+                  newPeer.priority = maxPriority + increment + 1
+                } else {
+                  newPeer.priority = maxPriority + increment
+                }
+              }
+              await peerEndpointService.insert(newPeer)
+              increment++
+            }
+          }
+          condition = {}
+          condition['ownerPeerId'] = clientPeerId
+          condition['priority'] = { $gt: null }
+          ret = await peerEndpointService.find(condition, [{ priority: 'asc' }], null, null, null)
+          let result = ret ? ret : []
+          console.log(result)
+        }
+      }
+      let end = new Date().getTime()
+      console.log('------------------------------------------------------------connectReceiver:' + (end - start))
     },
     ifOnlySocketConnected(peerId) {
       let webrtcPeers = webrtcPeerPool.getConnected(peerId)
@@ -5036,6 +5174,7 @@ export default {
     chatAction.registReceiver('chat', _that.chatReceiver)
     p2pChatAction.registReceiver('p2pChat', _that.p2pChatReceiver)
     consensusAction.registReceiver('consensus', _that.consensusReceiver)
+    connectAction.registReceiver('connect', _that.connectReceiver)
     webrtcPeerPool.peerId = myself.myselfPeerClient.peerId
     webrtcPeerPool.peerPublicKey = myself.myselfPeerClient.peerPublicKey
     webrtcPeerPool.registEvent('connect', _that.webrtcConnect)
